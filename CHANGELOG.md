@@ -19,6 +19,8 @@
 - `NEXT_TASK.md` now contains one physical Quest 3 acceptance task for the published build.
 - Recorded initial physical Quest evidence without changing application code: immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter passed; standing-floor alignment requires a controlled retest because initial seated testing placed geometry near chair height.
 - Replaced the broad Quest acceptance task with one bounded standing-calibration floor-alignment retest; seated or chair-height Quest calibration is recorded only as an unconfirmed environmental hypothesis.
+- Completed Milestone 0 after the controlled standing-floor Quest 3 retest passed; no north calibration, astronomy, controller ray, geographic heading, or persistence behavior was added.
+- Replaced the floor retest with one bounded Milestone 1 physical north-marker calibration task.
 
 ### Validated
 
@@ -29,13 +31,13 @@
 - Production asset references remain relative and suitable for an unknown Pages project subpath.
 - GitHub Pages workflow run #2 passed its build (15/15 tests) and deployment jobs; the hosted production page loaded at `https://thinksql1.github.io/cosmic-calibration-webxr/` with subpath-safe assets, a rendered desktop canvas, readable fallback status, and no browser-console warnings or errors.
 - Physical Quest testing: immersive AR entry PASS; passthrough PASS; world locking/stability PASS; exit, re-entry, and recenter PASS.
+- Controlled standing-floor Quest 3 retest: reference geometry visible; origin and horizon ring aligned with the physical floor; ring horizontal; zenith/nadir vertical; world locking, exit, re-entry, recenter, comfort, and usability all PASS.
 
 ### Known limitations
 
-- Standing floor-height alignment remains **CONDITIONAL**. Initial seated testing placed the reference geometry at approximately chair height; the suspected seated or chair-height environment calibration cause is not yet confirmed.
+- The earlier chair-height observation was environmental and resolved by resetting the Quest floor for standing use; this evidence is limited to the tested Quest 3 environment.
 - The Three.js production chunk triggers Vite's 500 kB size advisory.
-- A controlled standing/room-scale Quest floor-calibration retest is required before attributing the elevation result to the application or passing floor alignment.
-- Overall Milestone 0 status is **CONDITIONAL PASS** pending hosted physical Quest testing.
+- Milestone 0 does not establish future north calibration, geographic heading, controller ray, persistence, astronomy, or celestial-geometry behavior.
 
 ## 2026-07-15 — Initial project activation
 

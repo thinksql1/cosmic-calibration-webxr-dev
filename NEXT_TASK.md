@@ -4,11 +4,11 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Repeat Quest floor-alignment validation with standing calibration
+**Title:** Implement physical north-marker calibration
 
 ## Why this is next
 
-Initial physical Quest testing passed immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter. The reference geometry appeared at approximately chair/seated height instead of the physical floor. The test was performed seated, and a seated or chair-height Quest environment calibration is a plausible but unconfirmed cause. No application defect is established until a controlled standing-floor retest is complete.
+Milestone 0 is complete: automated, desktop, and tested Quest 3 immersive AR, passthrough, floor alignment, stability, session lifecycle, recenter, comfort, and usability checks passed. The next capability is a deliberate user-driven alignment of the room-relative reference frame to a pre-marked physical north direction.
 
 ## Recommended execution
 
@@ -16,45 +16,60 @@ Initial physical Quest testing passed immersive AR entry, passthrough, spatial s
 
 **Reasoning effort:** High
 
-**Mode:** Guided physical-device validation
+**Mode:** Plan, then bounded implementation
 
 **Thread:** Main control thread
 
 ## Objective
 
-Repeat only the floor-height portion of the Quest acceptance test at `https://thinksql1.github.io/cosmic-calibration-webxr/` after deliberately establishing a standing or room-scale Quest floor calibration. Record observed evidence only; do not modify application code, deploy, or begin Milestone 1.
+Allow a standing Quest user to point a tracked controller toward a physical north marker and capture the horizontal yaw offset required to align the application’s room-relative coordinate system with geographic north. The existing room axes are not geographic directions before calibration.
 
-## Required work
+## Required scope
 
-1. Configure a safe standing or room-scale Quest boundary.
-2. Establish the Quest floor height using a controller placed at the physical floor.
-3. Stand upright when entering the session.
-4. Reload the deployed site and enter AR.
-5. Observe whether the origin marker and horizon ring appear near the physical floor.
-6. Confirm whether the horizon ring is horizontal.
-7. Confirm whether the zenith/nadir line is vertical.
-8. Confirm that world locking remains stable while moving the head slowly.
-9. Exit, re-enter, and recenter once.
-10. Record PASS, FAIL, or UNCERTAIN and the approximate height error.
+1. Detect and display available XR controllers.
+2. Render a restrained controller aiming ray only where useful during calibration.
+3. Provide an explicit **Calibrate North** workflow that requires the user to stand at the chosen physical origin marker and point one controller toward the pre-marked north reference.
+4. Project the captured controller direction onto the horizontal XZ plane and reject a too-small or nearly vertical projection with readable feedback.
+5. Define and test an explicit coordinate convention without relying silently on a Three.js forward-axis assumption.
+6. Calculate and store an in-memory yaw offset so captured physical north aligns with geographic north; south is opposite north, east and west are perpendicular, and Y remains local vertical.
+7. Rotate a dedicated geographic-reference group rather than altering scientific source coordinates.
+8. Render N, S, E, W, north–south and east–west lines, and retain the existing horizon ring and zenith/nadir line.
+9. Provide recalibrate and reset controls plus explicit calibrated, uncalibrated, and error states.
+10. Preserve desktop fallback through a simulation method that exercises calibration logic.
+11. Add unit tests for horizontal projection, known-vector yaw sign/angle conventions, invalid-direction rejection, reset, and recalibration.
+12. Document the physical setup procedure and the limit that a yaw value is not universally valid across boundary resets, recentering, rooms, or tracking-origin changes.
 
-## Acceptance rules
+## Persistence boundary
 
-- **PASS:** The origin and ring are reasonably near the physical floor, the ring is horizontal, the scene is stable, and the result is usable.
-- **FAIL:** After the Quest floor was deliberately reset, the ring remains clearly at chair height or another incorrect elevation.
-- **UNCERTAIN:** The floor setup or observed elevation cannot be confidently established.
-- Do not infer PASS from source code.
+- In-memory calibration is required.
+- Browser local-storage persistence may be included only if it remains small and testable and never implies room-persistence validity.
+- Defer persistence if it adds ambiguity or risk; always provide a visible recalibration path.
 
-## Prohibited scope
+## Explicitly deferred
 
-- Do not modify application code, dependencies, repository configuration, remote, Pages workflow, or deployment.
-- Do not begin north calibration, controller raycasting, geolocation, Astronomy Engine, celestial geometry, persistence, or time controls.
-- Do not claim a code defect or application fix before the controlled retest establishes evidence.
+- Astronomy Engine, geolocation, automatic compass access, magnetic declination, and true-versus-magnetic-north correction.
+- Sun or Moon calibration; spatial anchors, plane detection, hit testing, and hand tracking.
+- Earth axis, celestial poles/equator, ecliptic, Sun, Moon, planets, time controls, orbital paths, contemplative sequencing, audio, and 360 video.
+
+## Acceptance criteria
+
+1. Existing Milestone 0 behavior remains intact.
+2. The controller ray appears only where useful for calibration.
+3. A horizontal controller direction can be captured.
+4. Nearly vertical or invalid rays are rejected with readable feedback.
+5. Geographic N/S/E/W geometry rotates coherently from the stored yaw.
+6. Known-vector unit tests verify the accepted sign and angle convention.
+7. Recalibration replaces the prior calibration; reset returns to an explicitly uncalibrated state.
+8. Desktop simulation exercises calibration logic.
+9. Type-check, tests, and build pass.
+10. Quest testing remains a separate physical acceptance step.
+11. No astronomical or automatic-heading features are added.
 
 ## Stop conditions
 
-- A safe standing/room-scale boundary or confident physical-floor calibration cannot be established.
-- The published HTTPS site or Quest AR session is unavailable.
-- The retest would require code changes or expand beyond floor-alignment evidence.
+- The coordinate sign/rotation convention cannot be made explicit and covered by known-vector tests.
+- A dependency, persistence mechanism, or scope expansion would be required to make calibration deterministic.
+- The work requires astronomy, geolocation, automatic heading, or other deferred features.
 
 ## Expected return format
 
@@ -62,15 +77,16 @@ Repeat only the floor-height portion of the Quest acceptance test at `https://th
 Objective:
 Status: Complete | Partial | Blocked
 
-Standing calibration evidence:
-- Floor setup:
-- Origin/ring height error:
-- Ring horizontality:
-- Zenith/nadir verticality:
-- World locking:
-- Exit/re-entry/recenter:
+Calibration convention:
+- Captured direction:
+- Horizontal projection:
+- Yaw rule:
+- Geographic-reference rotation:
 
-Result: PASS | FAIL | UNCERTAIN
+Validation:
+- PASS:
+- FAIL:
+- NOT RUN:
 
 Exact next task:
 - <one bounded task>

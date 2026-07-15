@@ -4,13 +4,13 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 0 physical validation / controlled floor retest pending
+**Current phase:** Milestone 1 — North calibration
 
-**Overall status:** **CONDITIONAL PASS**. Automated and desktop validation passed; physical Quest immersive AR, passthrough, stability, and session lifecycle are verified, while standing-floor alignment requires a controlled retest.
+**Overall status:** **Milestone 0 COMPLETE.** Automated, desktop, and physical Quest validation passed within the tested Quest 3 environment.
 
 ## One-paragraph state summary
 
-Milestone 0 is integrated into `master` through merge commit `df8b26a` and published through the existing GitHub Pages workflow. The independent re-gate found no remaining blocking or material implementation, lifecycle, workflow, test, documentation, dependency, or scope defects. Local automated and desktop Chromium validation passed, and the public site is https://thinksql1.github.io/cosmic-calibration-webxr/. Initial physical Quest testing verified immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter. The reference geometry appeared at approximately chair/seated height rather than the physical floor; a seated or chair-height Quest environment calibration is a plausible but unconfirmed environmental cause. No application defect has been established. A standing/room-scale floor-calibration retest is required before floor alignment can pass.
+Milestone 0 is integrated into `master` through merge commit `df8b26a` and remains deployed at https://thinksql1.github.io/cosmic-calibration-webxr/. Automated validation, desktop validation, and physical Quest 3 validation passed. After the Quest floor was deliberately reset for standing use, immersive AR entry, passthrough, reference geometry, physical-floor alignment, horizon horizontality, zenith/nadir verticality, world locking, exit, re-entry, recenter, comfort, and usability all passed. The earlier chair-height observation was environmental and resolved by resetting the Quest floor; it was not an application defect. This evidence does not establish any Milestone 1 north-calibration behavior. No geographic heading, controller ray, persistence, or celestial geometry exists yet.
 
 ## Working and verified
 
@@ -26,6 +26,7 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 - GitHub Pages workflow run #2 passed on the published `b1bf282` commit: build completed with 15/15 tests and deploy completed successfully.
 - The hosted site loads at `https://thinksql1.github.io/cosmic-calibration-webxr/`; its static assets resolve under the repository subpath, the desktop canvas renders, the compatibility fallback is readable, and the browser console has no warnings or errors.
 - Initial physical Quest 3 evidence: immersive AR entry PASS, passthrough PASS, world locking/stability PASS, and session exit/re-entry/recenter PASS.
+- Controlled standing-floor Quest 3 retest: immersive AR, passthrough, reference geometry, origin/floor alignment, horizon ring, zenith/nadir line, world locking, lifecycle/recenter, comfort, and usability PASS.
 
 ## Implemented but not fully verified
 
@@ -38,41 +39,38 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 
 ## In progress
 
-- Repeat only the Quest floor-alignment validation using a deliberately established standing/room-scale floor calibration.
+- Plan and implement the bounded physical north-marker calibration capability for Milestone 1.
 
 ## Blocked
 
-- No technical blocker is established. Controlled standing-floor calibration evidence is required before determining whether the observed elevation was environmental or application-related.
+- No current blocker. Physical Quest acceptance for Milestone 1 remains a separate future validation step.
 
 ## Known defects or limitations
 
-- Quest immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter: physically verified **PASS**.
-- Standing floor-height alignment: **CONDITIONAL / requires retest**. The geometry appeared at approximately chair/seated height during initial seated testing; the suspected seated or chair-height calibration cause is a hypothesis, not a confirmed diagnosis.
-- Do not modify application code until the controlled standing-floor retest is complete.
+- Milestone 0 Quest 3 coverage is limited to the tested physical environment; it does not establish behavior for all rooms, boundaries, browsers, or device configurations.
+- This milestone does not include geographic heading, controller raycasting, persistence, north calibration, astronomy, celestial geometry, or time controls.
 - Desktop Chromium reports immersive AR as unsupported; desktop validation cannot exercise a browser XR session.
 - The production bundle contains a 547.64 kB minified Three.js chunk and triggers Vite's 500 kB advisory; no runtime defect was observed.
 - GitHub Pages has been exercised on the published `b1bf282` commit; no custom domain is configured.
 
 ## Important unknowns
 
-- Standing/room-scale `local-floor` accuracy after the Quest floor is deliberately established with a controller at the physical floor.
-- Exact height error and behavior after standing calibration and recenter.
 - Milestone 1 controller behavior and later astronomy validation tolerances.
 
 ## Active artifacts
 
 | Artifact | Purpose | Status |
 |---|---|---|
-| `src/` | Milestone 0 scene, renderer, UI, and WebXR state/session logic | Integrated into `master`; device behavior unverified |
+| `src/` | Milestone 0 scene, renderer, UI, and WebXR state/session logic | Integrated and physically validated for the tested Quest 3 environment |
 | `tests/xr-state.test.ts` | Capability and deterministic session-lifecycle tests | 15/15 passed |
 | `README.md` | Commands, behavior, deployment strategy, and limits | Current |
 | `docs/ARCHITECTURE.md` | Implemented Milestone 0 boundaries and lifecycle model | Current |
-| `docs/QUEST_TESTING.md` | Physical Quest acceptance checklist | Initial evidence recorded in project state; standing-floor retest pending |
+| `docs/QUEST_TESTING.md` | Physical Quest acceptance checklist | Milestone 0 evidence complete; future milestone testing remains separate |
 | `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | GitHub Actions source enabled; run #2 passed |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation decisions | Active; unchanged this task |
-| `NEXT_TASK.md` | One standing-calibration floor-alignment retest task | Active |
+| `NEXT_TASK.md` | One bounded Milestone 1 north-marker calibration task | Active |
 
 ## Environment
 
@@ -91,9 +89,9 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 | Risk | Likelihood | Impact | Mitigation or next evidence |
 |---|---|---|---|
 | Session lifecycle regression remains despite local tests | Low/unknown | High | Independent lifecycle review and physical Quest test after integration |
-| Standing floor calibration differs from the initial seated environment | Medium | High | Deliberately establish the physical floor with a controller and repeat only floor alignment |
-| `local-floor` registration is incorrect after controlled standing calibration | Medium | High | Record approximate height error, ring horizontality, vertical line, stability, re-entry, and recenter evidence |
-| Transparent rendering does not expose passthrough as expected | Medium | High | Verify on Quest 3; do not infer from code |
+| North marker is captured with an invalid or nearly vertical controller direction | Medium | Medium | Reject invalid horizontal projections with readable feedback and unit tests |
+| Reused yaw is invalid after a room, boundary, or tracking-origin change | Medium | High | Keep recalibration/reset visible; do not treat in-memory state as universally valid |
+| Passthrough behavior differs outside the tested Quest 3 environment | Low/unknown | Medium | Revalidate on device after future rendering changes; do not generalize the tested result |
 | Bundle size affects Quest startup/performance | Low/unknown | Medium | Measure on device before adding optimization complexity |
 | Scientific and contemplative layers become conflated later | Medium | High | Preserve traceable scientific modules and explicit framing |
 
@@ -121,7 +119,8 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 | 2026-07-15 | GitHub Pages publication | PASS; public `thinksql1/cosmic-calibration-webxr` created, `master` pushed normally, Pages configured for GitHub Actions, workflow run #2 built and deployed | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29457929634` |
 | 2026-07-15 | Hosted desktop verification | PASS; production page, subpath assets, reference canvas, fallback status, and browser console inspected | `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-15 | Initial physical Quest 3 acceptance evidence | PASS for immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter; floor alignment conditional because geometry appeared at chair/seated height | User-observed evidence at `https://thinksql1.github.io/cosmic-calibration-webxr/` |
+| 2026-07-15 | Controlled standing-floor Quest 3 retest | PASS; origin and horizon ring aligned with the physical floor, ring was horizontal, zenith/nadir was vertical, world locking and lifecycle/recenter remained stable, and comfort/usability passed | User-observed evidence at `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 
 ## Current decision horizon
 
-Repeat only the floor-alignment portion of the Quest acceptance test after deliberately establishing a safe standing/room-scale Quest floor calibration. Do not alter application code unless that controlled retest establishes an application-level defect.
+Plan and implement physical north-marker calibration as the next bounded capability, preserving the completed Milestone 0 behavior and keeping Quest validation separate from implementation.
