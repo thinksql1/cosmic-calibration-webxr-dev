@@ -28,24 +28,34 @@ The origin marker and horizon ring are authored at the reference origin and `Y =
 - capability check in progress;
 - immersive AR supported or unsupported;
 - capability-check failure;
-- session starting, active, ended, or denied/failed.
+- session starting, cleaning, active, ended, or denied/failed.
 
 Detection checks `window.isSecureContext`, then `navigator.xr`, then `isSessionSupported('immersive-ar')`. Pure interfaces keep this logic testable without a headset or browser XR runtime.
 
 ## Session lifecycle
 
-The explicit Enter AR action calls `requestSession('immersive-ar', { requiredFeatures: ['local-floor'] })`. No optional future features are requested. Duplicate requests are ignored while a request or session is active. A successful session is bound to the renderer; an end event restores the desktop state. Rejection and binding failures become readable UI states while detailed errors remain available to the console.
+The controller keeps one explicit internal phase: `idle`, `requesting`, `binding`, `binding-ended`, `active`, or `ending`. It owns at most one session at a time.
+
+1. An explicit Enter AR action requests `immersive-ar` with `requiredFeatures: ['local-floor']`; no optional future features are requested.
+2. Once `requestSession()` resolves, the controller records ownership and attaches a one-time `end` listener before awaiting Three.js renderer binding.
+3. Only a still-owned session whose binding succeeds becomes renderer-bound active. A session that ends during binding stays non-active, blocks retry until binding settles, then reports ended.
+4. Binding failure enters cleanup, calls `session.end()`, and blocks retry until the cleanup operation settles. The terminal UI state reports whether cleanup also failed; internal ownership is cleared so stale references do not persist.
+5. A normal end clears ownership once and restores the desktop state. A new session request is allowed only after no request, binding, active session, binding-after-end operation, or cleanup operation remains unresolved.
+
+The controller emits restrained phase-labelled diagnostics only for renderer-binding and cleanup failures. `src/main.ts` writes those diagnostics once to the browser console; raw stacks are not placed in the status UI.
 
 ## Static hosting
 
-`vite.config.ts` uses a relative `./` base. Built script and style references therefore work under an unknown GitHub Pages project subpath without hardcoding a repository name. The current application has no router, backend, or server-only behavior. The workflow file follows the Pages artifact pattern but cannot be exercised until an authorized remote and Pages configuration exist.
+`vite.config.ts` uses a relative `./` base. Built script and style references therefore work under an unknown GitHub Pages project subpath without hardcoding a repository name. The current application has no router, backend, or server-only behavior.
+
+The workflow keeps validation and artifact upload in the build job. The Pages-authorized deploy job runs `actions/configure-pages@v5` and `actions/deploy-pages@v4` with `pages: write` and `id-token: write`; the workflow-level permission remains `contents: read`. It cannot be exercised until an authorized remote and Pages configuration exist.
 
 ## Module boundaries
 
-- `src/main.ts`: renderer, camera, controls, DOM status, and lifecycle wiring.
+- `src/main.ts`: renderer, camera, controls, DOM status, diagnostics, and lifecycle wiring.
 - `src/scene/createReferenceScene.ts`: neutral floor-origin reference geometry.
-- `src/xr/state.ts`: capability classification and immersive-session state transitions.
-- `tests/xr-state.test.ts`: capability and session-state behavior.
+- `src/xr/state.ts`: capability classification and owned immersive-session state transitions.
+- `tests/xr-state.test.ts`: deterministic capability and session-lifecycle behavior.
 
 These boundaries are deliberately narrow. They are not a generalized future architecture.
 

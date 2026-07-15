@@ -70,7 +70,11 @@ function renderState(state: XRState): void {
   enterArButton.textContent = state.kind === 'session-denied-or-failed' ? 'Try AR again' : 'Enter AR';
 
   if (state.kind === 'session-active') setImmersivePresentation(true);
-  if (state.kind === 'session-ended' || state.kind === 'session-denied-or-failed') {
+  if (
+    state.kind === 'session-cleaning' ||
+    state.kind === 'session-ended' ||
+    state.kind === 'session-denied-or-failed'
+  ) {
     setImmersivePresentation(false);
   }
 }
@@ -93,6 +97,9 @@ if (xrApi) {
       await renderer.xr.setSession(session as XRSession);
     },
     renderState,
+    (phase, error) => {
+      console.warn(`WebXR ${phase} failure.`, error);
+    },
   );
 }
 

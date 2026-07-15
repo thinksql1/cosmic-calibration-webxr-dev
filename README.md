@@ -26,7 +26,7 @@ X and Z are room-relative and are not geographic cardinal directions. The transp
 ## Local commands
 
 ```powershell
-npm install
+npm ci
 npm run dev -- --host 127.0.0.1
 npm run typecheck
 npm run test
@@ -36,9 +36,13 @@ npm run preview -- --host 127.0.0.1
 
 The development server URL shown by Vite opens the desktop fallback. Mouse drag orbits the camera; the wheel zooms. Browsers without WebXR retain the scene and show a specific compatibility state.
 
-## WebXR requirements
+## WebXR session handling
 
-The application checks for a secure context, `navigator.xr`, and support for `immersive-ar`. Entering AR requires an explicit button press and requests only `local-floor`. Session denial or failure leaves the desktop scene running, and session end restores desktop presentation.
+The application checks for a secure context, `navigator.xr`, and support for `immersive-ar`. Entering AR requires an explicit button press and requests only `local-floor`.
+
+After `requestSession()` resolves, the controller owns that session immediately, attaches its `end` listener, then binds it to Three.js. The UI reports an active session only after binding succeeds. A new request is blocked while a request, renderer binding, active session, ending operation, or binding-after-end operation remains unresolved. If binding fails, the controller attempts `session.end()` before allowing retry. If the session ends during binding, the controller waits for binding to settle and does not report a false active state.
+
+Unexpected renderer-binding and cleanup failures produce a concise UI message and one phase-labelled browser-console warning. The UI shows error messages rather than raw stack traces. Cleanup failure is reported and internal ownership is cleared, but desktop testing cannot prove browser-specific cleanup behavior.
 
 `localhost` is acceptable for local browser development, but it does not prove that an arbitrary HTTP origin will work. Physical Quest testing requires HTTPS. See [Quest testing](docs/QUEST_TESTING.md).
 
@@ -46,7 +50,7 @@ The application checks for a secure context, `navigator.xr`, and support for `im
 
 Vite uses `base: './'`, so emitted asset references are relative and the build remains portable when the final project repository name—and therefore its Pages subpath—is unknown. The tradeoff is that this strategy assumes document-relative assets and no client-side routing. Milestone 0 uses neither routing nor a backend.
 
-The Pages workflow validates with `npm ci`, type-checks, tests, builds, and uploads `dist/` before the standard deployment job. The workflow is configuration only: it cannot run until a GitHub remote exists and Pages is enabled. This task does not create a remote, push, enable Pages, or deploy.
+The Pages workflow validates with `npm ci`, type-checks, tests, builds, and uploads `dist/`. Its deploy job configures Pages and deploys the artifact with explicit `pages: write` and `id-token: write` permissions; repository-content access remains read-only. The workflow is configuration only: it has not run because no GitHub remote or Pages site exists. This task does not create a remote, push, enable Pages, or deploy.
 
 ## Current limitations
 

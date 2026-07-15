@@ -6,6 +6,7 @@ export type XRStateKind =
   | 'unsupported'
   | 'check-failed'
   | 'session-starting'
+  | 'session-cleaning'
   | 'session-active'
   | 'session-ended'
   | 'session-denied-or-failed';
@@ -81,6 +82,7 @@ export interface ImmersiveArSession {
     listener: () => void,
     options?: { once?: boolean },
   ): void;
+  end(): Promise<void>;
 }
 
 export interface XRSessionApi {
@@ -92,21 +94,34 @@ export interface XRSessionApi {
 
 export type SessionBinder = (session: ImmersiveArSession) => Promise<void>;
 export type StateListener = (state: XRState) => void;
+export type SessionDiagnosticListener = (
+  phase: 'binding' | 'cleanup',
+  error: unknown,
+) => void;
+
+type SessionPhase =
+  | 'idle'
+  | 'requesting'
+  | 'binding'
+  | 'binding-ended'
+  | 'active'
+  | 'ending';
 
 export class ImmersiveArSessionController {
-  private activeSession?: ImmersiveArSession;
-  private requestPending = false;
+  private phase: SessionPhase = 'idle';
+  private ownedSession?: ImmersiveArSession;
 
   constructor(
     private readonly xr: XRSessionApi,
     private readonly bindSession: SessionBinder,
     private readonly onState: StateListener,
+    private readonly onDiagnostic: SessionDiagnosticListener = () => {},
   ) {}
 
   async start(): Promise<void> {
-    if (this.requestPending || this.activeSession) return;
+    if (this.phase !== 'idle') return;
 
-    this.requestPending = true;
+    this.phase = 'requesting';
     this.onState({
       kind: 'session-starting',
       message: 'Requesting an immersive AR session…',
@@ -117,31 +132,109 @@ export class ImmersiveArSessionController {
       const session = await this.xr.requestSession('immersive-ar', {
         requiredFeatures: ['local-floor'],
       });
+
+      // A successful request owns an immersive session before renderer setup finishes.
+      this.ownedSession = session;
+      this.phase = 'binding';
+      session.addEventListener('end', () => this.handleSessionEnd(session), { once: true });
+
       await this.bindSession(session);
-      this.activeSession = session;
-      session.addEventListener('end', this.handleSessionEnd, { once: true });
+
+      if (this.phase !== 'binding' || this.ownedSession !== session) {
+        this.finishBindingAfterSessionEnd();
+        return;
+      }
+
+      this.phase = 'active';
       this.onState({
         kind: 'session-active',
         message: 'Immersive AR session active.',
         detail: 'Floor placement and passthrough still require physical Quest verification.',
       });
     } catch (error) {
-      this.onState({
-        kind: 'session-denied-or-failed',
-        message: 'The immersive AR session was denied or could not start.',
-        detail: errorMessage(error),
-      });
-    } finally {
-      this.requestPending = false;
+      if (this.phase === 'requesting') {
+        this.phase = 'idle';
+        this.onState({
+          kind: 'session-denied-or-failed',
+          message: 'The immersive AR session was denied or could not start.',
+          detail: errorMessage(error),
+        });
+        return;
+      }
+
+      await this.handleBindingFailure(error);
     }
   }
 
-  private readonly handleSessionEnd = (): void => {
-    this.activeSession = undefined;
+  private async handleBindingFailure(bindingError: unknown): Promise<void> {
+    this.onDiagnostic('binding', bindingError);
+
+    if (!this.ownedSession) {
+      this.finishBindingAfterSessionEnd();
+      return;
+    }
+
+    const session = this.ownedSession;
+    this.phase = 'ending';
+    this.onState({
+      kind: 'session-cleaning',
+      message: 'Renderer setup failed; ending the immersive AR session.',
+      detail: 'Retry remains unavailable until cleanup completes.',
+    });
+
+    let cleanupError: unknown;
+    try {
+      await session.end();
+    } catch (error) {
+      cleanupError = error;
+      this.onDiagnostic('cleanup', error);
+    }
+
+    if (this.ownedSession === session) this.ownedSession = undefined;
+    this.phase = 'idle';
+
+    this.onState({
+      kind: 'session-denied-or-failed',
+      message: 'The immersive AR session could not start.',
+      detail: cleanupError
+        ? `Renderer setup failed: ${errorMessage(bindingError)}. Session cleanup also failed: ${errorMessage(cleanupError)}.`
+        : `Renderer setup failed: ${errorMessage(bindingError)}. The acquired session was ended.`,
+    });
+  }
+
+  private handleSessionEnd(session: ImmersiveArSession): void {
+    if (this.ownedSession !== session) return;
+
+    this.ownedSession = undefined;
+
+    if (this.phase === 'binding') {
+      this.phase = 'binding-ended';
+      this.onState({
+        kind: 'session-cleaning',
+        message: 'The immersive AR session ended while renderer setup was pending.',
+        detail: 'Retry remains unavailable until renderer setup settles.',
+      });
+      return;
+    }
+
+    if (this.phase === 'ending') return;
+
+    this.phase = 'idle';
+    this.emitSessionEnded();
+  }
+
+  private finishBindingAfterSessionEnd(): void {
+    if (this.phase !== 'binding-ended') return;
+
+    this.phase = 'idle';
+    this.emitSessionEnded();
+  }
+
+  private emitSessionEnded(): void {
     this.onState({
       kind: 'session-ended',
       message: 'Immersive AR session ended.',
       detail: 'The desktop reference scene is active again.',
     });
-  };
+  }
 }
