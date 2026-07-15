@@ -4,13 +4,13 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 0 published / physical Quest acceptance pending
+**Current phase:** Milestone 0 physical validation / controlled floor retest pending
 
-**Overall status:** **CONDITIONAL PASS** pending hosted physical Quest testing. Automated and desktop validation passed; Quest verification is **NOT RUN**.
+**Overall status:** **CONDITIONAL PASS**. Automated and desktop validation passed; physical Quest immersive AR, passthrough, stability, and session lifecycle are verified, while standing-floor alignment requires a controlled retest.
 
 ## One-paragraph state summary
 
-Milestone 0 is integrated into `master` through merge commit `df8b26a` and published from commit `b1bf282` through the existing GitHub Pages workflow. The independent re-gate found no remaining blocking or material implementation, lifecycle, workflow, test, documentation, dependency, or scope defects. Local automated and desktop Chromium validation passed, and GitHub Actions run #2 passed its build and deployment jobs. The public site is https://thinksql1.github.io/cosmic-calibration-webxr/. Quest passthrough, floor registration, stability, drift, session re-entry, and recenter behavior remain **NOT RUN**.
+Milestone 0 is integrated into `master` through merge commit `df8b26a` and published through the existing GitHub Pages workflow. The independent re-gate found no remaining blocking or material implementation, lifecycle, workflow, test, documentation, dependency, or scope defects. Local automated and desktop Chromium validation passed, and the public site is https://thinksql1.github.io/cosmic-calibration-webxr/. Initial physical Quest testing verified immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter. The reference geometry appeared at approximately chair/seated height rather than the physical floor; a seated or chair-height Quest environment calibration is a plausible but unconfirmed environmental cause. No application defect has been established. A standing/room-scale floor-calibration retest is required before floor alignment can pass.
 
 ## Working and verified
 
@@ -25,6 +25,7 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 - Production preview loaded successfully on the feature branch and again from integrated `master`; relative production assets loaded with no console errors or warnings.
 - GitHub Pages workflow run #2 passed on the published `b1bf282` commit: build completed with 15/15 tests and deploy completed successfully.
 - The hosted site loads at `https://thinksql1.github.io/cosmic-calibration-webxr/`; its static assets resolve under the repository subpath, the desktop canvas renders, the compatibility fallback is readable, and the browser console has no warnings or errors.
+- Initial physical Quest 3 evidence: immersive AR entry PASS, passthrough PASS, world locking/stability PASS, and session exit/re-entry/recenter PASS.
 
 ## Implemented but not fully verified
 
@@ -37,24 +38,25 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 
 ## In progress
 
-- Run the physical Quest 3 manual acceptance checklist against the published HTTPS site and record device evidence.
+- Repeat only the Quest floor-alignment validation using a deliberately established standing/room-scale floor calibration.
 
 ## Blocked
 
-- Quest device verification requires a physical Meta Quest 3 and a safe test environment.
+- No technical blocker is established. Controlled standing-floor calibration evidence is required before determining whether the observed elevation was environmental or application-related.
 
 ## Known defects or limitations
 
-- Quest testing: **NOT RUN**.
-- WebXR passthrough, transparency, floor alignment, stability, drift, session re-entry, and recenter behavior are unverified on physical hardware.
+- Quest immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter: physically verified **PASS**.
+- Standing floor-height alignment: **CONDITIONAL / requires retest**. The geometry appeared at approximately chair/seated height during initial seated testing; the suspected seated or chair-height calibration cause is a hypothesis, not a confirmed diagnosis.
+- Do not modify application code until the controlled standing-floor retest is complete.
 - Desktop Chromium reports immersive AR as unsupported; desktop validation cannot exercise a browser XR session.
 - The production bundle contains a 547.64 kB minified Three.js chunk and triggers Vite's 500 kB advisory; no runtime defect was observed.
 - GitHub Pages has been exercised on the published `b1bf282` commit; no custom domain is configured.
 
 ## Important unknowns
 
-- Current Quest Browser immersive-AR and passthrough behavior.
-- `local-floor` accuracy, stability, and response to recenter/session changes.
+- Standing/room-scale `local-floor` accuracy after the Quest floor is deliberately established with a controller at the physical floor.
+- Exact height error and behavior after standing calibration and recenter.
 - Milestone 1 controller behavior and later astronomy validation tolerances.
 
 ## Active artifacts
@@ -65,12 +67,12 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 | `tests/xr-state.test.ts` | Capability and deterministic session-lifecycle tests | 15/15 passed |
 | `README.md` | Commands, behavior, deployment strategy, and limits | Current |
 | `docs/ARCHITECTURE.md` | Implemented Milestone 0 boundaries and lifecycle model | Current |
-| `docs/QUEST_TESTING.md` | Physical Quest acceptance checklist | Ready; NOT RUN |
+| `docs/QUEST_TESTING.md` | Physical Quest acceptance checklist | Initial evidence recorded in project state; standing-floor retest pending |
 | `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | GitHub Actions source enabled; run #2 passed |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation decisions | Active; unchanged this task |
-| `NEXT_TASK.md` | One physical Quest 3 acceptance task | Active |
+| `NEXT_TASK.md` | One standing-calibration floor-alignment retest task | Active |
 
 ## Environment
 
@@ -89,8 +91,8 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 | Risk | Likelihood | Impact | Mitigation or next evidence |
 |---|---|---|---|
 | Session lifecycle regression remains despite local tests | Low/unknown | High | Independent lifecycle review and physical Quest test after integration |
-| Quest Browser behavior differs from desktop-tested assumptions | Medium | High | Execute the physical checklist |
-| `local-floor` registration or recenter behavior is unstable | Medium | High | Record floor, motion, drift, re-entry, and recenter evidence |
+| Standing floor calibration differs from the initial seated environment | Medium | High | Deliberately establish the physical floor with a controller and repeat only floor alignment |
+| `local-floor` registration is incorrect after controlled standing calibration | Medium | High | Record approximate height error, ring horizontality, vertical line, stability, re-entry, and recenter evidence |
 | Transparent rendering does not expose passthrough as expected | Medium | High | Verify on Quest 3; do not infer from code |
 | Bundle size affects Quest startup/performance | Low/unknown | Medium | Measure on device before adding optimization complexity |
 | Scientific and contemplative layers become conflated later | Medium | High | Preserve traceable scientific modules and explicit framing |
@@ -118,8 +120,8 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 | 2026-07-15 | Local Milestone 0 integration and revalidation | PASS; merged without rewriting history and reran the full local suite | Merge commit `df8b26a` on `master` |
 | 2026-07-15 | GitHub Pages publication | PASS; public `thinksql1/cosmic-calibration-webxr` created, `master` pushed normally, Pages configured for GitHub Actions, workflow run #2 built and deployed | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29457929634` |
 | 2026-07-15 | Hosted desktop verification | PASS; production page, subpath assets, reference canvas, fallback status, and browser console inspected | `https://thinksql1.github.io/cosmic-calibration-webxr/` |
-| 2026-07-15 | Physical Quest 3 validation | NOT RUN | `docs/QUEST_TESTING.md` |
+| 2026-07-15 | Initial physical Quest 3 acceptance evidence | PASS for immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter; floor alignment conditional because geometry appeared at chair/seated height | User-observed evidence at `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 
 ## Current decision horizon
 
-Run the physical Quest 3 acceptance checklist against the published `b1bf282` build at `https://thinksql1.github.io/cosmic-calibration-webxr/`, recording evidence without inferring any device behavior from desktop results.
+Repeat only the floor-alignment portion of the Quest acceptance test after deliberately establishing a safe standing/room-scale Quest floor calibration. Do not alter application code unless that controlled retest establishes an application-level defect.
