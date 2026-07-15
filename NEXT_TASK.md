@@ -27,7 +27,7 @@ Use a physical Meta Quest 3 and `docs/QUEST_TESTING.md` to evaluate the publishe
 ## Required work
 
 1. Confirm the Quest 3, safe test area, and published HTTPS URL are available.
-2. Open `https://thinksql1.github.io/cosmic-calibration-webxr/` in Quest Browser and record commit `b1bf282` plus Quest OS and browser versions.
+2. Open `https://thinksql1.github.io/cosmic-calibration-webxr/` in Quest Browser and record the exact deployed `master` commit plus Quest OS and browser versions.
 3. Execute every criterion in `docs/QUEST_TESTING.md`, recording **PASS**, **FAIL**, or **NOT RUN** with notes and safe evidence.
 4. Verify passthrough, floor registration, gravity alignment, world stability, drift, session exit/re-entry, and recenter behavior on device.
 5. Update `docs/QUEST_TESTING.md`, `PROJECT_STATE.md`, and `CHANGELOG.md` only with observed evidence; do not infer untested results.

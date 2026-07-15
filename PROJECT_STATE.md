@@ -33,7 +33,7 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and publi
 - An acquired session is owned and given an `end` listener before renderer binding. Binding failure requests `session.end()` and blocks retry until cleanup settles; cleanup failure is surfaced while stale ownership is cleared.
 - The renderer is alpha-enabled, clears its opaque background in XR, and uses the Three.js XR animation loop.
 - Floor-relative reference geometry is authored around `Y = 0` and the XR reference-space type is `local-floor`.
-- The GitHub Pages workflow is configured to use GitHub Actions with Pages/OIDC permissions limited to its deploy job. It has passed once; its first push-triggered run failed before Pages was enabled and does not represent an application failure.
+- The GitHub Pages workflow is configured to use GitHub Actions with Pages/OIDC permissions limited to its deploy job. Successful deployment runs have completed; its first push-triggered run failed before Pages was enabled and does not represent an application failure.
 
 ## In progress
 
