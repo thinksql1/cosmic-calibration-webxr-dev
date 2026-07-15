@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A minimal floor-relative WebXR reference-frame technical spike."
+    />
+    <title>Cosmic Calibration · Reference Frame</title>
+  </head>
+  <body>
+    <main id="app" aria-label="Cosmic Calibration WebXR technical spike">
+      <section class="status-panel" aria-labelledby="app-title">
+        <p class="eyebrow">Milestone 0 · Reference frame</p>
+        <h1 id="app-title">Cosmic Calibration</h1>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <button id="enter-ar" type="button" hidden>Enter AR</button>
+        <p id="status-detail" class="status-detail"></p>
+      </section>
+      <aside class="legend" aria-label="Coordinate legend">
+        <span><i class="swatch swatch-y"></i>+Y up / zenith</span>
+        <span><i class="swatch swatch-floor"></i>Y = 0 floor plane</span>
+        <span>X and Z are room-relative</span>
+      </aside>
+      <div id="scene" aria-hidden="true"></div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

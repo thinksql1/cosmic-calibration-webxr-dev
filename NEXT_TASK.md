@@ -4,82 +4,72 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Implement the minimal floor-relative WebXR passthrough technical spike.
+**Title:** Re-run the independent Milestone 0 integration gate.
 
 ## Why this is next
 
-Establish evidence that the browser, device, passthrough, and `local-floor` assumptions can support a stable spatial reference frame before calibration or celestial work begins.
+The first independent gate found an owned-session cleanup defect, incomplete lifecycle coverage, and an insufficient Pages permission boundary. The feature branch now contains a focused remediation that must be independently reviewed and reproduced before any local merge decision or Quest work.
 
 ## Recommended execution
 
 **Model:** GPT-5.6 Sol
 
-**Reasoning effort:** High
+**Reasoning effort:** Max
 
-**Mode:** Plan, then bounded implementation
+**Mode:** Independent validation
+
 **Thread:** Main control thread
 
 ## Objective
 
-Create the smallest Vite, TypeScript, Three.js, and WebXR proof that feature-detects immersive AR, requests a floor-relative reference space where supported, renders neutral reference geometry, and retains a working desktop fallback.
+Independently inspect the remediation commit against `420b7f9`, reproduce the local type-check, test, build, and desktop evidence, review the WebXR lifecycle races and Pages workflow permissions, and decide whether the Milestone 0 feature may be integrated locally. Do not implement fixes during the gate.
 
-## Allowed paths
+## Required work
 
-- Root Vite/TypeScript configuration, `src/`, `public/`, and focused tests needed for the spike.
-- `README.md`, narrow documentation in `docs/`, and durable project records as verified results require.
+1. Confirm the feature branch, baseline ancestry, clean working tree, and absence of a remote.
+2. Inspect the complete remediation diff, especially session ownership, end-event handling, cleanup, retries, lifecycle tests, documentation, and the Pages workflow job permissions.
+3. Reproduce `npm ci`, type-check, tests, build, diff validation, and desktop development/production-preview inspection.
+4. Confirm no dependency, deferred feature, remote, deployment, or Quest-testing change was introduced.
+5. Classify the gate as PASS, CONDITIONAL PASS, or FAIL. Only a passing gate may authorize the separate local integration procedure.
 
 ## Prohibited scope
 
-- No Astronomy Engine, geolocation, north calibration, controller interaction, celestial bodies, or time controls.
-- No deployment or GitHub remote creation.
-- No native application, accounts, analytics, multi-user features, or contemplative claims.
+- No implementation changes, merge, rebase, squash, push, remote configuration, Pages enablement, deployment, or Quest testing.
+- No north calibration, controller raycasting, geolocation, Astronomy Engine, celestial geometry, persistence, or time controls.
+- Do not infer passthrough, floor registration, stability, drift, re-entry, or recenter behavior from desktop evidence.
 
 ## Acceptance criteria
 
-1. Minimal Vite/TypeScript application renders a Three.js desktop fallback with origin marker, axes, horizon ring, and zenith/nadir line.
-2. Interface reports immersive-AR availability and provides Enter AR only where supported.
-3. Immersive path requests a floor-relative reference space and documents fallback/unsupported behavior.
-4. Production build passes without TypeScript errors.
-5. Documentation gives local setup, desktop verification, and Quest 3 test instructions without unrun claims.
-6. Quest verification remains **NOT RUN** until physically tested on a Quest 3.
-
-## Validation methods
-
-- Static inspection, type-check/build, and desktop runtime verification.
-- Diff and documentation inspection for prohibited features and unsupported claims.
-- Physical Quest 3 only: immersive-AR availability, passthrough, floor alignment, recenter behavior, and stability.
-
-## Quest test boundary
-
-Do not mark immersive AR, passthrough, `local-floor`, or floor alignment as passed without physical Quest 3 evidence.
+1. The acquired session is owned and subscribed before renderer binding.
+2. Binding failure performs and awaits cleanup before retry is enabled.
+3. End-during-binding cannot report a false active state.
+4. Focused tests cover pending, active, cleanup, retry, and end-race behavior.
+5. The Pages configuration uses explicit minimum Pages/OIDC permissions in the authorized deploy job.
+6. Documentation accurately distinguishes local, hosted, and physical-device evidence.
+7. Quest validation remains **NOT RUN**.
 
 ## Stop conditions
 
-- A broader architecture decision is required.
-- Desktop fallback cannot be preserved.
-- An unsupported requirement has no boundary-preserving fallback.
-- Completion would require deployment, remote configuration, or prohibited scope.
+- A material lifecycle, workflow, dependency, documentation, or scope defect remains.
+- A required check fails or cannot be reproduced.
+- Integration would require an unauthorized external action.
 
 ## Expected return format
 
 ```text
 Objective:
-Status: Complete | Partial | Blocked
+Result: PASS | CONDITIONAL PASS | FAIL
 
-Changes:
-- <file and purpose>
+Findings:
+- <ordered findings>
 
 Validation:
 - PASS:
 - FAIL:
 - NOT RUN:
-- NOT APPLICABLE:
 
-Quest evidence:
-- <physical-test result or NOT RUN>
-
-Known limitations:
-- <item or none>
+Integration:
+- Performed: YES | NO
 
 Exact next task:
 - <one bounded task>
