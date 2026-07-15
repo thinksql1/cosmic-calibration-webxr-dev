@@ -4,11 +4,11 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Publish the Milestone 0 test site to GitHub Pages.
+**Title:** Run the Milestone 0 Quest 3 manual acceptance test.
 
 ## Why this is next
 
-Milestone 0 is integrated into local `master`, and its automated and desktop integration checks passed. Physical Quest validation requires an HTTPS site serving the exact integrated build. No GitHub repository, remote, deployment, or Pages URL currently exists.
+Milestone 0 automated validation, desktop validation, and hosted GitHub Pages deployment passed. Physical Quest validation is the remaining acceptance evidence and must be performed against the exact published build.
 
 ## Recommended execution
 
@@ -16,68 +16,46 @@ Milestone 0 is integrated into local `master`, and its automated and desktop int
 
 **Reasoning effort:** High
 
-**Mode:** Guided publication with explicit authorization gates
+**Mode:** Guided physical-device validation
 
 **Thread:** Main control thread
 
 ## Objective
 
-After the user explicitly confirms the GitHub account, repository name, repository visibility, and each external publication action, create the GitHub repository, add the remote, push local `master` normally, publish with GitHub Actions, verify the HTTPS production site, and record the exact URL without claiming Quest success.
+Use a physical Meta Quest 3 and `docs/QUEST_TESTING.md` to evaluate the published Milestone 0 build at `https://thinksql1.github.io/cosmic-calibration-webxr/`. Record the exact tested commit, device/browser versions, result for every checklist criterion, and supporting evidence. Do not claim success from desktop or hosted-browser checks.
 
 ## Required work
 
-1. Confirm the working tree is clean and local `master` contains the integrated Milestone 0 commits.
-2. Ask the user to confirm the authorized GitHub account, repository name, and repository visibility.
-3. Before creating a repository, adding a remote, pushing, enabling Pages, or causing deployment, present the exact external action and obtain explicit authorization.
-4. Create the repository without altering local history, add the intended remote, and push `master` normally.
-5. Configure Pages to publish through GitHub Actions and observe the existing workflow through completion.
-6. Open the resulting HTTPS URL, verify the production application and relative assets, and record the URL and tested commit in `PROJECT_STATE.md`.
-7. Preserve Quest validation as **NOT RUN** and replace this file with exactly one physical Quest 3 acceptance task.
+1. Confirm the Quest 3, safe test area, and published HTTPS URL are available.
+2. Open `https://thinksql1.github.io/cosmic-calibration-webxr/` in Quest Browser and record commit `b1bf282` plus Quest OS and browser versions.
+3. Execute every criterion in `docs/QUEST_TESTING.md`, recording **PASS**, **FAIL**, or **NOT RUN** with notes and safe evidence.
+4. Verify passthrough, floor registration, gravity alignment, world stability, drift, session exit/re-entry, and recenter behavior on device.
+5. Update `docs/QUEST_TESTING.md`, `PROJECT_STATE.md`, and `CHANGELOG.md` only with observed evidence; do not infer untested results.
 
 ## Prohibited scope
 
-- Do not create a GitHub repository, add a remote, push, enable Pages, or cause deployment before the corresponding external action is explicitly authorized.
-- Do not rewrite local history, force-push, delete branches, expose credentials, add dependencies, change application behavior, or begin Quest testing.
+- Do not change application behavior, dependencies, repository visibility, Pages configuration, remote, or history while testing.
+- Do not expose private room details in screenshots or video.
 - Do not begin north calibration, controller raycasting, geolocation, Astronomy Engine, celestial geometry, persistence, or time controls.
 - Do not infer Quest passthrough, floor registration, stability, drift, re-entry, or recenter behavior from the hosted desktop/browser check.
 
 ## Acceptance criteria
 
-1. Authorized GitHub account and repository name are confirmed.
-2. Repository visibility is confirmed.
-3. GitHub repository is created without altering local history.
-4. Local `master` is pushed normally.
-5. Pages publishing source uses GitHub Actions.
-6. Workflow completes successfully.
-7. HTTPS Pages URL loads the production site.
-8. URL is recorded in `PROJECT_STATE.md`.
-9. Quest success remains unclaimed.
-10. `NEXT_TASK.md` then becomes the physical Quest 3 acceptance test.
+1. Every checklist item has a recorded PASS, FAIL, or NOT RUN result.
+2. The tested HTTPS URL, commit, Quest model, Quest OS, Quest Browser version, date/time, and room conditions are recorded.
+3. Passthrough, floor registration, gravity alignment, world stability, drift, exit/re-entry, and recenter behavior have device evidence or remain explicitly NOT RUN/FAIL.
+4. No Quest or overall Milestone 0 success is claimed without physical evidence.
 
 ## Stop conditions
 
-- The GitHub account, repository name, visibility, or external authorization is missing or ambiguous.
-- Repository creation, remote configuration, push, Pages enablement, or deployment differs from the exact authorized action.
-- Credentials, repository permissions, workflow execution, or the HTTPS site cannot be verified safely.
-- Publication would require rewriting history, force-pushing, changing application behavior, or expanding scope.
+- A Quest 3, safe environment, supported Quest Browser state, or the published HTTPS site is unavailable.
+- Any physical result requires application changes, broader scope, or a safety-compromising test setup.
 
 ## Expected return format
 
 ```text
 Objective:
 Status: Complete | Partial | Blocked
-
-Authorization:
-- Account:
-- Repository:
-- Visibility:
-- Approved external actions:
-
-Publication:
-- Remote:
-- Pushed commit:
-- Workflow:
-- HTTPS URL:
 
 Validation:
 - PASS:
