@@ -55,6 +55,21 @@ describe('scientific dependency and frame boundaries', () => {
     }
   });
 
+  it('does not couple science to browser/XR storage, timers, or controller APIs', () => {
+    for (const source of Object.values(scienceSources)) {
+      expect(source).not.toMatch(/\b(?:navigator|XRSession|XRReferenceSpace|localStorage|indexedDB|setInterval|setTimeout)\b/);
+    }
+  });
+
+  it('keeps the browser UI outside direct Astronomy Engine imports', () => {
+    const presentationAndUiSources = Object.entries(applicationSources).filter(
+      ([path]) => !path.includes('/science/'),
+    );
+    for (const [, source] of presentationAndUiSources) {
+      expect(source).not.toMatch(/from\s+['"]astronomy-engine['"]/);
+    }
+  });
+
   it('keeps the application presentation mapping outside science and Three.js-free', () => {
     const [source] = Object.values(presentationSources);
     expect(source).toContain('east -> +X, up -> +Y, north -> -Z');

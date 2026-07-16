@@ -11,6 +11,10 @@ register](OFFICIAL_ASTRONOMY_SOURCES.md).
 
 ## Central simulation clock
 
+### Implemented non-visual subset
+
+Milestone 2A implements the deterministic core as `frozen` or explicit-tick `realtime`, paused state, signed finite rate, immutable UTC instant, and revision. It deliberately does not implement an ambient live clock, IANA time-zone/locale label state, calendar selection, temporal controls, or any solar/lunar calculation. The planned richer state contract below remains future temporal-layer architecture.
+
 ### State contract
 
 ```text

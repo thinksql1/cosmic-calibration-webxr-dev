@@ -183,6 +183,13 @@
   not expose this mean-only quantity, and substituting its true-of-date frame would silently add
   nutation.
 
+### DEC-018: Use explicit immutable scientific snapshots and exact frozen-time caching
+- **Date:** 2026-07-16
+- **Status:** Accepted
+- **Owner:** Darrell Wright / project control
+- **Decision:** Future scientific presentation consumes an immutable snapshot built from explicit observer, UTC clock, geographic-calibration, configuration, provider-version, and revisioned inputs. A missing or invalid input returns a structured non-ready result rather than partial geometry. The P03 axis and deterministic equator basis remain scientific data; calibrated yaw is recorded but applied only by the later presentation parent. Cache entries use the complete exact key and a bounded LRU policy. Frozen or paused instants may cache; an active unpaused clock deliberately bypasses caching. State serialization is versioned and revalidated, while room calibration and cache values are never persisted as universally valid truth.
+- **Rationale:** This prevents ambient time, stale observer/calibration values, frame ambiguity, and cache reuse from becoming hidden inputs to visible astronomy. Exact-key caching favors correctness over speculative time quantization and keeps the later rendering layer small.
+
 ## Proposed decisions awaiting review
 
 None yet.

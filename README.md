@@ -59,6 +59,10 @@ The desktop fallback retains OrbitControls. Use the bearing slider or the `0°`,
 
 See [Architecture](docs/ARCHITECTURE.md) and [Calibration](docs/CALIBRATION.md) for the signed-angle rule and physical procedure.
 
+## Scientific foundation status
+
+Milestone 2A provides a non-visual, explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. It remains separate from Three.js and the visible application: no celestial geometry, body display, time/location control, or persistence exists yet. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), and [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md).
+
 ## Physical north-marker workflow
 
 Milestone 1 assumes the physical marker already represents true north. DOM overlay is an

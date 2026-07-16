@@ -4,6 +4,9 @@
 
 ### Added
 
+- Non-visual Milestone 2A revisioned observer, explicit-tick UTC clock, read-only geographic-calibration adapter, validated Tier 1 configuration, provider registry, immutable P03 axis/equator-basis snapshot, structured readiness, and bounded exact-key LRU cache.
+- Deterministic state, serialization, clock, calibration, snapshot, basis, cache, and orchestration tests; the suite now has 12 files / 157 tests.
+- Scientific state, snapshot-contract, and cache-policy documentation plus DEC-018, preserving the presentation-only calibrated-yaw boundary.
 - Deterministic Vitest coverage for pending requests, renderer binding, active sessions, cleanup, retry, cleanup failure, and end-during-binding lifecycle transitions.
 - Pure horizontal projection, signed-yaw, bearing, and cardinal-direction calibration math with an explicit `-Z` application-north convention.
 - In-memory north-calibration state, left/right tracked-controller target-ray capture, calibration-only aiming rays, recoverable invalid-direction handling, and duplicate-capture suppression.
@@ -77,6 +80,9 @@
   application-entry integration, merge, push, deployment, or physical Quest celestial testing.
 - Selected one next task: implement the production-quality non-visual observer, simulation
   snapshot, provider facade, and cache/invalidation foundation before any visible axis or pole.
+- Completed the bounded Milestone 2A foundation locally without visible geometry, UI changes,
+  dependency changes, merge, push, deployment, or Quest celestial testing; selected the coherent
+  Earth-axis and celestial-pole layer as the only next task.
 
 ### Validated
 

@@ -1,5 +1,9 @@
 # Celestial Validation Strategy
 
+## Milestone 2A implemented checks
+
+The non-visual foundation adds deterministic store, serialization, explicit-tick clock, calibration-adapter, configuration, snapshot, exact-cache, LRU, axis-basis, and boundary tests. They retain the frozen 2A0 JPL/SOFA/P03 fixtures unchanged. Snapshot checks verify exact pole antipodes, unit/perpendicular/right-handed equator preparation, frame/provenance metadata, structured readiness, warnings, and no stale cache reuse after observer/time/calibration/profile changes. The checks are not a visual or Quest celestial validation.
+
 ## Purpose
 
 Scientific validation is designed before implementation. This strategy separates pure coordinate
