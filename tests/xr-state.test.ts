@@ -158,6 +158,29 @@ describe('ImmersiveArSessionController', () => {
     ]);
   });
 
+  it('forwards optional session features without weakening required local-floor', async () => {
+    const session = new FakeSession();
+    const states: XRState[] = [];
+    const requestSession = vi.fn().mockResolvedValue(session);
+    const options: XRSessionInit = {
+      requiredFeatures: ['local-floor'],
+      optionalFeatures: ['dom-overlay'],
+      domOverlay: { root: {} as Element },
+    };
+    const controller = new ImmersiveArSessionController(
+      { requestSession },
+      vi.fn().mockResolvedValue(undefined),
+      (state) => states.push(state),
+      undefined,
+      options,
+    );
+
+    await controller.start();
+
+    expect(requestSession).toHaveBeenCalledWith('immersive-ar', options);
+    expect(states.at(-1)?.kind).toBe('session-active');
+  });
+
   it('blocks duplicate starts while the session request is pending', async () => {
     const requestedSession = deferred<ImmersiveArSession>();
     const session = new FakeSession();

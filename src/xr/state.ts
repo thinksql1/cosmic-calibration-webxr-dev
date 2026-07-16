@@ -116,6 +116,9 @@ export class ImmersiveArSessionController {
     private readonly bindSession: SessionBinder,
     private readonly onState: StateListener,
     private readonly onDiagnostic: SessionDiagnosticListener = () => {},
+    private readonly sessionOptions: XRSessionInit = {
+      requiredFeatures: ['local-floor'],
+    },
   ) {}
 
   async start(): Promise<void> {
@@ -129,9 +132,7 @@ export class ImmersiveArSessionController {
     });
 
     try {
-      const session = await this.xr.requestSession('immersive-ar', {
-        requiredFeatures: ['local-floor'],
-      });
+      const session = await this.xr.requestSession('immersive-ar', this.sessionOptions);
 
       // A successful request owns an immersive session before renderer setup finishes.
       this.ownedSession = session;
@@ -149,7 +150,7 @@ export class ImmersiveArSessionController {
       this.onState({
         kind: 'session-active',
         message: 'Immersive AR session active.',
-        detail: 'Floor placement and passthrough still require physical Quest verification.',
+        detail: 'Use Calibrate North to align the geographic reference frame.',
       });
     } catch (error) {
       if (this.phase === 'requesting') {

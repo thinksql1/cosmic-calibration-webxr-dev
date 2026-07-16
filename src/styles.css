@@ -31,6 +31,7 @@ canvas {
 }
 
 .status-panel,
+.calibration-panel,
 .legend {
   position: fixed;
   z-index: 2;
@@ -38,6 +39,16 @@ canvas {
   background: rgb(6 17 22 / 82%);
   box-shadow: 0 14px 40px rgb(0 0 0 / 22%);
   backdrop-filter: blur(12px);
+}
+
+.calibration-panel {
+  top: clamp(14rem, 32vh, 17rem);
+  left: clamp(1rem, 3vw, 2rem);
+  width: min(27rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 16rem);
+  overflow: auto;
+  padding: 1rem 1.25rem 1.15rem;
+  border-radius: 0.8rem;
 }
 
 .status-panel {
@@ -63,6 +74,12 @@ h1 {
   letter-spacing: -0.025em;
 }
 
+h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 520;
+}
+
 .status {
   margin: 1.15rem 0 0;
   color: #f4fdff;
@@ -75,6 +92,50 @@ h1 {
   color: #9cb8be;
   font-size: 0.82rem;
   line-height: 1.4;
+}
+
+.calibration-status {
+  margin: 0.8rem 0 0;
+  color: #f4fdff;
+  line-height: 1.4;
+}
+
+.button-row,
+.bearing-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.button-row button,
+.bearing-presets button {
+  margin-top: 0.65rem;
+}
+
+.simulation-panel {
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(159 221 231 / 14%);
+}
+
+.simulation-panel label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #b9d2d7;
+  font-size: 0.78rem;
+}
+
+.simulation-panel input[type='range'] {
+  width: 100%;
+  margin-top: 0.7rem;
+  accent-color: #73d7e8;
+}
+
+.simulation-note {
+  margin: 0.65rem 0 0;
+  color: #78969d;
+  font-size: 0.7rem;
 }
 
 button {
@@ -127,6 +188,11 @@ button:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .calibration-panel {
+    top: 13.5rem;
+    max-height: calc(100vh - 19rem);
+  }
+
   .legend {
     left: 1rem;
     right: auto;

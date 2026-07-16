@@ -5,6 +5,12 @@
 ### Added
 
 - Deterministic Vitest coverage for pending requests, renderer binding, active sessions, cleanup, retry, cleanup failure, and end-during-binding lifecycle transitions.
+- Pure horizontal projection, signed-yaw, bearing, and cardinal-direction calibration math with an explicit `-Z` application-north convention.
+- In-memory north-calibration state, left/right tracked-controller target-ray capture, calibration-only aiming rays, recoverable invalid-direction handling, and duplicate-capture suppression.
+- A dedicated geographic-reference group with restrained N/S/E/W labels and cardinal axes plus shared desktop bearing simulation.
+- Physical setup and troubleshooting guidance in `docs/CALIBRATION.md`, architecture details, and a separate Milestone 1 Quest checklist.
+- Deterministic coverage for controller-only calibration, explicit release gating, exact event-frame
+  target-ray poses, tracking failure, overlay input isolation, and late-session cleanup.
 
 ### Changed
 
@@ -21,6 +27,20 @@
 - Replaced the broad Quest acceptance task with one bounded standing-calibration floor-alignment retest; seated or chair-height Quest calibration is recorded only as an unconfirmed environmental hypothesis.
 - Completed Milestone 0 after the controlled standing-floor Quest 3 retest passed; no north calibration, astronomy, controller ray, geographic heading, or persistence behavior was added.
 - Replaced the floor retest with one bounded Milestone 1 physical north-marker calibration task.
+- Requested DOM overlay only as an optional XR feature while retaining `local-floor` as required.
+- Calibration remains in memory and resets across immersive-session exit; persistence, automatic heading, magnetic correction, and astronomy remain deferred.
+- Recorded the failed initial Milestone 1 gate: optional DOM overlay was the only practical XR
+  calibration path, missing current poses could fall through to stale/default transforms, and
+  overlay actions could collide with XR selection.
+- Added a controller-only begin/release/capture state machine with squeeze and deliberate-hold
+  cancel/recalibrate/reset actions plus restrained controller/world spatial feedback.
+- Required capture from the exact native XR input-event frame and reference space; missing,
+  disconnected, invisible, non-finite, and stale/default-only pose cases remain recoverable and
+  preserve any prior accepted calibration.
+- Added per-control `beforexrselect` cancellation while DOM overlay is active and cleanup guards
+  that prevent native or overlay listeners from being reattached after manager deactivation.
+- Replaced the physical-device task with one independent Milestone 1 re-gate; no merge, push,
+  deployment, or physical Quest validation occurred during remediation.
 
 ### Validated
 
@@ -32,12 +52,26 @@
 - GitHub Pages workflow run #2 passed its build (15/15 tests) and deployment jobs; the hosted production page loaded at `https://thinksql1.github.io/cosmic-calibration-webxr/` with subpath-safe assets, a rendered desktop canvas, readable fallback status, and no browser-console warnings or errors.
 - Physical Quest testing: immersive AR entry PASS; passthrough PASS; world locking/stability PASS; exit, re-entry, and recenter PASS.
 - Controlled standing-floor Quest 3 retest: reference geometry visible; origin and horizon ring aligned with the physical floor; ring horizontal; zenith/nadir vertical; world locking, exit, re-entry, recenter, comfort, and usability all PASS.
+- Milestone 1 local validation: clean `npm ci`, type-check, 3 test files / 43 tests, production build, dependency inspection, and `git diff --check` passed.
+- Development and production-preview desktop simulation passed for known bearings, recalibration, reset, geographic-label rendering, relative asset paths, and console health.
+- Milestone 1 remediation clean install, type-check, 3 test files / 66 tests, production build,
+  dependency inspection, and `git diff --check` passed locally, including
+  cross-controller release gating, canceled-action behavior, exact pose arguments, valid current
+  identity pose, stale/missing pose rejection, stale-press invalidation, feedback fallback, overlay
+  isolation, and late-bind cleanup.
+- Development and production-preview inspection passed in the Codex in-app Chromium browser:
+  Milestone 0 geometry, known-bearing simulation, recalibration/reset, OrbitControls, resize,
+  relative production assets, readable fallback status, and console health remained intact.
 
 ### Known limitations
 
 - The earlier chair-height observation was environmental and resolved by resetting the Quest floor for standing use; this evidence is limited to the tested Quest 3 environment.
 - The Three.js production chunk triggers Vite's 500 kB size advisory.
 - Milestone 0 does not establish future north calibration, geographic heading, controller ray, persistence, astronomy, or celestial-geometry behavior.
+- Milestone 1 physical Quest north-marker calibration is **NOT RUN**; no feature-branch push or deployment occurred.
+- The remediated Milestone 1 build still requires an independent re-gate before integration or
+  publication; physical controller-only and DOM-overlay behavior remains **NOT RUN** on Quest.
+- The existing Three.js production chunk still triggers Vite’s 500 kB size advisory.
 
 ## 2026-07-15 — Initial project activation
 

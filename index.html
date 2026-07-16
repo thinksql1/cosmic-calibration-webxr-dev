@@ -12,16 +12,43 @@
   <body>
     <main id="app" aria-label="Cosmic Calibration WebXR technical spike">
       <section class="status-panel" aria-labelledby="app-title">
-        <p class="eyebrow">Milestone 0 · Reference frame</p>
+        <p class="eyebrow">Milestone 1 · North calibration</p>
         <h1 id="app-title">Cosmic Calibration</h1>
         <p id="status" class="status" role="status" aria-live="polite"></p>
         <button id="enter-ar" type="button" hidden>Enter AR</button>
         <p id="status-detail" class="status-detail"></p>
       </section>
+      <section class="calibration-panel" aria-labelledby="north-title">
+        <p class="eyebrow">Geographic reference</p>
+        <h2 id="north-title">Physical North</h2>
+        <p id="north-status" class="calibration-status" role="status" aria-live="polite"></p>
+        <p id="north-detail" class="status-detail"></p>
+        <div class="button-row">
+          <button id="calibrate-north" type="button" hidden>Calibrate North</button>
+          <button id="cancel-calibration" type="button" hidden>Cancel Calibration</button>
+          <button id="reset-north" type="button" hidden>Reset North</button>
+        </div>
+        <div id="desktop-simulation" class="simulation-panel">
+          <label for="simulated-bearing">
+            Simulated true-north bearing
+            <output id="bearing-output" for="simulated-bearing">0°</output>
+          </label>
+          <input id="simulated-bearing" type="range" min="0" max="359" step="1" value="0" />
+          <div class="bearing-presets" aria-label="Known bearing presets">
+            <button type="button" data-bearing="0">0°</button>
+            <button type="button" data-bearing="90">90°</button>
+            <button type="button" data-bearing="180">180°</button>
+            <button type="button" data-bearing="270">270°</button>
+            <button id="simulate-north" type="button">Simulate North</button>
+          </div>
+          <p class="simulation-note">Simulation uses the same calibration math as controller capture.</p>
+        </div>
+      </section>
       <aside class="legend" aria-label="Coordinate legend">
         <span><i class="swatch swatch-y"></i>+Y up / zenith</span>
         <span><i class="swatch swatch-floor"></i>Y = 0 floor plane</span>
         <span>X and Z are room-relative</span>
+        <span>N/S/E/W appear only after calibration</span>
       </aside>
       <div id="scene" aria-hidden="true"></div>
     </main>

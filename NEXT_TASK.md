@@ -4,90 +4,44 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Implement physical north-marker calibration
+**Title:** Re-run the Milestone 1 independent integration gate
 
 ## Why this is next
 
-Milestone 0 is complete: automated, desktop, and tested Quest 3 immersive AR, passthrough, floor alignment, stability, session lifecycle, recenter, comfort, and usability checks passed. The next capability is a deliberate user-driven alignment of the room-relative reference frame to a pre-marked physical north direction.
-
-## Recommended execution
-
-**Model:** GPT-5.6 Sol
-
-**Reasoning effort:** High
-
-**Mode:** Plan, then bounded implementation
-
-**Thread:** Main control thread
+The first gate found three material XR-input defects. The feature branch now includes bounded
+remediation for controller-only calibration, exact current-event target-ray pose validation, and
+DOM-overlay `beforexrselect` isolation. Those changes require independent inspection and
+reproduction before integration, publication, or physical Quest acceptance.
 
 ## Objective
 
-Allow a standing Quest user to point a tracked controller toward a physical north marker and capture the horizontal yaw offset required to align the application’s room-relative coordinate system with geographic north. The existing room axes are not geographic directions before calibration.
+Independently review the complete Milestone 1 branch and the remediation diff, reproduce all
+automated and desktop checks, and confirm that no blocking or material finding remains.
 
-## Required scope
+## Required work
 
-1. Detect and display available XR controllers.
-2. Render a restrained controller aiming ray only where useful during calibration.
-3. Provide an explicit **Calibrate North** workflow that requires the user to stand at the chosen physical origin marker and point one controller toward the pre-marked north reference.
-4. Project the captured controller direction onto the horizontal XZ plane and reject a too-small or nearly vertical projection with readable feedback.
-5. Define and test an explicit coordinate convention without relying silently on a Three.js forward-axis assumption.
-6. Calculate and store an in-memory yaw offset so captured physical north aligns with geographic north; south is opposite north, east and west are perpendicular, and Y remains local vertical.
-7. Rotate a dedicated geographic-reference group rather than altering scientific source coordinates.
-8. Render N, S, E, W, north–south and east–west lines, and retain the existing horizon ring and zenith/nadir line.
-9. Provide recalibrate and reset controls plus explicit calibrated, uncalibrated, and error states.
-10. Preserve desktop fallback through a simulation method that exercises calibration logic.
-11. Add unit tests for horizontal projection, known-vector yaw sign/angle conventions, invalid-direction rejection, reset, and recalibration.
-12. Document the physical setup procedure and the limit that a yaw value is not universally valid across boundary resets, recentering, rooms, or tracking-origin changes.
+1. Review the feature against its Milestone 0 baseline and inspect the remediation separately.
+2. Verify the controller-only begin, release, capture, cancel, recalibrate, reset, feedback, and
+   cross-controller gating paths from actual control flow.
+3. Verify capture requires the exact current input-event frame pose and rejects missing,
+   stale/default-only, disconnected, invisible, non-finite, and nearly vertical inputs.
+4. Verify failed recalibration preserves the prior accepted calibration.
+5. Verify interactive overlay controls cancel `beforexrselect`, outside-overlay controller input
+   remains functional, and all session/overlay listeners are cleaned up, including late binding.
+6. Re-run clean install, type-check, all tests, production build, diff check, and dependency review.
+7. Inspect development and production-preview desktop behavior, simulation, controls, resize,
+   relative assets, and browser console.
+8. Confirm documentation matches actual behavior and physical Quest validation remains NOT RUN.
+9. Integrate, publish, or begin physical validation only under separate explicit authorization.
 
-## Persistence boundary
+## Acceptance rules
 
-- In-memory calibration is required.
-- Browser local-storage persistence may be included only if it remains small and testable and never implies room-persistence validity.
-- Defer persistence if it adds ambiguity or risk; always provide a visible recalibration path.
+- **PASS:** No blocking or material finding remains and all required local validation passes.
+- **FAIL:** Any input race, invalid-pose capture, overlay collision, regression, unsupported claim,
+  or validation failure remains; return one bounded remediation task and do not integrate.
 
-## Explicitly deferred
+## Prohibited scope
 
-- Astronomy Engine, geolocation, automatic compass access, magnetic declination, and true-versus-magnetic-north correction.
-- Sun or Moon calibration; spatial anchors, plane detection, hit testing, and hand tracking.
-- Earth axis, celestial poles/equator, ecliptic, Sun, Moon, planets, time controls, orbital paths, contemplative sequencing, audio, and 360 video.
-
-## Acceptance criteria
-
-1. Existing Milestone 0 behavior remains intact.
-2. The controller ray appears only where useful for calibration.
-3. A horizontal controller direction can be captured.
-4. Nearly vertical or invalid rays are rejected with readable feedback.
-5. Geographic N/S/E/W geometry rotates coherently from the stored yaw.
-6. Known-vector unit tests verify the accepted sign and angle convention.
-7. Recalibration replaces the prior calibration; reset returns to an explicitly uncalibrated state.
-8. Desktop simulation exercises calibration logic.
-9. Type-check, tests, and build pass.
-10. Quest testing remains a separate physical acceptance step.
-11. No astronomical or automatic-heading features are added.
-
-## Stop conditions
-
-- The coordinate sign/rotation convention cannot be made explicit and covered by known-vector tests.
-- A dependency, persistence mechanism, or scope expansion would be required to make calibration deterministic.
-- The work requires astronomy, geolocation, automatic heading, or other deferred features.
-
-## Expected return format
-
-```text
-Objective:
-Status: Complete | Partial | Blocked
-
-Calibration convention:
-- Captured direction:
-- Horizontal projection:
-- Yaw rule:
-- Geographic-reference rotation:
-
-Validation:
-- PASS:
-- FAIL:
-- NOT RUN:
-
-Exact next task:
-- <one bounded task>
-```
+- Do not infer physical Quest PASS from source, tests, or desktop behavior.
+- Do not begin Milestone 2, astronomy, geolocation, magnetic correction, persistence, or anchors.
+- Do not merge, push, deploy, or test on Quest without the authorization required by the gate task.

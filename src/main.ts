@@ -1,7 +1,18 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import './styles.css';
+import { normalizeDegrees } from './calibration/math';
+import {
+  isCalibrationActive,
+  NorthCalibrationController,
+  type NorthCalibrationState,
+} from './calibration/state';
+import {
+  applyCalibrationToGeographicGroup,
+  createGeographicReferenceGroup,
+} from './scene/createGeographicReference';
 import { createReferenceScene } from './scene/createReferenceScene';
+import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
   detectImmersiveAr,
@@ -20,9 +31,32 @@ const sceneHost = requireElement<HTMLDivElement>('#scene');
 const statusElement = requireElement<HTMLParagraphElement>('#status');
 const detailElement = requireElement<HTMLParagraphElement>('#status-detail');
 const enterArButton = requireElement<HTMLButtonElement>('#enter-ar');
+const calibrationStatus = requireElement<HTMLParagraphElement>('#north-status');
+const calibrationDetail = requireElement<HTMLParagraphElement>('#north-detail');
+const calibrateButton = requireElement<HTMLButtonElement>('#calibrate-north');
+const cancelCalibrationButton = requireElement<HTMLButtonElement>('#cancel-calibration');
+const resetNorthButton = requireElement<HTMLButtonElement>('#reset-north');
+const desktopSimulation = requireElement<HTMLDivElement>('#desktop-simulation');
+const bearingInput = requireElement<HTMLInputElement>('#simulated-bearing');
+const bearingOutput = requireElement<HTMLOutputElement>('#bearing-output');
+const simulateNorthButton = requireElement<HTMLButtonElement>('#simulate-north');
+const bearingPresetButtons = [
+  ...document.querySelectorAll<HTMLButtonElement>('[data-bearing]'),
+];
+const domOverlayControls: EventTarget[] = [
+  enterArButton,
+  calibrateButton,
+  cancelCalibrationButton,
+  resetNorthButton,
+  bearingInput,
+  simulateNorthButton,
+  ...bearingPresetButtons,
+];
 
 const desktopBackground = new THREE.Color(0x071014);
 const scene = createReferenceScene();
+const geographicReference = createGeographicReferenceGroup();
+scene.add(geographicReference);
 scene.background = desktopBackground;
 
 const camera = new THREE.PerspectiveCamera(
@@ -50,6 +84,10 @@ controls.minDistance = 1.2;
 controls.maxDistance = 9;
 controls.update();
 
+const northCalibration = new NorthCalibrationController();
+let currentXrState: XRState = checkingState;
+let controllerManager: NorthCalibrationControllerManager | undefined;
+
 function setImmersivePresentation(active: boolean): void {
   controls.enabled = !active;
   scene.background = active ? null : desktopBackground;
@@ -57,6 +95,7 @@ function setImmersivePresentation(active: boolean): void {
 }
 
 function renderState(state: XRState): void {
+  currentXrState = state;
   statusElement.textContent = state.message;
   detailElement.textContent = state.detail ?? '';
   document.body.dataset.xrState = state.kind;
@@ -70,14 +109,84 @@ function renderState(state: XRState): void {
   enterArButton.textContent = state.kind === 'session-denied-or-failed' ? 'Try AR again' : 'Enter AR';
 
   if (state.kind === 'session-active') setImmersivePresentation(true);
+  if (state.kind === 'session-starting') {
+    northCalibration.reset();
+    controllerManager?.activate();
+  }
   if (
     state.kind === 'session-cleaning' ||
     state.kind === 'session-ended' ||
     state.kind === 'session-denied-or-failed'
   ) {
     setImmersivePresentation(false);
+    controllerManager?.deactivate();
+    northCalibration.reset();
   }
+
+  renderCalibrationState(northCalibration.current);
 }
+
+function formatYaw(yawRadians: number): string {
+  const degrees = (yawRadians * 180) / Math.PI;
+  return `${degrees >= 0 ? '+' : ''}${degrees.toFixed(1)}°`;
+}
+
+function renderCalibrationState(state: NorthCalibrationState): void {
+  const xrActive = currentXrState.kind === 'session-active';
+  const calibrationActive = isCalibrationActive(state);
+  const interaction = controllerManager?.currentInteraction;
+  applyCalibrationToGeographicGroup(geographicReference, state);
+  controllerManager?.updateRayVisibility();
+  document.body.dataset.northState = state.kind;
+
+  if (state.kind === 'uncalibrated') {
+    calibrationStatus.textContent = 'North not calibrated.';
+    calibrationDetail.textContent = xrActive
+      ? interaction?.kind === 'reset'
+        ? 'North reset. Press and release either controller trigger to begin again.'
+        : 'Press and release either controller trigger once to begin calibration. The first press only arms capture.'
+      : 'Enter AR for physical calibration or use the desktop simulation.';
+  } else if (state.kind === 'calibrating') {
+    calibrationStatus.textContent = 'North calibration active.';
+    calibrationDetail.textContent =
+      interaction?.kind === 'awaiting-release'
+        ? 'Release the starting trigger. A later deliberate trigger press captures north.'
+        : 'Point either tracked controller at true north and press its trigger. Squeeze cancels; holding trigger for 1.2 seconds is the no-squeeze cancel fallback.';
+  } else if (state.kind === 'calibrated') {
+    calibrationStatus.textContent = state.calibration.simulated
+      ? 'North calibrated (desktop simulation).'
+      : 'North calibrated.';
+    calibrationDetail.textContent = `Geographic-group yaw: ${formatYaw(state.calibration.yawRadians)}. Trigger starts recalibration; hold trigger or grip for 1.2 seconds to reset. Recalibrate after recentering, changing rooms, or resetting the boundary.`;
+  } else {
+    calibrationStatus.textContent =
+      state.kind === 'controller-unavailable'
+        ? 'Controller unavailable.'
+        : state.kind === 'invalid-direction'
+          ? 'Direction not usable.'
+          : 'North capture failed.';
+    calibrationDetail.textContent = state.previousCalibration
+      ? `${state.message} Squeeze or hold trigger to cancel and restore the prior accepted calibration.`
+      : state.message;
+  }
+
+  calibrateButton.hidden = !xrActive || calibrationActive;
+  calibrateButton.textContent = state.kind === 'calibrated' ? 'Recalibrate North' : 'Calibrate North';
+  cancelCalibrationButton.hidden = !xrActive || !calibrationActive;
+  resetNorthButton.hidden = state.kind === 'uncalibrated';
+  desktopSimulation.hidden = xrActive;
+}
+
+northCalibration.subscribe(renderCalibrationState);
+
+controllerManager = new NorthCalibrationControllerManager(
+  scene,
+  (index) => renderer.xr.getController(index),
+  () => renderer.xr.getReferenceSpace(),
+  northCalibration,
+);
+controllerManager.subscribeInteraction(() => {
+  renderCalibrationState(northCalibration.current);
+});
 
 const browserXr = navigator.xr;
 const xrApi = browserXr
@@ -94,11 +203,22 @@ if (xrApi) {
   sessionController = new ImmersiveArSessionController(
     xrApi,
     async (session: ImmersiveArSession) => {
-      await renderer.xr.setSession(session as XRSession);
+      const xrSession = session as XRSession;
+      await renderer.xr.setSession(xrSession);
+      controllerManager?.bindSession(xrSession);
+      controllerManager?.configureDomOverlay(
+        domOverlayControls,
+        Boolean(xrSession.domOverlayState),
+      );
     },
     renderState,
     (phase, error) => {
       console.warn(`WebXR ${phase} failure.`, error);
+    },
+    {
+      requiredFeatures: ['local-floor'],
+      optionalFeatures: ['dom-overlay'],
+      domOverlay: { root: document.body },
     },
   );
 }
@@ -106,6 +226,39 @@ if (xrApi) {
 enterArButton.addEventListener('click', () => {
   void sessionController?.start();
 });
+
+calibrateButton.addEventListener('click', () => {
+  controllerManager?.beginCalibration();
+});
+
+cancelCalibrationButton.addEventListener('click', () => {
+  controllerManager?.cancelCalibration();
+});
+
+resetNorthButton.addEventListener('click', () => {
+  controllerManager?.resetCalibration();
+});
+
+function updateBearingOutput(): void {
+  bearingOutput.value = `${normalizeDegrees(Number(bearingInput.value)).toFixed(0)}°`;
+}
+
+function simulateBearing(degrees: number): void {
+  bearingInput.value = String(normalizeDegrees(degrees));
+  updateBearingOutput();
+  northCalibration.simulateBearing(degrees);
+}
+
+bearingInput.addEventListener('input', updateBearingOutput);
+simulateNorthButton.addEventListener('click', () => {
+  simulateBearing(Number(bearingInput.value));
+});
+bearingPresetButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    simulateBearing(Number(button.dataset.bearing));
+  });
+});
+updateBearingOutput();
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
