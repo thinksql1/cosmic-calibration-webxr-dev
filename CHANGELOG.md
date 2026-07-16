@@ -41,10 +41,14 @@
   that prevent native or overlay listeners from being reattached after manager deactivation.
 - Replaced the physical-device task with one independent Milestone 1 re-gate; no merge, push,
   deployment, or physical Quest validation occurred during remediation.
+- Integrated the remediated Milestone 1 feature branch into local `master` with normal merge commit
+  `8a20899`; the feature branch was retained and history was not rewritten.
+- Replaced the independent re-gate task with one bounded physical Quest north-calibration
+  acceptance task that starts only after hosted Milestone 1 controls are confirmed.
 
 ### Validated
 
-- The independent re-gate found no blocking or material implementation, lifecycle, workflow, test, documentation, dependency, or deferred-scope findings.
+- The independent Milestone 0 re-gate found no blocking or material implementation, lifecycle, workflow, test, documentation, dependency, or deferred-scope findings.
 - On the feature branch, `npm ci`, type-check, 15/15 unit tests, production build, `git diff --check`, and `npm ls --depth=0` passed.
 - On integrated `master`, the same `npm ci`, type-check, 15/15 unit tests, production build, diff, and dependency-tree checks passed again.
 - Desktop development and production-preview scenes passed Chromium inspection for reference geometry, OrbitControls, resize, readable fallback status, and console health; production preview passed again after integration.
@@ -62,15 +66,19 @@
 - Development and production-preview inspection passed in the Codex in-app Chromium browser:
   Milestone 0 geometry, known-bearing simulation, recalibration/reset, OrbitControls, resize,
   relative production assets, readable fallback status, and console health remained intact.
+- The independent Milestone 1 re-gate found no blocking or material controller-only, current-pose,
+  overlay-collision, coordinate, test, documentation, dependency, or deferred-scope finding.
+- Merged `master` passed a clean install, type-check, 3 test files / 66 tests, production build,
+  dependency inspection, `git diff --check`, and development/production-preview desktop checks.
 
 ### Known limitations
 
 - The earlier chair-height observation was environmental and resolved by resetting the Quest floor for standing use; this evidence is limited to the tested Quest 3 environment.
 - The Three.js production chunk triggers Vite's 500 kB size advisory.
 - Milestone 0 does not establish future north calibration, geographic heading, controller ray, persistence, astronomy, or celestial-geometry behavior.
-- Milestone 1 physical Quest north-marker calibration is **NOT RUN**; no feature-branch push or deployment occurred.
-- The remediated Milestone 1 build still requires an independent re-gate before integration or
-  publication; physical controller-only and DOM-overlay behavior remains **NOT RUN** on Quest.
+- Milestone 1 physical Quest north-marker calibration is **NOT RUN**; the integrated build is not
+  yet pushed or deployed.
+- Physical controller-only and DOM-overlay behavior remains **NOT RUN** on Quest.
 - The existing Three.js production chunk still triggers Vite’s 500 kB size advisory.
 
 ## 2026-07-15 — Initial project activation

@@ -4,44 +4,53 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Re-run the Milestone 1 independent integration gate
+**Title:** Run the Milestone 1 physical north-calibration acceptance test
 
-## Why this is next
+## Start condition
 
-The first gate found three material XR-input defects. The feature branch now includes bounded
-remediation for controller-only calibration, exact current-event target-ray pose validation, and
-DOM-overlay `beforexrselect` isolation. Those changes require independent inspection and
-reproduction before integration, publication, or physical Quest acceptance.
+Begin only after confirming that the hosted Pages site contains the Milestone 1 **Physical North**
+controls and desktop bearing simulation. Do not infer device behavior from source, unit tests,
+desktop simulation, or hosted desktop inspection.
 
 ## Objective
 
-Independently review the complete Milestone 1 branch and the remediation diff, reproduce all
-automated and desktop checks, and confirm that no blocking or material finding remains.
+On a physical Quest 3, verify that controller-only and optional DOM-overlay north calibration are
+usable, reject invalid captures safely, preserve the floor-relative Milestone 0 scene, and remain
+coherent across recalibration, reset, session exit/re-entry, and recenter.
 
 ## Required work
 
-1. Review the feature against its Milestone 0 baseline and inspect the remediation separately.
-2. Verify the controller-only begin, release, capture, cancel, recalibrate, reset, feedback, and
-   cross-controller gating paths from actual control flow.
-3. Verify capture requires the exact current input-event frame pose and rejects missing,
-   stale/default-only, disconnected, invisible, non-finite, and nearly vertical inputs.
-4. Verify failed recalibration preserves the prior accepted calibration.
-5. Verify interactive overlay controls cancel `beforexrselect`, outside-overlay controller input
-   remains functional, and all session/overlay listeners are cleaned up, including late binding.
-6. Re-run clean install, type-check, all tests, production build, diff check, and dependency review.
-7. Inspect development and production-preview desktop behavior, simulation, controls, resize,
-   relative assets, and browser console.
-8. Confirm documentation matches actual behavior and physical Quest validation remains NOT RUN.
-9. Integrate, publish, or begin physical validation only under separate explicit authorization.
+1. Establish a safe standing or room-scale boundary and deliberately confirm the physical floor.
+2. Open the deployed Pages URL and confirm the Milestone 1 controls are present before entering AR.
+3. Enter immersive AR and verify passthrough, floor geometry, and world locking still behave as in
+   the accepted Milestone 0 result.
+4. Test the controller-only start, release/arm, later capture, cancel, recalibrate, deliberate reset,
+   left-controller, and right-controller paths without relying on DOM overlay.
+5. If Quest Browser provides DOM overlay, test its calibrate, cancel, recalibrate, and reset controls
+   and confirm each overlay action causes no duplicate XR capture. If unavailable, record that path
+   as NOT APPLICABLE rather than FAIL.
+6. Attempt capture with a missing/untracked or nearly vertical target ray where practical and verify
+   that the previous accepted calibration is preserved and a later valid capture remains possible.
+7. Verify the physical north marker, N/S/E/W geometry, displayed yaw, readability, scale, comfort,
+   and controller/world feedback.
+8. Exit and re-enter immersive AR, recenter once, and verify the documented need for deliberate
+   recalibration without stale or corrupted geographic geometry.
+9. Record each observation as PASS, FAIL, UNCERTAIN, NOT RUN, or NOT APPLICABLE, including Quest
+   Browser/system versions and whether DOM overlay was available.
 
 ## Acceptance rules
 
-- **PASS:** No blocking or material finding remains and all required local validation passes.
-- **FAIL:** Any input race, invalid-pose capture, overlay collision, regression, unsupported claim,
-  or validation failure remains; return one bounded remediation task and do not integrate.
+- **PASS:** Physical capture aligns application north to the marked direction; controller-only
+  lifecycle, invalid-input recovery, recalibration/reset, session lifecycle, floor reference,
+  stability, readability, and comfort are usable with no duplicate capture or severe regression.
+- **FAIL:** Any stale/default capture, same-action begin-and-capture, overlay collision, unusable
+  controller-only path, lost prior calibration after rejected recapture, floor/stability regression,
+  fatal session error, or severe comfort issue occurs.
+- **UNCERTAIN:** The physical setup, marker, controller tracking, or observation cannot establish a
+  reliable result. Do not promote uncertainty to PASS.
 
 ## Prohibited scope
 
-- Do not infer physical Quest PASS from source, tests, or desktop behavior.
-- Do not begin Milestone 2, astronomy, geolocation, magnetic correction, persistence, or anchors.
-- Do not merge, push, deploy, or test on Quest without the authorization required by the gate task.
+- Do not begin Milestone 2, astronomy, celestial-pole/precession geometry, automatic north,
+  compass access, magnetic correction, geolocation, persistence, anchors, or deployment changes.
+- Do not modify application code while collecting acceptance evidence. Record any failure first.

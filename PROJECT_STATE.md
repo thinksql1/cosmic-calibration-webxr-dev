@@ -1,14 +1,14 @@
 # Project State
 
-**Last updated:** 2026-07-15 America/New_York
+**Last updated:** 2026-07-16 America/New_York
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 1 gate remediation complete / independent re-gate pending
+**Current phase:** Milestone 1 integrated / authorized publication pending
 
-**Overall status:** **Milestone 1 remediation PASS locally.** The initial independent gate failed
-on three confirmed XR-input defects. The bounded remediation and automated validation pass;
-independent re-gate and physical Quest north calibration are **NOT RUN**.
+**Overall status:** **Milestone 1 independent gate PASS and integrated locally.** Automated and
+desktop validation pass on merged `master`; publication is pending and physical Quest north
+calibration is **NOT RUN**.
 
 ## One-paragraph state summary
 
@@ -16,11 +16,13 @@ Milestone 0 is complete and its deployed build remains at
 https://thinksql1.github.io/cosmic-calibration-webxr/. The first Milestone 1 independent gate
 failed because calibration depended on optional DOM overlay, capture could use a stale/default
 controller transform when no current pose existed, and an overlay action could also produce XR
-`select`. The feature branch now has a controller-only start/release/capture/cancel/recalibrate/reset
-flow, exact event-frame target-ray pose validation, and `beforexrselect` isolation. Clean install,
-type-check, 66 deterministic tests, production build, dependency/diff inspection, and observed
-development/production-preview desktop behavior pass. Independent re-gate and physical Quest
-north calibration are **NOT RUN**; the branch is not pushed or deployed.
+`select`. Commit `2275661` remediated those defects with a controller-only lifecycle, exact
+event-frame target-ray pose validation, and `beforexrselect` isolation. The independent re-gate
+found no blocking or material issue, and merge commit `8a20899` integrated the retained feature
+branch normally into local `master`. Clean install, type-check, 66 deterministic tests, production
+build, dependency/diff inspection, and development/production-preview desktop behavior pass on
+merged `master`. The Milestone 1 build is not yet pushed or deployed; physical Quest north
+calibration is **NOT RUN**.
 
 ## Working and verified
 
@@ -46,6 +48,12 @@ north calibration are **NOT RUN**; the branch is not pushed or deployed.
   includes controller-only input, current-event pose validity, cross-controller release
   gating and stale-press invalidation, overlay isolation, and cleanup races.
 - Desktop development and production-preview simulation: known bearings `0°`, `90°`, `180°`, and `270°` produced the expected signed yaw; recalibration replaced the prior result; reset restored uncalibrated state; geographic labels rendered; relative assets loaded; console remained clean.
+- Independent Milestone 1 re-gate: PASS for controller-only lifecycle, current-event pose proof,
+  DOM-overlay suppression, coordinates/frame separation, tests, documentation, dependencies, and
+  deferred-scope review; physical Quest behavior remains NOT RUN.
+- Local Milestone 1 integration: merge commit `8a20899` retained the feature branch and did not
+  rewrite history. Merged `master` passed `npm ci`, type-check, 66/66 tests, production build,
+  `git diff --check`, dependency inspection, and development/production-preview desktop checks.
 
 ## Implemented but not fully verified
 
@@ -68,12 +76,12 @@ north calibration are **NOT RUN**; the branch is not pushed or deployed.
 
 ## In progress
 
-- Complete remediation validation and re-run the Milestone 1 independent integration gate.
+- Push the validated integrated `master`, verify the existing Pages workflow, and confirm the
+  hosted site exposes the Milestone 1 controls before physical acceptance begins.
 
 ## Blocked
 
-- Physical Quest acceptance requires the independent re-gate, integration, and an authorized
-  deployed Milestone 1 build. This remediation task does not merge, push, or deploy.
+- Physical Quest acceptance is intentionally waiting for a confirmed hosted Milestone 1 build.
 
 ## Known defects or limitations
 
@@ -110,7 +118,7 @@ north calibration are **NOT RUN**; the branch is not pushed or deployed.
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation and geographic-frame convention decisions | Current |
-| `NEXT_TASK.md` | One Milestone 1 independent re-gate task | Active |
+| `NEXT_TASK.md` | One Milestone 1 physical north-calibration acceptance task | Active after hosted-control confirmation |
 
 ## Environment
 
@@ -163,9 +171,11 @@ north calibration are **NOT RUN**; the branch is not pushed or deployed.
 | 2026-07-15 | Milestone 1 local implementation validation | PASS; clean install, type-check, 43/43 tests, production build, desktop known bearings/reset/recalibration, relative preview assets, and clean console | `feature/milestone-1-north-calibration` |
 | 2026-07-15 | Initial Milestone 1 independent integration gate | FAIL; optional-overlay dependency, stale/default pose capture risk, and overlay/XR select collision required remediation | Feature commit `8b3dbe2` |
 | 2026-07-15 | Milestone 1 input remediation | Clean install, type-check, 66/66 tests, build, dependency/diff checks, and desktop development/preview PASS; independent re-gate pending | `feature/milestone-1-north-calibration` |
+| 2026-07-16 | Independent Milestone 1 remediation re-gate | PASS; the three original input defects are resolved, automated/desktop checks pass, and physical Quest behavior remains NOT RUN | Commit `2275661` |
+| 2026-07-16 | Local Milestone 1 integration and revalidation | PASS; normal no-fast-forward merge, retained feature branch, 66/66 merged-master tests, build, dependency/diff, and desktop development/preview checks | Merge commit `8a20899` on `master` |
 | 2026-07-15 | Milestone 1 physical Quest acceptance | NOT RUN | `docs/QUEST_TESTING.md` |
 
 ## Current decision horizon
 
-Re-run the independent Milestone 1 integration gate. Only a passing gate may authorize later
-integration/publication and the bounded physical north-calibration acceptance checklist.
+Publish and verify the authorized integrated Milestone 1 build. Begin the bounded physical
+north-calibration acceptance checklist only after the hosted Milestone 1 controls are confirmed.
