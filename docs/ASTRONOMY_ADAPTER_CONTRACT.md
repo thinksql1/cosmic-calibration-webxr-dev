@@ -257,6 +257,7 @@ contract**. It is not validated as a generic astronomy authority, as a P03 mean-
 for Tier 2/Tier 3 claims. Planet operations, event searches, ecliptic frames, refraction near the
 horizon, and every later visible layer require their own profiles and fixtures.
 
-The production entry point does not import this non-visual spike yet. Vite therefore emitted the
-same 574.29 kB application/Three.js chunk as before; package adoption adds no current visible
-runtime behavior. The existing size advisory remains.
+Milestone 2B now reaches the adapter only through the validated scientific snapshot; presentation
+does not import Astronomy Engine or the P03 provider directly. The integrated production build
+emits a 662.83 kB minified / 178.12 kB gzip application/Three.js/astronomy chunk. The existing
+500 kB size advisory remains and physical Quest startup/performance evidence is pending.

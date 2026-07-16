@@ -19,10 +19,10 @@ mean-pole provider before selecting visible axis or precession geometry.
 `feature/milestone-2a0-astronomy-validation`. Astronomy Engine `2.1.19`, the canonical ENU
 boundary, and the application-owned P03 mean-pole provider passed their bounded fixture gates.
 Milestone 2A's non-visual state/snapshot/cache foundation passed its independent gate and is
-integrated and published. Milestone 2B is now implemented locally on its feature branch: it
-consumes the validated snapshot for only a coherent Earth axis and NCP/SCP presentation layer.
-Its automated and desktop gates pass; independent integration, publication, and physical Quest
-acceptance remain pending. It does not add equator geometry, precession, bodies, ecliptic,
+integrated and published. Milestone 2B consumes the validated snapshot for only a coherent Earth
+axis and NCP/SCP presentation layer. Its independent, automated, and desktop gates pass and it is
+integrated normally into local `master`; publication and physical Quest acceptance remain pending.
+It does not add equator geometry, precession, bodies, ecliptic,
 temporal clocks, media, or contemplative logic.
 
 ## Sequence overview
@@ -132,8 +132,8 @@ layers, temporal clocks, and time controls.
 
 ## Milestone 2B - mean Earth axis and celestial poles
 
-**Local result:** implementation and desktop validation PASS; independent integration,
-publication, and physical Quest acceptance NOT RUN.
+**Integrated result:** independent scientific/visual review, automated validation, and desktop
+validation PASS; publication and physical Quest acceptance NOT RUN.
 
 **Objective:** render one coherent observer-centered P03 mean-axis-of-date system with exact
 antipodal north and south celestial poles.

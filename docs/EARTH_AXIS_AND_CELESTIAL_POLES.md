@@ -2,9 +2,9 @@
 
 ## Status
 
-Milestone 2B is implemented locally on `feature/milestone-2b-earth-axis-poles`. Automated and
-desktop development/production-preview validation pass. Independent integration, publication,
-hosted verification, and physical Quest acceptance have not run.
+Milestone 2B passed independent scientific/visual review and was integrated normally into local
+`master` at merge commit `09a6e67`. Automated and desktop development/production-preview
+validation pass. Publication, hosted verification, and physical Quest acceptance have not run.
 
 This layer renders only one coherent IAU P03 precession-only mean Earth axis and its exact
 antipodal north and south celestial-pole endpoints. It is a Tier 1 structural display, not a true,

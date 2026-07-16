@@ -18,16 +18,17 @@ The architecture preserves the validated Milestone 1 convention:
 - The XR camera, renderer, `local-floor` reference space, controllers, room diagnostics, and
   scientific source values are never rotated to perform geographic calibration.
 
-## Implemented foundation and first local visual consumer
+## Implemented foundation and first visual consumer
 
 Milestone 2A implements the application-owned observer, explicit-tick UTC clock, read-only
 geographic-calibration view, Tier 1 configuration, provider registry, immutable P03
 axis/equator-basis snapshot, and bounded exact-key cache described in [Scientific State
-Foundation](SCIENTIFIC_STATE_FOUNDATION.md). Milestone 2B now extends that snapshot locally with a
+Foundation](SCIENTIFIC_STATE_FOUNDATION.md). Milestone 2B extends that snapshot with a
 validated observer-horizontal Earth-axis result and consumes it in the first bounded presentation
 layer: one symbolic axis and exact antipodal NCP/SCP endpoints. Calibration yaw remains
-presentation-parent work. The visible layer has not been independently integrated, published, or
-physically accepted. No celestial-equator geometry, precession path, body display, temporal
+presentation-parent work. The visible layer passed independent review and is integrated into
+local `master`; publication and physical Quest acceptance remain pending. No celestial-equator
+geometry, precession path, body display, temporal
 clock, or contemplative sequence has been added. See [Earth Axis and Celestial
 Poles](EARTH_AXIS_AND_CELESTIAL_POLES.md).
 
@@ -594,6 +595,6 @@ different direction, or replace missing science with decorative geometry.
   canonical ENU intermediary, central time snapshot, and optional layers.
 - **Assumed for planning:** the trusted physical marker continues to represent true north and the
   observer provides a valid geodetic location. Implementation must validate inputs.
-- **Deferred:** package installation, geolocation, visible geometry, Sun/Moon/planets, time
-  controls, full-cycle precession, nutation detail, EOP, polar motion, persistence, and
+- **Deferred:** geolocation, celestial-equator and later celestial geometry, Sun/Moon/planets,
+  time controls, full-cycle precession, nutation detail, EOP, polar motion, persistence, and
   contemplative sequencing.

@@ -203,7 +203,8 @@ Still open or deferred:
 - a true/CIP-like optional mode with explicit nutation;
 - live EOP, observed offsets, polar motion, and Chandler wobble;
 - the long-term model and date interval for precession trajectories; and
-- all observer-horizontal placement and visible Quest presentation.
+- physical Quest observer-horizontal placement and presentation acceptance.
 
-The next non-visual foundation may use this provider. Visible axis, pole, equator, or precession
-geometry remains unauthorized and unimplemented.
+Integrated Milestone 2B consumes this provider only through the validated scientific snapshot for
+its observer-horizontal axis and pole presentation. Celestial-equator and precession geometry
+remain unimplemented, and physical Quest acceptance remains NOT RUN.

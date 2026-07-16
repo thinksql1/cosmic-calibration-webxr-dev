@@ -1,6 +1,6 @@
 # Cosmic Calibration WebXR
 
-Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A provides the validated non-visual astronomy foundation, and Milestone 2B now implements its first local visual consumer: one coherent mean Earth axis with antipodal NCP/SCP endpoints.
+Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A provides the validated non-visual astronomy foundation, and integrated Milestone 2B implements its first visual consumer: one coherent mean Earth axis with antipodal NCP/SCP endpoints.
 
 Scientific geometry and contemplative interpretation remain separate layers. Milestone 2B adds no automatic heading, compass, geolocation, magnetic-declination behavior, celestial equator, precession trajectory, celestial body, or contemplative sequence.
 
@@ -13,11 +13,11 @@ precession-only mean pole. After two bounded remediation rounds, the final indep
 2A gate found no blocking or material defect. The retained 2A0 and 2A branches are integrated
 normally into `master`, which passes 239 tests and the production build. GitHub Pages workflow run
 #7 deployed commit `ca0a9d7`, and the unchanged hosted Milestone 1 interface, simulation/reset,
-subpath assets, and browser diagnostics regressed cleanly. Milestone 2B is implemented only on
-`feature/milestone-2b-earth-axis-poles`; its automated and local desktop gates pass, but it is not
-integrated, pushed, deployed, or physically tested. The 15-file / 270-test local suite retains all
-239 integrated tests. The exact next task is its physical acceptance
-test after independent integration/publication:
+subpath assets, and browser diagnostics regressed cleanly. Milestone 2B passed its independent,
+automated, and desktop gates and is integrated normally into local `master`; publication, hosted
+verification, and physical Quest acceptance remain pending. The 15-file / 270-test merged suite
+retains all 239 Milestone 2A tests. The exact next task is physical acceptance after publication
+and hosted verification:
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -40,8 +40,8 @@ The shared desktop/XR scene contains:
 - a desktop bearing simulation using the same projection, yaw, and state logic as XR capture;
 - non-visual immutable observer/time contracts, tagged scientific frames and correction profiles,
   canonical ENU conversion, frozen provider provenance, and a bounded P03 mean-pole provider;
-- on the Milestone 2B feature branch only, manual in-memory observer input, explicit UTC fixtures,
-  and one observer-centered symbolic mean-axis group with exact antipodal NCP/SCP endpoints.
+- manual in-memory observer input, explicit UTC fixtures, and one observer-centered symbolic
+  mean-axis group with exact antipodal NCP/SCP endpoints.
 
 The room X and Z axes have no geographic meaning before calibration. Geographic geometry is hidden until a valid physical or simulated calibration is captured.
 
@@ -119,8 +119,8 @@ current hosted Milestone 1 site is:
 
 GitHub Pages workflow run #7 deployed integrated Milestone 2A commit `ca0a9d7`. Hosted desktop
 verification confirmed the unchanged Physical North controls, simulation/reset behavior,
-repository-subpath assets, and clean browser diagnostics. The hosted site does not yet contain
-the local Milestone 2B axis/pole layer.
+repository-subpath assets, and clean browser diagnostics. Integrated Milestone 2B publication
+and hosted verification are pending.
 
 ## Validation boundary
 
@@ -131,7 +131,7 @@ laboratory-grade angular accuracy, broad device coverage, or unreported edge-cas
 Milestone 2B's automated and local development/production-preview checks pass for frame mapping,
 exact antipodes, latitude/horizon cases, controls, visibility, reset/rebuild behavior,
 OrbitControls, resize, relative assets, and console health. Physical Quest axis/pole validation is
-**NOT RUN** and remains required after independent integration and publication.
+**NOT RUN** and remains required after publication and hosted verification.
 
 ## Explicitly deferred
 

@@ -4,7 +4,7 @@
 
 ### Added
 
-- Local Milestone 2B observer-horizontal mean-axis snapshot contract: the validated P03 GCRS
+- Milestone 2B observer-horizontal mean-axis snapshot contract: the validated P03 GCRS
   pole/matrix pair is proved against mean-date `+Z`, then mapped through the WGS84 geodetic
   Earth-fixed-to-ENU basis into exact antipodal NCP/SCP directions.
 - One restrained observer-centered `1.8 m` symbolic Earth-axis group with NCP/SCP markers,
@@ -42,11 +42,12 @@
 
 ### Changed
 
-- Completed the bounded Milestone 2B implementation locally on
-  `feature/milestone-2b-earth-axis-poles`. Presentation consumes the immutable scientific snapshot,
-  maps ENU once under the existing geographic-yaw parent, and clears when observer, clock, model,
-  or calibration readiness is absent. No merge, push, deployment, or physical Quest acceptance
-  occurred.
+- Passed the independent Milestone 2B scientific/visual gate and integrated the retained
+  `feature/milestone-2b-earth-axis-poles` branch normally into local `master` with merge commit
+  `09a6e67`. Presentation consumes the immutable scientific snapshot, maps ENU once under the
+  existing geographic-yaw parent, and clears when observer, clock, model, or calibration readiness
+  is absent. Merged-master validation passes 270 tests, type-check, production build, diff, and
+  dependency checks. Publication and physical Quest acceptance remain NOT RUN.
 - Published integrated Milestone 2A `master` normally at `ca0a9d7`; GitHub Pages run #7 passed
   install, type-check, 239 tests, build, artifact upload, and deployment. Hosted Milestone 1
   simulation/reset, repository-subpath assets, and browser diagnostics regressed cleanly, with no
@@ -113,6 +114,9 @@
 
 ### Validated
 
+- Independent Milestone 2B probes pass for equator, both hemispheres, high latitude, longitude
+  cancellation, explicit time provenance, exact antipodes, same-yaw calibration identity,
+  out-of-domain readiness rejection, ENU/application signs, and single geographic-yaw application.
 - Milestone 2B local development and production-preview checks pass for equator, mid-northern,
   mid-southern, and high-northern visual cases; explicit observer/time controls; label and
   below-horizon controls; recalibration/reset; orbit, zoom, resize, relative production assets,
