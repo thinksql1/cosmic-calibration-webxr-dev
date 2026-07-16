@@ -1,64 +1,88 @@
-# Milestone 0 Architecture
+# Cosmic Calibration WebXR Architecture
 
-## Purpose and boundary
+## Frames and boundaries
 
-Milestone 0 isolates the browser and WebXR platform risk. Three.js supplies one small scene graph and renderer; WebXR supplies capability detection, immersive-session lifecycle, and the requested floor-relative reference space. No calibration or astronomy layer is implemented.
+The application uses one shared Three.js scene for desktop and immersive AR while keeping three concepts distinct:
 
-## Shared desktop and XR scene
+1. **Room/floor frame:** the established Milestone 0 origin, room-relative axes, horizon ring, and zenith/nadir line.
+2. **Geographic display frame:** a dedicated `geographic-reference-frame` group containing N/S/E/W labels and cardinal axes.
+3. **Future scientific source frame:** not implemented; future source coordinates must remain separate from display rotations.
 
-`src/scene/createReferenceScene.ts` creates one scene used in both modes. Desktop uses a perspective camera with `OrbitControls`. XR uses the same authored geometry through the renderer's XR camera. The renderer uses an XR-compatible animation loop in both cases.
+North calibration rotates only the geographic display group around local Y. It never rotates the XR camera, renderer, room/floor frame, controller target-ray objects, or future scientific source data.
 
-The desktop scene has a dark background. During an immersive session the scene background is cleared and renderer alpha is zero so an AR compositor can show the environment. This is only a passthrough-enabling assumption; transparent rendering does not prove Quest passthrough.
-
-## Coordinate conventions
+## Coordinate convention
 
 - `+Y`: local up / zenith
 - `-Y`: local down / nadir
-- `Y = 0`: requested local floor/reference plane
-- X and Z: room-relative axes with no geographic meaning
+- `Y = 0`: local-floor plane
+- XZ: local horizontal plane
+- application north before calibration: `(0, 0, -1)`
+- application east before calibration: `(+1, 0, 0)`
 
-The origin marker and horizon ring are authored at the reference origin and `Y = 0`. The session requests `local-floor`, and Three.js is configured for the same reference-space type. Code structure alone does not prove accurate floor registration, world stability, or recenter behavior.
+Three.js positive Y rotation maps `-Z` toward `-X`. Therefore a physical-north target ray captured along room `+X` produces `-π/2` yaw. The geographic group’s unrotated N marker at `-Z` then maps to the captured `+X` direction. S is the exact opposite; E and W are the yaw-rotated `+X` and `-X` vectors.
 
-## Capability-state model
+## Pure calibration math
 
-`src/xr/state.ts` distinguishes:
+`src/calibration/math.ts` has no renderer dependency.
 
-- insecure context;
-- missing WebXR API;
-- capability check in progress;
-- immersive AR supported or unsupported;
-- capability-check failure;
-- session starting, cleaning, active, ended, or denied/failed.
+1. It validates finite vector components.
+2. It copies X and Z into a horizontal projection without mutating caller data.
+3. It rejects horizontal magnitude below `0.25`. Controller target rays are unit vectors, so this rejects directions within about `14.5°` of vertical.
+4. It normalizes the accepted horizontal direction.
+5. It computes signed yaw with `atan2(crossY, dot)` from application north to captured north.
+6. It normalizes yaw to `[-π, π)`.
 
-Detection checks `window.isSecureContext`, then `navigator.xr`, then `isSessionSupported('immersive-ar')`. Pure interfaces keep this logic testable without a headset or browser XR runtime.
+Known-vector tests establish the sign convention: `-Z → 0°`, `+X → -90°`, `+Z → -180°`, `-X → +90°`, and northeast `(+X,-Z) → -45°`.
 
-## Session lifecycle
+## Calibration state
 
-The controller keeps one explicit internal phase: `idle`, `requesting`, `binding`, `binding-ended`, `active`, or `ending`. It owns at most one session at a time.
+`src/calibration/state.ts` owns the renderer-independent lifecycle:
 
-1. An explicit Enter AR action requests `immersive-ar` with `requiredFeatures: ['local-floor']`; no optional future features are requested.
-2. Once `requestSession()` resolves, the controller records ownership and attaches a one-time `end` listener before awaiting Three.js renderer binding.
-3. Only a still-owned session whose binding succeeds becomes renderer-bound active. A session that ends during binding stays non-active, blocks retry until binding settles, then reports ended.
-4. Binding failure enters cleanup, calls `session.end()`, and blocks retry until the cleanup operation settles. The terminal UI state reports whether cleanup also failed; internal ownership is cleared so stale references do not persist.
-5. A normal end clears ownership once and restores the desktop state. A new session request is allowed only after no request, binding, active session, binding-after-end operation, or cleanup operation remains unresolved.
+- `uncalibrated`
+- `calibrating`
+- `calibrated`
+- `invalid-direction`
+- `controller-unavailable`
+- `capture-failed`
 
-The controller emits restrained phase-labelled diagnostics only for renderer-binding and cleanup failures. `src/main.ts` writes those diagnostics once to the browser console; raw stacks are not placed in the status UI.
+Error states remain recoverable calibration attempts. Cancel restores the prior calibration when recalibrating, otherwise it returns to uncalibrated. Reset always returns to uncalibrated. A successful record contains yaw, normalized direction, optional controller identity/handedness, timestamp, and simulated/physical provenance; identity and timestamp are diagnostic metadata, not scientific data.
 
-## Static hosting
+## Controller target-ray capture
 
-`vite.config.ts` uses a relative `./` base. Built script and style references therefore work under an unknown GitHub Pages project subpath without hardcoding a repository name. The current application has no router, backend, or server-only behavior.
+`src/xr/controllerCalibration.ts` prepares Three.js target-ray spaces for indices 0 and 1 before session binding so connection events are observable. It accepts either left or right `tracked-pointer` input and deliberately excludes hand input.
 
-The workflow keeps validation and artifact upload in the build job. The Pages-authorized deploy job runs `actions/configure-pages@v5` and `actions/deploy-pages@v4` with `pages: write` and `id-token: write`; the workflow-level permission remains `contents: read`. It cannot be exercised until an authorized remote and Pages configuration exist.
+During calibration only, each usable connected controller shows a restrained 1.8 m target-ray line. A 300 ms arming delay prevents the UI action that begins calibration from also becoming the capture action. A later `select` event resolves controller target-ray forward as local `-Z` transformed by its world quaternion, then calls the shared calibration state/math path. Successful capture immediately leaves calibration mode, suppressing duplicate select capture. Session end removes listeners, controller objects, and rays and clears transient calibration.
+
+DOM overlay is optional in the XR session request. `local-floor` remains the sole required feature.
+
+## Geographic-reference rendering
+
+`src/scene/createGeographicReference.ts` creates thin N/S and E/W lines just above the floor to avoid z-fighting plus lightweight canvas-texture sprites. North is warm and visually distinct; the remaining labels are subdued. The group is hidden while uncalibrated or calibrating and becomes visible immediately after a valid capture.
+
+The existing horizon ring and zenith/nadir line stay in the room/floor group and remain unchanged.
+
+## Desktop simulation and UI
+
+`src/main.ts` maps calibration state to the panel, buttons, geographic group, and controller rays. Desktop simulation converts a clockwise bearing—`0°` north, `90°` east, `180°` south, `270°` west—to a horizontal vector and calls the same state/math functions used by physical capture. It contains no separate yaw logic.
+
+The panel exposes uncalibrated, calibrating, calibrated, and readable error states; yaw is labelled as a diagnostic. Recalibration replaces the previous result, cancel restores it, and reset removes it.
+
+## Session and persistence lifecycle
+
+The established owned-session controller still requests `immersive-ar` with required `local-floor`, owns the acquired session before renderer binding, and prevents overlapping request/bind/active/cleanup operations. Optional DOM overlay supports in-headset controls where the browser provides it.
+
+Calibration is deliberately in memory only. Session exit, reload, room change, boundary reset, or tracking-origin change requires recalibration. The application does not claim a yaw remains valid across recentering; physical acceptance must verify and document recenter behavior.
 
 ## Module boundaries
 
-- `src/main.ts`: renderer, camera, controls, DOM status, diagnostics, and lifecycle wiring.
-- `src/scene/createReferenceScene.ts`: neutral floor-origin reference geometry.
-- `src/xr/state.ts`: capability classification and owned immersive-session state transitions.
-- `tests/xr-state.test.ts`: deterministic capability and session-lifecycle behavior.
-
-These boundaries are deliberately narrow. They are not a generalized future architecture.
+- `src/main.ts`: renderer, DOM UI, simulation, and integration wiring.
+- `src/scene/createReferenceScene.ts`: unchanged room/floor reference geometry.
+- `src/scene/createGeographicReference.ts`: geographic-only cardinal display group.
+- `src/calibration/math.ts`: pure projection, signed yaw, bearing, and cardinal math.
+- `src/calibration/state.ts`: calibration state transitions and records.
+- `src/xr/state.ts`: capability and owned immersive-session lifecycle.
+- `src/xr/controllerCalibration.ts`: Three.js target-ray connection, visualization, and select capture.
 
 ## Deferred architecture
 
-Geolocation, geographic calibration, controllers, persistence, astronomy calculations, celestial rendering, time controls, and experiential layers are absent. Later scientific modules must keep source coordinates and units separate from display coordinates and teaching-scale transforms so claims remain traceable. That future separation is a constraint, not an implemented capability.
+Persistence, geolocation, automatic heading, magnetic correction, astronomy calculations, celestial rendering, time controls, spatial anchors, hit testing, hand tracking, and experiential layers remain absent.

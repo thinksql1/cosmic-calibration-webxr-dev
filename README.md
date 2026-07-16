@@ -1,27 +1,20 @@
 # Cosmic Calibration WebXR
 
-Cosmic Calibration is a mixed-reality cosmic-navigation project intended to make celestial reference geometry spatially perceptible. This repository currently contains the Milestone 0 technical spike: a calm room-relative reference scene, desktop inspection controls, and an explicit WebXR immersive-AR entry path that requires `local-floor`.
+Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction.
 
-Scientific geometry and contemplative interpretation are separate layers. This spike contains no astronomical or metaphysical claims.
+Scientific geometry and contemplative interpretation remain separate layers. This milestone adds no astronomy, automatic heading, compass, geolocation, or magnetic-declination behavior.
 
 ## Current scope
 
-Milestone 0 renders:
+The shared desktop/XR scene contains:
 
-- a floor-origin marker;
-- room-relative X/Y/Z axes;
-- a horizon ring at `Y = 0`;
-- a zenith/nadir line;
-- a WebXR capability and session-status panel.
+- the Milestone 0 floor origin, room-relative X/Y/Z axes, horizon ring, and zenith/nadir line;
+- a dedicated geographic-reference group containing N/S/E/W labels and horizontal cardinal axes;
+- explicit in-memory calibration, recalibration, cancellation, and reset states;
+- left- or right-controller target-ray capture during immersive AR;
+- a desktop bearing simulation using the same projection, yaw, and state logic as XR capture.
 
-X and Z are room-relative and are not geographic cardinal directions. The transparent XR renderer and required `local-floor` feature are implementation assumptions until physically tested on Quest 3.
-
-## Prerequisites
-
-- Node.js 24 or another current compatible LTS release
-- npm
-- A modern desktop browser for fallback inspection
-- A deployed HTTPS URL and Meta Quest 3 for device validation
+The room X and Z axes have no geographic meaning before calibration. Geographic geometry is hidden until a valid physical or simulated calibration is captured.
 
 ## Local commands
 
@@ -34,32 +27,51 @@ npm run build
 npm run preview -- --host 127.0.0.1
 ```
 
-The development server URL shown by Vite opens the desktop fallback. Mouse drag orbits the camera; the wheel zooms. Browsers without WebXR retain the scene and show a specific compatibility state.
+The desktop fallback retains OrbitControls. Use the bearing slider or the `0°`, `90°`, `180°`, and `270°` presets, then select **Simulate North** when using a custom slider value. Simulation is labelled and does not claim a physical heading.
 
-## WebXR session handling
+## Coordinate convention
 
-The application checks for a secure context, `navigator.xr`, and support for `immersive-ar`. Entering AR requires an explicit button press and requests only `local-floor`.
+- `+Y` is local up; `Y = 0` is the local-floor plane.
+- The XZ plane is local horizontal.
+- Unrotated application north is `(0, 0, -1)`.
+- Unrotated east is `(+1, 0, 0)`; south and west are the opposites of north and east.
+- Positive Three.js Y rotation turns application north toward `-X`; a captured `+X` direction therefore produces `-90°` yaw.
+- Only `geographic-reference-frame` receives the calibration yaw. The XR camera, renderer, floor frame, room axes, controllers, and future scientific source coordinates are never rotated by calibration.
 
-After `requestSession()` resolves, the controller owns that session immediately, attaches its `end` listener, then binds it to Three.js. The UI reports an active session only after binding succeeds. A new request is blocked while a request, renderer binding, active session, ending operation, or binding-after-end operation remains unresolved. If binding fails, the controller attempts `session.end()` before allowing retry. If the session ends during binding, the controller waits for binding to settle and does not report a false active state.
+See [Architecture](docs/ARCHITECTURE.md) and [Calibration](docs/CALIBRATION.md) for the signed-angle rule and physical procedure.
 
-Unexpected renderer-binding and cleanup failures produce a concise UI message and one phase-labelled browser-console warning. The UI shows error messages rather than raw stack traces. Cleanup failure is reported and internal ownership is cleared, but desktop testing cannot prove browser-specific cleanup behavior.
+## Physical north-marker workflow
 
-`localhost` is acceptable for local browser development, but it does not prove that an arbitrary HTTP origin will work. Physical Quest testing requires HTTPS. See [Quest testing](docs/QUEST_TESTING.md).
+Milestone 1 assumes the physical marker already represents true north.
 
-## Static build and GitHub Pages
+1. Establish a safe standing/room-scale Quest boundary and correct physical floor.
+2. Stand at the chosen physical origin marker and enter AR.
+3. Select **Calibrate North**.
+4. Point either tracked controller at the true-north marker while holding the target ray approximately level.
+5. Press that controller’s trigger/select action once.
+6. Verify the N/S/E/W group, diagnostic yaw, and physical marker alignment.
+7. Use **Recalibrate North** to replace the result or **Reset North** to return to an explicitly uncalibrated state.
 
-Vite uses `base: './'`, so emitted asset references are relative and the build remains portable when the final project repository name—and therefore its Pages subpath—is unknown. The tradeoff is that this strategy assumes document-relative assets and no client-side routing. Milestone 0 uses neither routing nor a backend.
+Target rays are visible only during active calibration for usable tracked controllers. A ray with horizontal magnitude below `0.25` is rejected because it is within roughly `14.5°` of vertical and cannot provide a stable horizontal bearing.
 
-The Pages workflow validates with `npm ci`, type-checks, tests, builds, and uploads `dist/`. Its deploy job configures Pages and deploys the artifact with explicit `pages: write` and `id-token: write` permissions; repository-content access remains read-only. The workflow is configuration only: it has not run because no GitHub remote or Pages site exists. This task does not create a remote, push, enable Pages, or deploy.
+## Session and persistence limits
 
-## Current limitations
+Immersive AR still requires `local-floor`; DOM overlay is requested only as an optional feature for calibration controls. Acquired-session ownership, renderer binding, cleanup, and duplicate-start protection remain unchanged.
 
-- Quest Browser immersive AR: **NOT RUN**
-- Passthrough visibility/transparency: **NOT RUN**
-- `local-floor` registration, stability, drift, and recenter behavior: **NOT RUN**
-- Desktop rendering cannot prove any of the device behaviors above.
-- The reference scene has no geographic or astronomical calibration.
+Calibration is in memory only. Reloading, session exit, boundary reset, room change, or tracking-origin change requires deliberate recalibration. Recenter behavior must be checked physically; a displayed yaw is a room-relative diagnostic, not magnetic heading or scientific data.
+
+## Static hosting
+
+Vite uses `base: './'`, keeping emitted assets relative for GitHub Pages project subpaths. The current hosted Milestone 0 site is:
+
+`https://thinksql1.github.io/cosmic-calibration-webxr/`
+
+This implementation task does not push or deploy Milestone 1.
+
+## Validation boundary
+
+Pure math, state transitions, controller integration, existing XR lifecycle, type-check, build, and desktop simulation are locally testable. Physical Quest north-marker calibration is a separate acceptance step and remains **NOT RUN** until the feature branch is published under explicit authorization.
 
 ## Explicitly deferred
 
-Geolocation, north calibration, controllers, persistence, hit testing, plane detection, Astronomy Engine, celestial bodies, cardinal directions, time controls, spatial anchors, hand tracking, contemplative sequences, accounts, analytics, and backend services are intentionally absent.
+Local-storage persistence, Astronomy Engine, geolocation, automatic compass access, headset magnetometer access, magnetic declination, true-versus-magnetic-north correction, automatic north detection, spatial anchors, plane detection, hit testing, hand tracking, celestial geometry, time controls, audio, 360 video, backend services, accounts, and analytics are absent.

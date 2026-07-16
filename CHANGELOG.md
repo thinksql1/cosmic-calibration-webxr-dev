@@ -5,6 +5,10 @@
 ### Added
 
 - Deterministic Vitest coverage for pending requests, renderer binding, active sessions, cleanup, retry, cleanup failure, and end-during-binding lifecycle transitions.
+- Pure horizontal projection, signed-yaw, bearing, and cardinal-direction calibration math with an explicit `-Z` application-north convention.
+- In-memory north-calibration state, left/right tracked-controller target-ray capture, calibration-only aiming rays, recoverable invalid-direction handling, and duplicate-capture suppression.
+- A dedicated geographic-reference group with restrained N/S/E/W labels and cardinal axes plus shared desktop bearing simulation.
+- Physical setup and troubleshooting guidance in `docs/CALIBRATION.md`, architecture details, and a separate Milestone 1 Quest checklist.
 
 ### Changed
 
@@ -21,6 +25,8 @@
 - Replaced the broad Quest acceptance task with one bounded standing-calibration floor-alignment retest; seated or chair-height Quest calibration is recorded only as an unconfirmed environmental hypothesis.
 - Completed Milestone 0 after the controlled standing-floor Quest 3 retest passed; no north calibration, astronomy, controller ray, geographic heading, or persistence behavior was added.
 - Replaced the floor retest with one bounded Milestone 1 physical north-marker calibration task.
+- Requested DOM overlay only as an optional XR feature while retaining `local-floor` as required.
+- Calibration remains in memory and resets across immersive-session exit; persistence, automatic heading, magnetic correction, and astronomy remain deferred.
 
 ### Validated
 
@@ -32,12 +38,16 @@
 - GitHub Pages workflow run #2 passed its build (15/15 tests) and deployment jobs; the hosted production page loaded at `https://thinksql1.github.io/cosmic-calibration-webxr/` with subpath-safe assets, a rendered desktop canvas, readable fallback status, and no browser-console warnings or errors.
 - Physical Quest testing: immersive AR entry PASS; passthrough PASS; world locking/stability PASS; exit, re-entry, and recenter PASS.
 - Controlled standing-floor Quest 3 retest: reference geometry visible; origin and horizon ring aligned with the physical floor; ring horizontal; zenith/nadir vertical; world locking, exit, re-entry, recenter, comfort, and usability all PASS.
+- Milestone 1 local validation: clean `npm ci`, type-check, 3 test files / 43 tests, production build, dependency inspection, and `git diff --check` passed.
+- Development and production-preview desktop simulation passed for known bearings, recalibration, reset, geographic-label rendering, relative asset paths, and console health.
 
 ### Known limitations
 
 - The earlier chair-height observation was environmental and resolved by resetting the Quest floor for standing use; this evidence is limited to the tested Quest 3 environment.
 - The Three.js production chunk triggers Vite's 500 kB size advisory.
 - Milestone 0 does not establish future north calibration, geographic heading, controller ray, persistence, astronomy, or celestial-geometry behavior.
+- Milestone 1 physical Quest north-marker calibration is **NOT RUN**; no feature-branch push or deployment occurred.
+- The existing Three.js production chunk still triggers Vite’s 500 kB size advisory.
 
 ## 2026-07-15 — Initial project activation
 

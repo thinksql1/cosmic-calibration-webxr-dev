@@ -58,6 +58,13 @@
 - **Decision:** The initial visual language is calm, spacious, precise, luminous, and low-noise.
 - **Rationale:** Geometry should orient rather than overwhelm.
 
+### DEC-009: Separate room, geographic-display, and scientific source frames
+- **Date:** 2026-07-15
+- **Status:** Accepted
+- **Owner:** Darrell Wright / project control
+- **Decision:** Unrotated application north is local `-Z`, east is local `+X`, and physical north calibration applies signed Y-axis yaw only to a dedicated geographic-reference group. The room/floor frame, XR camera, renderer, controllers, and future scientific source coordinates are not rotated by calibration.
+- **Rationale:** An explicit tested convention prevents visual trial-and-error from becoming an implicit scientific coordinate rule and keeps future astronomy data traceable.
+
 ## Proposed decisions awaiting review
 
 None yet.

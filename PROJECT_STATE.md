@@ -4,13 +4,13 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 1 — North calibration
+**Current phase:** Milestone 1 implemented / physical north-calibration acceptance pending
 
-**Overall status:** **Milestone 0 COMPLETE.** Automated, desktop, and physical Quest validation passed within the tested Quest 3 environment.
+**Overall status:** **Milestone 1 CONDITIONAL PASS.** Automated validation and desktop simulation passed; physical Quest north calibration is **NOT RUN**.
 
 ## One-paragraph state summary
 
-Milestone 0 is integrated into `master` through merge commit `df8b26a` and remains deployed at https://thinksql1.github.io/cosmic-calibration-webxr/. Automated validation, desktop validation, and physical Quest 3 validation passed. After the Quest floor was deliberately reset for standing use, immersive AR entry, passthrough, reference geometry, physical-floor alignment, horizon horizontality, zenith/nadir verticality, world locking, exit, re-entry, recenter, comfort, and usability all passed. The earlier chair-height observation was environmental and resolved by resetting the Quest floor; it was not an application defect. This evidence does not establish any Milestone 1 north-calibration behavior. No geographic heading, controller ray, persistence, or celestial geometry exists yet.
+Milestone 0 is complete and its deployed build remains at https://thinksql1.github.io/cosmic-calibration-webxr/. Milestone 1 now implements in-memory physical north-marker calibration on `feature/milestone-1-north-calibration`: either tracked controller can capture its target-ray direction, invalid or nearly vertical rays are rejected, signed yaw rotates only a dedicated geographic-reference group, and N/S/E/W geometry is available after calibration. Desktop simulation, 43 unit/integration tests, type-check, and production build pass. Physical Quest north-calibration acceptance is **NOT RUN**; the feature branch is not pushed or deployed.
 
 ## Working and verified
 
@@ -27,6 +27,8 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and remai
 - The hosted site loads at `https://thinksql1.github.io/cosmic-calibration-webxr/`; its static assets resolve under the repository subpath, the desktop canvas renders, the compatibility fallback is readable, and the browser console has no warnings or errors.
 - Initial physical Quest 3 evidence: immersive AR entry PASS, passthrough PASS, world locking/stability PASS, and session exit/re-entry/recenter PASS.
 - Controlled standing-floor Quest 3 retest: immersive AR, passthrough, reference geometry, origin/floor alignment, horizon ring, zenith/nadir line, world locking, lifecycle/recenter, comfort, and usability PASS.
+- Milestone 1 automated validation: clean `npm ci`, TypeScript check, 3 test files / 43 tests, production build, `git diff --check`, and dependency-tree inspection PASS.
+- Desktop development and production-preview simulation: known bearings `0°`, `90°`, `180°`, and `270°` produced the expected signed yaw; recalibration replaced the prior result; reset restored uncalibrated state; geographic labels rendered; relative assets loaded; console remained clean.
 
 ## Implemented but not fully verified
 
@@ -36,41 +38,50 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and remai
 - The renderer is alpha-enabled, clears its opaque background in XR, and uses the Three.js XR animation loop.
 - Floor-relative reference geometry is authored around `Y = 0` and the XR reference-space type is `local-floor`.
 - The GitHub Pages workflow is configured to use GitHub Actions with Pages/OIDC permissions limited to its deploy job. Successful deployment runs have completed; its first push-triggered run failed before Pages was enabled and does not represent an application failure.
+- Physical north-marker calibration supports either tracked controller, target-ray visualization during calibration only, horizontal projection with a `0.25` magnitude threshold, explicit signed yaw, cancel/recalibrate/reset, and simulated/physical result provenance.
+- Geographic N/S/E/W labels and cardinal axes live in a dedicated group. Calibration never rotates the camera, renderer, room/floor frame, room axes, controllers, or future scientific source coordinates.
+- Optional DOM overlay is requested for immersive calibration controls; `local-floor` remains the only required XR feature.
 
 ## In progress
 
-- Plan and implement the bounded physical north-marker calibration capability for Milestone 1.
+- Run the Milestone 1 physical north-calibration acceptance test on Quest 3 after separate publication authorization.
 
 ## Blocked
 
-- No current blocker. Physical Quest acceptance for Milestone 1 remains a separate future validation step.
+- Physical Quest acceptance requires an authorized deployed Milestone 1 build. This implementation task does not push or deploy.
 
 ## Known defects or limitations
 
 - Milestone 0 Quest 3 coverage is limited to the tested physical environment; it does not establish behavior for all rooms, boundaries, browsers, or device configurations.
-- This milestone does not include geographic heading, controller raycasting, persistence, north calibration, astronomy, celestial geometry, or time controls.
+- Milestone 1 controller detection, DOM overlay controls, ray visibility, trigger capture, marker alignment, recalibration, reset, exit/re-entry, and recenter behavior are implemented but **NOT RUN** on Quest.
+- Calibration is in memory only and is deliberately invalidated across session exit. Reload, recenter, boundary reset, tracking-origin change, or room change requires deliberate recalibration.
+- The physical marker is assumed to represent true north. No automatic heading, compass, magnetic declination, or true-versus-magnetic-north correction exists.
 - Desktop Chromium reports immersive AR as unsupported; desktop validation cannot exercise a browser XR session.
 - The production bundle contains a 547.64 kB minified Three.js chunk and triggers Vite's 500 kB advisory; no runtime defect was observed.
 - GitHub Pages has been exercised on the published `b1bf282` commit; no custom domain is configured.
 
 ## Important unknowns
 
-- Milestone 1 controller behavior and later astronomy validation tolerances.
+- Quest Browser optional DOM-overlay behavior and physical controller target-ray alignment accuracy for Milestone 1.
+- Acceptable physical north-marker alignment tolerance and later astronomy validation tolerances.
 
 ## Active artifacts
 
 | Artifact | Purpose | Status |
 |---|---|---|
-| `src/` | Milestone 0 scene, renderer, UI, and WebXR state/session logic | Integrated and physically validated for the tested Quest 3 environment |
-| `tests/xr-state.test.ts` | Capability and deterministic session-lifecycle tests | 15/15 passed |
-| `README.md` | Commands, behavior, deployment strategy, and limits | Current |
-| `docs/ARCHITECTURE.md` | Implemented Milestone 0 boundaries and lifecycle model | Current |
-| `docs/QUEST_TESTING.md` | Physical Quest acceptance checklist | Milestone 0 evidence complete; future milestone testing remains separate |
+| `src/calibration/` | Pure north projection/yaw math and calibration state | Implemented; automated PASS |
+| `src/scene/` | Room/floor frame plus separate geographic-reference group | Implemented; desktop PASS; Quest Milestone 1 NOT RUN |
+| `src/xr/` | Owned session lifecycle and tracked-controller calibration adapter | Implemented; automated PASS; Quest Milestone 1 NOT RUN |
+| `tests/` | Capability, session, calibration math/state, and controller integration tests | 3 files / 43 tests passed |
+| `README.md` | Commands, workflow, conventions, deployment, and limits | Current |
+| `docs/ARCHITECTURE.md` | Frame separation, yaw convention, lifecycle, and module boundaries | Current |
+| `docs/CALIBRATION.md` | Physical setup, calibration procedure, limits, and troubleshooting | Current |
+| `docs/QUEST_TESTING.md` | Milestone 0 evidence and separate Milestone 1 acceptance checklist | Milestone 1 NOT RUN |
 | `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | GitHub Actions source enabled; run #2 passed |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
-| `DECISIONS.md` | Accepted foundation decisions | Active; unchanged this task |
-| `NEXT_TASK.md` | One bounded Milestone 1 north-marker calibration task | Active |
+| `DECISIONS.md` | Accepted foundation and geographic-frame convention decisions | Current |
+| `NEXT_TASK.md` | One physical Milestone 1 acceptance task | Active |
 
 ## Environment
 
@@ -81,7 +92,7 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and remai
 | Runtime dependency | Three.js `0.185.1` | Yes |
 | Development dependencies | Vite `8.1.4`; TypeScript `7.0.2`; Vitest `4.1.10`; Three/WebXR types | Yes |
 | Build command | `npm run build` | Passed |
-| Test command | `npm run test` | 15/15 passed |
+| Test command | `npm run test` | 43/43 passed |
 | Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run #2 passed |
 
 ## Risks
@@ -89,7 +100,7 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and remai
 | Risk | Likelihood | Impact | Mitigation or next evidence |
 |---|---|---|---|
 | Session lifecycle regression remains despite local tests | Low/unknown | High | Independent lifecycle review and physical Quest test after integration |
-| North marker is captured with an invalid or nearly vertical controller direction | Medium | Medium | Reject invalid horizontal projections with readable feedback and unit tests |
+| North marker is captured with an invalid or nearly vertical controller direction | Low/unknown | Medium | `0.25` horizontal threshold and readable rejection are tested; verify controller posture physically |
 | Reused yaw is invalid after a room, boundary, or tracking-origin change | Medium | High | Keep recalibration/reset visible; do not treat in-memory state as universally valid |
 | Passthrough behavior differs outside the tested Quest 3 environment | Low/unknown | Medium | Revalidate on device after future rendering changes; do not generalize the tested result |
 | Bundle size affects Quest startup/performance | Low/unknown | Medium | Measure on device before adding optimization complexity |
@@ -98,7 +109,7 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and remai
 ## Parking Lot
 
 - Astronomy Engine; celestial bodies, ecliptic, poles, and real-time astronomy.
-- North calibration, geolocation, controllers, persistence, and magnetic declination.
+- Geolocation, persistent room calibration, automatic heading, and magnetic declination.
 - Orbital-awareness, time navigation, and teaching-scale modes.
 - Contemplative, sacred-geometry, cultural, and symbolic layers, clearly distinct from scientific claims.
 - Star catalog, audio, hand tracking, persistent anchors, multi-user use, and native applications.
@@ -120,7 +131,9 @@ Milestone 0 is integrated into `master` through merge commit `df8b26a` and remai
 | 2026-07-15 | Hosted desktop verification | PASS; production page, subpath assets, reference canvas, fallback status, and browser console inspected | `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-15 | Initial physical Quest 3 acceptance evidence | PASS for immersive AR entry, passthrough, spatial stability, and exit/re-entry/recenter; floor alignment conditional because geometry appeared at chair/seated height | User-observed evidence at `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-15 | Controlled standing-floor Quest 3 retest | PASS; origin and horizon ring aligned with the physical floor, ring was horizontal, zenith/nadir was vertical, world locking and lifecycle/recenter remained stable, and comfort/usability passed | User-observed evidence at `https://thinksql1.github.io/cosmic-calibration-webxr/` |
+| 2026-07-15 | Milestone 1 local implementation validation | PASS; clean install, type-check, 43/43 tests, production build, desktop known bearings/reset/recalibration, relative preview assets, and clean console | `feature/milestone-1-north-calibration` |
+| 2026-07-15 | Milestone 1 physical Quest acceptance | NOT RUN | `docs/QUEST_TESTING.md` |
 
 ## Current decision horizon
 
-Plan and implement physical north-marker calibration as the next bounded capability, preserving the completed Milestone 0 behavior and keeping Quest validation separate from implementation.
+Publish the exact Milestone 1 feature under separate authorization, then execute the bounded physical north-calibration acceptance checklist without inferring device behavior from desktop tests.
