@@ -183,6 +183,20 @@
   not expose this mean-only quantity, and substituting its true-of-date frame would silently add
   nutation.
 
+### DEC-018: Use explicit immutable scientific snapshots and exact frozen-time caching
+- **Date:** 2026-07-16
+- **Status:** Accepted
+- **Owner:** Darrell Wright / project control
+- **Decision:** Future scientific presentation consumes an immutable snapshot built from explicit observer, UTC clock, geographic-calibration, configuration, provider-version, and revisioned inputs. A missing or invalid input returns a structured non-ready result rather than partial geometry. The P03 axis and deterministic equator basis remain scientific data; calibrated yaw is recorded but applied only by the later presentation parent. Cache entries use the complete exact key and a bounded LRU policy. Frozen or paused instants may cache; an active unpaused clock deliberately bypasses caching. State serialization is versioned and revalidated, while room calibration and cache values are never persisted as universally valid truth.
+- **Rationale:** This prevents ambient time, stale observer/calibration values, frame ambiguity, and cache reuse from becoming hidden inputs to visible astronomy. Exact-key caching favors correctness over speculative time quantization and keeps the later rendering layer small.
+
+### DEC-019: Separate accepted calibration identity from semantic clock equality
+- **Date:** 2026-07-16
+- **Status:** Accepted
+- **Owner:** Darrell Wright / project control
+- **Decision:** Every accepted Milestone 1 calibration capture receives a monotonically increasing scientific identity and invalidates dependent snapshots even when yaw and origin match a prior capture. Failed/cancelled attempts retain the prior accepted identity; reset invalidates it. In contrast, simulation-clock revisions are value-based and do not change for an identical selected instant, mode, pause state, rate, or no-op tick. Public scientific configuration and snapshot values are recursively isolated from caller/provider mutation, and canonical provider identity/version participates in provenance and exact cache keys.
+- **Rationale:** A physical recalibration is a new evidence event even when its numeric output repeats, while duplicate clock selections have no scientific change. Distinguishing these semantics prevents stale room calibration reuse without creating needless time/cache churn. Recursive isolation and one provider-version source prevent hidden mutation or inconsistent provenance from bypassing revisioned invalidation.
+
 ## Proposed decisions awaiting review
 
 None yet.

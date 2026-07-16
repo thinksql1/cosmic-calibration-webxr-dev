@@ -6,11 +6,15 @@ Scientific geometry and contemplative interpretation remain separate layers. The
 
 ## Milestone 2 architecture status
 
-Milestone 2 architecture is complete and its bounded 2A0 validation spike passes. The exact
+Milestone 2 architecture is complete and its bounded 2A0 validation spike passes locally. The exact
 `astronomy-engine@2.1.19` dependency is isolated behind typed application contracts; NASA/JPL
 Horizons fixtures validate the Sun/Moon adapter, and IAU SOFA/P03 fixtures validate the
-precession-only mean pole. No celestial display is implemented. The next step remains a
-production-quality non-visual scientific foundation:
+precession-only mean pole. The Milestone 2A non-visual scientific foundation is implemented on
+its retained local feature branch. Two independent gates identified bounded runtime-state and
+cache-contract defects; the second remediation is complete locally and must be independently
+re-gated before integration. No Milestone 2 branch is merged, pushed, deployed, or connected to
+visible celestial geometry. The exact next task is the independent Milestone 2A scientific
+integration re-gate:
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -58,6 +62,10 @@ The desktop fallback retains OrbitControls. Use the bearing slider or the `0°`,
 - Only `geographic-reference-frame` receives the calibration yaw. The XR camera, renderer, floor frame, room axes, controllers, and future scientific source coordinates are never rotated by calibration.
 
 See [Architecture](docs/ARCHITECTURE.md) and [Calibration](docs/CALIBRATION.md) for the signed-angle rule and physical procedure.
+
+## Scientific foundation status
+
+Milestone 2A locally provides a non-visual, explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime-boundary remediation owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. Independent acceptance, integration, and deployment remain pending. It remains separate from Three.js and the visible application: no celestial geometry, body display, time/location control, or persistence exists yet. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), and [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md).
 
 ## Physical north-marker workflow
 

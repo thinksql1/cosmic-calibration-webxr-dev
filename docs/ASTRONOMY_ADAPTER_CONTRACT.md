@@ -246,6 +246,10 @@ undocumented provider deflection correction. These frame, time, correction, and 
 justify the comparison tolerance without turning it into a product accuracy claim. A stricter
 Tier 2 same-profile/same-observer frame comparison remains deferred.
 
+## Implemented Milestone 2A orchestration
+
+`ScientificSnapshotService` now supplies the non-visual orchestration boundary. It accepts an explicit immutable observer/clock/calibration/configuration state set and a typed registry; only this module composes provider results into a P03 axis snapshot. It does not expand the adapter's supported body operation set or make provider calls from presentation. See [Scientific Snapshot Contract](SCIENTIFIC_SNAPSHOT_CONTRACT.md) and [Scientific Cache Policy](SCIENTIFIC_CACHE_POLICY.md).
+
 ## Decision and remaining limits
 
 Astronomy Engine `2.1.19` is **validated for the bounded Tier 1 adapter operations in this

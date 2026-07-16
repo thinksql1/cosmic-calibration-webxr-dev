@@ -7,6 +7,8 @@ import {
 } from './math';
 
 export interface CalibrationRecord {
+  /** Monotonic accepted-capture identity; it is not a timestamp. */
+  readonly acceptedRevision?: number;
   readonly yawRadians: number;
   readonly capturedDirection: HorizontalDirection;
   readonly controllerHandedness?: XRHandedness;
@@ -60,6 +62,7 @@ function priorCalibration(state: NorthCalibrationState): CalibrationRecord | und
 
 export class NorthCalibrationController {
   private state: NorthCalibrationState = { kind: 'uncalibrated' };
+  private acceptedCalibrationRevision = 0;
   private readonly listeners = new Set<CalibrationStateListener>();
 
   get current(): NorthCalibrationState {
@@ -129,9 +132,11 @@ export class NorthCalibrationController {
       return false;
     }
 
+    this.acceptedCalibrationRevision += 1;
     this.setState({
       kind: 'calibrated',
       calibration: {
+        acceptedRevision: this.acceptedCalibrationRevision,
         yawRadians,
         capturedDirection: projection.direction,
         controllerHandedness: metadata.controllerHandedness,

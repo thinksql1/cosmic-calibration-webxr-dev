@@ -1,5 +1,6 @@
 export type AstronomyContractErrorCode =
   | 'INVALID_INSTANT'
+  | 'INVALID_REVISION'
   | 'INVALID_OBSERVER'
   | 'UNSUPPORTED_VERTICAL_DATUM'
   | 'INVALID_ANGLE'

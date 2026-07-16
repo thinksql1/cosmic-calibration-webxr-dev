@@ -187,6 +187,36 @@ describe('NorthCalibrationController', () => {
     });
   });
 
+  it('assigns a new accepted-capture identity even when a recalibration has the same yaw', () => {
+    const controller = new NorthCalibrationController();
+    controller.simulateBearing(90, 1);
+    const first = controller.current;
+    expect(first.kind).toBe('calibrated');
+    if (first.kind !== 'calibrated') return;
+
+    controller.begin(true);
+    expect(controller.capture({ x: 1, y: 0, z: 0 }, { simulated: false, timestamp: 2 })).toBe(true);
+    const second = controller.current;
+    expect(second.kind).toBe('calibrated');
+    if (second.kind !== 'calibrated') return;
+
+    expect(second.calibration.yawRadians).toBe(first.calibration.yawRadians);
+    expect(second.calibration.acceptedRevision).toBe(first.calibration.acceptedRevision! + 1);
+  });
+
+  it('does not advance accepted-capture identity for failed or cancelled recalibration', () => {
+    const controller = new NorthCalibrationController();
+    controller.simulateBearing(0, 1);
+    const accepted = controller.current;
+    expect(accepted.kind).toBe('calibrated');
+    if (accepted.kind !== 'calibrated') return;
+
+    controller.begin(true);
+    expect(controller.capture({ x: 0, y: 1, z: 0 }, { simulated: false, timestamp: 2 })).toBe(false);
+    controller.cancel();
+    expect(controller.current).toEqual(accepted);
+  });
+
   it('reset returns to uncalibrated and capture outside calibration is ignored', () => {
     const listener = vi.fn();
     const controller = new NorthCalibrationController();

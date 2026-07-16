@@ -4,6 +4,10 @@
 
 **Implementation:** `src/science/astronomy/meanPoleProvider.ts`
 
+**Provider identity:** `Cosmic Calibration P03 mean-pole provider@1.0.0`. This single exported
+identity is used by the provider registry, result provenance, scientific snapshots, and cache
+keys.
+
 ## Selected model and naming
 
 The initial structural axis is named:

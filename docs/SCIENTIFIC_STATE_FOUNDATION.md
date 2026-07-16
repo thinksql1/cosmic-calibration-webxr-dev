@@ -1,0 +1,24 @@
+# Scientific State Foundation
+
+## Status
+
+Milestone 2A implementation and its second bounded runtime-contract remediation are complete locally on `feature/milestone-2a-scientific-foundation`; an independent re-gate is still required. This is a non-visual, in-memory foundation. It does not create celestial geometry, UI, timers, network requests, persistence, or XR/controller behavior.
+
+## Explicit state
+
+- `ObserverStateStore` owns a validated WGS84 geodetic observer, east-positive longitude, elevation datum/source/uncertainty, ready status, and a monotonic revision. It has no geolocation capability.
+- `SimulationClock` owns one immutable UTC instant, `frozen` or explicit-tick `realtime` mode, paused state, signed finite rate, and a **value-based** revision. Every constructor, selection, restoration, snapshot, and cache boundary revalidates the structural instant, rebuilds its canonical UTC/millisecond/source record, and retains a frozen application-owned copy. Setting an identical frozen selection, rate, or mode is a no-op; an explicit tick changes revision only when it changes the instant. No consumer reads a browser clock; an integrator must supply elapsed milliseconds to `tick`.
+- `GeographicCalibrationStateAdapter` exposes only a serializable read-only view of the existing Milestone 1 calibration: ready yaw, accepted-capture revision, optional origin identity, and `user-calibrated-true-north` provenance. Every accepted physical calibration capture receives a new monotonic identity even when yaw and origin are equal; reset/recalibration/reference-space invalidation changes the scientific revision. Failed or cancelled attempts preserve the prior accepted identity. It neither owns nor restores a controller/XR session.
+- `ScientificConfigurationStore` accepts only the validated Tier 1 IAU P03 configuration. Airless and normal-refraction body profiles are distinct; unsupported Tier 2/3 claims are not exposed as working options. Enabled providers are validated, duplicate-free, canonically ordered cloned arrays. Serialized configuration revisions are required finite safe non-negative integers; they are validated as schema evidence but do not replace the receiving store's local semantic revision.
+
+Each public state/configuration/snapshot/cache value is recursively isolated and immutable: nested arrays, warnings, basis vectors, provenance, and metadata are cloned before freezing. Changes use semantic value equality except for accepted physical calibration events, whose event identity intentionally invalidates scientific state even for equal yaw.
+
+## Serialization and readiness
+
+Observer state, selected clock state, and configuration serialize with version `1`; restore uses the same runtime validators as construction and rejects malformed payloads, unsupported modes/profiles/models/providers, duplicate providers, invalid rates, invalid or unsafe revisions, disagreeing UTC fields, and unknown schema versions. The complete clock-state validator also runs on direct snapshot inputs and before cache-key construction, so malformed clock state cannot invoke a provider or become a cached ready result. Raw provider instances, Three.js/XR/controller objects, caches, and geographic calibration are not persistent truth. A restored calibration cannot be trusted after reload, session exit, recenter, boundary reset, room change, or tracking-origin change.
+
+Snapshots are not ready if an observer or current calibration is missing, a clock/configuration runtime contract is invalid, a provider identity/version is incompatible, a provider fails, the P03 date domain is exceeded, or a finite/antipodal/basis invariant fails. Fatal structured errors are distinct from Tier 1 warnings. Five general Tier 1 limitations remain unconditional. The `HEIGHT_DATUM_REFERENCE_DIFFERENCE` warning is added only when a validated mean-sea-level observer and supported Astronomy Engine observer-relative profile are prepared; it retains declared datum/source metadata, distinguishes Astronomy Engine mean-sea-level meters from references that may use ellipsoid height, and records a possible small non-fatal topocentric difference without claiming equivalence. A WGS84-ellipsoid observer receives no such warning because the current Astronomy Engine body adapter cannot consume that datum without a reviewed conversion.
+
+## Ownership and presentation boundary
+
+`ScientificSnapshotService.capture` receives explicit state and a typed provider registry. It is the future non-visual state-to-snapshot entry point; it does not query the DOM, browser time, calibration controller, or renderer. Astronomy Engine remains contained by the 2A0 adapter. Scientific vectors remain in their named frames. The scientific layer records calibration yaw but does not rotate a celestial vector by it: presentation alone later applies it through the existing calibrated geographic parent.

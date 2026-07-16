@@ -18,6 +18,10 @@ The architecture preserves the validated Milestone 1 convention:
 - The XR camera, renderer, `local-floor` reference space, controllers, room diagnostics, and
   scientific source values are never rotated to perform geographic calibration.
 
+## Implemented non-visual foundation
+
+Milestone 2A implements the application-owned observer, explicit-tick UTC clock, read-only geographic-calibration view, Tier 1 configuration, provider registry, immutable P03 axis/equator-basis snapshot, and bounded exact-key cache described in [Scientific State Foundation](SCIENTIFIC_STATE_FOUNDATION.md). The snapshot preserves the architecture's frame boundary: calibration yaw remains presentation-parent work. No celestial geometry, body display, temporal control, or P03 path has been added.
+
 ## Non-negotiable invariants
 
 1. Every scientific vector carries its origin, orientation/frame, units, epoch/date, observer,
