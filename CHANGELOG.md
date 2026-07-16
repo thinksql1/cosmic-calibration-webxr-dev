@@ -32,10 +32,15 @@
 
 ### Changed
 
+- Published integrated Milestone 2A `master` normally at `ca0a9d7`; GitHub Pages run #7 passed
+  install, type-check, 239 tests, build, artifact upload, and deployment. Hosted Milestone 1
+  simulation/reset, repository-subpath assets, and browser diagnostics regressed cleanly, with no
+  visible celestial geometry introduced.
 - Passed the final independent Milestone 2A scientific gate and integrated the retained 2A0 and
   2A branches normally into local `master` with merge commits `1757781` and `6fcaa33`. Merged
   validation passes 239 tests, type-check, production build, diff, and dependency checks; no
-  visible celestial geometry was introduced and publication remains pending.
+  visible celestial geometry was introduced. Publication was not performed in that integration
+  checkpoint and is recorded separately above.
 - Recorded the second independent Milestone 2A gate failure and completed its bounded local remediation: clocks now own canonical immutable instants, direct malformed clock state cannot invoke providers, configuration revisions are runtime-validated, cache identity includes time source/rate and explicit accepted-capture identity, equator normals are owned, and the datum warning is conditional with frozen provenance metadata. Independent re-gating remains required; no visible celestial behavior, merge, push, or deployment occurred.
 - The first Milestone 2A remediation established accepted-event invalidation, value-based clock revisions, nested snapshot isolation, strict supported-profile restoration, unified P03 provider identity at `1.0.0`, and true-LRU evidence; its subsequent independent gate exposed the remaining bounded runtime contracts above.
 - Hardened the WebXR session controller so an acquired session is owned and subscribed before renderer binding.
@@ -93,6 +98,10 @@
 
 ### Validated
 
+- GitHub Pages run #7 passed on exact commit `ca0a9d7`. The hosted Milestone 1 page loaded from the
+  project subpath, `90 degrees` produced geographic yaw `-90.0 degrees`, reset restored the
+  uncalibrated state, and Chrome reported no warnings or errors. This was a non-visual regression
+  deployment, not a Quest celestial test.
 - The independent Milestone 0 re-gate found no blocking or material implementation, lifecycle, workflow, test, documentation, dependency, or deferred-scope findings.
 - On the feature branch, `npm ci`, type-check, 15/15 unit tests, production build, `git diff --check`, and `npm ls --depth=0` passed.
 - On integrated `master`, the same `npm ci`, type-check, 15/15 unit tests, production build, diff, and dependency-tree checks passed again.

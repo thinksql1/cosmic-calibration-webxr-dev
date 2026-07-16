@@ -4,13 +4,14 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 2A integrated into local `master`; publication and hosted regression verification pending
+**Current phase:** Milestone 2A integrated and published; coherent Earth-axis and celestial-pole implementation is next
 
-**Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and integrated locally.** Automated,
+**Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS, integrated, and published.** Automated,
 desktop, hosted, and reported physical Quest 3 Milestone 1 acceptance validation pass. The
 non-visual Milestone 2A0 adapter/P03 contracts and final Milestone 2A scientific foundation passed
-their independent gate and were merged normally into local `master`. Merged-master validation
-passes with 239 tests. Publication and hosted regression verification are pending; no visible
+their independent gate, were merged normally into `master`, and were pushed without force. GitHub
+Pages workflow run #7 passed with 239 tests and deployed the unchanged visible Milestone 1
+application; hosted simulation/reset, subpath assets, and console health passed. No visible
 celestial feature or Quest celestial behavior exists.
 
 ## One-paragraph state summary
@@ -49,10 +50,11 @@ unconditional/incomplete height warnings, and missing regression/status evidence
 second remediation owns and validates those values, suppresses providers for invalid clocks,
 keys provenance explicitly, and adds 49 deterministic regressions for a 239-test suite. The final
 independent gate reproduced the failed probes and found no blocking or material issue. Merge
-commits `1757781` and `6fcaa33` integrated the retained 2A0 and 2A branches normally into local
+commits `1757781` and `6fcaa33` integrated the retained 2A0 and 2A branches normally into
 `master`; clean install, type-check, 239 tests, production build, diff check, and dependency audit
-pass on the merged result. No visible celestial geometry was introduced. The next task is the
-bounded coherent Earth-axis and antipodal celestial-pole layer after publication regression.
+pass on the merged result. Commit `ca0a9d7` was pushed normally, GitHub Pages run #7 passed, and
+the unchanged hosted Milestone 1 application regressed cleanly. No visible celestial geometry was
+introduced. The next task is the bounded coherent Earth-axis and antipodal celestial-pole layer.
 
 ## Working and verified
 
@@ -149,14 +151,13 @@ bounded coherent Earth-axis and antipodal celestial-pole layer after publication
 
 ## In progress
 
-- Milestone 2A0 and the remediated non-visual Milestone 2A foundation are integrated into local
-  `master` after a passing final independent gate. Publication, Actions, Pages, and hosted
-  Milestone 1 regression verification remain pending before the bounded axis/pole task begins.
+- Milestone 2A0 and the remediated non-visual Milestone 2A foundation are integrated and published
+  after a passing final independent gate. The only active task is the bounded coherent Earth-axis
+  and antipodal celestial-pole implementation; that implementation has not begun.
 
 ## Blocked
 
-- None. Visible celestial implementation remains intentionally deferred until the integrated
-  non-visual foundation is published and its unchanged Milestone 1 hosted application regresses cleanly.
+- None. Visible celestial implementation remains intentionally bounded to the next axis/pole task.
 
 ## Known defects or limitations
 
@@ -172,7 +173,8 @@ bounded coherent Earth-axis and antipodal celestial-pole layer after publication
 - Desktop Chromium reports immersive AR as unsupported; desktop validation cannot exercise a browser XR session.
 - The production bundle contains a 574.29 kB minified application/Three.js chunk and triggers
   Vite's 500 kB advisory; no runtime defect was observed.
-- GitHub Pages run #5 deployed the Milestone 1 application at `ddcf676`; no custom domain is configured.
+- GitHub Pages run #7 deployed integrated Milestone 2A commit `ca0a9d7`; the visible application
+  remains Milestone 1 and no custom domain is configured.
 - Calibration remains session-scoped and in memory. Session exit, reload, recenter, boundary reset,
   tracking-origin change, or room change requires deliberate recalibration as documented.
 - Astronomy Engine validation is bounded to `2.1.19`, the named Sun/Moon operations, and Tier 1
@@ -208,7 +210,7 @@ bounded coherent Earth-axis and antipodal celestial-pole layer after publication
 | `src/scene/` | Room/floor frame plus separate geographic-reference group | Implemented; desktop PASS; Quest Milestone 1 accepted |
 | `src/xr/` | Owned session lifecycle and tracked-controller calibration adapter | Implemented; automated PASS; Quest controller-calibration flow accepted |
 | `src/science/astronomy/` | Typed observer/time/frame/correction contracts, Astronomy Engine adapter, ENU math, and P03 mean-pole provider | Milestone 2A0 bounded validation PASS; not consumed by visible app |
-| `src/science/state/`, `src/science/snapshot/`, `src/science/frames/`, `src/science/providers/` | Revisioned scientific state, provider registry, immutable P03 snapshot/equator basis, and bounded exact-key cache | Independent gate PASS; integrated locally; no UI or renderer import |
+| `src/science/state/`, `src/science/snapshot/`, `src/science/frames/`, `src/science/providers/` | Revisioned scientific state, provider registry, immutable P03 snapshot/equator basis, and bounded exact-key cache | Independent gate PASS; integrated and published; no UI or renderer import |
 | `src/presentation/mapEnuToApplicationBasis.ts` | Pure ENU `(east, north, up)` to application `(east, up, -north)` mapping outside science | Automated PASS; no Three.js dependency |
 | `tests/` | Capability, session, calibration, controller, adapter, JPL fixture, SOFA/P03, state/snapshot/cache, and boundary tests | 12 files / 239 tests passed on merged `master` |
 | `README.md` | Commands, workflow, conventions, deployment, and limits | Current |
@@ -218,17 +220,17 @@ bounded coherent Earth-axis and antipodal celestial-pole layer after publication
 | `docs/CELESTIAL_REFERENCE_ARCHITECTURE.md` | Explicit frame hierarchy, transforms, axis/poles/equator, horizon, precision tiers, and layer contracts | Architecture complete; 2A0 non-visual contracts proven; visible implementation not started |
 | `docs/ASTRONOMY_ENGINE_EVALUATION.md` | Runtime-library capability, limits, responsibility split, alternatives, and adoption gates | `2.1.19` bounded Tier 1 adapter validated |
 | `docs/ASTRONOMY_ADAPTER_CONTRACT.md` | Implemented observer, time, frame, correction, ENU, provenance, error, and provider contract | Milestone 2A0 current evidence |
-| `docs/SCIENTIFIC_STATE_FOUNDATION.md`, `docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md`, `docs/SCIENTIFIC_CACHE_POLICY.md` | Milestone 2A state, snapshot, readiness, cache, and presentation-boundary contracts | Final independent gate PASS; integrated locally |
+| `docs/SCIENTIFIC_STATE_FOUNDATION.md`, `docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md`, `docs/SCIENTIFIC_CACHE_POLICY.md` | Milestone 2A state, snapshot, readiness, cache, and presentation-boundary contracts | Final independent gate PASS; integrated and published |
 | `docs/MEAN_POLE_MODEL_VALIDATION.md` | P03 model, TT, matrix direction, fixtures, tolerances, corrections, and domain | Direct bounded provider validated |
 | `docs/CELESTIAL_VALIDATION_STRATEGY.md` | Pure, golden, cross-reference, visual/Quest, and error-budget validation plan | First JPL/SOFA fixtures captured; later layers pending |
 | `docs/TEMPORAL_LAYER_ARCHITECTURE.md` | Central simulation clock and future solar/lunar sampling and label policies | Architecture only |
 | `docs/MILESTONE_2_SEQUENCE.md` | Bounded 2A0 through later-layer dependency and acceptance sequence | Current sequence |
 | `docs/OFFICIAL_ASTRONOMY_SOURCES.md` | Official/primary source, capability, limitation, version, and license register | Research evidence current as of 2026-07-16 |
-| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run #5 passed for Milestone 1 at `ddcf676` |
+| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run #7 passed for integrated Milestone 2A at `ca0a9d7`; visible app remains Milestone 1 |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | One coherent Earth-axis and celestial-pole implementation task | Ready after publication regression |
+| `NEXT_TASK.md` | One coherent Earth-axis and celestial-pole implementation task | Ready |
 
 ## Environment
 
@@ -240,7 +242,7 @@ bounded coherent Earth-axis and antipodal celestial-pole layer after publication
 | Development dependencies | Vite `8.1.4`; TypeScript `7.0.2`; Vitest `4.1.10`; Three/WebXR types | Yes |
 | Build command | `npm run build` | Passed |
 | Test command | `npm run test` | 239/239 passed across 12 files on merged `master` |
-| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run #5 passed; Milestone 1 UI verified |
+| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run #7 passed at `ca0a9d7`; unchanged Milestone 1 UI verified |
 
 ## Risks
 
@@ -294,10 +296,11 @@ bounded coherent Earth-axis and antipodal celestial-pole layer after publication
 | 2026-07-16 | Milestone 1 physical Quest 3 acceptance | PASS; user reported the deployed hosted flow passed for AR/passthrough, controller start/capture separation, north capture, coherent cardinal geometry, world/floor stability, cancel/recalibrate/reset, and lifecycle; no blocking defect observed | User-reported Quest 3 evidence; no angular measurement or version details supplied |
 | 2026-07-16 | Milestone 2 celestial architecture research | PASS for documentation scope; official/primary sources define the library boundary, frames, mean-axis target, time/observer contracts, precession semantics, temporal schedules, validation/error budget, and bounded sequence; no source or dependency change | `docs/CELESTIAL_REFERENCE_ARCHITECTURE.md` and five companion documents |
 | 2026-07-16 | Milestone 2A0 astronomy adapter and mean-pole spike | PASS locally; exact `astronomy-engine@2.1.19`, three JPL Horizons DE441 fixtures, full SOFA `pmat06` matrix, J2000/present/future P03 poles, 135/135 tests, type-check, and unchanged production build. No visible geometry, merge, push, deployment, or Quest celestial test | `feature/milestone-2a0-astronomy-validation`; `docs/ASTRONOMY_ADAPTER_CONTRACT.md`; `docs/MEAN_POLE_MODEL_VALIDATION.md` |
-| 2026-07-16 | Milestone 2A final independent gate and local integration | PASS; all runtime-boundary, immutability, restoration, provenance, calibration-identity, cache, vector, warning, P03, and fixture probes passed. Normal merge commits `1757781` and `6fcaa33` integrated retained 2A0/2A branches; merged `master` passes clean install, type-check, 239 tests, build, diff, and dependency checks. Publication pending; no visible celestial geometry or Quest celestial test | `master`; `docs/SCIENTIFIC_STATE_FOUNDATION.md`; `docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md`; `docs/SCIENTIFIC_CACHE_POLICY.md` |
+| 2026-07-16 | Milestone 2A final independent gate and local integration | PASS; all runtime-boundary, immutability, restoration, provenance, calibration-identity, cache, vector, warning, P03, and fixture probes passed. Normal merge commits `1757781` and `6fcaa33` integrated retained 2A0/2A branches; merged `master` passes clean install, type-check, 239 tests, build, diff, and dependency checks. No visible celestial geometry or Quest celestial test | `master`; `docs/SCIENTIFIC_STATE_FOUNDATION.md`; `docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md`; `docs/SCIENTIFIC_CACHE_POLICY.md` |
+| 2026-07-16 | Milestone 2A publication regression | PASS; normal push of `ca0a9d7`, workflow run #7 install/type-check/239-test/build/upload/deploy success, hosted Milestone 1 UI, 90-degree simulation/reset, repository-subpath assets, and clean browser diagnostics verified. No visible celestial geometry was deployed | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29529809825`; `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 
 ## Current decision horizon
 
-Publish and regress the integrated non-visual foundation, then implement only the coherent
-Earth-axis and antipodal celestial-pole layer from validated scientific snapshots. Do not begin
+Implement only the coherent Earth-axis and antipodal celestial-pole layer from validated
+scientific snapshots. Do not begin
 celestial-equator, precession, body, temporal, media, relational, or contemplative layers.

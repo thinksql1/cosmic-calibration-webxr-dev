@@ -11,9 +11,10 @@ Milestone 2 architecture is complete and its bounded 2A0 validation spike passes
 Horizons fixtures validate the Sun/Moon adapter, and IAU SOFA/P03 fixtures validate the
 precession-only mean pole. After two bounded remediation rounds, the final independent Milestone
 2A gate found no blocking or material defect. The retained 2A0 and 2A branches are integrated
-normally into local `master`, which passes 239 tests and the production build. Publication and
-hosted regression verification remain pending. No visible celestial geometry has been added. The
-exact next task is the bounded coherent Earth-axis and celestial-pole implementation:
+normally into `master`, which passes 239 tests and the production build. GitHub Pages workflow run
+#7 deployed commit `ca0a9d7`, and the unchanged hosted Milestone 1 interface, simulation/reset,
+subpath assets, and browser diagnostics regressed cleanly. No visible celestial geometry has been
+added. The exact next task is the bounded coherent Earth-axis and celestial-pole implementation:
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -64,7 +65,7 @@ See [Architecture](docs/ARCHITECTURE.md) and [Calibration](docs/CALIBRATION.md) 
 
 ## Scientific foundation status
 
-Milestone 2A provides a non-visual, explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. Independent acceptance and local integration pass; publication is pending. It remains separate from Three.js and the visible application: no celestial geometry, body display, time/location control, or persistence exists yet. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), and [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md).
+Milestone 2A provides a non-visual, explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. Independent acceptance, integration, publication, and hosted regression pass. It remains separate from Three.js and the visible application: no celestial geometry, body display, time/location control, or persistence exists yet. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), and [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md).
 
 ## Physical north-marker workflow
 
@@ -110,8 +111,9 @@ current hosted Milestone 1 site is:
 
 `https://thinksql1.github.io/cosmic-calibration-webxr/`
 
-GitHub Pages workflow run #5 deployed commit `ddcf676`. Hosted desktop verification confirmed the
-Physical North controls, simulation/reset behavior, repository-subpath assets, and a clean console.
+GitHub Pages workflow run #7 deployed integrated Milestone 2A commit `ca0a9d7`. Hosted desktop
+verification confirmed the unchanged Physical North controls, simulation/reset behavior,
+repository-subpath assets, and clean browser diagnostics. No visible celestial geometry is present.
 
 ## Validation boundary
 
