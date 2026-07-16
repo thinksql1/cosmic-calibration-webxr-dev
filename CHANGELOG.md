@@ -45,6 +45,8 @@
   `8a20899`; the feature branch was retained and history was not rewritten.
 - Replaced the independent re-gate task with one bounded physical Quest north-calibration
   acceptance task that starts only after hosted Milestone 1 controls are confirmed.
+- Pushed integrated `master` normally at `ddcf676`; GitHub Pages workflow run #5 deployed the
+  Milestone 1 build without force-push, history rewrite, branch deletion, or custom-domain changes.
 
 ### Validated
 
@@ -70,14 +72,19 @@
   overlay-collision, coordinate, test, documentation, dependency, or deferred-scope finding.
 - Merged `master` passed a clean install, type-check, 3 test files / 66 tests, production build,
   dependency inspection, `git diff --check`, and development/production-preview desktop checks.
+- GitHub Pages run #5 passed checkout, Node setup, clean install, type-check, 66/66 tests, build,
+  artifact upload, Pages configuration, and deployment on exact commit `ddcf676`.
+- The hosted site exposes the Milestone 1 Physical North controls and desktop simulation; `90°`
+  produced `-90.0°`, reset restored uncalibrated state, project-subpath assets loaded, and the
+  browser console remained free of warnings and errors.
 
 ### Known limitations
 
 - The earlier chair-height observation was environmental and resolved by resetting the Quest floor for standing use; this evidence is limited to the tested Quest 3 environment.
 - The Three.js production chunk triggers Vite's 500 kB size advisory.
 - Milestone 0 does not establish future north calibration, geographic heading, controller ray, persistence, astronomy, or celestial-geometry behavior.
-- Milestone 1 physical Quest north-marker calibration is **NOT RUN**; the integrated build is not
-  yet pushed or deployed.
+- Milestone 1 physical Quest north-marker calibration is **NOT RUN** despite successful hosted
+  desktop verification.
 - Physical controller-only and DOM-overlay behavior remains **NOT RUN** on Quest.
 - The existing Three.js production chunk still triggers Vite’s 500 kB size advisory.
 

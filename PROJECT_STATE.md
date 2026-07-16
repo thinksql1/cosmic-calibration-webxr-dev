@@ -4,11 +4,10 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 1 integrated / authorized publication pending
+**Current phase:** Milestone 1 hosted / physical Quest acceptance pending
 
-**Overall status:** **Milestone 1 independent gate PASS and integrated locally.** Automated and
-desktop validation pass on merged `master`; publication is pending and physical Quest north
-calibration is **NOT RUN**.
+**Overall status:** **Milestone 1 CONDITIONAL PASS.** Independent gate, automated, desktop, and
+hosted verification pass; physical Quest north calibration is **NOT RUN**.
 
 ## One-paragraph state summary
 
@@ -21,8 +20,9 @@ event-frame target-ray pose validation, and `beforexrselect` isolation. The inde
 found no blocking or material issue, and merge commit `8a20899` integrated the retained feature
 branch normally into local `master`. Clean install, type-check, 66 deterministic tests, production
 build, dependency/diff inspection, and development/production-preview desktop behavior pass on
-merged `master`. The Milestone 1 build is not yet pushed or deployed; physical Quest north
-calibration is **NOT RUN**.
+merged `master`. Commit `ddcf676` was pushed normally and GitHub Pages run #5 deployed it
+successfully. The hosted Milestone 1 controls, simulation, reset, repository-subpath assets, and
+console health pass desktop inspection. Physical Quest north calibration is **NOT RUN**.
 
 ## Working and verified
 
@@ -54,6 +54,13 @@ calibration is **NOT RUN**.
 - Local Milestone 1 integration: merge commit `8a20899` retained the feature branch and did not
   rewrite history. Merged `master` passed `npm ci`, type-check, 66/66 tests, production build,
   `git diff --check`, dependency inspection, and development/production-preview desktop checks.
+- GitHub Pages workflow run #5 passed on pushed commit `ddcf676`: checkout, Node setup, clean
+  install, type-check, 66/66 tests, production build, artifact upload, Pages configuration, and
+  deployment completed successfully.
+- Hosted Milestone 1 verification passed at
+  `https://thinksql1.github.io/cosmic-calibration-webxr/`: Physical North controls and desktop
+  simulation are visible, `90°` produces `-90.0°`, reset restores uncalibrated state, relative
+  assets resolve under the project subpath, and the browser console has no warnings or errors.
 
 ## Implemented but not fully verified
 
@@ -76,12 +83,11 @@ calibration is **NOT RUN**.
 
 ## In progress
 
-- Push the validated integrated `master`, verify the existing Pages workflow, and confirm the
-  hosted site exposes the Milestone 1 controls before physical acceptance begins.
+- Run the bounded Milestone 1 physical north-calibration acceptance test on Quest 3.
 
 ## Blocked
 
-- Physical Quest acceptance is intentionally waiting for a confirmed hosted Milestone 1 build.
+- None. Physical Quest testing is the active next task and remains **NOT RUN**.
 
 ## Known defects or limitations
 
@@ -94,7 +100,7 @@ calibration is **NOT RUN**.
 - Desktop Chromium reports immersive AR as unsupported; desktop validation cannot exercise a browser XR session.
 - The production bundle contains a 574.29 kB minified application/Three.js chunk and triggers
   Vite's 500 kB advisory; no runtime defect was observed.
-- GitHub Pages has been exercised on the published `b1bf282` commit; no custom domain is configured.
+- GitHub Pages run #5 deployed the Milestone 1 application at `ddcf676`; no custom domain is configured.
 
 ## Important unknowns
 
@@ -114,7 +120,7 @@ calibration is **NOT RUN**.
 | `docs/ARCHITECTURE.md` | Frame separation, yaw convention, lifecycle, and module boundaries | Current |
 | `docs/CALIBRATION.md` | Physical setup, calibration procedure, limits, and troubleshooting | Current |
 | `docs/QUEST_TESTING.md` | Milestone 0 evidence and separate Milestone 1 acceptance checklist | Milestone 1 NOT RUN |
-| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | GitHub Actions source enabled; run #2 passed |
+| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run #5 passed for Milestone 1 at `ddcf676` |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation and geographic-frame convention decisions | Current |
@@ -130,7 +136,7 @@ calibration is **NOT RUN**.
 | Development dependencies | Vite `8.1.4`; TypeScript `7.0.2`; Vitest `4.1.10`; Three/WebXR types | Yes |
 | Build command | `npm run build` | Passed |
 | Test command | `npm run test` | 66/66 passed for remediation |
-| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run #2 passed |
+| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run #5 passed; Milestone 1 UI verified |
 
 ## Risks
 
@@ -173,9 +179,10 @@ calibration is **NOT RUN**.
 | 2026-07-15 | Milestone 1 input remediation | Clean install, type-check, 66/66 tests, build, dependency/diff checks, and desktop development/preview PASS; independent re-gate pending | `feature/milestone-1-north-calibration` |
 | 2026-07-16 | Independent Milestone 1 remediation re-gate | PASS; the three original input defects are resolved, automated/desktop checks pass, and physical Quest behavior remains NOT RUN | Commit `2275661` |
 | 2026-07-16 | Local Milestone 1 integration and revalidation | PASS; normal no-fast-forward merge, retained feature branch, 66/66 merged-master tests, build, dependency/diff, and desktop development/preview checks | Merge commit `8a20899` on `master` |
+| 2026-07-16 | Milestone 1 publication | PASS; normal push of `ddcf676`, workflow run #5 build/deploy success, hosted Physical North UI, simulation/reset, subpath assets, and console verified | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29494408661` |
 | 2026-07-15 | Milestone 1 physical Quest acceptance | NOT RUN | `docs/QUEST_TESTING.md` |
 
 ## Current decision horizon
 
-Publish and verify the authorized integrated Milestone 1 build. Begin the bounded physical
-north-calibration acceptance checklist only after the hosted Milestone 1 controls are confirmed.
+Run the bounded Milestone 1 physical north-calibration acceptance test. Do not begin Milestone 2
+until physical evidence is recorded and reconciled.

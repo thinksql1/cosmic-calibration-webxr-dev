@@ -79,15 +79,20 @@ Calibration is in memory only. Reloading, session exit, boundary reset, room cha
 
 ## Static hosting
 
-Vite uses `base: './'`, keeping emitted assets relative for GitHub Pages project subpaths. The current hosted Milestone 0 site is:
+Vite uses `base: './'`, keeping emitted assets relative for GitHub Pages project subpaths. The
+current hosted Milestone 1 site is:
 
 `https://thinksql1.github.io/cosmic-calibration-webxr/`
 
-This implementation task does not push or deploy Milestone 1.
+GitHub Pages workflow run #5 deployed commit `ddcf676`. Hosted desktop verification confirmed the
+Physical North controls, simulation/reset behavior, repository-subpath assets, and a clean console.
 
 ## Validation boundary
 
-Pure math, state transitions, controller integration, existing XR lifecycle, type-check, build, and desktop simulation are locally testable. Physical Quest north-marker calibration is a separate acceptance step and remains **NOT RUN** until the feature branch is published under explicit authorization.
+Pure math, state transitions, controller integration, existing XR lifecycle, type-check, build, and
+desktop simulation are locally testable. Physical Quest north-marker calibration is a separate
+acceptance step and remains **NOT RUN**; hosted desktop verification is not evidence of controller
+behavior in an immersive Quest session.
 
 ## Explicitly deferred
 
