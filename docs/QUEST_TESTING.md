@@ -10,7 +10,15 @@ This result does not establish Milestone 1 north calibration.
 
 ## Milestone 1 status
 
-**Physical north-calibration acceptance: NOT RUN.** The implementation must be locally validated and published under separate authorization before this checklist is executed.
+**Physical north-calibration acceptance: PASS for the reported Quest 3 flow.** The deployed
+Milestone 1 controls were visible; immersive AR/passthrough, controller start/capture separation,
+controller-based north capture, coherent cardinal geometry, world/floor stability,
+cancel/recalibrate/reset, and session lifecycle were reported as passing with no blocking defect.
+This is a usability result for the tested flow, not a laboratory-grade angular-accuracy result.
+
+Exact Quest OS/browser versions, numerical north error, left/right controller coverage,
+DOM-overlay availability, aiming-ray observations, and targeted tracking-loss or invalid-pose
+rejection were not supplied and remain unmeasured rather than inferred.
 
 ## Prerequisites
 
@@ -58,26 +66,27 @@ This result does not establish Milestone 1 north calibration.
 
 | Criterion | Result | Notes/evidence |
 |---|---|---|
-| Milestone 0 behavior preserved | NOT RUN | |
-| Available controllers detected | NOT RUN | |
-| Rays visible only during calibration | NOT RUN | |
-| DOM-overlay calibration and action isolation | NOT RUN | |
-| Controller-only start and release-before-capture | NOT RUN | |
-| Controller-only cancel and reset | NOT RUN | |
+| Milestone 0 behavior preserved | PASS | Floor alignment and world locking remained correct in the reported flow. |
+| Available controllers detected | PASS | At least one controller completed calibration; handedness coverage was not reported. |
+| Rays visible only during calibration | NOT RUN | Not separately reported. |
+| DOM-overlay calibration and action isolation | NOT RUN | Overlay availability and interaction results were not separately reported. |
+| Controller-only start and release-before-capture | PASS | Reported start/capture separation passed. |
+| Controller-only cancel and reset | PASS | Cancel and reset were reported as passing. |
 | Nearly vertical capture rejected | NOT RUN | |
 | Tracking-loss/stale-pose capture rejected | NOT RUN | |
-| Trigger captures horizontal target ray | NOT RUN | |
-| N aligns with physical true-north marker | NOT RUN | |
-| S opposite and E/W perpendicular | NOT RUN | |
-| Geographic frame world-locked | NOT RUN | |
+| Trigger captures horizontal target ray | PASS | A controller captured the trusted north-marker direction; no numeric posture or error was reported. |
+| N aligns with physical true-north marker | PASS | Coherent geographic alignment was reported; no angular precision was measured. |
+| S opposite and E/W perpendicular | PASS | Coherent N/S/E/W geometry was reported. |
+| Geographic frame world-locked | PASS | World locking remained stable in the reported flow. |
 | Duplicate capture suppressed | NOT RUN | |
-| Recalibration replaces prior result | NOT RUN | |
-| Cancel restores prior result | NOT RUN | |
-| Reset returns to uncalibrated | NOT RUN | |
+| Recalibration replaces prior result | PASS | Recalibration was reported as passing; intermediate preservation details were not separately reported. |
+| Cancel restores prior result | UNCERTAIN | Cancel passed, but preservation of a prior calibration was not separately described. |
+| Reset returns to uncalibrated | PASS | Reset was reported as passing. |
 | Left/right controller behavior | NOT RUN | |
-| Exit/re-entry invalidation recorded | NOT RUN | |
-| Recenter behavior recorded | NOT RUN | |
-| Comfort and readability | NOT RUN | |
-| Versions, URL, commit, and room setup | NOT RUN | |
+| Exit/re-entry invalidation recorded | PASS | Session lifecycle was reported as usable; exact post-exit state details were not supplied. |
+| Recenter behavior recorded | UNCERTAIN | Session lifecycle was reported usable, but recenter-specific observations were not supplied. |
+| Comfort and readability | UNCERTAIN | No blocking defect was reported, but no separate comfort/readability observations were supplied. |
+| Versions, URL, commit, and room setup | UNCERTAIN | Hosted deployment was confirmed; exact device/software/setup details were not supplied. |
 
-Physical device evidence is required before Milestone 1 can pass overall.
+Physical device evidence has been recorded for the reported Quest 3 acceptance flow. Additional
+device/room coverage and unmeasured edge-case evidence remain future regression-validation work.

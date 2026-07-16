@@ -90,9 +90,9 @@ Physical North controls, simulation/reset behavior, repository-subpath assets, a
 ## Validation boundary
 
 Pure math, state transitions, controller integration, existing XR lifecycle, type-check, build, and
-desktop simulation are locally testable. Physical Quest north-marker calibration is a separate
-acceptance step and remains **NOT RUN**; hosted desktop verification is not evidence of controller
-behavior in an immersive Quest session.
+desktop simulation are locally testable. The reported Quest 3 Milestone 1 acceptance flow passed
+for controller-based calibration and usable lifecycle behavior. That evidence does not establish
+laboratory-grade angular accuracy, broad device coverage, or unreported edge-case outcomes.
 
 ## Explicitly deferred
 

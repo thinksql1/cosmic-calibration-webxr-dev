@@ -47,6 +47,10 @@
   acceptance task that starts only after hosted Milestone 1 controls are confirmed.
 - Pushed integrated `master` normally at `ddcf676`; GitHub Pages workflow run #5 deployed the
   Milestone 1 build without force-push, history rewrite, branch deletion, or custom-domain changes.
+- Completed Milestone 1 from reported physical Quest 3 acceptance evidence and replaced the
+  physical-test task with one Milestone 2 celestial reference-frame architecture task.
+- Began Milestone 2 planning only. No celestial, astronomy-library, temporal, source, dependency,
+  workflow, deployment, or configuration implementation was performed.
 
 ### Validated
 
@@ -77,15 +81,21 @@
 - The hosted site exposes the Milestone 1 Physical North controls and desktop simulation; `90°`
   produced `-90.0°`, reset restored uncalibrated state, project-subpath assets loaded, and the
   browser console remained free of warnings and errors.
+- Reported physical Quest 3 Milestone 1 acceptance passed on the deployed site: hosted controls,
+  immersive AR/passthrough, controller start/capture separation, north capture, coherent N/S/E/W
+  geometry, world locking/floor alignment, cancel, recalibration, reset, and session lifecycle
+  were usable with no blocking physical defect observed.
 
 ### Known limitations
 
 - The earlier chair-height observation was environmental and resolved by resetting the Quest floor for standing use; this evidence is limited to the tested Quest 3 environment.
 - The Three.js production chunk triggers Vite's 500 kB size advisory.
 - Milestone 0 does not establish future north calibration, geographic heading, controller ray, persistence, astronomy, or celestial-geometry behavior.
-- Milestone 1 physical Quest north-marker calibration is **NOT RUN** despite successful hosted
-  desktop verification.
-- Physical controller-only and DOM-overlay behavior remains **NOT RUN** on Quest.
+- Milestone 1 physical acceptance is limited to the reported Quest 3 flow. No laboratory-grade
+  angular-error measurement, Quest OS/browser version, controller-by-controller coverage,
+  DOM-overlay availability, or targeted pose-loss observation was supplied.
+- The physical marker remains the trusted reference. Automatic heading, compass, geolocation,
+  magnetic correction, persistence, and astronomy remain absent.
 - The existing Three.js production chunk still triggers Vite’s 500 kB size advisory.
 
 ## 2026-07-15 — Initial project activation

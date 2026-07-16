@@ -4,53 +4,78 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the Milestone 1 physical north-calibration acceptance test
+**Title:** Define Milestone 2 celestial reference-frame architecture
 
-## Start condition
+## Why this is next
 
-Begin only after confirming that the hosted Pages site contains the Milestone 1 **Physical North**
-controls and desktop bearing simulation. Do not infer device behavior from source, unit tests,
-desktop simulation, or hosted desktop inspection.
+Milestone 1 is complete: the local geographic frame can be physically calibrated on the tested
+Quest 3 flow. Milestone 2 must first define a traceable celestial architecture before adding any
+astronomy library, celestial geometry, temporal data, or new XR behavior.
 
 ## Objective
 
-On a physical Quest 3, verify that controller-only and optional DOM-overlay north calibration are
-usable, reject invalid captures safely, preserve the floor-relative Milestone 0 scene, and remain
-coherent across recalibration, reset, session exit/re-entry, and recenter.
+Produce an architecture-and-sequencing proposal for scientifically traceable, horizon-relative
+celestial reference frames and optional temporal display layers. The proposal must preserve the
+existing separation between room/floor, local geographic, and future celestial frames.
 
-## Required work
+## Required planning work
 
-1. Establish a safe standing or room-scale boundary and deliberately confirm the physical floor.
-2. Open the deployed Pages URL and confirm the Milestone 1 controls are present before entering AR.
-3. Enter immersive AR and verify passthrough, floor geometry, and world locking still behave as in
-   the accepted Milestone 0 result.
-4. Test the controller-only start, release/arm, later capture, cancel, recalibrate, deliberate reset,
-   left-controller, and right-controller paths without relying on DOM overlay.
-5. If Quest Browser provides DOM overlay, test its calibrate, cancel, recalibrate, and reset controls
-   and confirm each overlay action causes no duplicate XR capture. If unavailable, record that path
-   as NOT APPLICABLE rather than FAIL.
-6. Attempt capture with a missing/untracked or nearly vertical target ray where practical and verify
-   that the previous accepted calibration is preserved and a later valid capture remains possible.
-7. Verify the physical north marker, N/S/E/W geometry, displayed yaw, readability, scale, comfort,
-   and controller/world feedback.
-8. Exit and re-enter immersive AR, recenter once, and verify the documented need for deliberate
-   recalibration without stale or corrupted geographic geometry.
-9. Record each observation as PASS, FAIL, UNCERTAIN, NOT RUN, or NOT APPLICABLE, including Quest
-   Browser/system versions and whether DOM overlay was available.
+1. Define the intended coordinate/frame chain, ownership, units, epoch/date conventions, and
+   transformation boundaries for room/floor, geographic, Earth-rotational, celestial, and
+   horizon-relative display frames.
+2. Define how Earth’s rotational axis, north/south celestial poles, and celestial equator relate
+   to the calibrated local geographic frame without rotating the room frame, XR camera, or
+   scientific source coordinates.
+3. Evaluate astronomy-library candidates and a validation strategy using authoritative reference
+   data. Specify the required date/time, location, civil-time, and observer assumptions before
+   selecting or adding a dependency.
+4. Define module boundaries and an incremental delivery sequence with explicit validation gates,
+   performance/comfort constraints, and a desktop-plus-Quest evidence plan.
+5. Define the future precession-circle model:
+   - Extend one Earth rotational axis toward both celestial poles.
+   - Attach one long-term precession-path circle at each pole end.
+   - Compute each pole’s astronomically correct, date-dependent contact point on its circle.
+   - Keep north and south as one coherent axis system; never substitute decorative generic circles.
+   - Model nutation and smaller motions separately, or explicitly defer them with a reason.
+6. Define the future solar temporal-clock model:
+   - apparent Sun path;
+   - 24 hourly position ticks and optional hour labels;
+   - current-Sun emphasis and below-horizon positions;
+   - date, location, season, and civil-time handling; and
+   - minimal, selectable display modes.
+7. Define the future lunar temporal-clock model:
+   - Moon next-24-hour path markers and optional hourly labels;
+   - local-midnight Moon position;
+   - successive local-midnight markers across a lunar cycle;
+   - optional date/day labels and lunar-phase symbols; and
+   - scientifically accurate non-circular motion.
+8. Record the visual/contemplative presentation rule: minimalism is functional; every layer must
+   be independently optional; focused attention must be supported rather than interrupted;
+   accuracy outranks decorative complexity; and no metaphysical state claim may be presented as
+   scientific fact.
+
+## Deliverables
+
+- A proposed Milestone 2 architecture document or clearly scoped amendment describing frame
+  contracts, data flow, library-evaluation criteria, validation sources, module boundaries, and
+  delivery order.
+- Explicit deferred-items and risk notes for precision, timezone/civil-time handling, location
+  assumptions, precession/nutation fidelity, and visual comfort.
+- Any genuinely durable decision candidates for review; do not mark them accepted without evidence.
 
 ## Acceptance rules
 
-- **PASS:** Physical capture aligns application north to the marked direction; controller-only
-  lifecycle, invalid-input recovery, recalibration/reset, session lifecycle, floor reference,
-  stability, readability, and comfort are usable with no duplicate capture or severe regression.
-- **FAIL:** Any stale/default capture, same-action begin-and-capture, overlay collision, unusable
-  controller-only path, lost prior calibration after rejected recapture, floor/stability regression,
-  fatal session error, or severe comfort issue occurs.
-- **UNCERTAIN:** The physical setup, marker, controller tracking, or observation cannot establish a
-  reliable result. Do not promote uncertainty to PASS.
+- The plan distinguishes local geographic calibration from celestial calculations and display.
+- It preserves a single coherent north/south rotational-axis and date-dependent precession model.
+- It treats Sun and Moon paths as optional temporal layers backed by defined scientific inputs.
+- It defines validation before implementation and makes no unsupported precision or metaphysical
+  claim.
+- No runtime, dependency, source, workflow, or deployment change occurs.
 
 ## Prohibited scope
 
-- Do not begin Milestone 2, astronomy, celestial-pole/precession geometry, automatic north,
-  compass access, magnetic correction, geolocation, persistence, anchors, or deployment changes.
-- Do not modify application code while collecting acceptance evidence. Record any failure first.
+- Do not implement or install Astronomy Engine.
+- Do not add Earth-axis geometry, celestial poles, celestial equator, ecliptic, precession circles,
+  nutation, Sun, Moon, planets, geolocation, time controls, temporal ticks, orbital paths, audio,
+  or contemplative sequencing.
+- Do not alter Milestone 1 behavior, publish, deploy, or begin a new physical test.

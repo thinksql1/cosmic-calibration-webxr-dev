@@ -78,6 +78,20 @@
   Explicit release gating separates start from capture, current-event pose proof prevents stale
   headings, and overlay isolation keeps both interaction paths coherent.
 
+### DEC-011: Keep celestial modeling accuracy-first and temporal layers independently optional
+- **Date:** 2026-07-16
+- **Status:** Accepted
+- **Owner:** Darrell Wright / project control
+- **Decision:** Future celestial geometry must be derived from traceable scientific calculations in
+  a dedicated celestial frame that remains separate from room/floor and local geographic display
+  frames. Precession, solar, lunar, and other temporal layers must be independently optional and
+  validated before display. Visual minimalism is functional: it supports focused attention, does
+  not excuse decorative inaccuracy, and does not present contemplative or metaphysical claims as
+  scientific fact.
+- **Rationale:** Celestial phenomena have different dependencies, timescales, and validation
+  requirements. Frame separation preserves scientific traceability; optional layers prevent
+  temporal complexity from obscuring orientation; accuracy-first presentation preserves trust.
+
 ## Proposed decisions awaiting review
 
 None yet.
