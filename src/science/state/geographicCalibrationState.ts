@@ -1,4 +1,4 @@
-import type { NorthCalibrationState } from '../../calibration/state';
+import type { CalibrationRecord, NorthCalibrationState } from '../../calibration/state';
 
 export interface GeographicCalibrationReady {
   readonly kind: 'ready';
@@ -6,6 +6,7 @@ export interface GeographicCalibrationReady {
   readonly revision: number;
   readonly provenance: 'user-calibrated-true-north';
   readonly originIdentity?: string;
+  readonly acceptedCalibrationRevision?: number;
 }
 
 export interface GeographicCalibrationNotReady {
@@ -20,21 +21,30 @@ function freezeState(state: GeographicCalibrationState): GeographicCalibrationSt
   return Object.freeze(state);
 }
 
-function asScientificView(
+function acceptedCalibration(
   calibration: NorthCalibrationState,
+): CalibrationRecord | undefined {
+  if (calibration.kind === 'calibrated') return calibration.calibration;
+  return 'previousCalibration' in calibration
+    ? calibration.previousCalibration
+    : undefined;
+}
+
+function readyState(
+  calibration: CalibrationRecord,
   revision: number,
   originIdentity?: string,
-): GeographicCalibrationState {
-  if (calibration.kind !== 'calibrated') {
-    return freezeState({ kind: 'not-ready', revision, reason: revision === 0 ? 'uncalibrated' : 'invalidated' });
-  }
-  return freezeState({
+): GeographicCalibrationReady {
+  return Object.freeze({
     kind: 'ready',
-    yawRadians: calibration.calibration.yawRadians,
+    yawRadians: calibration.yawRadians,
     revision,
     provenance: 'user-calibrated-true-north',
     ...(originIdentity === undefined ? {} : { originIdentity }),
-  });
+    ...(calibration.acceptedRevision === undefined
+      ? {}
+      : { acceptedCalibrationRevision: calibration.acceptedRevision }),
+  }) as GeographicCalibrationReady;
 }
 
 export class GeographicCalibrationStateAdapter {
@@ -45,10 +55,32 @@ export class GeographicCalibrationStateAdapter {
   }
 
   update(calibration: NorthCalibrationState, originIdentity?: string): GeographicCalibrationState {
-    const candidate = asScientificView(calibration, this.state.revision, originIdentity);
-    const unchanged = JSON.stringify({ ...candidate, revision: 0 }) === JSON.stringify({ ...this.state, revision: 0 });
-    if (unchanged) return this.state;
-    this.state = asScientificView(calibration, this.state.revision + 1, originIdentity);
+    const accepted = acceptedCalibration(calibration);
+    if (accepted) {
+      const hasAcceptedEventIdentity = accepted.acceptedRevision !== undefined;
+      if (
+        this.state.kind === 'ready' &&
+        this.state.yawRadians === accepted.yawRadians &&
+        this.state.originIdentity === originIdentity &&
+        (!hasAcceptedEventIdentity ||
+          this.state.acceptedCalibrationRevision === accepted.acceptedRevision)
+      ) {
+        return this.state;
+      }
+      const revision = accepted.acceptedRevision ?? this.state.revision + 1;
+      const candidate = readyState(accepted, revision, originIdentity);
+      this.state = candidate;
+      return this.state;
+    }
+
+    if (this.state.kind === 'not-ready' && this.state.reason === 'uncalibrated') {
+      return this.state;
+    }
+    this.state = freezeState({
+      kind: 'not-ready',
+      revision: this.state.revision + 1,
+      reason: this.state.revision === 0 ? 'uncalibrated' : 'invalidated',
+    });
     return this.state;
   }
 

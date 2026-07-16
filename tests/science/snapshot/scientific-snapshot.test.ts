@@ -7,6 +7,11 @@ import { SimulationClock } from '../../../src/science/state/simulationClock';
 import { ScientificConfigurationStore } from '../../../src/science/state/scientificConfiguration';
 import { buildScientificSnapshot, type ScientificSnapshotInput } from '../../../src/science/snapshot/scientificSnapshotBuilder';
 import { ScientificSnapshotService } from '../../../src/science/snapshot/scientificSnapshotService';
+import type { ScientificSnapshot } from '../../../src/science/snapshot/scientificSnapshot';
+import {
+  P03_MEAN_POLE_PROVIDER,
+  P03_MEAN_POLE_PROVIDER_VERSION,
+} from '../../../src/science/astronomy/meanPoleProvider';
 
 function input(): ScientificSnapshotInput {
   const observer = new ObserverStateStore();
@@ -35,7 +40,15 @@ describe('scientific snapshot builder', () => {
     expect(dot(cross, snapshot.earthAxis.north)).toBeCloseTo(1, 12);
     expect(snapshot.frameContract.calibratedYawApplication).toBe('presentation-parent-only');
     expect(snapshot.providers).toEqual({ astronomyEngineVersion: '2.1.19', meanPoleProviderVersion: '1.0.0' });
-    expect(snapshot.warnings).toHaveLength(5);
+    expect(snapshot.warnings).toHaveLength(6);
+    expect(snapshot.warnings).toContainEqual(expect.objectContaining({
+      code: 'HEIGHT_DATUM_REFERENCE_DIFFERENCE',
+    }));
+    expect(snapshot.earthAxis.provenance).toMatchObject({
+      provider: P03_MEAN_POLE_PROVIDER,
+      providerVersion: P03_MEAN_POLE_PROVIDER_VERSION,
+    });
+    expect(snapshot.providers.meanPoleProviderVersion).toBe(P03_MEAN_POLE_PROVIDER_VERSION);
     expect(Object.isFrozen(snapshot)).toBe(true);
     expect(Object.isFrozen(snapshot.earthAxis)).toBe(true);
   });
@@ -44,6 +57,9 @@ describe('scientific snapshot builder', () => {
     ['observer', (value: ScientificSnapshotInput) => ({ ...value, observer: { kind: 'not-ready' as const, revision: 4 } })],
     ['calibration', (value: ScientificSnapshotInput) => ({ ...value, calibration: { kind: 'not-ready' as const, revision: 4, reason: 'invalidated' as const } })],
     ['configuration', (value: ScientificSnapshotInput) => ({ ...value, configuration: { ...value.configuration, precisionTier: 'TIER_2' as never } })],
+    ['correction profile', (value: ScientificSnapshotInput) => ({ ...value, configuration: { ...value.configuration, bodyCorrectionProfile: 'UNSUPPORTED' as never } })],
+    ['refraction policy', (value: ScientificSnapshotInput) => ({ ...value, configuration: { ...value.configuration, refractionPolicy: 'normal' as never } })],
+    ['non-canonical provider order', (value: ScientificSnapshotInput) => ({ ...value, configuration: { ...value.configuration, enabledProviders: ['P03 Mean Pole', 'Astronomy Engine'] as never } })],
   ])('returns structured not-ready errors for missing or unsupported %s', (_name, mutate) => {
     const result = buildScientificSnapshot(mutate(input()));
     expect(result.kind).toBe('not-ready');
@@ -72,5 +88,16 @@ describe('scientific snapshot builder', () => {
     expect(first.kind).toBe('ready');
     expect(second).toEqual(first);
     expect(service.cacheDiagnostics).toMatchObject({ hits: 1, misses: 1 });
+  });
+
+  it('deeply isolates nested provider values, warnings, and basis vectors', () => {
+    const result = buildScientificSnapshot(input());
+    expect(result.kind).toBe('ready');
+    if (result.kind !== 'ready') return;
+    const { snapshot } = result;
+    expect(() => { (snapshot.earthAxis.provenance as { provider: string }).provider = 'mutated'; }).toThrow();
+    expect(() => { (snapshot.warnings as ScientificSnapshot['warnings'] as unknown as { code: string }[])[0]!.code = 'mutated'; }).toThrow();
+    expect(() => { (snapshot.equatorBasis.first as { x: number }).x = 42; }).toThrow();
+    expect(snapshot.earthAxis.provenance.provider).toBe(P03_MEAN_POLE_PROVIDER);
   });
 });

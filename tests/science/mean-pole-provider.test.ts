@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { angularSeparationDeg } from '../../src/science/astronomy/frameTransforms';
 import {
+  P03_MEAN_POLE_PROVIDER,
+  P03_MEAN_POLE_PROVIDER_VERSION,
   P03MeanPoleProvider,
   computeP03BiasPrecessionMatrix,
 } from '../../src/science/astronomy/meanPoleProvider';
 import { createSimulationInstant } from '../../src/science/astronomy/time';
+import { createScientificProviderRegistry } from '../../src/science/providers/scientificProviderRegistry';
 import type {
   MeanPoleRequest,
   SimulationInstant,
@@ -143,6 +146,21 @@ describe('P03 precession-only mean-pole provider', () => {
         [result.south.x, result.south.y, result.south.z],
       ),
     ).toBeCloseTo(180, 12);
+  });
+
+  it('uses the same authoritative provider identity in the registry and result provenance', () => {
+    const result = providerFor(2_460_848.167531584).getMeanPole(
+      meanPoleRequest('2025-06-21T16:00:00Z'),
+    );
+    const registry = createScientificProviderRegistry();
+    expect(registry.meanPole).toMatchObject({
+      provider: P03_MEAN_POLE_PROVIDER,
+      version: P03_MEAN_POLE_PROVIDER_VERSION,
+    });
+    expect(result.provenance).toMatchObject({
+      provider: registry.meanPole.provider,
+      providerVersion: registry.meanPole.version,
+    });
   });
 
   it('cannot be confused with a true pole or nutation-inclusive result', () => {

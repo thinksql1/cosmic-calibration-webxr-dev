@@ -26,6 +26,7 @@ export type ScientificWarningCode =
   | 'NO_LIVE_EOP'
   | 'MEAN_AXIS_EXCLUDES_NUTATION'
   | 'NO_POLAR_MOTION'
+  | 'HEIGHT_DATUM_REFERENCE_DIFFERENCE'
   | 'NO_PRECISION_CLAIM_BEYOND_TIER_1';
 
 export interface ScientificWarning {

@@ -4,7 +4,11 @@ import {
   getObserverRelativePosition,
   toTerrestrialTime,
 } from '../astronomy/astronomyEngineAdapter';
-import { P03MeanPoleProvider } from '../astronomy/meanPoleProvider';
+import {
+  P03_MEAN_POLE_PROVIDER,
+  P03_MEAN_POLE_PROVIDER_VERSION,
+  P03MeanPoleProvider,
+} from '../astronomy/meanPoleProvider';
 
 export interface ScientificProviderRegistry {
   readonly astronomy: {
@@ -14,8 +18,8 @@ export interface ScientificProviderRegistry {
     readonly getObserverRelativePosition: typeof getObserverRelativePosition;
   };
   readonly meanPole: {
-    readonly provider: 'P03 Mean Pole';
-    readonly version: '1.0.0';
+    readonly provider: typeof P03_MEAN_POLE_PROVIDER;
+    readonly version: typeof P03_MEAN_POLE_PROVIDER_VERSION;
     readonly validationStatus: 'validated-2A0';
     readonly getMeanPole: P03MeanPoleProvider['getMeanPole'];
   };
@@ -31,8 +35,8 @@ export function createScientificProviderRegistry(): ScientificProviderRegistry {
       getObserverRelativePosition,
     }),
     meanPole: Object.freeze({
-      provider: 'P03 Mean Pole' as const,
-      version: '1.0.0' as const,
+      provider: P03_MEAN_POLE_PROVIDER,
+      version: P03_MEAN_POLE_PROVIDER_VERSION,
       validationStatus: 'validated-2A0' as const,
       getMeanPole: meanPole.getMeanPole.bind(meanPole),
     }),

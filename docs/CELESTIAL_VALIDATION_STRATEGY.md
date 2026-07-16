@@ -2,7 +2,7 @@
 
 ## Milestone 2A implemented checks
 
-The non-visual foundation adds deterministic store, serialization, explicit-tick clock, calibration-adapter, configuration, snapshot, exact-cache, LRU, axis-basis, and boundary tests. They retain the frozen 2A0 JPL/SOFA/P03 fixtures unchanged. Snapshot checks verify exact pole antipodes, unit/perpendicular/right-handed equator preparation, frame/provenance metadata, structured readiness, warnings, and no stale cache reuse after observer/time/calibration/profile changes. The checks are not a visual or Quest celestial validation.
+The non-visual foundation adds deterministic store, serialization, explicit-tick clock, calibration-adapter, configuration, snapshot, exact-cache, LRU, axis-basis, and boundary tests. Remediation adds accepted-event same-yaw invalidation, nested mutation resistance, malformed restore rejection, provider-version consistency, semantic clock no-op behavior, true-LRU recency, and the height-datum warning. They retain the frozen 2A0 JPL/SOFA/P03 fixtures unchanged. Snapshot checks verify exact pole antipodes, unit/perpendicular/right-handed equator preparation, frame/provenance metadata, structured readiness, warnings, and no stale cache reuse after observer/time/calibration/profile changes. The checks are not a visual or Quest celestial validation.
 
 ## Purpose
 

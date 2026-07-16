@@ -2,10 +2,11 @@ import { AstronomyContractError } from '../astronomy/errors';
 import { createSimulationInstant } from '../astronomy/time';
 import type { SimulationInstant, SimulationInstantSource } from '../astronomy/types';
 
+export const SIMULATION_CLOCK_VERSION = 1 as const;
 export type SimulationClockMode = 'frozen' | 'realtime';
 
 export interface SimulationClockState {
-  readonly version: 1;
+  readonly version: typeof SIMULATION_CLOCK_VERSION;
   readonly mode: SimulationClockMode;
   readonly paused: boolean;
   readonly timeRate: number;
@@ -14,7 +15,7 @@ export interface SimulationClockState {
 }
 
 export interface SerializedSimulationClock {
-  readonly version: 1;
+  readonly version: typeof SIMULATION_CLOCK_VERSION;
   readonly state: SimulationClockState;
 }
 
@@ -22,12 +23,81 @@ function freezeState(state: SimulationClockState): SimulationClockState {
   return Object.freeze(state);
 }
 
+function reject(message: string): never {
+  throw new AstronomyContractError('INVALID_INSTANT', message);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function sameInstant(left: SimulationInstant, right: SimulationInstant): boolean {
+  return (
+    left.utcIso === right.utcIso &&
+    left.unixMilliseconds === right.unixMilliseconds &&
+    left.source === right.source
+  );
+}
+
 function updateInstant(
   instant: SimulationInstant,
   milliseconds: number,
   source: SimulationInstantSource,
 ): SimulationInstant {
-  return createSimulationInstant(new Date(instant.unixMilliseconds + milliseconds).toISOString(), source);
+  if (!Number.isFinite(milliseconds)) {
+    return reject('Clock tick produced a non-finite simulation-time change.');
+  }
+  const nextMilliseconds = instant.unixMilliseconds + milliseconds;
+  if (!Number.isFinite(nextMilliseconds)) {
+    return reject('Clock tick produced an invalid simulation instant.');
+  }
+  return createSimulationInstant(new Date(nextMilliseconds).toISOString(), source);
+}
+
+function normalizeSerializedState(value: unknown): Omit<SimulationClockState, 'revision'> {
+  if (!isRecord(value)) return reject('Serialized simulation clock state must be an object.');
+  if (value.version !== SIMULATION_CLOCK_VERSION) {
+    return reject('Unsupported simulation-clock state serialization version.');
+  }
+  if (value.mode !== 'frozen' && value.mode !== 'realtime') {
+    return reject('Serialized simulation clock has an unsupported mode.');
+  }
+  if (typeof value.paused !== 'boolean') {
+    return reject('Serialized simulation clock paused state must be boolean.');
+  }
+  if (value.mode === 'frozen' && value.paused !== true) {
+    return reject('Frozen simulation clocks must be paused.');
+  }
+  if (typeof value.timeRate !== 'number' || !Number.isFinite(value.timeRate)) {
+    return reject('Serialized simulation clock has an invalid time rate.');
+  }
+  if (!Number.isInteger(value.revision) || (value.revision as number) < 0) {
+    return reject('Serialized simulation clock has an invalid revision.');
+  }
+  if (!isRecord(value.instant) || typeof value.instant.utcIso !== 'string') {
+    return reject('Serialized simulation clock has an invalid instant.');
+  }
+  if (
+    value.instant.source !== 'frozen-test' &&
+    value.instant.source !== 'user-selected' &&
+    value.instant.source !== 'system-selected'
+  ) {
+    return reject('Serialized simulation clock has an invalid instant source.');
+  }
+  if (!Number.isFinite(value.instant.unixMilliseconds)) {
+    return reject('Serialized simulation clock instant milliseconds must be finite.');
+  }
+  const instant = createSimulationInstant(value.instant.utcIso, value.instant.source);
+  if (instant.unixMilliseconds !== value.instant.unixMilliseconds) {
+    return reject('Serialized simulation clock instant fields disagree.');
+  }
+  return Object.freeze({
+    version: SIMULATION_CLOCK_VERSION,
+    mode: value.mode,
+    paused: value.paused,
+    timeRate: value.timeRate,
+    instant,
+  });
 }
 
 export class SimulationClock {
@@ -35,7 +105,7 @@ export class SimulationClock {
 
   constructor(initial: SimulationInstant) {
     this.state = freezeState({
-      version: 1,
+      version: SIMULATION_CLOCK_VERSION,
       mode: 'frozen',
       paused: true,
       timeRate: 1,
@@ -49,7 +119,20 @@ export class SimulationClock {
   }
 
   selectFrozen(instant: SimulationInstant): SimulationClockState {
-    this.state = freezeState({ ...this.state, mode: 'frozen', paused: true, instant, revision: this.state.revision + 1 });
+    if (
+      this.state.mode === 'frozen' &&
+      this.state.paused &&
+      sameInstant(this.state.instant, instant)
+    ) {
+      return this.state;
+    }
+    this.state = freezeState({
+      ...this.state,
+      mode: 'frozen',
+      paused: true,
+      instant,
+      revision: this.state.revision + 1,
+    });
     return this.state;
   }
 
@@ -66,9 +149,7 @@ export class SimulationClock {
   }
 
   setRate(timeRate: number): SimulationClockState {
-    if (!Number.isFinite(timeRate)) {
-      throw new AstronomyContractError('INVALID_INSTANT', 'Simulation time rate must be finite.');
-    }
+    if (!Number.isFinite(timeRate)) return reject('Simulation time rate must be finite.');
     if (this.state.timeRate === timeRate) return this.state;
     this.state = freezeState({ ...this.state, timeRate, revision: this.state.revision + 1 });
     return this.state;
@@ -76,36 +157,39 @@ export class SimulationClock {
 
   tick(elapsedMilliseconds: number): SimulationClockState {
     if (!Number.isFinite(elapsedMilliseconds) || elapsedMilliseconds < 0) {
-      throw new AstronomyContractError('INVALID_INSTANT', 'Clock tick elapsed milliseconds must be finite and non-negative.');
+      return reject('Clock tick elapsed milliseconds must be finite and non-negative.');
     }
     if (this.state.mode !== 'realtime' || this.state.paused || elapsedMilliseconds === 0 || this.state.timeRate === 0) {
       return this.state;
     }
-    this.state = freezeState({
-      ...this.state,
-      instant: updateInstant(this.state.instant, elapsedMilliseconds * this.state.timeRate, 'system-selected'),
-      revision: this.state.revision + 1,
-    });
+    const instant = updateInstant(
+      this.state.instant,
+      elapsedMilliseconds * this.state.timeRate,
+      'system-selected',
+    );
+    if (sameInstant(instant, this.state.instant)) return this.state;
+    this.state = freezeState({ ...this.state, instant, revision: this.state.revision + 1 });
     return this.state;
   }
 
   serialize(): SerializedSimulationClock {
-    return Object.freeze({ version: 1, state: this.state });
+    return Object.freeze({ version: SIMULATION_CLOCK_VERSION, state: this.state });
   }
 
-  restore(serialized: SerializedSimulationClock): SimulationClockState {
-    if (serialized.version !== 1 || serialized.state.version !== 1) {
-      throw new AstronomyContractError('INVALID_INSTANT', 'Unsupported simulation-clock serialization version.');
+  restore(serialized: unknown): SimulationClockState {
+    if (!isRecord(serialized) || serialized.version !== SIMULATION_CLOCK_VERSION) {
+      return reject('Unsupported simulation-clock serialization version.');
     }
-    if (!Number.isFinite(serialized.state.timeRate)) {
-      throw new AstronomyContractError('INVALID_INSTANT', 'Serialized simulation clock has an invalid time rate.');
+    const next = normalizeSerializedState(serialized.state);
+    if (
+      this.state.mode === next.mode &&
+      this.state.paused === next.paused &&
+      this.state.timeRate === next.timeRate &&
+      sameInstant(this.state.instant, next.instant)
+    ) {
+      return this.state;
     }
-    const instant = createSimulationInstant(serialized.state.instant.utcIso, serialized.state.instant.source);
-    this.state = freezeState({
-      ...serialized.state,
-      instant,
-      revision: this.state.revision + 1,
-    });
+    this.state = freezeState({ ...next, revision: this.state.revision + 1 });
     return this.state;
   }
 }

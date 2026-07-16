@@ -6,13 +6,14 @@ import { ScientificConfigurationStore } from '../../../src/science/state/scienti
 import { createSimulationInstant } from '../../../src/science/astronomy/time';
 
 const instant = () => createSimulationInstant('2025-06-21T16:00:00Z', 'frozen-test');
-const calibrated = (yawRadians = 0.25) => ({
+const calibrated = (yawRadians = 0.25, acceptedRevision?: number) => ({
   kind: 'calibrated' as const,
   calibration: {
     yawRadians,
     capturedDirection: { x: 0, y: 0 as const, z: -1 },
     timestamp: 1,
     simulated: true,
+    ...(acceptedRevision === undefined ? {} : { acceptedRevision }),
   },
 });
 
@@ -63,6 +64,42 @@ describe('explicit simulation clock', () => {
     expect(restored.restore(serialized).timeRate).toBe(0);
     expect(() => restored.restore({ version: 2 } as never)).toThrow('Unsupported simulation-clock');
   });
+
+  it('uses value-based revisions for equivalent frozen selections and state changes only', () => {
+    const clock = new SimulationClock(instant());
+    const initial = clock.current;
+    expect(clock.selectFrozen(instant())).toBe(initial);
+    expect(clock.current.revision).toBe(0);
+    expect(clock.setRate(1)).toBe(initial);
+    expect(clock.pause()).toBe(initial);
+    expect(clock.tick(0)).toBe(initial);
+
+    expect(clock.selectFrozen(createSimulationInstant('2025-06-21T16:00:01Z', 'frozen-test')).revision).toBe(1);
+    expect(clock.setRate(-2).revision).toBe(2);
+    expect(clock.startRealtime().revision).toBe(3);
+    expect(clock.tick(500).revision).toBe(4);
+    expect(clock.pause().revision).toBe(5);
+    expect(clock.pause().revision).toBe(5);
+    expect(clock.tick(500).revision).toBe(5);
+    clock.startRealtime();
+    clock.setRate(0);
+    const zeroRate = clock.current;
+    expect(clock.tick(500)).toBe(zeroRate);
+  });
+
+  it.each([
+    { version: 2 },
+    { version: 1, state: { version: 1, mode: 'invalid-mode', paused: true, timeRate: 1, instant: instant(), revision: 0 } },
+    { version: 1, state: { version: 1, mode: 'frozen', paused: true, timeRate: Number.NaN, instant: instant(), revision: 0 } },
+    { version: 1, state: { version: 1, mode: 'frozen', paused: true, timeRate: 1, instant: { ...instant(), utcIso: 'bad-time' }, revision: 0 } },
+    { version: 1, state: { version: 1, mode: 'frozen', paused: false, timeRate: 1, instant: instant(), revision: 0 } },
+    null,
+    'clock',
+  ])('rejects malformed clock restoration payload %#', (serialized) => {
+    expect(() => new SimulationClock(instant()).restore(serialized as never)).toThrowError(
+      expect.objectContaining({ code: 'INVALID_INSTANT' }),
+    );
+  });
 });
 
 describe('read-only geographic calibration view', () => {
@@ -73,6 +110,17 @@ describe('read-only geographic calibration view', () => {
     expect(ready).toEqual({ kind: 'ready', yawRadians: 0.25, revision: 1, provenance: 'user-calibrated-true-north', originIdentity: 'session-a' });
     expect(adapter.update(calibrated(), 'session-a')).toBe(ready);
     expect(adapter.update(calibrated(-0.5), 'session-a')).toMatchObject({ kind: 'ready', revision: 2, yawRadians: -0.5 });
+    expect(adapter.update({ kind: 'uncalibrated' })).toMatchObject({ kind: 'not-ready', revision: 3, reason: 'invalidated' });
+  });
+
+  it('uses accepted calibration event identity to invalidate same-yaw snapshots', () => {
+    const adapter = new GeographicCalibrationStateAdapter();
+    const first = adapter.update(calibrated(0.25, 1), 'same-origin');
+    const repeat = adapter.update(calibrated(0.25, 1), 'same-origin');
+    const recalibrated = adapter.update(calibrated(0.25, 2), 'same-origin');
+    expect(repeat).toBe(first);
+    expect(recalibrated).toMatchObject({ kind: 'ready', yawRadians: 0.25, acceptedCalibrationRevision: 2, revision: 2 });
+    expect(adapter.update({ kind: 'invalid-direction', message: 'invalid', previousCalibration: calibrated(0.25, 2).calibration }, 'same-origin')).toBe(recalibrated);
     expect(adapter.update({ kind: 'uncalibrated' })).toMatchObject({ kind: 'not-ready', revision: 3, reason: 'invalidated' });
   });
 
@@ -97,5 +145,39 @@ describe('scientific configuration', () => {
     expect(normal.revision).toBe(1);
     expect(() => store.replace({ ...normal, precisionTier: 'TIER_2' as never })).toThrow('validated Tier 1');
     expect(() => store.replace({ ...normal, refractionPolicy: 'disabled' })).toThrow('Refraction policy');
+  });
+
+  it('normalizes, clones, and freezes provider identity without retaining caller arrays', () => {
+    const providers = ['P03 Mean Pole', 'Astronomy Engine'] as const;
+    const store = new ScientificConfigurationStore();
+    const configuration = store.replace({
+      precisionTier: 'TIER_1',
+      bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS',
+      meanPoleModel: 'IAU_P03_PRECESSION_ONLY',
+      refractionPolicy: 'disabled',
+      enabledProviders: providers,
+    });
+    (providers as unknown as string[]).reverse();
+    expect(configuration.enabledProviders).toEqual(['Astronomy Engine', 'P03 Mean Pole']);
+    expect(Object.isFrozen(configuration.enabledProviders)).toBe(true);
+    expect(() => (configuration.enabledProviders as unknown as string[]).push('unexpected')).toThrow();
+  });
+
+  it.each([
+    { version: 2 },
+    { version: 1, precisionTier: 'TIER_2', bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS', meanPoleModel: 'IAU_P03_PRECESSION_ONLY', refractionPolicy: 'disabled', enabledProviders: ['Astronomy Engine', 'P03 Mean Pole'] },
+    { version: 1, precisionTier: 'TIER_1', bodyCorrectionProfile: 'UNSUPPORTED', meanPoleModel: 'IAU_P03_PRECESSION_ONLY', refractionPolicy: 'disabled', enabledProviders: ['Astronomy Engine', 'P03 Mean Pole'] },
+    { version: 1, precisionTier: 'TIER_1', bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS', meanPoleModel: 'IAU_P03_PRECESSION_ONLY', refractionPolicy: 'normal', enabledProviders: ['Astronomy Engine', 'P03 Mean Pole'] },
+    { version: 1, precisionTier: 'TIER_1', bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS', meanPoleModel: 'OTHER', refractionPolicy: 'disabled', enabledProviders: ['Astronomy Engine', 'P03 Mean Pole'] },
+    { version: 1, precisionTier: 'TIER_1', bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS', meanPoleModel: 'IAU_P03_PRECESSION_ONLY', refractionPolicy: 'disabled', enabledProviders: ['Unknown', 'P03 Mean Pole'] },
+    { version: 1, precisionTier: 'TIER_1', bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS', meanPoleModel: 'IAU_P03_PRECESSION_ONLY', refractionPolicy: 'disabled', enabledProviders: ['Astronomy Engine', 'Astronomy Engine'] },
+    { version: 1, precisionTier: 'TIER_1', bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS', meanPoleModel: 'IAU_P03_PRECESSION_ONLY', refractionPolicy: 'disabled', enabledProviders: 'P03 Mean Pole' },
+    { version: 1, precisionTier: 'TIER_1', bodyCorrectionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS', meanPoleModel: 'IAU_P03_PRECESSION_ONLY', refractionPolicy: 'disabled' },
+    null,
+    3,
+  ])('rejects malformed scientific-configuration restoration payload %#', (serialized) => {
+    expect(() => new ScientificConfigurationStore().restore(serialized as never)).toThrowError(
+      expect.objectContaining({ code: 'UNSUPPORTED_CORRECTION_PROFILE' }),
+    );
   });
 });

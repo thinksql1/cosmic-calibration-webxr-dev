@@ -16,6 +16,9 @@ const ARCSECONDS_TO_RADIANS = Math.PI / (180 * 3_600);
 const MINIMUM_VALIDATED_CENTURIES = -1;
 const MAXIMUM_VALIDATED_CENTURIES = 1;
 
+export const P03_MEAN_POLE_PROVIDER = 'Cosmic Calibration P03 mean-pole provider';
+export const P03_MEAN_POLE_PROVIDER_VERSION = '1.0.0';
+
 type Matrix3 = readonly [RotationRow, RotationRow, RotationRow];
 
 function polynomial(
@@ -203,8 +206,8 @@ export class P03MeanPoleProvider {
       z: -north.z,
     });
     const provenance: MeanPoleProvenance = Object.freeze({
-      provider: 'Cosmic Calibration P03 mean-pole provider',
-      providerVersion: '1.0.0-spike',
+      provider: P03_MEAN_POLE_PROVIDER,
+      providerVersion: P03_MEAN_POLE_PROVIDER_VERSION,
       simulationInstant: instant,
       matrixSourceFrame: 'GCRS',
       matrixOutputFrame: 'P03_MEAN_EQUATOR_OF_DATE',

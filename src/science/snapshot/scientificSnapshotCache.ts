@@ -41,6 +41,8 @@ export class ScientificSnapshotCache {
 
   clear(): void {
     this.entries.clear();
+    this.hits = 0;
+    this.misses = 0;
   }
 
   get diagnostics(): ScientificSnapshotCacheDiagnostics {

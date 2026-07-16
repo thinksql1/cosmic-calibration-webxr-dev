@@ -4,8 +4,9 @@
 
 ### Added
 
+- Milestone 2A remediation coverage for same-yaw accepted recalibration, strict configuration/clock restoration, nested immutability, provider-version identity, semantic clock equality, exact cache identity, true LRU recency, and the observer-height datum warning; the suite now has 12 files / 190 tests.
 - Non-visual Milestone 2A revisioned observer, explicit-tick UTC clock, read-only geographic-calibration adapter, validated Tier 1 configuration, provider registry, immutable P03 axis/equator-basis snapshot, structured readiness, and bounded exact-key LRU cache.
-- Deterministic state, serialization, clock, calibration, snapshot, basis, cache, and orchestration tests; the suite now has 12 files / 157 tests.
+- Deterministic state, serialization, clock, calibration, snapshot, basis, cache, and orchestration tests; expanded by remediation coverage to 12 files / 190 tests.
 - Scientific state, snapshot-contract, and cache-policy documentation plus DEC-018, preserving the presentation-only calibrated-yaw boundary.
 - Deterministic Vitest coverage for pending requests, renderer binding, active sessions, cleanup, retry, cleanup failure, and end-during-binding lifecycle transitions.
 - Pure horizontal projection, signed-yaw, bearing, and cardinal-direction calibration math with an explicit `-Z` application-north convention.
@@ -31,6 +32,7 @@
 
 ### Changed
 
+- Hardened non-visual Milestone 2A state/cache contracts after the first independent gate: accepted calibration events now have their own invalidation identity; clock revisions remain value-based; configuration and snapshots recursively isolate nested values; restoration uses strict runtime validation; P03 provider identity is unified at `1.0.0`; and the documented MSL-versus-ellipsoid height distinction is a structured Tier 1 warning. Independent re-gating remains required; no visible celestial behavior, merge, push, or deployment occurred.
 - Hardened the WebXR session controller so an acquired session is owned and subscribed before renderer binding.
 - Added binding-failure cleanup through `session.end()`, blocked retry during unresolved work, and prevented an end-during-binding race from reporting false active state.
 - Added restrained phase-labelled browser-console diagnostics for unexpected binding and cleanup failures.
