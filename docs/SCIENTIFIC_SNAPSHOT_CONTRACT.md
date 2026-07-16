@@ -18,6 +18,9 @@ The immutable ready result contains:
 - validated observer, clock, geographic-calibration summary, configuration, and all revisions;
 - canonical scientific horizontal contract `east,north,up`, and the separate application basis identifier `east -> +X`, `up -> +Y`, `north -> -Z`;
 - a validated IAU P03 precession-only mean axis: north/south poles in GCRS, P03 matrix/equator frame metadata, correction profile, TT provenance, and date domain;
+- one axis-specific observer-horizontal result that proves the GCRS pole/matrix pair becomes the
+  P03 mean-date `+Z` axis and maps that Earth-fixed mean axis through the WGS84 geodetic basis to
+  exact antipodal `HORIZONTAL_ENU` pole directions;
 - a deterministic unit, orthogonal, right-handed equator-plane pair whose cross product is the same north mean-pole normal; the basis owns a separately frozen normalized copy and never aliases its caller's pole object;
 - exact provider names/versions (the P03 registry, model provenance, and cache key all use `Cosmic Calibration P03 mean-pole provider@1.0.0`), cache identity, creation sequence, and Tier 1 warnings.
 
@@ -31,4 +34,13 @@ The height-datum warning is conditional rather than a generic P03 warning. A rea
 
 ## Frame boundary
 
-The P03 pole is expressed in GCRS while its bias-precession matrix declares a GCRS-to-P03 mean-equator-of-date transform. The application basis is only a named future display conversion; it is not performed here. The calibrated geographic yaw enters once, later, at the presentation parent. No snapshot calculation imports Three.js or relies on a visible scene matrix. Provider output and state inputs are cloned into recursively frozen snapshot values, so a caller cannot mutate cache content through nested provenance, warnings, or vectors.
+The P03 pole is expressed in GCRS while its bias-precession matrix declares a GCRS-to-P03
+mean-equator-of-date transform. Milestone 2B extends the immutable snapshot with the explicit
+axis-only pipeline
+`GCRS -> P03 mean-date +Z -> WGS84 Earth-fixed mean axis -> HORIZONTAL_ENU`. Earth rotation
+cannot change that axis because it is a rotation about the same `+Z`; this invariant is not a
+general celestial-to-horizontal shortcut for equator samples, stars, or bodies. The application
+basis conversion remains outside science and the calibrated geographic yaw enters once at the
+presentation parent. No snapshot calculation imports Three.js or relies on a visible scene
+matrix. Provider output and state inputs are cloned into recursively frozen snapshot values, so a
+caller cannot mutate cache content through nested provenance, warnings, or vectors.

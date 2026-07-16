@@ -4,6 +4,16 @@
 
 ### Added
 
+- Local Milestone 2B observer-horizontal mean-axis snapshot contract: the validated P03 GCRS
+  pole/matrix pair is proved against mean-date `+Z`, then mapped through the WGS84 geodetic
+  Earth-fixed-to-ENU basis into exact antipodal NCP/SCP directions.
+- One restrained observer-centered `1.8 m` symbolic Earth-axis group with NCP/SCP markers,
+  optional labels, full/subdued below-horizon treatment, concise readiness/diagnostics, manual
+  in-memory observer input, and explicit central-clock UTC fixtures.
+- Deterministic axis, latitude/hemisphere, longitude-invariance, time-provenance, mapping,
+  visibility, rebuild/reset, and persistent-scene-group regression coverage plus the Milestone 2B
+  scientific/presentation and Quest-test documentation; the complete local suite is now 15 files
+  / 270 tests, retaining all 239 integrated tests.
 - Milestone 2A remediation coverage for same-yaw accepted recalibration, owned simulation instants, strict configuration/clock restoration and direct snapshot validation, nested vector immutability, provider/version/time-source/calibration cache identity, semantic clock equality, true LRU recency, and conditional observer-height datum warnings; the suite now has 12 files / 239 tests.
 - Non-visual Milestone 2A revisioned observer, explicit-tick UTC clock, read-only geographic-calibration adapter, validated Tier 1 configuration, provider registry, immutable P03 axis/equator-basis snapshot, structured readiness, and bounded exact-key LRU cache.
 - Deterministic state, serialization, clock, calibration, snapshot, basis, cache, and orchestration tests; expanded by both remediation passes to 12 files / 239 tests.
@@ -32,6 +42,11 @@
 
 ### Changed
 
+- Completed the bounded Milestone 2B implementation locally on
+  `feature/milestone-2b-earth-axis-poles`. Presentation consumes the immutable scientific snapshot,
+  maps ENU once under the existing geographic-yaw parent, and clears when observer, clock, model,
+  or calibration readiness is absent. No merge, push, deployment, or physical Quest acceptance
+  occurred.
 - Published integrated Milestone 2A `master` normally at `ca0a9d7`; GitHub Pages run #7 passed
   install, type-check, 239 tests, build, artifact upload, and deployment. Hosted Milestone 1
   simulation/reset, repository-subpath assets, and browser diagnostics regressed cleanly, with no
@@ -98,6 +113,10 @@
 
 ### Validated
 
+- Milestone 2B local development and production-preview checks pass for equator, mid-northern,
+  mid-southern, and high-northern visual cases; explicit observer/time controls; label and
+  below-horizon controls; recalibration/reset; orbit, zoom, resize, relative production assets,
+  and clean application console output. Physical Quest validation remains NOT RUN.
 - GitHub Pages run #7 passed on exact commit `ca0a9d7`. The hosted Milestone 1 page loaded from the
   project subpath, `90 degrees` produced geographic yaw `-90.0 degrees`, reset restored the
   uncalibrated state, and Chrome reported no warnings or errors. This was a non-visual regression

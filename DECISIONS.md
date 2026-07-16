@@ -197,6 +197,26 @@
 - **Decision:** Every accepted Milestone 1 calibration capture receives a monotonically increasing scientific identity and invalidates dependent snapshots even when yaw and origin match a prior capture. Failed/cancelled attempts retain the prior accepted identity; reset invalidates it. In contrast, simulation-clock revisions are value-based and do not change for an identical selected instant, mode, pause state, rate, or no-op tick. Public scientific configuration and snapshot values are recursively isolated from caller/provider mutation, and canonical provider identity/version participates in provenance and exact cache keys.
 - **Rationale:** A physical recalibration is a new evidence event even when its numeric output repeats, while duplicate clock selections have no scientific change. Distinguishing these semantics prevents stale room calibration reuse without creating needless time/cache churn. Recursive isolation and one provider-version source prevent hidden mutation or inconsistent provenance from bypassing revisioned invalidation.
 
+### DEC-020: Present the P03 mean axis as one observer-centered directional proxy
+- **Date:** 2026-07-16
+- **Status:** Accepted
+- **Owner:** Darrell Wright / project control
+- **Decision:** The first celestial visual layer consumes the immutable Milestone 2A snapshot and
+  proves the GCRS P03 pole/matrix pair becomes the mean-date `+Z` axis before converting that
+  Earth-fixed mean axis through the WGS84 geodetic ENU basis. Earth rotation about the same axis
+  is analytically invariant and is not replaced by fabricated sidereal motion. Presentation maps
+  ENU once into `(east, up, -north)`, uses a symbolic `1.8 m` observer-centered line with exact
+  antipodal NCP/SCP endpoints, and inherits accepted north yaw only from the geographic parent.
+  The physical geocentric axis, observer-centered directional proxy, room floor, and geometric
+  horizon remain explicitly distinct. Below-horizon styling may subdue or hide a segment but may
+  not recalculate or independently place either pole.
+- **Rationale:** This preserves the validated P03/frame provenance while giving an embodied,
+  room-scale representation without claiming literal celestial distance or Earth-center
+  placement. Keeping the transformation in science and the yaw/radius/style in presentation
+  prevents direct-provider coupling, double rotation, false date motion, and independent pole
+  drift. The axis-specific Earth-rotation invariance must not be reused for the future equator,
+  stars, or bodies.
+
 ## Proposed decisions awaiting review
 
 None yet.

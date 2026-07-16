@@ -1,5 +1,6 @@
 import { AstronomyContractError } from '../astronomy/errors';
 import { createMeanEquatorBasis } from '../frames/earthAxisState';
+import { createObserverHorizontalEarthAxis } from '../frames/observerHorizontalEarthAxis';
 import {
   ASTRONOMY_ENGINE_PROVIDER,
   ASTRONOMY_ENGINE_VERSION,
@@ -150,7 +151,11 @@ function validateInput(input: ScientificSnapshotInput): SnapshotInputValidation 
   });
 }
 
-function verifyAxis(snapshot: { readonly earthAxis: ScientificSnapshot['earthAxis']; readonly equatorBasis: ScientificSnapshot['equatorBasis'] }): ScientificIssue | undefined {
+function verifyAxis(snapshot: {
+  readonly earthAxis: ScientificSnapshot['earthAxis'];
+  readonly observerHorizontalEarthAxis: ScientificSnapshot['observerHorizontalEarthAxis'];
+  readonly equatorBasis: ScientificSnapshot['equatorBasis'];
+}): ScientificIssue | undefined {
   const { north, south } = snapshot.earthAxis;
   const vectors = [
     north.x, north.y, north.z,
@@ -161,6 +166,17 @@ function verifyAxis(snapshot: { readonly earthAxis: ScientificSnapshot['earthAxi
   ];
   if (!vectors.every(Number.isFinite)) return issue('NON_FINITE_RESULT', 'Provider returned a non-finite scientific vector.');
   if (south.x !== -north.x || south.y !== -north.y || south.z !== -north.z) return issue('INVARIANT_FAILURE', 'North and south mean poles must be exact antipodes.');
+  const horizontalNorth = snapshot.observerHorizontalEarthAxis.north.direction;
+  const horizontalSouth = snapshot.observerHorizontalEarthAxis.south.direction;
+  if (
+    horizontalSouth.east !== -horizontalNorth.east ||
+    horizontalSouth.north !== -horizontalNorth.north ||
+    horizontalSouth.up !== -horizontalNorth.up ||
+    Math.abs(Math.hypot(horizontalNorth.east, horizontalNorth.north, horizontalNorth.up) - 1) > 1e-12 ||
+    snapshot.observerHorizontalEarthAxis.meanDateAlignmentResidual > 1e-12
+  ) {
+    return issue('INVARIANT_FAILURE', 'Observer-horizontal north and south mean poles must be unit antipodes of the same validated P03 axis.');
+  }
   const dot = (a: { x: number; y: number; z: number }, b: { x: number; y: number; z: number }) => a.x * b.x + a.y * b.y + a.z * b.z;
   const length = (vector: { x: number; y: number; z: number }) => Math.hypot(vector.x, vector.y, vector.z);
   const cross = {
@@ -237,6 +253,9 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
     }
     const earthAxis = immutableClone(providerAxis);
     const equatorBasis = immutableClone(createMeanEquatorBasis(earthAxis.north));
+    const observerHorizontalEarthAxis = immutableClone(
+      createObserverHorizontalEarthAxis(earthAxis, validation.observer),
+    );
     const revisions: ScientificRevisions = Object.freeze({
       observer: readyObserver.revision,
       time: normalizedInput.clock.revision,
@@ -245,6 +264,7 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
     });
     const candidate = {
       earthAxis,
+      observerHorizontalEarthAxis,
       equatorBasis,
     };
     const invariantFailure = verifyAxis(candidate);
@@ -263,8 +283,10 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
         horizontal: 'HORIZONTAL_ENU_EAST_NORTH_UP',
         applicationBasis: 'ENU_EAST_TO_X__UP_TO_Y__NORTH_TO_NEGATIVE_Z',
         calibratedYawApplication: 'presentation-parent-only',
+        celestialAxisPipeline: 'GCRS_P03_MEAN_DATE_AXIS_TO_WGS84_EARTH_FIXED_TO_HORIZONTAL_ENU',
       }),
       earthAxis,
+      observerHorizontalEarthAxis,
       equatorBasis,
       providers: Object.freeze({
         astronomyEngineVersion: normalizedInput.providers.astronomy.version,

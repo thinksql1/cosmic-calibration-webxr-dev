@@ -46,6 +46,14 @@ describe('scientific snapshot builder', () => {
     expect(dot(snapshot.equatorBasis.normal, snapshot.earthAxis.north)).toBeCloseTo(1, 12);
     expect(dot(cross, snapshot.earthAxis.north)).toBeCloseTo(1, 12);
     expect(snapshot.frameContract.calibratedYawApplication).toBe('presentation-parent-only');
+    expect(snapshot.frameContract.celestialAxisPipeline).toBe('GCRS_P03_MEAN_DATE_AXIS_TO_WGS84_EARTH_FIXED_TO_HORIZONTAL_ENU');
+    expect(snapshot.observerHorizontalEarthAxis).toMatchObject({
+      model: 'IAU_P03_PRECESSION_ONLY',
+      sourceFrame: 'GCRS',
+      outputFrame: 'HORIZONTAL_ENU',
+      north: { altitudeDeg: 38.8977, azimuthDeg: 0 },
+      south: { altitudeDeg: -38.8977, azimuthDeg: 180 },
+    });
     expect(snapshot.providers).toEqual({ astronomyEngineVersion: '2.1.19', meanPoleProviderVersion: '1.0.0' });
     expect(snapshot.warnings).toHaveLength(6);
     expect(snapshot.warnings).toContainEqual(expect.objectContaining({
@@ -261,6 +269,7 @@ describe('scientific snapshot builder', () => {
     expect(() => { (snapshot.equatorBasis.second as { y: number }).y = 42; }).toThrow();
     expect(() => { (snapshot.equatorBasis.normal as { z: number }).z = 42; }).toThrow();
     expect(() => { (snapshot.earthAxis.south as { x: number }).x = 42; }).toThrow();
+    expect(() => { (snapshot.observerHorizontalEarthAxis.north.direction as { up: number }).up = 42; }).toThrow();
     expect(() => { (snapshot.configuration.enabledProviders as unknown as string[]).push('mutated'); }).toThrow();
     expect(() => {
       (snapshot.observer.observer.uncertainty as { horizontalMeters: number }).horizontalMeters = 42;

@@ -11,7 +11,22 @@ import {
   applyCalibrationToGeographicGroup,
   createGeographicReferenceGroup,
 } from './scene/createGeographicReference';
+import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
+import { createSimulationInstant } from './science/astronomy/time';
+import { createScientificProviderRegistry } from './science/providers/scientificProviderRegistry';
+import { ScientificSnapshotService } from './science/snapshot/scientificSnapshotService';
+import { GeographicCalibrationStateAdapter } from './science/state/geographicCalibrationState';
+import { ObserverStateStore } from './science/state/observerState';
+import { ScientificConfigurationStore } from './science/state/scientificConfiguration';
+import { SimulationClock } from './science/state/simulationClock';
+import {
+  createEarthAxisPresentationModel,
+  createEarthAxisStatusViewModel,
+  DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
+  type BelowHorizonDisplayMode,
+  type EarthAxisDisplaySettings,
+} from './presentation/earthAxisPresentationModel';
 import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
@@ -43,6 +58,33 @@ const simulateNorthButton = requireElement<HTMLButtonElement>('#simulate-north')
 const bearingPresetButtons = [
   ...document.querySelectorAll<HTMLButtonElement>('[data-bearing]'),
 ];
+const celestialPanel = requireElement<HTMLElement>('#celestial-panel');
+const celestialStatus = requireElement<HTMLParagraphElement>('#celestial-status');
+const celestialDetail = requireElement<HTMLParagraphElement>('#celestial-detail');
+const celestialLimitations = requireElement<HTMLParagraphElement>('#celestial-limitations');
+const celestialDiagnostics = requireElement<HTMLUListElement>('#celestial-diagnostics');
+const observerLatitudeInput = requireElement<HTMLInputElement>('#observer-latitude');
+const observerLongitudeInput = requireElement<HTMLInputElement>('#observer-longitude');
+const observerElevationInput = requireElement<HTMLInputElement>('#observer-elevation');
+const observerError = requireElement<HTMLParagraphElement>('#observer-error');
+const applyObserverButton = requireElement<HTMLButtonElement>('#apply-observer');
+const clearObserverButton = requireElement<HTMLButtonElement>('#clear-observer');
+const observerPresetButtons = [
+  ...document.querySelectorAll<HTMLButtonElement>('[data-observer-latitude]'),
+];
+const selectedUtcOutput = requireElement<HTMLOutputElement>('#selected-utc');
+const timePresetButtons = [
+  ...document.querySelectorAll<HTMLButtonElement>('[data-time-utc]'),
+];
+const useCurrentTimeButton = requireElement<HTMLButtonElement>('#use-current-time');
+const showAxisInput = requireElement<HTMLInputElement>('#show-celestial-axis');
+const showMarkersInput = requireElement<HTMLInputElement>('#show-pole-markers');
+const showLabelsInput = requireElement<HTMLInputElement>('#show-pole-labels');
+const showBelowHorizonInput = requireElement<HTMLInputElement>('#show-below-horizon');
+const belowHorizonModeSelect = requireElement<HTMLSelectElement>('#below-horizon-mode');
+const celestialOverlayControls = [
+  ...celestialPanel.querySelectorAll<HTMLElement>('button, input, select, summary'),
+];
 const domOverlayControls: EventTarget[] = [
   enterArButton,
   calibrateButton,
@@ -51,11 +93,14 @@ const domOverlayControls: EventTarget[] = [
   bearingInput,
   simulateNorthButton,
   ...bearingPresetButtons,
+  ...celestialOverlayControls,
 ];
 
 const desktopBackground = new THREE.Color(0x071014);
 const scene = createReferenceScene();
 const geographicReference = createGeographicReferenceGroup();
+const celestialAxis = createEarthAxisGroup();
+geographicReference.add(celestialAxis.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
 
@@ -85,8 +130,64 @@ controls.maxDistance = 9;
 controls.update();
 
 const northCalibration = new NorthCalibrationController();
+const observerState = new ObserverStateStore();
+const simulationClock = new SimulationClock(
+  createSimulationInstant('2025-06-21T16:00:00.000Z', 'user-selected'),
+);
+const scientificConfiguration = new ScientificConfigurationStore();
+const scientificCalibration = new GeographicCalibrationStateAdapter();
+const scientificSnapshotService = new ScientificSnapshotService(
+  createScientificProviderRegistry(),
+);
 let currentXrState: XRState = checkingState;
 let controllerManager: NorthCalibrationControllerManager | undefined;
+let scientificOriginIdentity = 'desktop-simulation';
+let xrOriginSequence = 0;
+
+function currentAxisDisplaySettings(): EarthAxisDisplaySettings {
+  const belowHorizonMode: BelowHorizonDisplayMode =
+    belowHorizonModeSelect.value === 'full-axis'
+      ? 'full-axis'
+      : 'above-horizon-emphasis';
+  return Object.freeze({
+    ...DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
+    showAxis: showAxisInput.checked,
+    showMarkers: showMarkersInput.checked,
+    showLabels: showLabelsInput.checked,
+    showBelowHorizonSegment: showBelowHorizonInput.checked,
+    belowHorizonMode,
+  });
+}
+
+function renderCelestialAxis(): void {
+  selectedUtcOutput.value = simulationClock.current.instant.utcIso;
+  const result = scientificSnapshotService.capture({
+    observer: observerState.current,
+    clock: simulationClock.current,
+    calibration: scientificCalibration.current,
+    configuration: scientificConfiguration.current,
+  });
+  const view = createEarthAxisStatusViewModel(result);
+  celestialStatus.textContent = view.status;
+  celestialDetail.textContent = view.detail;
+  celestialLimitations.textContent = view.limitations;
+  celestialDiagnostics.replaceChildren(
+    ...view.diagnostics.map((diagnostic) => {
+      const item = document.createElement('li');
+      item.textContent = diagnostic;
+      return item;
+    }),
+  );
+  document.body.dataset.celestialState = view.kind;
+
+  if (result.kind !== 'ready') {
+    celestialAxis.clear();
+    return;
+  }
+  celestialAxis.update(
+    createEarthAxisPresentationModel(result.snapshot, currentAxisDisplaySettings()),
+  );
+}
 
 function setImmersivePresentation(active: boolean): void {
   controls.enabled = !active;
@@ -110,6 +211,7 @@ function renderState(state: XRState): void {
 
   if (state.kind === 'session-active') setImmersivePresentation(true);
   if (state.kind === 'session-starting') {
+    scientificOriginIdentity = `xr-session-pending-${xrOriginSequence + 1}`;
     northCalibration.reset();
     controllerManager?.activate();
   }
@@ -118,6 +220,7 @@ function renderState(state: XRState): void {
     state.kind === 'session-ended' ||
     state.kind === 'session-denied-or-failed'
   ) {
+    scientificOriginIdentity = 'desktop-simulation';
     setImmersivePresentation(false);
     controllerManager?.deactivate();
     northCalibration.reset();
@@ -136,6 +239,7 @@ function renderCalibrationState(state: NorthCalibrationState): void {
   const calibrationActive = isCalibrationActive(state);
   const interaction = controllerManager?.currentInteraction;
   applyCalibrationToGeographicGroup(geographicReference, state);
+  scientificCalibration.update(state, scientificOriginIdentity);
   controllerManager?.updateRayVisibility();
   document.body.dataset.northState = state.kind;
 
@@ -174,6 +278,7 @@ function renderCalibrationState(state: NorthCalibrationState): void {
   cancelCalibrationButton.hidden = !xrActive || !calibrationActive;
   resetNorthButton.hidden = state.kind === 'uncalibrated';
   desktopSimulation.hidden = xrActive;
+  renderCelestialAxis();
 }
 
 northCalibration.subscribe(renderCalibrationState);
@@ -205,6 +310,8 @@ if (xrApi) {
     async (session: ImmersiveArSession) => {
       const xrSession = session as XRSession;
       await renderer.xr.setSession(xrSession);
+      xrOriginSequence += 1;
+      scientificOriginIdentity = `xr-session-${xrOriginSequence}`;
       controllerManager?.bindSession(xrSession);
       controllerManager?.configureDomOverlay(
         domOverlayControls,
@@ -244,6 +351,7 @@ function updateBearingOutput(): void {
 }
 
 function simulateBearing(degrees: number): void {
+  scientificOriginIdentity = 'desktop-simulation';
   bearingInput.value = String(normalizeDegrees(degrees));
   updateBearingOutput();
   northCalibration.simulateBearing(degrees);
@@ -259,6 +367,66 @@ bearingPresetButtons.forEach((button) => {
   });
 });
 updateBearingOutput();
+
+function applyObserver(source = 'manual observer entry'): void {
+  try {
+    observerState.set({
+      latitudeDeg: observerLatitudeInput.valueAsNumber,
+      longitudeDegEast: observerLongitudeInput.valueAsNumber,
+      elevationMeters: observerElevationInput.valueAsNumber,
+      horizontalDatum: 'WGS84',
+      verticalDatum: 'MEAN_SEA_LEVEL',
+      source,
+    });
+    observerError.textContent = '';
+  } catch (error) {
+    observerState.clear();
+    observerError.textContent = error instanceof Error ? error.message : 'Observer values are invalid.';
+  }
+  renderCelestialAxis();
+}
+
+applyObserverButton.addEventListener('click', () => applyObserver());
+clearObserverButton.addEventListener('click', () => {
+  observerState.clear();
+  observerError.textContent = '';
+  renderCelestialAxis();
+});
+observerPresetButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    observerLatitudeInput.value = button.dataset.observerLatitude ?? '';
+    observerLongitudeInput.value = '0';
+    observerElevationInput.value = '0';
+    applyObserver(`generic ${button.dataset.observerLabel ?? 'observer'} validation preset`);
+  });
+});
+
+function selectTime(utcIso: string, source: 'user-selected' | 'system-selected'): void {
+  try {
+    simulationClock.selectFrozen(createSimulationInstant(utcIso, source));
+    observerError.textContent = '';
+  } catch (error) {
+    observerError.textContent = error instanceof Error ? error.message : 'Selected UTC instant is invalid.';
+  }
+  renderCelestialAxis();
+}
+
+timePresetButtons.forEach((button) => {
+  button.addEventListener('click', () => selectTime(button.dataset.timeUtc ?? '', 'user-selected'));
+});
+useCurrentTimeButton.addEventListener('click', () => {
+  selectTime(new Date().toISOString(), 'system-selected');
+});
+
+[
+  showAxisInput,
+  showMarkersInput,
+  showLabelsInput,
+  showBelowHorizonInput,
+  belowHorizonModeSelect,
+].forEach((control) => {
+  control.addEventListener('change', renderCelestialAxis);
+});
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;

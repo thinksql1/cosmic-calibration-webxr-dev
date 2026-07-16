@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A minimal floor-relative WebXR reference-frame technical spike."
+      content="A minimal WebXR true-north and mean Earth-axis reference experience."
     />
-    <title>Cosmic Calibration · Reference Frame</title>
+    <title>Cosmic Calibration · Earth Axis</title>
   </head>
   <body>
-    <main id="app" aria-label="Cosmic Calibration WebXR technical spike">
+    <main id="app" aria-label="Cosmic Calibration WebXR reference experience">
       <section class="status-panel" aria-labelledby="app-title">
-        <p class="eyebrow">Milestone 1 · North calibration</p>
+        <p class="eyebrow">Milestone 2B · Mean Earth axis</p>
         <h1 id="app-title">Cosmic Calibration</h1>
         <p id="status" class="status" role="status" aria-live="polite"></p>
         <button id="enter-ar" type="button" hidden>Enter AR</button>
@@ -44,11 +44,75 @@
           <p class="simulation-note">Simulation uses the same calibration math as controller capture.</p>
         </div>
       </section>
+      <section id="celestial-panel" class="celestial-panel" aria-labelledby="celestial-title">
+        <p class="eyebrow">Scientific celestial layer</p>
+        <h2 id="celestial-title">Mean Earth Axis &amp; Celestial Poles</h2>
+        <p id="celestial-status" class="calibration-status" role="status" aria-live="polite"></p>
+        <p id="celestial-detail" class="status-detail"></p>
+        <p id="celestial-limitations" class="scientific-limitations"></p>
+
+        <details open>
+          <summary>Observer &amp; time</summary>
+          <div class="observer-grid">
+            <label for="observer-latitude">Latitude (°)</label>
+            <input id="observer-latitude" type="number" min="-90" max="90" step="0.0001" value="42" inputmode="decimal" />
+            <label for="observer-longitude">Longitude (° east-positive)</label>
+            <input id="observer-longitude" type="number" step="0.0001" value="0" inputmode="decimal" />
+            <label for="observer-elevation">Elevation (m MSL)</label>
+            <input id="observer-elevation" type="number" min="-12000" max="100000" step="1" value="0" inputmode="decimal" />
+          </div>
+          <p id="observer-error" class="input-error" role="alert"></p>
+          <div class="button-row compact-buttons">
+            <button id="apply-observer" type="button">Apply observer</button>
+            <button id="clear-observer" type="button">Clear</button>
+          </div>
+          <div class="preset-grid" aria-label="Observer validation presets">
+            <button type="button" data-observer-latitude="0" data-observer-label="Equator">Equator</button>
+            <button type="button" data-observer-latitude="42" data-observer-label="Mid-north">Mid-north</button>
+            <button type="button" data-observer-latitude="-34" data-observer-label="Mid-south">Mid-south</button>
+            <button type="button" data-observer-latitude="70" data-observer-label="High-north">High-north</button>
+          </div>
+          <p class="simulation-note">Presets are generic validation latitudes at 0° longitude and 0 m MSL, not a detected location.</p>
+
+          <div class="time-controls">
+            <span class="field-label">Selected UTC</span>
+            <output id="selected-utc">2025-06-21T16:00:00.000Z</output>
+            <div class="preset-grid" aria-label="UTC validation presets">
+              <button type="button" data-time-utc="2000-01-01T11:58:56.152Z">J2000</button>
+              <button type="button" data-time-utc="2025-06-21T16:00:00.000Z">2025</button>
+              <button type="button" data-time-utc="2050-01-01T00:00:00.000Z">2050</button>
+              <button id="use-current-time" type="button">Use current time</button>
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Axis display</summary>
+          <div class="toggle-grid">
+            <label><input id="show-celestial-axis" type="checkbox" checked />Axis</label>
+            <label><input id="show-pole-markers" type="checkbox" checked />Pole markers</label>
+            <label><input id="show-pole-labels" type="checkbox" checked />NCP/SCP labels</label>
+            <label><input id="show-below-horizon" type="checkbox" checked />Below-horizon segment</label>
+          </div>
+          <label class="select-label" for="below-horizon-mode">Below-horizon treatment</label>
+          <select id="below-horizon-mode">
+            <option value="above-horizon-emphasis" selected>Subdue below horizon</option>
+            <option value="full-axis">Show full axis equally</option>
+          </select>
+          <p class="simulation-note">The 1.8 m radius is a symbolic directional scale. The room floor is not an opaque Earth surface.</p>
+        </details>
+
+        <details>
+          <summary>Diagnostics</summary>
+          <ul id="celestial-diagnostics" class="diagnostics-list"></ul>
+        </details>
+      </section>
       <aside class="legend" aria-label="Coordinate legend">
         <span><i class="swatch swatch-y"></i>+Y up / zenith</span>
         <span><i class="swatch swatch-floor"></i>Y = 0 floor plane</span>
         <span>X and Z are room-relative</span>
         <span>N/S/E/W appear only after calibration</span>
+        <span>NCP/SCP are P03 mean-pole directions</span>
       </aside>
       <div id="scene" aria-hidden="true"></div>
     </main>

@@ -19,10 +19,11 @@ mean-pole provider before selecting visible axis or precession geometry.
 `feature/milestone-2a0-astronomy-validation`. Astronomy Engine `2.1.19`, the canonical ENU
 boundary, and the application-owned P03 mean-pole provider passed their bounded fixture gates.
 Milestone 2A's non-visual state/snapshot/cache foundation passed its independent gate and is
-integrated into local `master`; no visible layer has started. The next bounded implementation is
-2B after publication regression: consume the validated snapshot for only a coherent Earth-axis and NCP/SCP
-presentation layer. It must not add equator geometry, precession, bodies, ecliptic, temporal
-clocks, media, or contemplative logic.
+integrated and published. Milestone 2B is now implemented locally on its feature branch: it
+consumes the validated snapshot for only a coherent Earth axis and NCP/SCP presentation layer.
+Its automated and desktop gates pass; independent integration, publication, and physical Quest
+acceptance remain pending. It does not add equator geometry, precession, bodies, ecliptic,
+temporal clocks, media, or contemplative logic.
 
 ## Sequence overview
 
@@ -131,6 +132,9 @@ layers, temporal clocks, and time controls.
 
 ## Milestone 2B - mean Earth axis and celestial poles
 
+**Local result:** implementation and desktop validation PASS; independent integration,
+publication, and physical Quest acceptance NOT RUN.
+
 **Objective:** render one coherent observer-centered P03 mean-axis-of-date system with exact
 antipodal north and south celestial poles.
 
@@ -145,6 +149,8 @@ antipodal north and south celestial poles.
 - One mean Earth-axis line with antipodal NCP/SCP endpoints.
 - Optional, clearly styled below-horizon continuation and pole labels.
 - Proven latitude/horizon relationship and model/provenance disclosure.
+- Bounded manual observer and frozen/current-time diagnostic controls backed by the Milestone 2A
+  state stores; no automatic location or general time-animation system.
 
 **Dependencies:** 2A PASS; accepted presentation radius and below-horizon policy.
 
@@ -163,7 +169,7 @@ world locking, below-horizon semantics, readability, and comfort. Do not claim a
 beyond the combined evidence budget.
 
 **Explicit exclusions:** celestial equator, precession path, nutation, polar motion, EOP, ecliptic,
-Sun, Moon, planets, and time controls.
+Sun, Moon, planets, animated/general time controls, automatic location, and persistence.
 
 ## Milestone 2C - mean celestial equator
 

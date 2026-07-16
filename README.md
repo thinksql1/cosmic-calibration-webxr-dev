@@ -1,8 +1,8 @@
 # Cosmic Calibration WebXR
 
-Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A0 now provides a tested, non-visual astronomy adapter and P03 mean-pole contract.
+Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A provides the validated non-visual astronomy foundation, and Milestone 2B now implements its first local visual consumer: one coherent mean Earth axis with antipodal NCP/SCP endpoints.
 
-Scientific geometry and contemplative interpretation remain separate layers. The current science spike renders nothing and adds no automatic heading, compass, geolocation, magnetic-declination behavior, or user-facing celestial feature.
+Scientific geometry and contemplative interpretation remain separate layers. Milestone 2B adds no automatic heading, compass, geolocation, magnetic-declination behavior, celestial equator, precession trajectory, celestial body, or contemplative sequence.
 
 ## Milestone 2 architecture status
 
@@ -13,8 +13,11 @@ precession-only mean pole. After two bounded remediation rounds, the final indep
 2A gate found no blocking or material defect. The retained 2A0 and 2A branches are integrated
 normally into `master`, which passes 239 tests and the production build. GitHub Pages workflow run
 #7 deployed commit `ca0a9d7`, and the unchanged hosted Milestone 1 interface, simulation/reset,
-subpath assets, and browser diagnostics regressed cleanly. No visible celestial geometry has been
-added. The exact next task is the bounded coherent Earth-axis and celestial-pole implementation:
+subpath assets, and browser diagnostics regressed cleanly. Milestone 2B is implemented only on
+`feature/milestone-2b-earth-axis-poles`; its automated and local desktop gates pass, but it is not
+integrated, pushed, deployed, or physically tested. The 15-file / 270-test local suite retains all
+239 integrated tests. The exact next task is its physical acceptance
+test after independent integration/publication:
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -24,6 +27,7 @@ added. The exact next task is the bounded coherent Earth-axis and celestial-pole
 - [Official astronomy source register](docs/OFFICIAL_ASTRONOMY_SOURCES.md)
 - [Astronomy adapter contract](docs/ASTRONOMY_ADAPTER_CONTRACT.md)
 - [Mean pole model validation](docs/MEAN_POLE_MODEL_VALIDATION.md)
+- [Earth axis and celestial poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md)
 
 ## Current scope
 
@@ -33,9 +37,11 @@ The shared desktop/XR scene contains:
 - a dedicated geographic-reference group containing N/S/E/W labels and horizontal cardinal axes;
 - explicit in-memory calibration, recalibration, cancellation, and reset states;
 - left- or right-controller target-ray capture during immersive AR;
-- a desktop bearing simulation using the same projection, yaw, and state logic as XR capture.
+- a desktop bearing simulation using the same projection, yaw, and state logic as XR capture;
 - non-visual immutable observer/time contracts, tagged scientific frames and correction profiles,
-  canonical ENU conversion, frozen provider provenance, and a bounded P03 mean-pole provider.
+  canonical ENU conversion, frozen provider provenance, and a bounded P03 mean-pole provider;
+- on the Milestone 2B feature branch only, manual in-memory observer input, explicit UTC fixtures,
+  and one observer-centered symbolic mean-axis group with exact antipodal NCP/SCP endpoints.
 
 The room X and Z axes have no geographic meaning before calibration. Geographic geometry is hidden until a valid physical or simulated calibration is captured.
 
@@ -65,7 +71,7 @@ See [Architecture](docs/ARCHITECTURE.md) and [Calibration](docs/CALIBRATION.md) 
 
 ## Scientific foundation status
 
-Milestone 2A provides a non-visual, explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. Independent acceptance, integration, publication, and hosted regression pass. It remains separate from Three.js and the visible application: no celestial geometry, body display, time/location control, or persistence exists yet. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), and [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md).
+Milestone 2A provides an explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. Independent acceptance, integration, publication, and hosted regression pass. Milestone 2B consumes that snapshot without direct provider calls: it proves the mean-date axis, maps it through WGS84 Earth-fixed to observer-horizontal ENU, then maps ENU once into the existing calibrated geographic parent. The manual observer/time controls remain in-memory diagnostics, not geolocation or a general time system. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md), and [Earth Axis and Celestial Poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md).
 
 ## Physical north-marker workflow
 
@@ -113,7 +119,8 @@ current hosted Milestone 1 site is:
 
 GitHub Pages workflow run #7 deployed integrated Milestone 2A commit `ca0a9d7`. Hosted desktop
 verification confirmed the unchanged Physical North controls, simulation/reset behavior,
-repository-subpath assets, and clean browser diagnostics. No visible celestial geometry is present.
+repository-subpath assets, and clean browser diagnostics. The hosted site does not yet contain
+the local Milestone 2B axis/pole layer.
 
 ## Validation boundary
 
@@ -121,9 +128,11 @@ Pure math, state transitions, controller integration, existing XR lifecycle, typ
 desktop simulation are locally testable. The reported Quest 3 Milestone 1 acceptance flow passed
 for controller-based calibration and usable lifecycle behavior. That evidence does not establish
 laboratory-grade angular accuracy, broad device coverage, or unreported edge-case outcomes.
-Milestone 2A0 adds deterministic reference comparisons only: no physical Quest celestial behavior
-exists to test.
+Milestone 2B's automated and local development/production-preview checks pass for frame mapping,
+exact antipodes, latitude/horizon cases, controls, visibility, reset/rebuild behavior,
+OrbitControls, resize, relative assets, and console health. Physical Quest axis/pole validation is
+**NOT RUN** and remains required after independent integration and publication.
 
 ## Explicitly deferred
 
-Local-storage persistence, automatic geolocation, automatic compass access, headset magnetometer access, magnetic declination, true-versus-magnetic-north correction, automatic north detection, observer/time UI, raw provider-result caching, spatial anchors, plane detection, hit testing, hand tracking, visible celestial geometry, temporal clocks, time controls, audio, 360 video, backend services, accounts, and analytics are absent.
+Local-storage persistence, automatic geolocation, automatic compass access, headset magnetometer access, magnetic declination, true-versus-magnetic-north correction, automatic north detection, raw provider-result caching, spatial anchors, plane detection, hit testing, hand tracking, celestial-equator/precession/body geometry, temporal clocks, animated/general time controls, audio, 360 video, backend services, accounts, and analytics are absent.

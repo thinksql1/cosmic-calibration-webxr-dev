@@ -32,6 +32,7 @@ canvas {
 
 .status-panel,
 .calibration-panel,
+.celestial-panel,
 .legend {
   position: fixed;
   z-index: 2;
@@ -39,6 +40,16 @@ canvas {
   background: rgb(6 17 22 / 82%);
   box-shadow: 0 14px 40px rgb(0 0 0 / 22%);
   backdrop-filter: blur(12px);
+}
+
+.celestial-panel {
+  top: clamp(1rem, 3vw, 2rem);
+  right: clamp(1rem, 3vw, 2rem);
+  width: min(27rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 7rem);
+  overflow: auto;
+  padding: 1rem 1.15rem 1.15rem;
+  border-radius: 0.8rem;
 }
 
 .calibration-panel {
@@ -118,6 +129,113 @@ h2 {
   border-top: 1px solid rgb(159 221 231 / 14%);
 }
 
+.celestial-panel details {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgb(159 221 231 / 14%);
+}
+
+.celestial-panel summary {
+  color: #c9e7eb;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.observer-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 0.45rem 0.65rem;
+  align-items: center;
+  margin-top: 0.7rem;
+}
+
+.observer-grid label,
+.field-label,
+.select-label {
+  color: #9fbfc5;
+  font-size: 0.72rem;
+}
+
+.observer-grid input,
+.celestial-panel select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.42rem 0.5rem;
+  border: 1px solid rgb(133 226 240 / 30%);
+  border-radius: 0.4rem;
+  color: #effdff;
+  background: rgb(4 13 17 / 72%);
+  font: inherit;
+}
+
+.scientific-limitations {
+  margin: 0.55rem 0 0;
+  color: #789ba2;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.input-error {
+  min-height: 1.2em;
+  margin: 0.45rem 0 0;
+  color: #ffc6a5;
+  font-size: 0.7rem;
+}
+
+.compact-buttons button,
+.preset-grid button {
+  margin-top: 0.45rem;
+  padding: 0.42rem 0.62rem;
+  font-size: 0.7rem;
+}
+
+.preset-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.time-controls {
+  margin-top: 0.8rem;
+}
+
+.time-controls output {
+  display: block;
+  margin-top: 0.25rem;
+  color: #d5edf1;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.69rem;
+  overflow-wrap: anywhere;
+}
+
+.toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+  color: #a9c7cc;
+  font-size: 0.72rem;
+}
+
+.toggle-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.select-label {
+  display: block;
+  margin: 0.7rem 0 0.3rem;
+}
+
+.diagnostics-list {
+  margin: 0.6rem 0 0;
+  padding-left: 1.1rem;
+  color: #91b2b8;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
 .simulation-panel label {
   display: flex;
   justify-content: space-between;
@@ -157,7 +275,8 @@ button:focus-visible {
 }
 
 .legend {
-  right: clamp(1rem, 3vw, 2rem);
+  left: clamp(1rem, 3vw, 2rem);
+  right: auto;
   bottom: clamp(1rem, 3vw, 2rem);
   display: grid;
   gap: 0.5rem;
@@ -188,13 +307,35 @@ button:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .celestial-panel {
+    top: auto;
+    right: 1rem;
+    bottom: 1rem;
+    max-height: min(48vh, 31rem);
+  }
+
   .calibration-panel {
     top: 13.5rem;
     max-height: calc(100vh - 19rem);
   }
 
   .legend {
-    left: 1rem;
-    right: auto;
+    display: none;
+  }
+}
+
+@media (max-height: 760px) {
+  .legend {
+    display: none;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 980px) {
+  .celestial-panel {
+    width: min(23rem, calc(50vw - 1.5rem));
+  }
+
+  .legend {
+    display: none;
   }
 }

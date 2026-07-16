@@ -10,6 +10,30 @@ Scientific validation is designed before implementation. This strategy separates
 correctness, provider accuracy, physical calibration, WebXR tracking, and presentation. A source
 inspection or plausible picture is never converted into `PASS`.
 
+## Milestone 2B local evidence
+
+Milestone 2B adds deterministic tests for the first visible scientific consumer without changing
+the P03 provider fixtures. The scientific tests apply the snapshot's GCRS-to-P03 mean-date
+matrix, require the result to be mean-date `+Z` within `1e-12`, and then exercise the full WGS84
+Earth-fixed-to-ENU basis for the axis. Independent analytic cases cover the equator, both
+mid-latitude hemispheres, both high-latitude hemispheres, exact antipodes, longitude cancellation,
+and undefined azimuth at zenith/nadir. A corrupted vector/matrix pair is rejected.
+
+Presentation tests verify ENU-to-application signs, a single geographic-parent yaw boundary,
+symbolic-radius-only scaling, exact opposite endpoints, observer/time/accepted-calibration
+identity changes, below-horizon policies, optional labels/markers, one persistent scene group,
+and clearing stale geometry. Time-fixture tests require new scientific provenance without
+inventing local motion for the Earth-fixed mean axis.
+
+Desktop development and production preview passed the equator, mid-northern, mid-southern, and
+high-northern cases; observer and explicit UTC controls; labels and below-horizon treatment;
+recalibration/reset; orbit, zoom, and resize; relative production assets; and clean application
+console checks. Physical Quest validation remains **NOT RUN** and visual inspection is supporting
+evidence rather than a substitute for the mathematical cases.
+
+The local suite is now 15 files / 270 tests: all 239 integrated Milestone 0/1/2A tests plus 31
+Milestone 2B snapshot, frame, presentation, scene, and status regressions.
+
 Reference authorities and their limitations are recorded in the [official astronomy source
 register](OFFICIAL_ASTRONOMY_SOURCES.md).
 

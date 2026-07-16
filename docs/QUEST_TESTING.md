@@ -90,3 +90,44 @@ rejection were not supplied and remain unmeasured rather than inferred.
 
 Physical device evidence has been recorded for the reported Quest 3 acceptance flow. Additional
 device/room coverage and unmeasured edge-case evidence remain future regression-validation work.
+
+## Milestone 2B status
+
+**Physical Earth-axis and celestial-pole acceptance: NOT RUN.** Run this checklist only after an
+independent gate has integrated the feature, the exact `master` commit has been published, and the
+hosted page visibly contains the Milestone 2B observer/time/axis controls. Desktop evidence cannot
+substitute for the headset observations.
+
+## Milestone 2B procedure
+
+1. Establish a safe standing boundary, reset the physical floor, mark the local origin, and use
+   the same trusted true-north marker as Milestone 1.
+2. Close stale Quest Browser tabs, open the published HTTPS URL in a fresh tab, and record the
+   hosted commit, Quest model/OS/Browser, room, observer values, selected UTC, and marker method.
+3. Confirm the manual observer fields, explicit UTC controls, axis/marker/label switches, P03
+   mean-pole disclosure, and Tier 1 exclusions are visible. Stop if the old hosted build appears.
+4. Enter AR and verify passthrough, floor ring, room diagnostics, and controller-only north
+   calibration still work before judging celestial placement.
+5. Enter the tested latitude/longitude/elevation, select a fixed UTC fixture, and complete a fresh
+   physical north capture. Confirm no axis appears before observer and calibration readiness.
+6. Verify one continuous line passes through the observer-centered proxy, with NCP and SCP at
+   opposite endpoints. Confirm the endpoints do not look independently positioned.
+7. In a northern-latitude test, verify NCP is above the northern horizon, SCP is below the
+   southern horizon, and NCP altitude is broadly consistent with the entered latitude. Do not
+   claim laboratory angular accuracy from visual estimation.
+8. If a southern validation observer is practical, enter the fixed southern preset and verify SCP
+   becomes the above-horizon pole. Otherwise record this device case as **NOT RUN** and retain the
+   automated evidence separately.
+9. Toggle labels, markers, the below-horizon segment, full-axis mode, and subdued mode. Confirm no
+   endpoint direction changes and the room floor is not presented as an opaque Earth surface.
+10. Move the head slowly, turn approximately 90 degrees, lean, change head height, and return.
+    Record world locking, jitter, drift, sliding, clipping, and whether labels remain readable.
+11. Recalibrate toward the same north marker and verify the layer rebuilds coherently. Reset north
+    and verify celestial readiness clears while Milestone 0 room geometry remains.
+12. Calibrate again, exit/re-enter AR, and recenter once. Record actual invalidation/recovery;
+    calibration remains session-scoped and must not be assumed valid after tracking-origin change.
+13. Record scale, brightness, contrast, below-floor ambiguity, clutter, flashing, unexpected
+    camera motion, discomfort, and whether the axis communicates one calm NCP/SCP relationship.
+
+Use only **PASS**, **FAIL**, **UNCERTAIN**, **NOT RUN**, or **NOT APPLICABLE**. This procedure does
+not authorize celestial-equator, precession, body, temporal-clock, media, or contemplative work.

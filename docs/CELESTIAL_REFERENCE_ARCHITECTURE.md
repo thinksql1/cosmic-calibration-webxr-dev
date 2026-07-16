@@ -18,9 +18,18 @@ The architecture preserves the validated Milestone 1 convention:
 - The XR camera, renderer, `local-floor` reference space, controllers, room diagnostics, and
   scientific source values are never rotated to perform geographic calibration.
 
-## Implemented non-visual foundation
+## Implemented foundation and first local visual consumer
 
-Milestone 2A implements the application-owned observer, explicit-tick UTC clock, read-only geographic-calibration view, Tier 1 configuration, provider registry, immutable P03 axis/equator-basis snapshot, and bounded exact-key cache described in [Scientific State Foundation](SCIENTIFIC_STATE_FOUNDATION.md). The snapshot preserves the architecture's frame boundary: calibration yaw remains presentation-parent work. No celestial geometry, body display, temporal control, or P03 path has been added.
+Milestone 2A implements the application-owned observer, explicit-tick UTC clock, read-only
+geographic-calibration view, Tier 1 configuration, provider registry, immutable P03
+axis/equator-basis snapshot, and bounded exact-key cache described in [Scientific State
+Foundation](SCIENTIFIC_STATE_FOUNDATION.md). Milestone 2B now extends that snapshot locally with a
+validated observer-horizontal Earth-axis result and consumes it in the first bounded presentation
+layer: one symbolic axis and exact antipodal NCP/SCP endpoints. Calibration yaw remains
+presentation-parent work. The visible layer has not been independently integrated, published, or
+physically accepted. No celestial-equator geometry, precession path, body display, temporal
+clock, or contemplative sequence has been added. See [Earth Axis and Celestial
+Poles](EARTH_AXIS_AND_CELESTIAL_POLES.md).
 
 ## Non-negotiable invariants
 
@@ -320,8 +329,8 @@ standards-level CIP, a terrestrial pole affected by polar motion, and an observa
 are distinct quantities; none is an alias for the P03 mean structural axis.
 
 The validated provider must not be replaced silently by Astronomy Engine `EQD`,
-`RotationAxis(Earth)`, or a fixed tilted line. Visible work remains blocked until the
-production-quality non-visual Milestone 2A foundation is independently accepted.
+`RotationAxis(Earth)`, or a fixed tilted line. The locally implemented Milestone 2B visual
+consumer accepts only the validated P03 snapshot and exposes no direct provider import.
 
 An optional later **true pole of date** uses an explicitly named IAU 2006/2000A
 precession-nutation/CIP-compatible provider. Astronomy Engine's combined `EQD` may support a Tier
@@ -347,6 +356,14 @@ observer-centered sky display, a line through the local origin connecting antipo
 directions is a **translated directional proxy parallel to the geocentric axis**. If a future
 teaching-scale Earth model is shown, the physical-axis representation passes through that model's
 explicit conceptual Earth center. The UI and documentation must distinguish those two views.
+
+For the axis-only Tier 1 transform, the snapshot applies its GCRS-to-P03 mean-date matrix and
+requires the resulting north direction to be mean-date `+Z`. Earth rotation about that same axis
+cannot change it. A full WGS84 Earth-fixed-to-ENU basis then yields north pole direction
+`(east 0, north cos(phi), up sin(phi))` for geodetic latitude `phi`; longitude cancels. This
+identity is proven from the tagged P03 result and is deliberately scoped to the rotational axis.
+It must not be reused for the future celestial equator, stars, or bodies, which require a complete
+date/Earth-rotation transform.
 
 ## Celestial equator
 
