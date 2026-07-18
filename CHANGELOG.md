@@ -17,6 +17,10 @@
   discloses WGS84 geodetic up as the current approximation to astronomical vertical.
 - Added DEC-024/DEC-025, binocular/horizon contracts, a Quest follow-up procedure, and 41
   deterministic eye-filter/horizon/calibration/depth/lifecycle regressions for 340 total tests.
+- Independently validated and normally integrated Milestone 2D in merge `79705c9`. Semantic
+  eye-order/missing-view probes, immutable-science checks, local ENU/cardinal/seam/yaw probes,
+  lifecycle review, 340 tests, build, and development/production-preview regression pass. The
+  retained feature branch is unchanged; publication and physical Quest acceptance remain pending.
 
 - Added the local Milestone 2C mean celestial-equator layer: a 96-sample homogeneous projective
   great circle from the immutable P03 snapshot's validated equator basis and science-owned local

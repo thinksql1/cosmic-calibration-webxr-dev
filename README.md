@@ -5,9 +5,9 @@ Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 est
 Scientific geometry and contemplative interpretation remain separate layers. The published
 Milestone 2C mean celestial equator has a conditional physical pass: it is good/workable and each
 eye receives one clean line, while binocular viewing produces doubled axis/equator lines. Local
-Milestone 2D adds reversible per-layer eye presentation and a calibrated local-horizon reference;
-it adds no automatic heading, geolocation, precession, ecliptic, body, clock, or contemplative
-system.
+Milestone 2D integrates reversible per-layer eye presentation and a calibrated local-horizon
+reference; it adds no automatic heading, geolocation, precession, ecliptic, body, clock, or
+contemplative system.
 
 ## Milestone 2 architecture status
 
@@ -33,8 +33,9 @@ detailed A–K observations were not individually captured. Milestone 2C adds an
 published mean celestial-equator implementation based on the same immutable P03 snapshot and
 geocentric Earth-core axis; its independent gate and GitHub Actions run #14 pass with 299 tests.
 Quest evidence conditionally accepts the equator while identifying binocular-only doubling. The
-local Milestone 2D feature provides independent `both`/`left`/`right` eye modes and a default-hidden
-24 m local tangent-plane horizon; independent integration and physical acceptance remain pending.
+integrated Milestone 2D feature provides independent `both`/`left`/`right` eye modes and a
+default-hidden 24 m local tangent-plane horizon; publication and physical acceptance remain
+pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
