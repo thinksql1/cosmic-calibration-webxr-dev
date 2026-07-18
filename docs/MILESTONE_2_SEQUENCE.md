@@ -182,9 +182,9 @@ Sun, Moon, planets, animated/general time controls, automatic location, and pers
 
 ## Milestone 2C - mean celestial equator
 
-**Current result:** independently validated and normally integrated in merge `0926cbf`; 299 tests,
-development/preview regression, and the bounded projective-rendering gate pass. Publication and
-physical Quest testing are pending.
+**Current result:** independently validated, normally integrated in merge `0926cbf`, and published
+from `54d64d0`; 299 tests, development/preview regression, GitHub Actions run #14, hosted controls,
+and the bounded projective-rendering gate pass. Physical Quest testing is pending.
 
 **Objective:** render the great circle perpendicular to the exact same P03 mean axis used by 2B.
 

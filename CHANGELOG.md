@@ -17,8 +17,12 @@
 - Independently validated and normally integrated the celestial equator in merge `0926cbf`.
   Temporary probes reproduced plane, seam, antipode, observer, asymmetric-eye, translation,
   malformed-basis, and accepted-recalibration behavior; merged `master` passes 299 tests and the
-  production/desktop gate. Publication and physical Quest acceptance remain pending. The existing
+  production/desktop gate. The existing
   axis-curvature and Earth-core distance-perception concerns remain separate and unresolved.
+- Published the integrated celestial equator normally from `master` at `54d64d0`. GitHub Actions
+  run #14 passed 21 files / 299 tests, build, artifact upload, and Pages deployment. Hosted
+  observer/time/axis/equator controls, default-hidden visibility, readiness, reset clearing, and
+  repository-subpath assets pass; physical Quest acceptance remains pending.
 
 ### Changed
 

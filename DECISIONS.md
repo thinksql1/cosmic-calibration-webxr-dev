@@ -258,7 +258,7 @@
 
 ### DEC-023: Render the mean celestial equator as a geocentric homogeneous projective great circle
 - **Date:** 2026-07-18
-- **Status:** Accepted, independently validated, and integrated; publication and physical Quest
+- **Status:** Accepted, independently validated, integrated, and published; physical Quest
   validation pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** Consume the immutable P03 snapshot's validated GCRS equator basis and its

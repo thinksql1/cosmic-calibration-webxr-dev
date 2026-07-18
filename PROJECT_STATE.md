@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 2C mean celestial equator independently validated and integrated; publication and physical Quest testing pending
+**Current phase:** Milestone 2C mean celestial equator independently validated, integrated, and published; physical Quest testing pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -26,7 +26,10 @@ homogeneous projective mean-equator layer. Independent source/math/lifecycle rev
 latitude/longitude/elevation/seam/asymmetric-eye/recalibration probes, type-check, 21 files / 299
 tests, production build, dependency/diff checks, and development/production-preview controls,
 readiness, visibility, reset, recalibration, teardown, and clean-console checks pass. Normal merge
-commit `0926cbf` retains the feature branch. Publication and physical Quest testing remain pending.
+commit `0926cbf` retains the feature branch. Documentation commit `54d64d0` was pushed normally;
+GitHub Actions run #14 passed 21 files / 299 tests, build, artifact upload, and Pages deployment.
+Hosted observer/time/axis/equator controls, default-hidden visibility, readiness, reset clearing,
+and repository-subpath assets pass. Physical Quest testing remains pending.
 The user's existing Milestone 2B physical concerns remain separate and unresolved: the pole-to-core
 axis appeared curved, and the Earth-core distance did not feel perceptually obvious. Milestone 2C
 does not claim to repair either observation.
@@ -196,9 +199,9 @@ normal local integration now pass; publication must succeed before the physical 
   Physical acceptance is **CONDITIONAL PASS** because the user tested the hosted build and reported
   it workable without supplying individual A–K observations. The next bounded milestone is the
   mean celestial equator; precession, bodies, clocks, and other deferred layers remain excluded.
-- Milestone 2C locally adds only the P03 mean celestial equator: a validated snapshot-owned,
+- Milestone 2C adds only the P03 mean celestial equator: a validated snapshot-owned,
   Earth-core-centred projective great circle with one visibility control. Independent validation,
-  integration, publication, and physical Quest acceptance remain pending.
+  integration and publication pass; physical Quest acceptance remains pending.
 
 ## Blocked
 
@@ -293,7 +296,7 @@ normal local integration now pass; publication must succeed before the physical 
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | One bounded next task for the mean celestial equator | Milestone 2B physical acceptance reconciled; no later layer started |
+| `NEXT_TASK.md` | One bounded physical Quest acceptance task for the celestial equator | Milestone 2C published; no later layer started |
 
 ## Environment
 
@@ -372,9 +375,9 @@ normal local integration now pass; publication must succeed before the physical 
 | 2026-07-18 | Hardened geocentric renderer publication and hosted regression | PASS; normal non-force push of `cdb5f4c`, GitHub Actions run #11 successful build/deploy with one Pages artifact, and hosted geocentric title, observer/UTC/Earth-core/axis controls, readiness, visibility, reset, subpath assets, and clean console verified. The old `1.8 m` observer-centered proxy is absent. Physical Quest acceptance remains NOT RUN | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29643004510`; `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-18 | Milestone 2B physical Quest acceptance reconciliation | CONDITIONAL PASS; the user physically tested the published hardened geocentric Earth-core axis and reported, “I tested it and can work with this.” No blocking physical defect was reported. Detailed A–K observations, device/version data, and individual physical subtest results were not captured and are not inferred. The current implementation is accepted as the workable baseline for subsequent celestial work | User-reported Quest evidence; `357b4d6` / `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-18 | Milestone 2C local celestial-equator implementation | PASS locally for type-check, 21 files / 299 tests, build, dependency/diff checks, and development/production-preview readiness/reset/console checks. It consumes the immutable P03 equator basis and science-owned horizontal sampling plane, renders 96 homogeneous projective samples under the existing calibrated parent, and leaves the Earth-core/pole renderer unchanged. No independent gate, merge, push, deployment, or Quest test | `feature/milestone-2c-celestial-equator`; `docs/CELESTIAL_EQUATOR.md` |
-| 2026-07-18 | Milestone 2C independent gate and integration | PASS; independent probes covered five latitudes, longitude/elevation variation, plane/seam/antipode invariants, malformed-basis rejection, asymmetric eye poses, translation invariance, and same-yaw accepted-recalibration identity. Feature and merged `master` pass clean install, type-check, 21 files / 299 tests, build, dependency/workflow/diff checks, development/preview readiness/visibility/reset/recalibration/teardown, visual control comparison, and clean consoles. Normal merge `0926cbf` retains the feature branch. Publication and physical Quest acceptance remain pending. Existing axis-curvature and core-distance perception concerns are unchanged | `master`; `docs/CELESTIAL_EQUATOR.md` |
+| 2026-07-18 | Milestone 2C independent gate, integration, and publication | PASS; independent probes covered five latitudes, longitude/elevation variation, plane/seam/antipode invariants, malformed-basis rejection, asymmetric eye poses, translation invariance, and same-yaw accepted-recalibration identity. Feature and merged `master` pass clean install, type-check, 21 files / 299 tests, build, dependency/workflow/diff checks, development/preview readiness/visibility/reset/recalibration/teardown, visual control comparison, and clean consoles. Normal merge `0926cbf` retains the feature branch; normal push of `54d64d0` triggered GitHub Actions run #14, which passed build and Pages deployment. Hosted controls, default-hidden equator visibility, readiness, reset, and subpath assets pass. Physical Quest acceptance remains pending. Existing axis-curvature and core-distance perception concerns are unchanged | `master`; `docs/CELESTIAL_EQUATOR.md`; GitHub Actions run #14 |
 
 ## Current decision horizon
 
-Publish the integrated celestial equator, then run its bounded physical Quest acceptance test. Do
+Run the published celestial equator's bounded physical Quest acceptance test. Do
 not begin precession, ecliptic, body, temporal, media, relational, or contemplative layers.

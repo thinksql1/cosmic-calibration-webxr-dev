@@ -24,10 +24,10 @@ explicit resource ownership. The independent renderer gate and normal local inte
 291 tests. GitHub Actions run #11 and the hosted geocentric controls/readiness/reset/subpath-assets
 regression pass. The user has physically tested the published hardened geocentric experience and
 accepted it as workable with no blocking issue reported. This is conditional physical acceptance:
-detailed A–K observations were not individually captured. Milestone 2C adds an integrated,
-unpublished mean celestial-equator implementation based on the same immutable P03 snapshot and
-geocentric Earth-core axis; its independent gate passes with 299 tests, while publication and
-Quest validation remain pending.
+detailed A–K observations were not individually captured. Milestone 2C adds an integrated and
+published mean celestial-equator implementation based on the same immutable P03 snapshot and
+geocentric Earth-core axis; its independent gate and GitHub Actions run #14 pass with 299 tests,
+while physical Quest validation remains pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)

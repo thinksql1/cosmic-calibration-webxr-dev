@@ -2,9 +2,10 @@
 
 ## Status
 
-Milestone 2C's independent scientific/rendering gate and normal integration pass. Merge `0926cbf`
-retains `feature/milestone-2c-celestial-equator`; publication and physical Quest validation remain
-pending. Existing physical impressions that the axis appeared curved and that the Earth-core
+Milestone 2C's independent scientific/rendering gate, normal integration, and publication pass.
+Merge `0926cbf` retains `feature/milestone-2c-celestial-equator`; GitHub Actions run #14 passed
+299 tests, build, artifact upload, and Pages deployment from `54d64d0`. Physical Quest validation
+remains pending. Existing physical impressions that the axis appeared curved and that the Earth-core
 distance was not perceptually obvious remain separate Milestone 2B concerns, not resolved 2C claims.
 
 ## Scientific definition
@@ -28,7 +29,7 @@ The finite Earth core remains camera-relative binary64 CPU data. Equator directi
 
 ## Limits and pending validation
 
-Deterministic tests cover plane invariants, closure, antipodes, observer relationships, Float32 directions, calibration, depth, and disposal. Independent probes and both feature/merged validation pass the 299-test suite, production build, development/production-preview controls, readiness, visibility, reset, recalibration, shader compilation, teardown, and console checks. Publication and physical Quest testing of readability, world locking, below-horizon interpretation, stereo, apparent curvature, depth impression, and comfort remain pending.
+Deterministic tests cover plane invariants, closure, antipodes, observer relationships, Float32 directions, calibration, depth, and disposal. Independent probes and both feature/merged validation pass the 299-test suite, production build, development/production-preview controls, readiness, visibility, reset, recalibration, shader compilation, teardown, and console checks. GitHub Actions run #14 and the hosted Pages controls/readiness/reset regression pass. Physical Quest testing of readability, world locking, below-horizon interpretation, stereo, apparent curvature, depth impression, and comfort remains pending.
 
 ## Exclusions
 
