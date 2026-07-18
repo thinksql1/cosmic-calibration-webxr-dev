@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 2D independently validated and integrated; publication and physical Quest acceptance pending
+**Current phase:** Milestone 2D independently validated, integrated, and published; physical Quest acceptance pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -45,8 +45,11 @@ The independent gate found no blocking or material defect. Feature and merged `m
 install, type-check, 26 files / 340 tests, production build, dependency/workflow/diff checks,
 temporary semantic-eye and horizon/yaw probes, and development/production-preview controls,
 fallback, reset/reload, teardown, and clean-console checks. Normal merge `79705c9` retains the
-feature branch. Publication and physical Quest validation of the new presentation controls remain
-pending.
+feature branch. Normal push of documentation commit `46cf613` triggered GitHub Actions run #16, which
+passed install, type-check, 340 tests, build, Pages artifact upload, and deployment. Hosted axis,
+equator, local-horizon, and all three eye-mode controls, defaults, desktop fallback, readiness,
+reset, repository-subpath assets, and clean console pass. Physical XR eye suppression, binocular
+fusion, horizon alignment, world locking, and comfort remain NOT RUN.
 
 ## One-paragraph state summary
 
@@ -218,8 +221,8 @@ normal local integration now pass; publication must succeed before the physical 
   integration and publication pass; physical acceptance is conditional on the supplied clean-
   monocular/binocular-doubling evidence.
 - Milestone 2D reconciles that evidence and adds independent eye presentation plus a bounded
-  calibrated local horizon. Independent review and normal integration pass; publication and
-  physical Quest acceptance remain pending.
+  calibrated local horizon. Independent review, normal integration, publication, and hosted
+  desktop regression pass; physical Quest acceptance remains pending.
 
 ## Blocked
 
@@ -314,7 +317,7 @@ normal local integration now pass; publication must succeed before the physical 
 | `docs/TEMPORAL_LAYER_ARCHITECTURE.md` | Central simulation clock and future solar/lunar sampling and label policies | Architecture only |
 | `docs/MILESTONE_2_SEQUENCE.md` | Bounded 2A0 through later-layer dependency and acceptance sequence | Current sequence |
 | `docs/OFFICIAL_ASTRONOMY_SOURCES.md` | Official/primary source, capability, limitation, version, and license register | Research evidence current as of 2026-07-16 |
-| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run #9 passed for integrated Milestone 2B at `5b657e4`; hosted desktop PASS |
+| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run #16 passed for integrated Milestone 2D at `46cf613`; hosted desktop PASS |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
@@ -401,9 +404,10 @@ normal local integration now pass; publication must succeed before the physical 
 | 2026-07-18 | Milestone 2C physical evidence reconciliation | CONDITIONAL PASS; user reports the equator good/workable and one clean axis/equator line through either eye independently, with doubling only binocularly. No individual-eye duplicate was observed. Classified as binocular fusion/stereo presentation without claiming an exact cause or inventing other checklist evidence | User-reported Quest evidence; `docs/BINOCULAR_PRESENTATION_MODES.md` |
 | 2026-07-18 | Milestone 2D local eye modes and horizon implementation | PASS for clean install, type-check, 26 files / 340 tests, build, dependency/diff, development, and production-preview checks. Actual `XRView.eye` identity controls independent axis/equator/horizon layer masks without scene copies; reversed order, monoscopic fallback, and missing-view suppression are tested. A 96-sample 24 m calibrated local tangent-plane horizon contains exact cardinals, uses linear non-writing depth, and owns reusable/idempotently disposable resources. Controls/readiness/reset/same-yaw rebuild/reload and clean consoles pass. Independent review, integration, publication, and Quest acceptance NOT RUN | `feature/milestone-2d-eye-modes-local-horizon`; `docs/BINOCULAR_PRESENTATION_MODES.md`; `docs/LOCAL_ASTRONOMICAL_HORIZON.md` |
 | 2026-07-18 | Milestone 2D independent gate and integration | PASS; actual-eye filtering, reversed/repeated/single/none/missing view handling, independent layer state, immutable science, 96-sample ENU/cardinal/seam invariants, `+/-90` and `180` degree yaw, same-yaw revision reuse, linear depth, and idempotent lifecycle pass independent inspection and temporary probes. Feature and merged `master` pass clean install, type-check, 26 files / 340 tests, build, dependency/workflow/diff checks, development/preview fallback, reset/reload, and clean consoles. Normal merge `79705c9` retains the feature branch. Publication and physical Quest acceptance remain pending | `master`; `docs/BINOCULAR_PRESENTATION_MODES.md`; `docs/LOCAL_ASTRONOMICAL_HORIZON.md` |
+| 2026-07-18 | Milestone 2D publication and hosted regression | PASS; normal non-force push of `46cf613`, GitHub Actions run #16 install/type-check/340-test/build/upload/deploy success, and hosted axis/equator/horizon controls, three eye selectors, default-hidden horizon, desktop fallback, readiness, reset, relative assets, and clean console verified. Physical Quest eye filtering and horizon acceptance remain NOT RUN | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29657256876`; `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 
 ## Current decision horizon
 
-Publish the integrated eye-presentation modes and local horizon, then run the bounded physical
-Quest acceptance task. Do not begin precession, ecliptic, body, temporal, media, relational, or
-contemplative layers before physical evidence is reconciled.
+Run the bounded physical Quest acceptance test for eye modes and the local horizon. Do not begin
+precession, ecliptic, body, temporal, media, relational, or contemplative layers before that
+physical evidence is reconciled.

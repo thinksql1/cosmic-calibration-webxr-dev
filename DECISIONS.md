@@ -274,7 +274,7 @@
 
 ### DEC-024: Keep XR eye presentation separate from scientific coordinates
 - **Date:** 2026-07-18
-- **Status:** Accepted and integrated; physical validation pending
+- **Status:** Accepted, integrated, and published; physical validation pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** Give the axis/poles, celestial equator, and local horizon independent `both`,
   `left`, and `right` presentation modes. Bind left/right through the browser-provided
@@ -290,7 +290,7 @@
 
 ### DEC-025: Render the Tier 1 local horizon in the calibrated observer tangent plane
 - **Date:** 2026-07-18
-- **Status:** Accepted and integrated; physical validation pending
+- **Status:** Accepted, integrated, and published; physical validation pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** Render a default-hidden, 96-sample, bounded 24 m local-horizon circle centered on
   the calibrated observer tangent origin. Canonical east/north span the plane, WGS84 geodetic up

@@ -5,7 +5,7 @@ Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 est
 Scientific geometry and contemplative interpretation remain separate layers. The published
 Milestone 2C mean celestial equator has a conditional physical pass: it is good/workable and each
 eye receives one clean line, while binocular viewing produces doubled axis/equator lines. Local
-Milestone 2D integrates reversible per-layer eye presentation and a calibrated local-horizon
+Milestone 2D publishes reversible per-layer eye presentation and a calibrated local-horizon
 reference; it adds no automatic heading, geolocation, precession, ecliptic, body, clock, or
 contemplative system.
 
@@ -33,9 +33,9 @@ detailed A–K observations were not individually captured. Milestone 2C adds an
 published mean celestial-equator implementation based on the same immutable P03 snapshot and
 geocentric Earth-core axis; its independent gate and GitHub Actions run #14 pass with 299 tests.
 Quest evidence conditionally accepts the equator while identifying binocular-only doubling. The
-integrated Milestone 2D feature provides independent `both`/`left`/`right` eye modes and a
-default-hidden 24 m local tangent-plane horizon; publication and physical acceptance remain
-pending.
+published Milestone 2D feature provides independent `both`/`left`/`right` eye modes and a
+default-hidden 24 m local tangent-plane horizon. GitHub Actions run #16 and hosted desktop
+regression pass with 340 tests; physical acceptance remains pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -144,9 +144,9 @@ current hosted Milestone 1 site is:
 
 `https://thinksql1.github.io/cosmic-calibration-webxr/`
 
-GitHub Pages workflow run #9 deployed integrated Milestone 2B commit `5b657e4`. Hosted desktop
-verification confirmed the observer/time/axis controls, NCP/SCP geometry, equator/northern/
-southern cases, display controls, simulation/reset behavior, repository-subpath assets, and clean
+GitHub Pages workflow run #16 deployed integrated Milestone 2D commit `46cf613`. Hosted desktop
+verification confirmed the observer/time/axis/equator/local-horizon controls, all three eye-mode
+selectors, desktop fallback, simulation/reset behavior, repository-subpath assets, and clean
 browser diagnostics.
 
 ## Validation boundary

@@ -21,6 +21,10 @@
   eye-order/missing-view probes, immutable-science checks, local ENU/cardinal/seam/yaw probes,
   lifecycle review, 340 tests, build, and development/production-preview regression pass. The
   retained feature branch is unchanged; publication and physical Quest acceptance remain pending.
+- Published integrated Milestone 2D normally at `46cf613`. GitHub Actions run #16 passed install,
+  type-check, 340 tests, build, Pages upload, and deployment. Hosted eye-mode and local-horizon
+  controls, desktop fallback, readiness/reset, subpath assets, and console health pass; physical
+  Quest acceptance remains pending.
 
 - Added the local Milestone 2C mean celestial-equator layer: a 96-sample homogeneous projective
   great circle from the immutable P03 snapshot's validated equator basis and science-owned local
