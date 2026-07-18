@@ -1,6 +1,7 @@
 import type { MeanPoleResult } from '../astronomy/types';
 import type { MeanEquatorBasis } from '../frames/earthAxisState';
 import type { ObserverHorizontalEarthAxis } from '../frames/observerHorizontalEarthAxis';
+import type { ObserverGeocentricEarthAxis } from '../frames/observerGeocentricEarthAxis';
 import type { ScientificRevisions } from '../state/scientificRevisions';
 import type { GeographicCalibrationState } from '../state/geographicCalibrationState';
 import type { ObserverStateReady } from '../state/observerState';
@@ -59,9 +60,11 @@ export interface ScientificSnapshot {
     readonly applicationBasis: 'ENU_EAST_TO_X__UP_TO_Y__NORTH_TO_NEGATIVE_Z';
     readonly calibratedYawApplication: 'presentation-parent-only';
     readonly celestialAxisPipeline: 'GCRS_P03_MEAN_DATE_AXIS_TO_WGS84_EARTH_FIXED_TO_HORIZONTAL_ENU';
+    readonly geocentricPlacement: 'WGS84_SURFACE_ORIGIN_TO_MODELED_EARTH_CENTER_IN_HORIZONTAL_ENU';
   };
   readonly earthAxis: MeanPoleResult;
   readonly observerHorizontalEarthAxis: ObserverHorizontalEarthAxis;
+  readonly observerGeocentricEarthAxis: ObserverGeocentricEarthAxis;
   readonly equatorBasis: MeanEquatorBasis;
   readonly providers: {
     readonly astronomyEngineVersion: string;

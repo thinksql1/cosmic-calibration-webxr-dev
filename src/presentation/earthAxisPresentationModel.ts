@@ -1,27 +1,44 @@
 import type { EnuUnitDirection } from '../science/astronomy/types';
 import type { ScientificSnapshot, ScientificSnapshotBuildResult } from '../science/snapshot/scientificSnapshot';
-import { mapEnuToApplicationBasis, type ApplicationBasisDirection } from './mapEnuToApplicationBasis';
+import {
+  mapEnuPositionToApplicationBasis,
+  mapEnuToApplicationBasis,
+  type ApplicationBasisDirection,
+} from './mapEnuToApplicationBasis';
 
-export const DEFAULT_EARTH_AXIS_RADIUS_METERS = 1.8;
+export const CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS = 10_000_000_000_000;
+export const CELESTIAL_SCENE_FAR_METERS = 20_000_000_000_000;
+export const EARTH_CORE_MARKER_VISUAL_RADIUS_METERS = 85_000;
+export const CELESTIAL_POLE_MARKER_VISUAL_RADIUS_METERS = 100_000_000_000;
+export const CELESTIAL_POLE_LABEL_WIDTH_METERS = 700_000_000_000;
+export const CELESTIAL_POLE_LABEL_HEIGHT_METERS = 350_000_000_000;
+const RADIANS_TO_ARCSECONDS = (180 / Math.PI) * 3600;
+
+function convergenceUpperBoundArcseconds(observerToCoreDistanceMeters: number): number {
+  return Math.atan2(
+    observerToCoreDistanceMeters,
+    CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS - observerToCoreDistanceMeters,
+  ) * RADIANS_TO_ARCSECONDS;
+}
 
 export type BelowHorizonDisplayMode = 'full-axis' | 'above-horizon-emphasis';
 
 export interface EarthAxisDisplaySettings {
   readonly showAxis: boolean;
+  readonly showEarthCore: boolean;
   readonly showMarkers: boolean;
   readonly showLabels: boolean;
   readonly showBelowHorizonSegment: boolean;
   readonly belowHorizonMode: BelowHorizonDisplayMode;
-  readonly presentationRadiusMeters: number;
 }
 
 export const DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS: EarthAxisDisplaySettings = Object.freeze({
   showAxis: true,
+  showEarthCore: true,
   showMarkers: true,
   showLabels: true,
   showBelowHorizonSegment: true,
   belowHorizonMode: 'above-horizon-emphasis',
-  presentationRadiusMeters: DEFAULT_EARTH_AXIS_RADIUS_METERS,
 });
 
 export interface PresentationPoint {
@@ -32,9 +49,11 @@ export interface PresentationPoint {
 
 export interface EarthAxisEndpointPresentation {
   readonly pole: 'NCP' | 'SCP';
+  readonly pointKind: 'PROJECTIVE_DIRECTION_AT_INFINITY';
   readonly directionEnu: EnuUnitDirection;
   readonly directionApplication: ApplicationBasisDirection;
-  readonly position: PresentationPoint;
+  readonly renderPosition: PresentationPoint;
+  readonly renderDistanceFromCoreMeters: number;
   readonly altitudeDeg: number;
   readonly azimuthDeg: number | null;
   readonly horizonRelation: 'above' | 'on' | 'below';
@@ -49,12 +68,20 @@ export interface EarthAxisPresentationModel {
   readonly model: 'IAU_P03_PRECESSION_ONLY';
   readonly terminology: 'MEAN_POLE_OF_DATE';
   readonly precisionTier: 'TIER_1';
-  readonly presentationKind: 'OBSERVER_CENTERED_DIRECTIONAL_PROXY';
-  readonly presentationRadiusMeters: number;
-  readonly origin: PresentationPoint;
+  readonly presentationKind: 'GEOCENTRIC_WORLD_SCALE_EARTH_CORE_AXIS';
+  readonly poleTopology: 'ANTIPODAL_PROJECTIVE_DIRECTIONS_AT_INFINITY';
+  readonly observerSurfaceOrigin: PresentationPoint;
+  readonly earthCore: PresentationPoint;
+  readonly earthCoreVisible: boolean;
+  readonly earthCoreVisualRadiusMeters: number;
+  readonly poleMarkerVisualRadiusMeters: number;
+  readonly poleLabelWidthMeters: number;
+  readonly poleLabelHeightMeters: number;
+  readonly poleRenderConvergenceUpperBoundArcseconds: number;
+  readonly observerToCoreDistanceMeters: number;
+  readonly observerToAxisDistanceMeters: number;
   readonly north: EarthAxisEndpointPresentation;
   readonly south: EarthAxisEndpointPresentation;
-  readonly showOrigin: boolean;
   readonly snapshotIdentity: {
     readonly cacheKey: string;
     readonly creationSequence: number;
@@ -75,13 +102,6 @@ export interface EarthAxisStatusViewModel {
 
 function validateSettings(settings: EarthAxisDisplaySettings): void {
   if (
-    !Number.isFinite(settings.presentationRadiusMeters) ||
-    settings.presentationRadiusMeters < 0.5 ||
-    settings.presentationRadiusMeters > 10
-  ) {
-    throw new Error('Earth-axis presentation radius must be finite and within [0.5, 10] meters.');
-  }
-  if (
     settings.belowHorizonMode !== 'full-axis' &&
     settings.belowHorizonMode !== 'above-horizon-emphasis'
   ) {
@@ -99,19 +119,37 @@ function opacityFor(
   return 0.88;
 }
 
+function addScaled(
+  origin: PresentationPoint,
+  direction: ApplicationBasisDirection,
+  scale: number,
+): PresentationPoint {
+  return Object.freeze({
+    x: origin.x + direction.x * scale,
+    y: origin.y + direction.y * scale,
+    z: origin.z + direction.z * scale,
+  });
+}
+
 function endpoint(
   pole: EarthAxisEndpointPresentation['pole'],
   source: ScientificSnapshot['observerHorizontalEarthAxis']['north'],
-  position: PresentationPoint,
+  earthCore: PresentationPoint,
   settings: EarthAxisDisplaySettings,
 ): EarthAxisEndpointPresentation {
   const directionApplication = mapEnuToApplicationBasis(source.direction);
   const belowVisible = source.horizonRelation !== 'below' || settings.showBelowHorizonSegment;
   return Object.freeze({
     pole,
+    pointKind: 'PROJECTIVE_DIRECTION_AT_INFINITY',
     directionEnu: source.direction,
     directionApplication,
-    position,
+    renderPosition: addScaled(
+      earthCore,
+      directionApplication,
+      CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS,
+    ),
+    renderDistanceFromCoreMeters: CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS,
     altitudeDeg: source.altitudeDeg,
     azimuthDeg: source.azimuthDeg,
     horizonRelation: source.horizonRelation,
@@ -123,39 +161,43 @@ function endpoint(
 }
 
 /**
- * Converts the snapshot's canonical ENU directions once. Geographic yaw is
- * intentionally absent: the calibrated geographic parent owns that rotation.
+ * Converts the snapshot's metric geocentric placement and projective pole
+ * directions once. Geographic yaw is intentionally absent: the calibrated
+ * geographic parent owns that room transform.
  */
 export function createEarthAxisPresentationModel(
   snapshot: ScientificSnapshot,
   settings: EarthAxisDisplaySettings = DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
 ): EarthAxisPresentationModel {
   validateSettings(settings);
-  const northDirection = mapEnuToApplicationBasis(
-    snapshot.observerHorizontalEarthAxis.north.direction,
+  const placement = snapshot.observerGeocentricEarthAxis;
+  const observerSurfaceOrigin = mapEnuPositionToApplicationBasis(
+    placement.observerSurfaceOrigin,
   );
-  const northPosition: PresentationPoint = Object.freeze({
-    x: northDirection.x * settings.presentationRadiusMeters,
-    y: northDirection.y * settings.presentationRadiusMeters,
-    z: northDirection.z * settings.presentationRadiusMeters,
-  });
-  const southPosition: PresentationPoint = Object.freeze({
-    x: -northPosition.x,
-    y: -northPosition.y,
-    z: -northPosition.z,
-  });
+  const earthCore = mapEnuPositionToApplicationBasis(placement.earthCore);
+  const convergenceBound = convergenceUpperBoundArcseconds(
+    placement.observerToCoreDistanceMeters,
+  );
 
   return Object.freeze({
     kind: 'ready',
     model: 'IAU_P03_PRECESSION_ONLY',
     terminology: 'MEAN_POLE_OF_DATE',
     precisionTier: 'TIER_1',
-    presentationKind: 'OBSERVER_CENTERED_DIRECTIONAL_PROXY',
-    presentationRadiusMeters: settings.presentationRadiusMeters,
-    origin: Object.freeze({ x: 0, y: 0, z: 0 }),
-    north: endpoint('NCP', snapshot.observerHorizontalEarthAxis.north, northPosition, settings),
-    south: endpoint('SCP', snapshot.observerHorizontalEarthAxis.south, southPosition, settings),
-    showOrigin: settings.showAxis,
+    presentationKind: 'GEOCENTRIC_WORLD_SCALE_EARTH_CORE_AXIS',
+    poleTopology: 'ANTIPODAL_PROJECTIVE_DIRECTIONS_AT_INFINITY',
+    observerSurfaceOrigin,
+    earthCore,
+    earthCoreVisible: settings.showEarthCore,
+    earthCoreVisualRadiusMeters: EARTH_CORE_MARKER_VISUAL_RADIUS_METERS,
+    poleMarkerVisualRadiusMeters: CELESTIAL_POLE_MARKER_VISUAL_RADIUS_METERS,
+    poleLabelWidthMeters: CELESTIAL_POLE_LABEL_WIDTH_METERS,
+    poleLabelHeightMeters: CELESTIAL_POLE_LABEL_HEIGHT_METERS,
+    poleRenderConvergenceUpperBoundArcseconds: convergenceBound,
+    observerToCoreDistanceMeters: placement.observerToCoreDistanceMeters,
+    observerToAxisDistanceMeters: placement.observerToAxisDistanceMeters,
+    north: endpoint('NCP', snapshot.observerHorizontalEarthAxis.north, earthCore, settings),
+    south: endpoint('SCP', snapshot.observerHorizontalEarthAxis.south, earthCore, settings),
     snapshotIdentity: Object.freeze({
       cacheKey: snapshot.cacheKey,
       creationSequence: snapshot.creationSequence,
@@ -176,7 +218,7 @@ export function createEarthAxisStatusViewModel(
   result: ScientificSnapshotBuildResult,
 ): EarthAxisStatusViewModel {
   const limitations =
-    'Tier 1 mean pole of date: P03 precession only; excludes nutation, CIP corrections, polar motion, Chandler wobble, and observed offsets.';
+    'Tier 1 P03 mean pole of date; excludes nutation, CIP corrections, polar motion, Chandler wobble, and observed offsets. Poles are directions at infinity, not Polaris. MSL elevation is a disclosed numeric ellipsoid-height approximation for geocentric placement.';
   if (result.kind === 'not-ready') {
     const codes = new Set(result.errors.map(({ code }) => code));
     const status = codes.has('OBSERVER_MISSING')
@@ -196,12 +238,20 @@ export function createEarthAxisStatusViewModel(
   }
 
   const { snapshot } = result;
+  const placement = snapshot.observerGeocentricEarthAxis;
+  const convergenceBound = convergenceUpperBoundArcseconds(
+    placement.observerToCoreDistanceMeters,
+  );
   return Object.freeze({
     kind: 'ready',
-    status: 'Mean Earth axis ready.',
-    detail: `Observer-centered directional proxy at ${DEFAULT_EARTH_AXIS_RADIUS_METERS.toFixed(2)} m; the calibrated geographic parent applies north yaw once.`,
+    status: 'Geocentric mean Earth axis ready.',
+    detail: 'The modeled WGS84 Earth core is placed at world scale; one P03 axis passes through it to antipodal projective NCP/SCP directions. Geographic yaw is applied once by the calibrated parent.',
     limitations,
     diagnostics: Object.freeze([
+      `Earth core distance ${(placement.observerToCoreDistanceMeters / 1000).toFixed(2)} km`,
+      `Observer distance from rotation axis ${(placement.observerToAxisDistanceMeters / 1000).toFixed(2)} km`,
+      `Core elevation treatment ${placement.elevationTreatment}`,
+      `Finite render convergence bound ${convergenceBound.toFixed(3)} arcseconds`,
       `NCP altitude ${snapshot.observerHorizontalEarthAxis.north.altitudeDeg.toFixed(2)} degrees`,
       `NCP azimuth ${formatAngle(snapshot.observerHorizontalEarthAxis.north.azimuthDeg)}`,
       `SCP altitude ${snapshot.observerHorizontalEarthAxis.south.altitudeDeg.toFixed(2)} degrees`,

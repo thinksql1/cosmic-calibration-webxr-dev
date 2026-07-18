@@ -54,6 +54,18 @@ describe('scientific snapshot builder', () => {
       north: { altitudeDeg: 38.8977, azimuthDeg: 0 },
       south: { altitudeDeg: -38.8977, azimuthDeg: 180 },
     });
+    expect(snapshot.frameContract.geocentricPlacement).toBe(
+      'WGS84_SURFACE_ORIGIN_TO_MODELED_EARTH_CENTER_IN_HORIZONTAL_ENU',
+    );
+    expect(snapshot.observerGeocentricEarthAxis).toMatchObject({
+      kind: 'OBSERVER_GEOCENTRIC_EARTH_AXIS',
+      centerModel: 'MODELED_WGS84_EARTH_CENTER',
+      presentationTopology: 'GEOCENTRIC_LINE_WITH_PROJECTIVE_POLES_AT_INFINITY',
+      outputFrame: 'HORIZONTAL_ENU',
+    });
+    expect(snapshot.observerGeocentricEarthAxis.earthCore).not.toEqual(
+      snapshot.observerGeocentricEarthAxis.observerSurfaceOrigin,
+    );
     expect(snapshot.providers).toEqual({ astronomyEngineVersion: '2.1.19', meanPoleProviderVersion: '1.0.0' });
     expect(snapshot.warnings).toHaveLength(6);
     expect(snapshot.warnings).toContainEqual(expect.objectContaining({
@@ -270,6 +282,7 @@ describe('scientific snapshot builder', () => {
     expect(() => { (snapshot.equatorBasis.normal as { z: number }).z = 42; }).toThrow();
     expect(() => { (snapshot.earthAxis.south as { x: number }).x = 42; }).toThrow();
     expect(() => { (snapshot.observerHorizontalEarthAxis.north.direction as { up: number }).up = 42; }).toThrow();
+    expect(() => { (snapshot.observerGeocentricEarthAxis.earthCore as { up: number }).up = 42; }).toThrow();
     expect(() => { (snapshot.configuration.enabledProviders as unknown as string[]).push('mutated'); }).toThrow();
     expect(() => {
       (snapshot.observer.observer.uncertainty as { horizontalMeters: number }).horizontalMeters = 42;

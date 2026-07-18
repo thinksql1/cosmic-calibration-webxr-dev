@@ -4,13 +4,22 @@ import type { EarthAxisPresentationModel, PresentationPoint } from '../presentat
 type PoleLabelFactory = (text: 'NCP' | 'SCP', color: string) => THREE.Sprite;
 
 function createLine(color: number): THREE.Line {
-  return new THREE.Line(
+  const line = new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(),
       new THREE.Vector3(),
     ]),
-    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.8 }),
+    new THREE.LineBasicMaterial({
+      color,
+      transparent: true,
+      opacity: 0.8,
+      depthTest: false,
+      depthWrite: false,
+    }),
   );
+  line.frustumCulled = false;
+  line.renderOrder = 20;
+  return line;
 }
 
 function createPoleLabel(text: 'NCP' | 'SCP', color: string): THREE.Sprite {
@@ -35,21 +44,22 @@ function createPoleLabel(text: 'NCP' | 'SCP', color: string): THREE.Sprite {
     depthWrite: false,
     depthTest: false,
   }));
-  sprite.scale.set(0.34, 0.17, 1);
+  sprite.frustumCulled = false;
+  sprite.renderOrder = 30;
   return sprite;
 }
 
 function setLine(
   line: THREE.Line,
+  origin: PresentationPoint,
   endpoint: PresentationPoint,
   visible: boolean,
   opacity: number,
 ): void {
   const positions = line.geometry.getAttribute('position') as THREE.BufferAttribute;
-  positions.setXYZ(0, 0, 0, 0);
+  positions.setXYZ(0, origin.x, origin.y, origin.z);
   positions.setXYZ(1, endpoint.x, endpoint.y, endpoint.z);
   positions.needsUpdate = true;
-  line.geometry.computeBoundingSphere();
   line.visible = visible;
   (line.material as THREE.LineBasicMaterial).opacity = opacity;
 }
@@ -64,12 +74,12 @@ export interface EarthAxisGroupHandle {
   clear(): void;
 }
 
-/** One persistent group owns both axis halves, the observer proxy, and both antipodal endpoints. */
+/** One persistent group owns the modeled Earth core, geocentric line, and projective pole proxies. */
 export function createEarthAxisGroup(
   labelFactory: PoleLabelFactory = createPoleLabel,
 ): EarthAxisGroupHandle {
   const group = new THREE.Group();
-  group.name = 'celestial-earth-axis-frame';
+  group.name = 'celestial-geocentric-earth-axis-frame';
   group.visible = false;
 
   const northSegment = createLine(0xffd67a);
@@ -77,23 +87,47 @@ export function createEarthAxisGroup(
   const southSegment = createLine(0x78d7e8);
   southSegment.name = 'mean-earth-axis-south-segment';
 
-  const origin = new THREE.Mesh(
-    new THREE.SphereGeometry(0.032, 16, 10),
-    new THREE.MeshBasicMaterial({ color: 0xeafcff, transparent: true, opacity: 0.78 }),
+  const earthCore = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 20, 12),
+    new THREE.MeshBasicMaterial({
+      color: 0xeafcff,
+      transparent: true,
+      opacity: 0.82,
+      depthTest: false,
+      depthWrite: false,
+    }),
   );
-  origin.name = 'celestial-axis-observer-origin';
+  earthCore.name = 'modeled-earth-core-marker';
+  earthCore.frustumCulled = false;
+  earthCore.renderOrder = 25;
 
-  const markerGeometry = new THREE.SphereGeometry(0.055, 20, 12);
+  const markerGeometry = new THREE.SphereGeometry(1, 20, 12);
   const northMarker = new THREE.Mesh(
     markerGeometry,
-    new THREE.MeshBasicMaterial({ color: 0xffdc84, transparent: true, opacity: 0.92 }),
+    new THREE.MeshBasicMaterial({
+      color: 0xffdc84,
+      transparent: true,
+      opacity: 0.92,
+      depthTest: false,
+      depthWrite: false,
+    }),
   );
   northMarker.name = 'north-celestial-pole-marker';
+  northMarker.frustumCulled = false;
+  northMarker.renderOrder = 26;
   const southMarker = new THREE.Mesh(
     markerGeometry,
-    new THREE.MeshBasicMaterial({ color: 0x83dceb, transparent: true, opacity: 0.86 }),
+    new THREE.MeshBasicMaterial({
+      color: 0x83dceb,
+      transparent: true,
+      opacity: 0.86,
+      depthTest: false,
+      depthWrite: false,
+    }),
   );
   southMarker.name = 'south-celestial-pole-marker';
+  southMarker.frustumCulled = false;
+  southMarker.renderOrder = 26;
 
   const northLabel = labelFactory('NCP', '#ffe39a');
   northLabel.name = 'north-celestial-pole-label';
@@ -103,7 +137,7 @@ export function createEarthAxisGroup(
   group.add(
     northSegment,
     southSegment,
-    origin,
+    earthCore,
     northMarker,
     southMarker,
     northLabel,
@@ -113,33 +147,53 @@ export function createEarthAxisGroup(
   return Object.freeze({
     group,
     update(model: EarthAxisPresentationModel): void {
-      setLine(northSegment, model.north.position, model.north.segmentVisible, model.north.segmentOpacity);
-      setLine(southSegment, model.south.position, model.south.segmentVisible, model.south.segmentOpacity);
-      setPosition(northMarker, model.north.position);
-      setPosition(southMarker, model.south.position);
-      setPosition(northLabel, model.north.position);
-      setPosition(southLabel, model.south.position);
-      const northLength = northLabel.position.length();
-      const southLength = southLabel.position.length();
-      if (northLength > 0) northLabel.position.addScaledVector(northLabel.position, 0.1 / northLength);
-      if (southLength > 0) southLabel.position.addScaledVector(southLabel.position, 0.1 / southLength);
-      northLabel.position.y += 0.24;
-      southLabel.position.y += 0.24;
+      setLine(
+        northSegment,
+        model.earthCore,
+        model.north.renderPosition,
+        model.north.segmentVisible,
+        model.north.segmentOpacity,
+      );
+      setLine(
+        southSegment,
+        model.earthCore,
+        model.south.renderPosition,
+        model.south.segmentVisible,
+        model.south.segmentOpacity,
+      );
+      setPosition(earthCore, model.earthCore);
+      setPosition(northMarker, model.north.renderPosition);
+      setPosition(southMarker, model.south.renderPosition);
+      setPosition(northLabel, model.north.renderPosition);
+      setPosition(southLabel, model.south.renderPosition);
+      northLabel.position.y += model.poleLabelHeightMeters * 0.65;
+      southLabel.position.y += model.poleLabelHeightMeters * 0.65;
+      earthCore.scale.setScalar(model.earthCoreVisualRadiusMeters);
+      northMarker.scale.setScalar(model.poleMarkerVisualRadiusMeters);
+      southMarker.scale.setScalar(model.poleMarkerVisualRadiusMeters);
+      northLabel.scale.set(
+        model.poleLabelWidthMeters,
+        model.poleLabelHeightMeters,
+        1,
+      );
+      southLabel.scale.copy(northLabel.scale);
+      earthCore.visible = model.earthCoreVisible;
       northMarker.visible = model.north.markerVisible;
       southMarker.visible = model.south.markerVisible;
       northLabel.visible = model.north.labelVisible;
       southLabel.visible = model.south.labelVisible;
-      origin.visible = model.showOrigin;
       (northMarker.material as THREE.MeshBasicMaterial).opacity = Math.max(0.28, model.north.segmentOpacity);
       (southMarker.material as THREE.MeshBasicMaterial).opacity = Math.max(0.28, model.south.segmentOpacity);
       (northLabel.material as THREE.SpriteMaterial).opacity = Math.max(0.35, model.north.segmentOpacity);
       (southLabel.material as THREE.SpriteMaterial).opacity = Math.max(0.35, model.south.segmentOpacity);
       group.userData.snapshotCacheKey = model.snapshotIdentity.cacheKey;
       group.userData.acceptedCalibrationRevision = model.snapshotIdentity.acceptedCalibrationRevision;
-      group.userData.presentationRadiusMeters = model.presentationRadiusMeters;
+      group.userData.presentationKind = model.presentationKind;
+      group.userData.observerToCoreDistanceMeters = model.observerToCoreDistanceMeters;
       group.visible =
         model.north.segmentVisible ||
         model.south.segmentVisible ||
+        model.earthCoreVisible ||
         model.north.markerVisible ||
         model.south.markerVisible ||
         model.north.labelVisible ||

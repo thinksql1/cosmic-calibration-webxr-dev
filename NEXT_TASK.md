@@ -4,80 +4,59 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the Milestone 2B physical Earth-axis and celestial-pole acceptance test
+**Title:** Independently validate and publish the geocentric Earth-core axis replacement
 
 ## Recommended execution
 
-- **Codex model:** GPT-5.6 Sol Max
-- **Reasoning effort:** High
-- **Why:** this is a high-value physical frame, world-locking, lifecycle, comfort, and scientific-
-  terminology acceptance gate whose evidence must remain distinct from automated/desktop results.
-- **Branch:** none for test preparation; project-record changes occur only after observed evidence.
-
-## Preconditions
-
-- An independent Milestone 2B integration gate has passed.
-- The feature has been merged normally into `master`, validated, pushed without force, and
-  deployed through the existing GitHub Pages workflow.
-- The exact hosted commit and successful workflow run are recorded.
-- A fresh Quest Browser tab visibly contains the Milestone 2B observer/time/axis controls.
-
-Stop without testing if any precondition is absent. Do not infer hosted readiness from local code.
+- **Codex model:** GPT-5.6 Sol
+- **Reasoning effort:** Max
+- **Why:** the replacement changes the accepted spatial model, uses Earth-scale WebGL depth, and
+  must be checked independently for scientific centerline correctness, visual usability, and XR
+  regression before it can replace the published proxy.
+- **Branch under review:** `feature/milestone-2b-geocentric-world-axis`
 
 ## Objective
 
-Physically verify on Quest 3 that the hosted P03 precession-only mean Earth-axis proxy and exact
-antipodal NCP/SCP endpoints are usable, geographically aligned, floor/horizon coherent,
-world-locked, lifecycle-safe, readable, and comfortable in the tested environment.
+Independently verify the local WGS84 Earth-core placement, P03 geocentric centerline, projective
+NCP/SCP contract, finite-render convergence bound, scene depth behavior, readiness, and retained
+Milestone 0/1/2A behavior. If and only if the gate passes, merge normally into `master`, revalidate,
+push without force under explicit publication authorization, verify GitHub Actions/Pages, and
+leave one new physical Quest acceptance task.
 
-## Required procedure
+## Required gate
 
-1. Establish a safe standing boundary and correct floor, mark the origin, and use a trusted
-   physical true-north marker.
-2. Record the exact Pages URL/commit, Quest model/OS/Browser, room setup, observer values, selected
-   UTC, and north-marker method without inventing precision.
-3. Enter AR, confirm passthrough and Milestone 0 floor geometry, then perform a fresh Milestone 1
-   controller north calibration.
-4. Verify no celestial axis appears before valid observer and north-calibration readiness.
-5. Apply the tested observer/time values and verify one continuous observer-centered axis with
-   exact-looking opposite NCP/SCP endpoints and accurate P03 mean/Tier 1 disclosure.
-6. Confirm the above-horizon pole matches the observer hemisphere and its approximate altitude is
-   usable relative to the entered latitude; record angular error only if actually measured.
-7. Exercise labels, markers, full-axis/subdued below-horizon modes, and explicit hiding of the
-   below-horizon segment. Confirm styling does not change either pole direction.
-8. Turn, lean, change head height, and return; record world locking, drift, jitter, clipping,
-   label orientation, passthrough continuity, and whether geometry follows the head.
-9. Recalibrate, reset north, calibrate again, exit/re-enter AR, and recenter once. Confirm stale
-   celestial readiness clears and coherent geometry returns only after valid state is restored.
-10. Record scale, brightness, contrast, floor ambiguity, clutter, accidental activation,
-    discomfort, flashing, unexpected camera motion, and overall clarity.
-
-## Evidence rules
-
-Use only **PASS**, **FAIL**, **UNCERTAIN**, **NOT RUN**, or **NOT APPLICABLE**. Device observation
-may validate usability and approximate relationships, but it must not create an unsupported
-arcminute, automatic-heading, or broad-device claim.
+1. Confirm the feature starts from published `master` commit `815624c` and is clean.
+2. Review DEC-021, the complete diff, WGS84 formulas, elevation-datum limitation, frame tags, and
+   single geographic-yaw path.
+3. Independently reproduce equatorial/polar Earth-core placement, longitude invariance,
+   observer-to-axis distance, one core-centered line, exact antipodal projective directions, and
+   the stated render-convergence bound.
+4. Confirm presentation never recomputes P03 or geocentric science and never places the observer
+   on the axis except where the modeled location legitimately lies on it.
+5. Verify finite marker/label/line appearance does not change scientific point centers or bend
+   the centerline; NCP is not presented as Polaris or a finite-distance object.
+6. Run clean install, type-check, the full test suite, production build, diff check, and dependency
+   audit. No dependency or workflow change is allowed.
+7. Validate development and production-preview rendering across equator, northern, southern, and
+   polar cases; check depth, clipping, orbit/zoom/resize, reset, console, and retained north
+   calibration behavior.
+8. Treat physical Quest visibility, comfort, depth precision, and world locking as NOT RUN until
+   the reviewed build is integrated, published, and confirmed hosted.
 
 ## Acceptance criteria
 
-1. The exact hosted Milestone 2B build is confirmed before physical testing.
-2. Passthrough, floor/up, true-north calibration, and Milestone 0/1 behavior remain usable.
-3. One continuous axis and antipodal NCP/SCP markers appear only when scientifically ready.
-4. Hemisphere, horizon, approximate latitude-altitude, below-horizon, and world-locking behavior
-   pass for the observed setup.
-5. Recalibration, reset, exit/re-entry, and recenter do not leave stale or camera-attached geometry.
-6. Labels, scale, contrast, and comfort are usable with no blocking physical defect.
-7. Evidence records actual observations and unmeasured precision remains explicitly unmeasured.
-
-## Explicit exclusions
-
-Do not implement or test celestial-equator geometry, precession paths, nutation/polar motion,
-Sun, Moon, planets, ecliptic, temporal clocks, geolocation, persistence, media, relational
-circuits, audio, AI enhancement, or contemplative sequencing. Do not begin Milestone 2C.
+- The modeled Earth core is a WGS84/Tier 1 geocentric point relative to the surface observer.
+- One P03 mean-axis centerline passes through the core; the observer is not substituted for core.
+- NCP/SCP remain exact antipodal projective directions at infinity.
+- Finite render points lie on the centerline and satisfy the documented convergence bound.
+- ENU maps once to application basis and geographic yaw is inherited once from the parent.
+- All existing and new tests, type-check, build, diff, dependencies, development, and preview pass.
+- No equator, precession, body, temporal, media, relational, or contemplative feature is added.
+- Publication occurs only after a passing gate and explicit authorized normal push; no force,
+  rebase, squash, history rewrite, or branch deletion is used.
 
 ## Stop conditions
 
-Stop and report the exact evidence state if the hosted build is stale, observer/floor/north setup
-cannot be established, tracking is unsafe, the user becomes uncomfortable, the axis appears
-scientifically incoherent, or a defect would require source modification. Testing does not
-authorize code repair.
+Stop without merge, push, or deployment if the core placement, projective-pole interpretation,
+render precision, Quest-compatible depth approach, test integrity, dependency boundary, or any
+retained milestone behavior is materially uncertain or fails.

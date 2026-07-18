@@ -93,10 +93,10 @@ device/room coverage and unmeasured edge-case evidence remain future regression-
 
 ## Milestone 2B status
 
-**Physical Earth-axis and celestial-pole acceptance: NOT RUN.** Run this checklist only after an
-independent gate has integrated the feature, the exact `master` commit has been published, and the
-hosted page visibly contains the Milestone 2B observer/time/axis controls. Desktop evidence cannot
-substitute for the headset observations.
+**Geocentric Earth-core/axis physical acceptance: NOT RUN.** The published proxy checklist is
+superseded. Run this checklist only after the DEC-021 replacement passes an independent gate, is
+integrated, and the exact `master` commit is published. Desktop evidence cannot substitute for
+headset depth, visibility, comfort, or world-locking observations.
 
 ## Milestone 2B procedure
 
@@ -110,8 +110,10 @@ substitute for the headset observations.
    calibration still work before judging celestial placement.
 5. Enter the tested latitude/longitude/elevation, select a fixed UTC fixture, and complete a fresh
    physical north capture. Confirm no axis appears before observer and calibration readiness.
-6. Verify one continuous line passes through the observer-centered proxy, with NCP and SCP at
-   opposite endpoints. Confirm the endpoints do not look independently positioned.
+6. Verify the Earth-core marker represents a remote modeled geocentric point rather than the
+   floor/user, and one continuous world-scale line passes through it toward NCP/SCP. Confirm the
+   observer is not falsely placed on the axis and the pole markers do not look independently
+   positioned or labeled as Polaris.
 7. In a northern-latitude test, verify NCP is above the northern horizon, SCP is below the
    southern horizon, and NCP altitude is broadly consistent with the entered latitude. Do not
    claim laboratory angular accuracy from visual estimation.

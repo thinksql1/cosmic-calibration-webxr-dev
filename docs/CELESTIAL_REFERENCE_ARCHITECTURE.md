@@ -24,10 +24,10 @@ Milestone 2A implements the application-owned observer, explicit-tick UTC clock,
 geographic-calibration view, Tier 1 configuration, provider registry, immutable P03
 axis/equator-basis snapshot, and bounded exact-key cache described in [Scientific State
 Foundation](SCIENTIFIC_STATE_FOUNDATION.md). Milestone 2B extends that snapshot with a
-validated observer-horizontal Earth-axis result and consumes it in the first bounded presentation
-layer: one symbolic axis and exact antipodal NCP/SCP endpoints. Calibration yaw remains
-presentation-parent work. The visible layer passed independent review and is integrated into
-local `master`; publication and physical Quest acceptance remain pending. No celestial-equator
+validated observer-horizontal Earth-axis result. The local geocentric replacement further adds
+snapshot-owned WGS84 Earth-center placement and consumes both products in one world-scale axis
+with exact antipodal projective NCP/SCP directions. Calibration yaw remains presentation-parent
+work. The replacement is not independently reviewed, integrated, or published. No celestial-equator
 geometry, precession path, body display, temporal
 clock, or contemplative sequence has been added. See [Earth Axis and Celestial
 Poles](EARTH_AXIS_AND_CELESTIAL_POLES.md).
@@ -350,13 +350,14 @@ offsets.
 - Both endpoints may render when one is below the horizon. Below-horizon style is independently
   optional and never changes the direction.
 
-### Observer-centered representation
+### Geocentric world-scale representation
 
-The physical Earth axis passes through the geocenter, not through the user. In an
-observer-centered sky display, a line through the local origin connecting antipodal pole
-directions is a **translated directional proxy parallel to the geocentric axis**. If a future
-teaching-scale Earth model is shown, the physical-axis representation passes through that model's
-explicit conceptual Earth center. The UI and documentation must distinguish those two views.
+The physical Earth axis passes through the geocenter, not through the user. DEC-021 supersedes
+the earlier local directional proxy: validated observer state now places the modeled WGS84 Earth
+center in local ENU meters, and one P03 mean-axis line passes through that point. The observer
+stays at the modeled surface origin and is generally off-axis. NCP/SCP are projective points at
+infinity; finite WebGL points are disclosed asymptotic render proxies on the exact centerline,
+not invented astronomical distances. Marker and label dimensions may change appearance only.
 
 For the axis-only Tier 1 transform, the snapshot applies its GCRS-to-P03 mean-date matrix and
 requires the resulting north direction to be mean-date `+Z`. Earth rotation about that same axis

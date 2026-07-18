@@ -7,6 +7,7 @@ import { ScientificConfigurationStore } from '../../src/science/state/scientific
 import { SimulationClock } from '../../src/science/state/simulationClock';
 import { buildScientificSnapshot } from '../../src/science/snapshot/scientificSnapshotBuilder';
 import {
+  CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS,
   createEarthAxisPresentationModel,
   createEarthAxisStatusViewModel,
   DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
@@ -40,28 +41,49 @@ function ready(
   return result;
 }
 
-describe('Earth-axis presentation model', () => {
-  it('maps ENU once into the application basis and never accepts geographic yaw', () => {
+function relativeToCore(
+  endpoint: { x: number; y: number; z: number },
+  core: { x: number; y: number; z: number },
+) {
+  return {
+    x: endpoint.x - core.x,
+    y: endpoint.y - core.y,
+    z: endpoint.z - core.z,
+  };
+}
+
+describe('geocentric Earth-axis presentation model', () => {
+  it('maps metric ENU once and leaves geographic yaw to the parent', () => {
     const result = ready(0);
     const model = createEarthAxisPresentationModel(result.snapshot);
+    expect(model.observerSurfaceOrigin).toEqual({ frame: 'APPLICATION_BASIS', units: 'meters', x: 0, y: 0, z: -0 });
+    expect(model.earthCore.x).toBeCloseTo(0, 8);
+    expect(model.earthCore.y).toBeCloseTo(-6_378_387, 4);
     expect(model.north.directionApplication).toMatchObject({ x: 0, y: 0, z: -1 });
-    expect(model.north.position).toEqual({ x: 0, y: 0, z: -1.8 });
-    expect(model.south.position).toEqual({ x: -0, y: -0, z: 1.8 });
     expect(model).not.toHaveProperty('yawRadians');
     expect(result.snapshot.frameContract.calibratedYawApplication).toBe('presentation-parent-only');
   });
 
-  it('keeps symbolic endpoints exact position antipodes around one origin', () => {
+  it('places one world-scale line through the modeled core with projective antipodal poles', () => {
     const model = createEarthAxisPresentationModel(ready(42).snapshot);
-    expect(model.origin).toEqual({ x: 0, y: 0, z: 0 });
-    expect(model.south.position.x).toBe(-model.north.position.x);
-    expect(model.south.position.y).toBe(-model.north.position.y);
-    expect(model.south.position.z).toBe(-model.north.position.z);
-    expect(Math.hypot(model.north.position.x, model.north.position.y, model.north.position.z)).toBeCloseTo(1.8, 14);
-    expect(model.presentationKind).toBe('OBSERVER_CENTERED_DIRECTIONAL_PROXY');
+    const north = relativeToCore(model.north.renderPosition, model.earthCore);
+    const south = relativeToCore(model.south.renderPosition, model.earthCore);
+    expect(model.presentationKind).toBe('GEOCENTRIC_WORLD_SCALE_EARTH_CORE_AXIS');
+    expect(model.poleTopology).toBe('ANTIPODAL_PROJECTIVE_DIRECTIONS_AT_INFINITY');
+    expect(model.north.pointKind).toBe('PROJECTIVE_DIRECTION_AT_INFINITY');
+    expect(model.south.pointKind).toBe('PROJECTIVE_DIRECTION_AT_INFINITY');
+    expect(model.earthCore).not.toEqual(model.observerSurfaceOrigin);
+    expect(south.x).toBeCloseTo(-north.x, 1);
+    expect(south.y).toBeCloseTo(-north.y, 1);
+    expect(south.z).toBeCloseTo(-north.z, 1);
+    expect(Math.hypot(north.x, north.y, north.z)).toBeCloseTo(
+      CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS,
+      -1,
+    );
+    expect(model.poleRenderConvergenceUpperBoundArcseconds).toBeLessThan(0.14);
   });
 
-  it('supports full-axis and above-horizon emphasis without removing the scientific endpoint', () => {
+  it('supports full-axis and above-horizon emphasis without moving the centerline', () => {
     const snapshot = ready(42).snapshot;
     const full = createEarthAxisPresentationModel(snapshot, {
       ...DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
@@ -74,10 +96,11 @@ describe('Earth-axis presentation model', () => {
     expect(full.south.segmentVisible).toBe(true);
     expect(emphasized.south.segmentVisible).toBe(true);
     expect(emphasized.south.segmentOpacity).toBeLessThan(emphasized.north.segmentOpacity);
-    expect(emphasized.south.position).toEqual(full.south.position);
+    expect(emphasized.south.renderPosition).toEqual(full.south.renderPosition);
+    expect(emphasized.earthCore).toEqual(full.earthCore);
   });
 
-  it('lets the user explicitly hide only the below-horizon segment while retaining its pole data', () => {
+  it('lets the user hide below-horizon rendering while retaining scientific pole data', () => {
     const model = createEarthAxisPresentationModel(ready(42).snapshot, {
       ...DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
       showBelowHorizonSegment: false,
@@ -88,22 +111,24 @@ describe('Earth-axis presentation model', () => {
     expect(model.south.directionEnu).toBeDefined();
   });
 
-  it('supports independent axis, marker, and label visibility', () => {
+  it('supports independent axis, core, marker, and label visibility', () => {
     const model = createEarthAxisPresentationModel(ready().snapshot, {
       ...DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
       showAxis: false,
+      showEarthCore: false,
       showMarkers: false,
       showLabels: true,
     });
     expect(model.north.segmentVisible).toBe(false);
     expect(model.south.segmentVisible).toBe(false);
+    expect(model.earthCoreVisible).toBe(false);
     expect(model.north.markerVisible).toBe(false);
     expect(model.south.markerVisible).toBe(false);
     expect(model.north.labelVisible).toBe(true);
     expect(model.south.labelVisible).toBe(true);
   });
 
-  it('records observer, time, and same-yaw accepted-calibration identities for rebuilds', () => {
+  it('records observer, time, and same-yaw accepted-calibration identities', () => {
     const first = createEarthAxisPresentationModel(ready(42, 1).snapshot);
     const second = createEarthAxisPresentationModel(ready(42, 2).snapshot);
     expect(first.snapshotIdentity.acceptedCalibrationRevision).toBe(1);
@@ -111,45 +136,45 @@ describe('Earth-axis presentation model', () => {
     expect(second.snapshotIdentity.cacheKey).not.toBe(first.snapshotIdentity.cacheKey);
   });
 
-  it('changes position after observer latitude changes while retaining the same transform path', () => {
+  it('changes core placement and pole orientation with latitude', () => {
     const equator = createEarthAxisPresentationModel(ready(0).snapshot);
     const north = createEarthAxisPresentationModel(ready(70).snapshot);
-    expect(equator.north.position).toEqual({ x: 0, y: 0, z: -1.8 });
-    expect(north.north.position.y).toBeGreaterThan(1.6);
-    expect(north.north.position.z).toBeLessThan(0);
+    expect(equator.north.directionApplication).toMatchObject({ x: 0, y: 0, z: -1 });
+    expect(north.north.directionApplication.y).toBeGreaterThan(0.93);
+    expect(north.north.directionApplication.z).toBeLessThan(0);
+    expect(north.earthCore).not.toEqual(equator.earthCore);
     expect(north.snapshotIdentity.cacheKey).not.toBe(equator.snapshotIdentity.cacheKey);
   });
 
-  it('rebuilds time provenance without inventing local motion for the Earth-fixed mean axis', () => {
-    const present = createEarthAxisPresentationModel(
-      ready(42, 1, '2025-06-21T16:00:00Z').snapshot,
-    );
-    const future = createEarthAxisPresentationModel(
-      ready(42, 1, '2050-01-01T00:00:00Z').snapshot,
-    );
+  it('rebuilds time provenance without inventing local Earth-fixed axis motion', () => {
+    const present = createEarthAxisPresentationModel(ready(42, 1, '2025-06-21T16:00:00Z').snapshot);
+    const future = createEarthAxisPresentationModel(ready(42, 1, '2050-01-01T00:00:00Z').snapshot);
     expect(future.snapshotIdentity.cacheKey).not.toBe(present.snapshotIdentity.cacheKey);
-    expect(future.north.position).toEqual(present.north.position);
-    expect(future.south.position).toEqual(present.south.position);
+    expect(future.earthCore).toEqual(present.earthCore);
+    expect(future.north.renderPosition).toEqual(present.north.renderPosition);
+    expect(future.south.renderPosition).toEqual(present.south.renderPosition);
   });
 
-  it('rejects unusable symbolic presentation radii', () => {
+  it('rejects unsupported display modes without exposing a scale control', () => {
     expect(() => createEarthAxisPresentationModel(ready().snapshot, {
       ...DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
-      presentationRadiusMeters: 100,
-    })).toThrow('presentation radius');
+      belowHorizonMode: 'decorative-ring' as never,
+    })).toThrow('below-horizon');
+    expect(DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS).not.toHaveProperty('presentationRadiusMeters');
   });
 });
 
 describe('Earth-axis status view model', () => {
-  it('provides restrained readiness, model limitations, and diagnostics', () => {
+  it('discloses the world-scale core, projective poles, and Tier 1 limits', () => {
     const view = createEarthAxisStatusViewModel(ready());
     expect(view.kind).toBe('ready');
-    expect(view.status).toBe('Mean Earth axis ready.');
-    expect(view.limitations).toContain('P03 precession only');
-    expect(view.limitations).toContain('excludes nutation');
+    expect(view.status).toBe('Geocentric mean Earth axis ready.');
+    expect(view.detail).toContain('world scale');
+    expect(view.limitations).toContain('directions at infinity');
+    expect(view.limitations).toContain('not Polaris');
     expect(view.diagnostics).toEqual(expect.arrayContaining([
-      expect.stringContaining('NCP altitude'),
-      expect.stringContaining('UTC'),
+      expect.stringContaining('Earth core distance'),
+      expect.stringContaining('Finite render convergence bound'),
       expect.stringContaining('Accepted calibration'),
     ]));
   });

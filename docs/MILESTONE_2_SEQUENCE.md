@@ -136,8 +136,9 @@ layers, temporal clocks, and time controls.
 validation, Pages workflow, and hosted desktop verification PASS; physical Quest acceptance
 NOT RUN.
 
-**Objective:** render one coherent observer-centered P03 mean-axis-of-date system with exact
-antipodal north and south celestial poles.
+**Objective:** render one coherent world-scale P03 mean-axis-of-date system through the modeled
+WGS84 Earth core, with the observer retained at the surface and exact antipodal projective north
+and south celestial-pole directions.
 
 **Inputs**
 
@@ -147,13 +148,13 @@ antipodal north and south celestial poles.
 
 **Outputs**
 
-- One mean Earth-axis line with antipodal NCP/SCP endpoints.
+- One geocentric mean Earth-axis line through the modeled core with projective NCP/SCP directions.
 - Optional, clearly styled below-horizon continuation and pole labels.
 - Proven latitude/horizon relationship and model/provenance disclosure.
 - Bounded manual observer and frozen/current-time diagnostic controls backed by the Milestone 2A
   state stores; no automatic location or general time-animation system.
 
-**Dependencies:** 2A PASS; accepted presentation radius and below-horizon policy.
+**Dependencies:** 2A PASS; accepted DEC-021 world-scale/projective-pole and below-horizon policy.
 
 **Acceptance criteria**
 

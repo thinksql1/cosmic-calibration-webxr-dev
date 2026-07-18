@@ -1,6 +1,7 @@
 import { AstronomyContractError } from '../astronomy/errors';
 import { createMeanEquatorBasis } from '../frames/earthAxisState';
 import { createObserverHorizontalEarthAxis } from '../frames/observerHorizontalEarthAxis';
+import { createObserverGeocentricEarthAxis } from '../frames/observerGeocentricEarthAxis';
 import {
   ASTRONOMY_ENGINE_PROVIDER,
   ASTRONOMY_ENGINE_VERSION,
@@ -154,6 +155,7 @@ function validateInput(input: ScientificSnapshotInput): SnapshotInputValidation 
 function verifyAxis(snapshot: {
   readonly earthAxis: ScientificSnapshot['earthAxis'];
   readonly observerHorizontalEarthAxis: ScientificSnapshot['observerHorizontalEarthAxis'];
+  readonly observerGeocentricEarthAxis: ScientificSnapshot['observerGeocentricEarthAxis'];
   readonly equatorBasis: ScientificSnapshot['equatorBasis'];
 }): ScientificIssue | undefined {
   const { north, south } = snapshot.earthAxis;
@@ -163,11 +165,18 @@ function verifyAxis(snapshot: {
     snapshot.equatorBasis.first.x, snapshot.equatorBasis.first.y, snapshot.equatorBasis.first.z,
     snapshot.equatorBasis.second.x, snapshot.equatorBasis.second.y, snapshot.equatorBasis.second.z,
     snapshot.equatorBasis.normal.x, snapshot.equatorBasis.normal.y, snapshot.equatorBasis.normal.z,
+    snapshot.observerGeocentricEarthAxis.earthCore.east,
+    snapshot.observerGeocentricEarthAxis.earthCore.north,
+    snapshot.observerGeocentricEarthAxis.earthCore.up,
+    snapshot.observerGeocentricEarthAxis.observerToCoreDistanceMeters,
+    snapshot.observerGeocentricEarthAxis.observerToAxisDistanceMeters,
   ];
   if (!vectors.every(Number.isFinite)) return issue('NON_FINITE_RESULT', 'Provider returned a non-finite scientific vector.');
   if (south.x !== -north.x || south.y !== -north.y || south.z !== -north.z) return issue('INVARIANT_FAILURE', 'North and south mean poles must be exact antipodes.');
   const horizontalNorth = snapshot.observerHorizontalEarthAxis.north.direction;
   const horizontalSouth = snapshot.observerHorizontalEarthAxis.south.direction;
+  const geocentricNorth = snapshot.observerGeocentricEarthAxis.northDirection;
+  const geocentricSouth = snapshot.observerGeocentricEarthAxis.southDirection;
   if (
     horizontalSouth.east !== -horizontalNorth.east ||
     horizontalSouth.north !== -horizontalNorth.north ||
@@ -176,6 +185,29 @@ function verifyAxis(snapshot: {
     snapshot.observerHorizontalEarthAxis.meanDateAlignmentResidual > 1e-12
   ) {
     return issue('INVARIANT_FAILURE', 'Observer-horizontal north and south mean poles must be unit antipodes of the same validated P03 axis.');
+  }
+  if (
+    snapshot.observerGeocentricEarthAxis.centerModel !== 'MODELED_WGS84_EARTH_CENTER' ||
+    snapshot.observerGeocentricEarthAxis.presentationTopology !==
+      'GEOCENTRIC_LINE_WITH_PROJECTIVE_POLES_AT_INFINITY' ||
+    snapshot.observerGeocentricEarthAxis.observerSurfaceOrigin.east !== 0 ||
+    snapshot.observerGeocentricEarthAxis.observerSurfaceOrigin.north !== 0 ||
+    snapshot.observerGeocentricEarthAxis.observerSurfaceOrigin.up !== 0 ||
+    geocentricNorth.east !== horizontalNorth.east ||
+    geocentricNorth.north !== horizontalNorth.north ||
+    geocentricNorth.up !== horizontalNorth.up ||
+    geocentricSouth.east !== -geocentricNorth.east ||
+    geocentricSouth.north !== -geocentricNorth.north ||
+    geocentricSouth.up !== -geocentricNorth.up ||
+    snapshot.observerGeocentricEarthAxis.observerToCoreDistanceMeters <= 0 ||
+    snapshot.observerGeocentricEarthAxis.observerToAxisDistanceMeters < 0 ||
+    snapshot.observerGeocentricEarthAxis.observerToAxisDistanceMeters >
+      snapshot.observerGeocentricEarthAxis.observerToCoreDistanceMeters + 1e-8
+  ) {
+    return issue(
+      'INVARIANT_FAILURE',
+      'Geocentric placement must retain one modeled WGS84 core and exact antipodal projective pole directions.',
+    );
   }
   const dot = (a: { x: number; y: number; z: number }, b: { x: number; y: number; z: number }) => a.x * b.x + a.y * b.y + a.z * b.z;
   const length = (vector: { x: number; y: number; z: number }) => Math.hypot(vector.x, vector.y, vector.z);
@@ -256,6 +288,9 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
     const observerHorizontalEarthAxis = immutableClone(
       createObserverHorizontalEarthAxis(earthAxis, validation.observer),
     );
+    const observerGeocentricEarthAxis = immutableClone(
+      createObserverGeocentricEarthAxis(observerHorizontalEarthAxis, validation.observer),
+    );
     const revisions: ScientificRevisions = Object.freeze({
       observer: readyObserver.revision,
       time: normalizedInput.clock.revision,
@@ -265,6 +300,7 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
     const candidate = {
       earthAxis,
       observerHorizontalEarthAxis,
+      observerGeocentricEarthAxis,
       equatorBasis,
     };
     const invariantFailure = verifyAxis(candidate);
@@ -284,9 +320,11 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
         applicationBasis: 'ENU_EAST_TO_X__UP_TO_Y__NORTH_TO_NEGATIVE_Z',
         calibratedYawApplication: 'presentation-parent-only',
         celestialAxisPipeline: 'GCRS_P03_MEAN_DATE_AXIS_TO_WGS84_EARTH_FIXED_TO_HORIZONTAL_ENU',
+        geocentricPlacement: 'WGS84_SURFACE_ORIGIN_TO_MODELED_EARTH_CENTER_IN_HORIZONTAL_ENU',
       }),
       earthAxis,
       observerHorizontalEarthAxis,
+      observerGeocentricEarthAxis,
       equatorBasis,
       providers: Object.freeze({
         astronomyEngineVersion: normalizedInput.providers.astronomy.version,

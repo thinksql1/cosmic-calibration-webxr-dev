@@ -217,10 +217,29 @@
   drift. The axis-specific Earth-rotation invariance must not be reused for the future equator,
   stars, or bodies.
 
+### DEC-021: Use a geocentric world-scale core with projective celestial poles
+- **Date:** 2026-07-18
+- **Status:** Accepted; supersedes DEC-020 for new implementation
+- **Owner:** Darrell Wright / project control
+- **Decision:** Compute the modeled WGS84 Earth-center displacement in local ENU from validated
+  observer state, place one P03 mean-axis line through that core, and retain NCP/SCP as exact
+  antipodal projective directions at infinity. The observer remains at the modeled surface origin
+  and is not moved onto the axis. The meter-based renderer uses declared asymptotic finite points
+  `10^13 m` from the core on that exact line and a `2 * 10^13 m` far range with logarithmic depth.
+  The maximum render convergence bound is below `0.14 arcseconds`; finite core/pole marker and
+  label dimensions are appearance only. Geographic calibration yaw remains parent-only.
+- **Rationale:** The product requires an actual modeled Earth-core point and a world-scale axis,
+  which a nearby line through the user cannot represent. Celestial poles have no finite physical
+  distance, so explicitly projective directions avoid inventing one while preserving one exact
+  geocentric centerline. Mean-sea-level elevation currently enters WGS84 placement as a disclosed
+  Tier 1 numeric ellipsoid-height approximation. The replacement requires new independent,
+  hosted, and Quest validation; prior proxy evidence cannot validate it.
+
 ## Proposed decisions awaiting review
 
 None yet.
 
 ## Superseded decisions
 
-None yet.
+- DEC-020 is superseded by DEC-021 for the geocentric replacement. It remains recorded as the
+  contract of the previously published Milestone 2B proxy.

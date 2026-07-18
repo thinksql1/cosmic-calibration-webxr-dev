@@ -12,7 +12,7 @@
   <body>
     <main id="app" aria-label="Cosmic Calibration WebXR reference experience">
       <section class="status-panel" aria-labelledby="app-title">
-        <p class="eyebrow">Milestone 2B · Mean Earth axis</p>
+        <p class="eyebrow">Milestone 2B · Geocentric mean Earth axis</p>
         <h1 id="app-title">Cosmic Calibration</h1>
         <p id="status" class="status" role="status" aria-live="polite"></p>
         <button id="enter-ar" type="button" hidden>Enter AR</button>
@@ -46,7 +46,7 @@
       </section>
       <section id="celestial-panel" class="celestial-panel" aria-labelledby="celestial-title">
         <p class="eyebrow">Scientific celestial layer</p>
-        <h2 id="celestial-title">Mean Earth Axis &amp; Celestial Poles</h2>
+        <h2 id="celestial-title">Earth Core, Axis &amp; Celestial Poles</h2>
         <p id="celestial-status" class="calibration-status" role="status" aria-live="polite"></p>
         <p id="celestial-detail" class="status-detail"></p>
         <p id="celestial-limitations" class="scientific-limitations"></p>
@@ -90,6 +90,7 @@
           <summary>Axis display</summary>
           <div class="toggle-grid">
             <label><input id="show-celestial-axis" type="checkbox" checked />Axis</label>
+            <label><input id="show-earth-core" type="checkbox" checked />Earth core</label>
             <label><input id="show-pole-markers" type="checkbox" checked />Pole markers</label>
             <label><input id="show-pole-labels" type="checkbox" checked />NCP/SCP labels</label>
             <label><input id="show-below-horizon" type="checkbox" checked />Below-horizon segment</label>
@@ -99,7 +100,7 @@
             <option value="above-horizon-emphasis" selected>Subdue below horizon</option>
             <option value="full-axis">Show full axis equally</option>
           </select>
-          <p class="simulation-note">The 1.8 m radius is a symbolic directional scale. The room floor is not an opaque Earth surface.</p>
+          <p class="simulation-note">World-scale WGS84 model: the core is at its modeled geocentric position. NCP/SCP are antipodal directions at infinity; finite marker size and render extent are visual only. The room floor is not an opaque Earth surface.</p>
         </details>
 
         <details>
@@ -112,7 +113,8 @@
         <span><i class="swatch swatch-floor"></i>Y = 0 floor plane</span>
         <span>X and Z are room-relative</span>
         <span>N/S/E/W appear only after calibration</span>
-        <span>NCP/SCP are P03 mean-pole directions</span>
+        <span>Earth core is modeled geocentrically at world scale</span>
+        <span>NCP/SCP are antipodal P03 mean-pole directions, not Polaris</span>
       </aside>
       <div id="scene" aria-hidden="true"></div>
     </main>

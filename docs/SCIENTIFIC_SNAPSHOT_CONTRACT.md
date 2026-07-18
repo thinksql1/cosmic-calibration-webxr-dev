@@ -21,6 +21,9 @@ The immutable ready result contains:
 - one axis-specific observer-horizontal result that proves the GCRS pole/matrix pair becomes the
   P03 mean-date `+Z` axis and maps that Earth-fixed mean axis through the WGS84 geodetic basis to
   exact antipodal `HORIZONTAL_ENU` pole directions;
+- one WGS84 geocentric placement result containing the modeled Earth center in local ENU meters,
+  the surface observer at local origin, observer-to-core and observer-to-axis distances, exact
+  antipodal pole directions, and the declared mean-sea-level/ellipsoid-height Tier 1 treatment;
 - a deterministic unit, orthogonal, right-handed equator-plane pair whose cross product is the same north mean-pole normal; the basis owns a separately frozen normalized copy and never aliases its caller's pole object;
 - exact provider names/versions (the P03 registry, model provenance, and cache key all use `Cosmic Calibration P03 mean-pole provider@1.0.0`), cache identity, creation sequence, and Tier 1 warnings.
 
@@ -44,3 +47,8 @@ basis conversion remains outside science and the calibrated geographic yaw enter
 presentation parent. No snapshot calculation imports Three.js or relies on a visible scene
 matrix. Provider output and state inputs are cloned into recursively frozen snapshot values, so a
 caller cannot mutate cache content through nested provenance, warnings, or vectors.
+
+The additional placement contract is
+`WGS84 surface observer -> Earth-fixed observer position -> modeled Earth-center displacement ->
+HORIZONTAL_ENU meters`. Presentation maps that position with the same `(east, up, -north)` basis
+and does not recompute geodesy.

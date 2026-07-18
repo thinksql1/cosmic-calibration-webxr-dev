@@ -1,6 +1,6 @@
 # Cosmic Calibration WebXR
 
-Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A provides the validated non-visual astronomy foundation, and integrated Milestone 2B implements its first visual consumer: one coherent mean Earth axis with antipodal NCP/SCP endpoints.
+Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A provides the validated non-visual astronomy foundation. A local Milestone 2B replacement now models the WGS84 Earth core at world scale and one coherent P03 mean axis with antipodal projective NCP/SCP directions.
 
 Scientific geometry and contemplative interpretation remain separate layers. Milestone 2B adds no automatic heading, compass, geolocation, magnetic-declination behavior, celestial equator, precession trajectory, celestial body, or contemplative sequence.
 
@@ -16,8 +16,9 @@ normally into `master`, which passes 239 tests and the production build. GitHub 
 subpath assets, and browser diagnostics regressed cleanly. Milestone 2B passed its independent,
 automated, and desktop gates and is integrated normally into `master`. GitHub Pages workflow run
 #9 deployed commit `5b657e4`; hosted observer/time/axis controls, golden cases, reset, subpath
-assets, and console health pass. Physical Quest acceptance remains NOT RUN. The 15-file / 270-test
-suite retains all 239 Milestone 2A tests. The exact next task is physical acceptance:
+assets, and console health pass for the previously published proxy. The local geocentric
+replacement is not integrated or deployed; its exact next task is independent validation and
+publication before a new physical Quest gate.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -40,8 +41,8 @@ The shared desktop/XR scene contains:
 - a desktop bearing simulation using the same projection, yaw, and state logic as XR capture;
 - non-visual immutable observer/time contracts, tagged scientific frames and correction profiles,
   canonical ENU conversion, frozen provider provenance, and a bounded P03 mean-pole provider;
-- manual in-memory observer input, explicit UTC fixtures, and one observer-centered symbolic
-  mean-axis group with exact antipodal NCP/SCP endpoints.
+- manual in-memory observer input, explicit UTC fixtures, a WGS84-modeled Earth-core point, and
+  one world-scale geocentric P03 mean-axis group with antipodal projective NCP/SCP directions.
 
 The room X and Z axes have no geographic meaning before calibration. Geographic geometry is hidden until a valid physical or simulated calibration is captured.
 
@@ -71,7 +72,7 @@ See [Architecture](docs/ARCHITECTURE.md) and [Calibration](docs/CALIBRATION.md) 
 
 ## Scientific foundation status
 
-Milestone 2A provides an explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. Independent acceptance, integration, publication, and hosted regression pass. Milestone 2B consumes that snapshot without direct provider calls: it proves the mean-date axis, maps it through WGS84 Earth-fixed to observer-horizontal ENU, then maps ENU once into the existing calibrated geographic parent. The manual observer/time controls remain in-memory diagnostics, not geolocation or a general time system. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md), and [Earth Axis and Celestial Poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md).
+Milestone 2A provides an explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. Independent acceptance, integration, publication, and hosted regression pass. The current local Milestone 2B replacement consumes that snapshot without direct provider calls, maps the mean axis into horizontal ENU, computes the modeled WGS84 Earth center relative to the surface observer, and maps both into the calibrated geographic parent once. NCP/SCP remain directions at infinity; finite render extent and marker size are disclosed presentation parameters, not astronomical distances. The manual observer/time controls remain in-memory diagnostics, not geolocation or a general time system. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md), and [Earth Axis and Celestial Poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md).
 
 ## Physical north-marker workflow
 
@@ -128,10 +129,10 @@ Pure math, state transitions, controller integration, existing XR lifecycle, typ
 desktop simulation are locally testable. The reported Quest 3 Milestone 1 acceptance flow passed
 for controller-based calibration and usable lifecycle behavior. That evidence does not establish
 laboratory-grade angular accuracy, broad device coverage, or unreported edge-case outcomes.
-Milestone 2B's automated and local development/production-preview checks pass for frame mapping,
-exact antipodes, latitude/horizon cases, controls, visibility, reset/rebuild behavior,
-OrbitControls, resize, relative assets, and console health. Physical Quest axis/pole validation is
-**NOT RUN** and is the exact next acceptance gate.
+The geocentric replacement's local automated/development checks cover WGS84 core placement, one
+centerline, exact projective antipodes, ENU mapping, controls, readiness, and console health.
+Independent review, integration, production-preview closeout, publication, and physical Quest
+validation are **NOT RUN**. The hosted build remains the earlier observer-centered proxy.
 
 ## Explicitly deferred
 

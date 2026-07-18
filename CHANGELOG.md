@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Changed
+
+- Replaced the local `1.8 m` observer-centered Earth-axis proxy on an unintegrated feature branch
+  with a WGS84 geocentric world-scale model: the observer stays at the modeled surface origin, an
+  actual modeled Earth-core point is placed in local ENU meters, and one P03 mean-axis centerline
+  extends to exact antipodal projective NCP/SCP directions.
+- Added finite render proxies at a declared `10^13 m` extent on that exact line, with a
+  sub-`0.14 arcsecond` convergence bound and visual-only core/pole/label sizes. NCP/SCP remain
+  directions at infinity and are explicitly not Polaris.
+- Extended the meter-based scene depth range with logarithmic depth and added deterministic WGS84
+  core, observer-to-axis, centerline, antipode, convergence, immutability, and visibility tests.
+- Superseded DEC-020 with DEC-021. Independent review, integration, publication, and Quest testing
+  of the replacement remain NOT RUN; the hosted site still contains the earlier proxy.
+
 ### Added
 
 - Milestone 2B observer-horizontal mean-axis snapshot contract: the validated P03 GCRS
