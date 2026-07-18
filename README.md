@@ -22,7 +22,9 @@ GPU rendering, logarithmic XR depth, and missing disposal. Those renderer defect
 locally with per-eye camera-relative/homogeneous geometry, linear compositor-safe depth, and
 explicit resource ownership. The independent renderer gate and normal local integration pass with
 291 tests. GitHub Actions run #11 and the hosted geocentric controls/readiness/reset/subpath-assets
-regression pass. Physical Quest acceptance remains NOT RUN.
+regression pass. The user has physically tested the published hardened geocentric experience and
+accepted it as workable with no blocking issue reported. This is conditional physical acceptance:
+detailed A–K observations were not individually captured.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -138,8 +140,10 @@ for controller-based calibration and usable lifecycle behavior. That evidence do
 laboratory-grade angular accuracy, broad device coverage, or unreported edge-case outcomes.
 The geocentric replacement's local automated/development checks cover WGS84 core placement, one
 centerline, exact projective antipodes, ENU mapping, controls, readiness, and console health.
-Independent review, integration, production-preview closeout, publication, and physical Quest
-validation are **NOT RUN**. The hosted build remains the earlier observer-centered proxy.
+Independent review, integration, production-preview closeout, publication, and hosted regression
+have passed for the hardened geocentric renderer. The user has conditionally accepted the physical
+Quest experience as workable; detailed individual physical observations were not captured. The
+hosted build is the geocentric replacement, not the earlier observer-centered proxy.
 
 ## Explicitly deferred
 

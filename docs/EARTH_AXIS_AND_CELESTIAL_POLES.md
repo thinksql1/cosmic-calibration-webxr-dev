@@ -2,12 +2,14 @@
 
 ## Status
 
-The geocentric scientific model and its hardened renderer are implemented locally on
-`feature/milestone-2b-geocentric-world-axis`. The original independent gate accepted the WGS84,
-P03, projective-pole, convergence, and calibration contracts but rejected raw `10^13 m` GPU
-coordinates, global logarithmic depth, and missing disposal. The local remediation replaces those
-rendering paths and adds deterministic precision/depth/lifecycle coverage. Independent re-gate,
-integration, publication, and physical Quest acceptance remain **NOT RUN**.
+The geocentric scientific model and its hardened renderer are integrated and published on
+`master`. The original independent gate accepted the WGS84, P03, projective-pole, convergence,
+and calibration contracts but rejected raw `10^13 m` GPU coordinates, global logarithmic depth,
+and missing disposal. The remediation replaced those paths and added deterministic
+precision/depth/lifecycle coverage; the independent re-gate, integration, publication, and hosted
+regression passed. The user physically tested the published experience and accepted it as workable
+with no blocking issue reported. Physical acceptance is **CONDITIONAL PASS** because detailed A–K
+observations were not individually captured.
 
 ## Scientific model — unchanged
 
@@ -144,10 +146,11 @@ translation and rotation, exact antipodes, one calibrated yaw, bounded float att
 camera-relative float32 error, homogeneous shader/source boundaries, material depth behavior,
 resource reuse, clear/rebuild, and idempotent disposal.
 
-Desktop development and production preview can validate shader compilation, controls, orbit,
-readiness/reset, and console health. They cannot establish Quest Browser stereo comfort,
-passthrough contrast, compositor behavior, or physical world locking. Those remain pending an
-independent renderer re-gate, publication, and later physical Quest acceptance.
+Desktop development and production preview validate shader compilation, controls, orbit,
+readiness/reset, and console health. The user has additionally reported the published Quest
+experience workable with no blocking issue. That practical acceptance does not establish detailed
+individual findings for stereo comfort, passthrough contrast, compositor behavior, or physical
+world locking; those were not separately captured.
 
 ## Exclusions
 

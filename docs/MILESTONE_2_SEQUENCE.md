@@ -21,7 +21,9 @@ boundary, and the application-owned P03 mean-pole provider passed their bounded 
 Milestone 2A's non-visual state/snapshot/cache foundation passed its independent gate and is
 integrated and published. Milestone 2B consumes the validated snapshot for only a coherent Earth
 axis and NCP/SCP presentation layer. Its independent, automated, desktop, workflow, and hosted
-gates pass and it is integrated and published normally; physical Quest acceptance remains pending.
+gates pass and it is integrated and published normally. The user has physically tested the hardened
+geocentric replacement and accepted it as workable; detailed A–K observations were not captured,
+so physical acceptance is conditional rather than exhaustive.
 It does not add equator geometry, precession, bodies, ecliptic,
 temporal clocks, media, or contemplative logic.
 
@@ -132,11 +134,12 @@ layers, temporal clocks, and time controls.
 
 ## Milestone 2B - mean Earth axis and celestial poles
 
-**Current result:** the earlier observer-centered implementation was published, then superseded
-locally by the geocentric DEC-021 model. The geodetic/P03 contract passed independent review, but
-the first geocentric renderer gate rejected raw large GPU coordinates, logarithmic XR depth, and
-missing disposal. DEC-022 remediation is complete locally; independent renderer re-gate,
-integration, publication, and physical Quest acceptance are NOT RUN.
+**Current result:** the earlier observer-centered implementation was superseded by the integrated
+and published geocentric DEC-021/DEC-022 model. The first geocentric renderer gate rejected raw
+large GPU coordinates, logarithmic XR depth, and missing disposal; the hardened re-gate,
+integration, publication, and hosted regression subsequently passed. The user has physically
+tested the published experience and accepted it as workable with no blocking issue reported.
+Physical acceptance is **CONDITIONAL PASS** because detailed A–K observations were not captured.
 
 **Objective:** render one coherent world-scale P03 mean-axis-of-date system through the modeled
 WGS84 Earth core, with the observer retained at the surface and exact antipodal projective north
@@ -168,9 +171,11 @@ and south celestial-pole directions.
    pole.
 5. Existing floor, horizon diagnostic, cardinal, controller, and session behavior remain intact.
 
-**Physical Quest boundary:** verify floor/up and north alignment, pole altitude relationship,
-world locking, below-horizon semantics, readability, and comfort. Do not claim angular precision
-beyond the combined evidence budget.
+**Physical Quest boundary:** conditionally accepted from the user's practical report that the
+published experience is workable. Individual floor/up, north-alignment, pole-altitude, world-
+locking, below-horizon, readability, stereo, and comfort observations were not separately
+captured; do not claim them as independently verified or claim angular precision beyond the
+combined evidence budget.
 
 **Explicit exclusions:** celestial equator, precession path, nutation, polar motion, EOP, ecliptic,
 Sun, Moon, planets, animated/general time controls, automatic location, and persistence.

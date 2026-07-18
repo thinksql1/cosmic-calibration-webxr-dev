@@ -31,6 +31,10 @@
 - Published `cdb5f4c` normally without force. GitHub Actions run #11 passed build/deploy and the
   hosted geocentric title, Earth-core/axis controls, readiness, visibility, reset, subpath assets,
   and console regression pass. Physical Quest acceptance remains NOT RUN.
+- Recorded the completed physical Quest test as **CONDITIONAL PASS**: the user reported the
+  published hardened geocentric Earth-core axis workable, with no blocking issue reported. Detailed
+  A–K observations were not individually captured, no production-code change was required, and the
+  implementation is accepted as the current Milestone 2B baseline.
 
 ### Added
 

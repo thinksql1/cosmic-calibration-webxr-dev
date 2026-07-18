@@ -93,10 +93,12 @@ device/room coverage and unmeasured edge-case evidence remain future regression-
 
 ## Milestone 2B status
 
-**Geocentric Earth-core/axis physical acceptance: NOT RUN.** The published proxy checklist is
-superseded. Run this checklist only after the DEC-021 replacement passes an independent gate, is
-integrated, and the exact `master` commit is published. Desktop evidence cannot substitute for
-headset depth, visibility, comfort, or world-locking observations.
+**Geocentric Earth-core/axis physical acceptance: CONDITIONAL PASS.** The user physically tested
+the published hardened DEC-021/DEC-022 replacement and reported it workable, with no blocking
+issue reported. Detailed A–K/checklist observations, Quest OS/browser details, and individual
+depth, visibility, stereo, world-locking, lifecycle, and comfort findings were not captured; none
+are inferred. This checklist remains the procedure for future regression evidence. Desktop
+evidence still cannot substitute for headset observations.
 
 ## Milestone 2B procedure
 

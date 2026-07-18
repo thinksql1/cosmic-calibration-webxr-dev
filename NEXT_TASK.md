@@ -4,61 +4,44 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the physical Quest acceptance test for the hardened geocentric Earth-core axis
+**Title:** Implement the celestial equator from the validated P03 pole and equator basis
 
 ## Recommended execution
 
-- **Codex model:** GPT-5.6 Sol
-- **Reasoning effort:** Max
-- **Branch:** `master`
-- **Why:** the remaining gate requires disciplined reconciliation of physical stereo, world
-  locking, calibration, depth/clipping, lifecycle, and comfort evidence without converting
-  automated or desktop results into a physical claim.
+- **Codex model:** GPT-5.6 Terra
+- **Reasoning effort:** High
+- **Branch:** `feature/milestone-2c-celestial-equator`
+- **Why:** this is an accepted, bounded presentation feature that must preserve the validated
+  geocentric axis and frame boundaries while adding independently testable geometry.
 
-## Entry condition
+## Scope
 
-Do not begin until the normal `master` push, GitHub Actions workflow, Pages deployment, and hosted
-desktop regression all pass for the hardened renderer. Confirm the hosted UI exposes observer,
-UTC, Earth-core, axis, pole-marker, label, and below-horizon controls and no longer contains the
-old observer-centered proxy.
+- Consume the existing immutable scientific snapshot and its validated P03 mean-pole/equator
+  basis; do not recompute P03 or scientific frame transforms in presentation code.
+- Render only the mean celestial-equator great circle, coherent with the existing geocentric
+  Earth-core axis and its current calibrated geographic parent.
+- Add bounded equator visibility and below-horizon presentation controls while keeping the visual
+  layer calm and low-noise.
+- Add deterministic orthogonality, closure, antipodal-sample, horizon-relationship, readiness,
+  calibration-invalidation, and presentation-boundary tests.
+- Require desktop validation and prepare—without performing—the subsequent physical Quest check.
 
-## Procedure
+## Invariants
 
-1. Record the hosted commit and Pages URL, then enter immersive AR on Quest 3 with a safe standing
-   boundary and verified floor.
-2. Enter the intended Michigan observer values and fixed UTC fixture; do not use invented or
-   automatically detected coordinates.
-3. Perform a fresh controller-only true-north calibration and confirm scientific readiness.
-4. Verify one coherent centerline relates NCP direction, the modeled Earth core below the
-   observer, and antipodal SCP direction; the observer must remain visibly offset from the
-   rotational axis rather than placed on it.
-5. Check NCP toward the appropriate northern celestial direction and SCP antipodally below the
-   opposite horizon. Treat the core/poles as scientific point/direction centers, not literal
-   marker sizes or Polaris.
-6. Check stereo unity, small translational parallax, world locking during slow head rotation,
-   crouch/stand behavior, and absence of eye-dependent kinks, sliding, duplication, or head lock.
-7. Inspect line/marker/label visibility, bright and dark passthrough readability, below-horizon
-   treatment, clipping, flicker, depth-order artifacts, and comfort.
-8. Toggle visibility without moving the scientific line. Reset, repeat same-yaw and changed-yaw
-   recalibration, exit/re-enter AR, reload once, and confirm clean readiness/resource lifecycle.
-9. Record every item as `PASS`, `FAIL`, `UNCERTAIN`, `NOT RUN`, or `NOT APPLICABLE`; do not infer
-   angular accuracy or compositor behavior beyond direct observation.
-
-## Required outcome
-
-Until the user performs and reports the headset procedure, the physical gate remains:
-
-`BLOCKED — PHYSICAL QUEST TEST NOT YET PERFORMED`
+- Every equator sample remains perpendicular to the exact same P03 mean axis used by NCP/SCP.
+- The circle is closed; opposing samples are exact negatives within the declared numeric tolerance.
+- Geographic calibration yaw is applied once by the existing presentation hierarchy.
+- The geocentric Earth-core/pole renderer remains unchanged; scientific snapshots stay immutable.
 
 ## Explicit exclusions
 
-Do not implement the celestial equator, precession trajectories, Sun, Moon, planets, ecliptic,
-temporal clocks, geolocation, media, relational circuits, game systems, AI enhancement, audio, or
-contemplative sequencing.
+Do not implement precession trajectories, ecliptic, Sun, Moon, planets, temporal clocks, media,
+game integration, AI enhancement, relational circuits, or contemplative sequencing. Do not add
+dependencies, change geolocation/time controls, or change the Earth-core/pole renderer.
 
-## Stop conditions
+## Validation and stop conditions
 
-Stop and preserve evidence if the hosted commit is stale, workflow/Pages regression fails, stereo
-does not fuse, the line bends or follows the head, calibration appears doubled, the Earth core is
-replaced by a nearby proxy, depth/clipping is unusable, lifecycle duplicates resources, or comfort
-requires changing the scientific contract.
+Run type-check, the full test suite, production build, dependency/diff checks, and bounded desktop
+development/preview verification. Stop for a frame ambiguity, double-yaw risk, snapshot-boundary
+gap, scientific/presentation coupling, needed dependency, or a requirement to modify the accepted
+Earth-core/pole renderer.
