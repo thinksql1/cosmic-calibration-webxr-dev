@@ -412,6 +412,17 @@ mapping for that mathematical up direction, with its error recorded separately. 
 ring may visually coincide with altitude zero after calibration, but it is not scientific evidence
 that terrain, gravity vertical, horizon dip, or refraction has been modeled.
 
+**Milestone 2D local reference:** the bounded horizon circle implements that initial altitude-zero
+plane with 96 samples at a symbolic 24 m presentation radius. It is centered on the calibrated
+observer tangent origin, spans canonical east/north, and inherits geographic yaw once. It is
+separate from the room-floor ring, the geocentric P03 axis, and the geocentric/projective celestial
+equator. Its user-facing astronomical-horizon terminology carries the explicit
+`WGS84_GEODETIC_UP_TIER_1_APPROXIMATION` qualifier because deflection of the vertical is absent.
+
+XR eye presentation is orthogonal to every frame above. DEC-024 permits each visible reference
+layer to select both, left, or right browser-identified XR views without changing scientific or
+calibration data. Desktop and monoscopic XR views remain visible fallbacks.
+
 ## Precision tiers
 
 ### Tier 1 - contemplative visual accuracy

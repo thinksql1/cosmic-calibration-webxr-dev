@@ -135,3 +135,32 @@ evidence still cannot substitute for headset observations.
 
 Use only **PASS**, **FAIL**, **UNCERTAIN**, **NOT RUN**, or **NOT APPLICABLE**. This procedure does
 not authorize celestial-equator, precession, body, temporal-clock, media, or contemplative work.
+
+## Milestone 2C physical evidence and Milestone 2D follow-up
+
+**Celestial-equator physical acceptance: CONDITIONAL PASS.** The user reports the published
+celestial equator is good and workable. The axis and equator each appear as one clean line when
+viewed through either eye independently; both appear doubled only with both eyes open. No
+individual-eye duplicate was reported. This is classified as a binocular-fusion/stereo-
+presentation concern with no conclusively proven cause. No other checklist result is inferred.
+
+After independent integration and publication of Milestone 2D, perform this bounded follow-up:
+
+1. Confirm axis, equator, and local horizon default to **Both eyes** and retain prior placement.
+2. Test each layer in **Left eye only** and **Right eye only** while safely alternating which eye
+   is closed. Confirm one clean line reaches the selected physical eye and none reaches the other.
+3. Assign axis right/equator left, then reverse them. Record fusion, rivalry, usefulness, strain,
+   and whether either combination reduces perceived doubling; do not assume improvement.
+4. Enable the local horizon in both eyes. Confirm it aligns with existing N/E/S/W, remains
+   horizontal and world-oriented, and is visibly distinct from the 1.5 m room-floor ring.
+5. Inspect horizon versus celestial-equator tilt at the entered latitude and axis perpendicularity.
+   Record whether the local reference makes the geocentric relationships easier to interpret.
+6. Repeat horizon left/right modes, head rotation, careful lateral motion, crouch/stand, bright and
+   dark passthrough, reset, same-direction recalibration, deliberately changed recalibration,
+   exit/re-entry, and reload.
+7. Record stereo comfort, binocular rivalry, line doubling, clipping, drift, duplicate resources,
+   horizon scale/readability, and whether the existing axis-curvature/core-distance impressions
+   change. Stop immediately for discomfort.
+
+Physical Milestone 2D acceptance remains **NOT RUN** until this published headset procedure is
+performed.

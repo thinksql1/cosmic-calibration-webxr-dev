@@ -21,11 +21,11 @@ boundary, and the application-owned P03 mean-pole provider passed their bounded 
 Milestone 2A's non-visual state/snapshot/cache foundation passed its independent gate and is
 integrated and published. Milestone 2B consumes the validated snapshot for only a coherent Earth
 axis and NCP/SCP presentation layer. Its independent, automated, desktop, workflow, and hosted
-gates pass and it is integrated and published normally. The user has physically tested the hardened
-geocentric replacement and accepted it as workable; detailed A–K observations were not captured,
-so physical acceptance is conditional rather than exhaustive.
-It does not add equator geometry, precession, bodies, ecliptic,
-temporal clocks, media, or contemplative logic.
+gates pass and it is integrated and published normally. The user has physically tested the
+hardened geocentric replacement and celestial equator. The equator is good/workable and each eye
+individually receives one clean axis/equator line, while binocular viewing doubles both layers.
+Milestone 2D therefore adds bounded eye-presentation modes and a local tangent-plane horizon before
+any precession or body work.
 
 ## Sequence overview
 
@@ -34,8 +34,8 @@ temporal clocks, media, or contemplative logic.
   -> 2A scientific foundation
       -> 2B mean Earth axis and antipodal celestial poles
           -> 2C mean celestial equator
-              -> 2D validated precession trajectories
-                  -> later ecliptic/body/temporal/presentation milestones
+              -> 2D eye-presentation modes and local horizon
+                  -> later validated precession/ecliptic/body/temporal milestones
 ```
 
 Every milestone consumes the same observer, time, frame, provenance, and correction contracts.
@@ -205,13 +205,40 @@ labels.
    astronomical horizon.
 5. Visibility and labels are independently optional; minimal mode remains low-noise.
 
-**Physical Quest boundary:** verify world locking, expected horizon crossings/orientation,
-below-horizon continuity, readability, and comfort after north/floor setup.
+**Physical Quest boundary:** **CONDITIONAL PASS.** The user reports the equator good and workable,
+with one clean equator line in either eye independently and binocular doubling. Individual results
+for world locking, horizon crossings, seam, readability, and comfort were not supplied and are not
+invented.
 
 **Explicit exclusions:** true equator/nutation mode, precession path, ecliptic, bodies, temporal
 ticks, and contemplative sequencing.
 
-## Milestone 2D - validated precession trajectories
+## Milestone 2D - eye-presentation modes and local horizon
+
+**Objective:** reconcile the supplied binocular evidence, add independent reversible eye
+presentation for axis/equator/horizon, and add one calibrated local altitude-zero reference circle.
+
+**Inputs:** published 2B/2C layers, actual `XRView.eye` identity, canonical ENU, accepted geographic
+calibration, and the Tier 1 WGS84 geodetic-up horizon contract.
+
+**Outputs:** independent `both`/`left`/`right` layer modes, mono desktop fallback, bounded
+diagnostics, and a default-hidden 96-sample 24 m local tangent-plane horizon.
+
+**Dependencies:** 2C publication and the user's conditional physical evidence.
+
+**Acceptance criteria:** eye filtering changes only visibility, uses actual XR eye identity without
+scene copies, preserves all scientific coordinates and depth contracts, and the horizon contains
+N/E/S/W, is perpendicular to local up, inherits yaw once, reuses/disposes owned resources, and
+remains distinct from the room-floor ring and celestial equator.
+
+**Physical Quest boundary:** test monocular combinations, rivalry/comfort, horizon/cardinal
+alignment, whether it clarifies the geocentric relationships, world locking, reset/re-entry, and
+readability. Do not claim the modes cure binocular doubling before observation.
+
+**Explicit exclusions:** precession, ecliptic, bodies, temporal clocks, broad layer management,
+media, game, AI, and contemplative sequencing.
+
+## Later validated precession trajectories
 
 **Objective:** add scientifically computed north/south long-term mean-pole trajectories and a
 date-dependent current contact marker without forcing the result into a perfect decorative ring.
@@ -229,7 +256,7 @@ date-dependent current contact marker without forcing the result into a perfect 
 - Current-date pole samples that touch the corresponding paths by construction.
 - Model/date-domain disclosure, optional time labels, and visible distinction from nutation.
 
-**Dependencies:** 2C PASS plus a dedicated scientific review of the long-term model. P03's normal
+**Dependencies:** 2D independent and physical acceptance plus a dedicated scientific review of the long-term model. P03's normal
 date domain is not silently stretched to a full precession cycle.
 
 **Acceptance criteria**

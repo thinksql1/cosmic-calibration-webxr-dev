@@ -149,6 +149,19 @@ h2 {
   margin-top: 0.7rem;
 }
 
+.eye-mode-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 0.45rem 0.65rem;
+  align-items: center;
+  margin-top: 0.8rem;
+}
+
+.eye-mode-grid label {
+  color: #9fbfc5;
+  font-size: 0.72rem;
+}
+
 .observer-grid label,
 .field-label,
 .select-label {

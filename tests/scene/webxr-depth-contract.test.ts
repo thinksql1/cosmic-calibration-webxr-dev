@@ -53,5 +53,6 @@ describe('WebXR-safe geocentric depth and GPU boundary', () => {
   it('owns an explicit page-teardown disposal path', () => {
     expect(mainSource).toContain("window.addEventListener('pagehide'");
     expect(mainSource).toContain('celestialAxis.dispose()');
+    expect(mainSource).toContain('localHorizon.dispose()');
   });
 });

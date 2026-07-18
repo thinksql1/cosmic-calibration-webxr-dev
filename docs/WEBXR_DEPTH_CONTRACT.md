@@ -36,6 +36,10 @@ Axis lines, the Earth-core marker, pole markers, and labels use custom shaders. 
 - never clear, replace, or resolve the main depth attachment; and
 - never request a second XR layer.
 
+The bounded local-horizon reference also uses linear depth with `depthTest = false` and
+`depthWrite = false`. Its 24 m vertices are ordinary local coordinates; it neither changes the
+celestial overlay projection nor writes compositor depth.
+
 Consequently, their depth value cannot contaminate compositor-visible depth. Ordinary reference
 geometry retains default Three.js depth testing and writing.
 

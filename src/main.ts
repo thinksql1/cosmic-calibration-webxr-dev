@@ -13,6 +13,7 @@ import {
 } from './scene/createGeographicReference';
 import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
+import { createLocalHorizonGroup } from './scene/createLocalHorizonGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
 import { createScientificProviderRegistry } from './science/providers/scientificProviderRegistry';
@@ -34,6 +35,15 @@ import {
   DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
   type CelestialEquatorDisplaySettings,
 } from './presentation/celestialEquatorPresentationModel';
+import {
+  parseEyePresentationMode,
+  type EyePresentationMode,
+} from './presentation/eyePresentationMode';
+import {
+  createLocalHorizonPresentationModel,
+  DEFAULT_LOCAL_HORIZON_DISPLAY_SETTINGS,
+  LOCAL_HORIZON_SAMPLE_COUNT,
+} from './presentation/localHorizonPresentationModel';
 import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
@@ -91,6 +101,11 @@ const showLabelsInput = requireElement<HTMLInputElement>('#show-pole-labels');
 const showBelowHorizonInput = requireElement<HTMLInputElement>('#show-below-horizon');
 const belowHorizonModeSelect = requireElement<HTMLSelectElement>('#below-horizon-mode');
 const showCelestialEquatorInput = requireElement<HTMLInputElement>('#show-celestial-equator');
+const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
+const axisEyeModeSelect = requireElement<HTMLSelectElement>('#axis-eye-mode');
+const equatorEyeModeSelect = requireElement<HTMLSelectElement>('#equator-eye-mode');
+const horizonEyeModeSelect = requireElement<HTMLSelectElement>('#horizon-eye-mode');
+const eyePresentationStatus = requireElement<HTMLParagraphElement>('#eye-presentation-status');
 const celestialOverlayControls = [
   ...celestialPanel.querySelectorAll<HTMLElement>('button, input, select, summary'),
 ];
@@ -110,8 +125,10 @@ const scene = createReferenceScene();
 const geographicReference = createGeographicReferenceGroup();
 const celestialAxis = createEarthAxisGroup();
 const celestialEquator = createCelestialEquatorGroup(96);
+const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 geographicReference.add(celestialAxis.group);
 geographicReference.add(celestialEquator.group);
+geographicReference.add(localHorizon.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
 
@@ -178,7 +195,59 @@ function currentEquatorDisplaySettings(): CelestialEquatorDisplaySettings {
   });
 }
 
+function selectedEyeMode(select: HTMLSelectElement): EyePresentationMode {
+  return parseEyePresentationMode(select.value);
+}
+
+function updateEyePresentationModes(): void {
+  const axisMode = selectedEyeMode(axisEyeModeSelect);
+  const equatorMode = selectedEyeMode(equatorEyeModeSelect);
+  const horizonMode = selectedEyeMode(horizonEyeModeSelect);
+  celestialAxis.setEyePresentationMode(axisMode);
+  celestialEquator.setEyePresentationMode(equatorMode);
+  localHorizon.setEyePresentationMode(horizonMode);
+  document.body.dataset.axisEyeMode = axisMode;
+  document.body.dataset.equatorEyeMode = equatorMode;
+  document.body.dataset.horizonEyeMode = horizonMode;
+}
+
+function renderLocalHorizon(): void {
+  const model = createLocalHorizonPresentationModel(northCalibration.current, {
+    ...DEFAULT_LOCAL_HORIZON_DISPLAY_SETTINGS,
+    showHorizon: showLocalHorizonInput.checked,
+  });
+  if (model.kind === 'not-ready') {
+    localHorizon.clear();
+    return;
+  }
+  localHorizon.update(model);
+}
+
+function eyeModeDiagnostic(
+  label: string,
+  diagnostics: ReturnType<typeof celestialAxis.getEyePresentationDiagnostics>,
+): string {
+  const views = diagnostics.context === 'desktop-mono-fallback'
+    ? 'desktop/mono fallback visible'
+    : diagnostics.context === 'xr-no-view'
+      ? 'XR view identity unavailable; layer suppressed rather than guessed'
+    : `XR views ${diagnostics.viewEyes.join('/')}; rendered ${diagnostics.renderedEyes.join('/') || 'none'}; suppressed ${diagnostics.suppressedEyes.join('/') || 'none'}`;
+  return `${label} eye mode ${diagnostics.mode}; ${views}`;
+}
+
+function updateEyePresentationStatus(): void {
+  const next = [
+    eyeModeDiagnostic('Axis/poles', celestialAxis.getEyePresentationDiagnostics()),
+    eyeModeDiagnostic('Equator', celestialEquator.getEyePresentationDiagnostics()),
+    eyeModeDiagnostic('Horizon', localHorizon.getEyePresentationDiagnostics()),
+  ].join(' | ');
+  if (eyePresentationStatus.textContent !== next) eyePresentationStatus.textContent = next;
+}
+
 function renderCelestialAxis(): void {
+  updateEyePresentationModes();
+  updateEyePresentationStatus();
+  renderLocalHorizon();
   selectedUtcOutput.value = simulationClock.current.instant.utcIso;
   const result = scientificSnapshotService.capture({
     observer: observerState.current,
@@ -190,7 +259,14 @@ function renderCelestialAxis(): void {
   celestialStatus.textContent = view.status;
   celestialDetail.textContent = view.detail;
   celestialLimitations.textContent = view.limitations;
-  const diagnostics = [...view.diagnostics];
+  const diagnostics = [
+    ...view.diagnostics,
+    eyeModeDiagnostic('Axis/poles', celestialAxis.getEyePresentationDiagnostics()),
+    eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),
+    eyeModeDiagnostic('Local horizon', localHorizon.getEyePresentationDiagnostics()),
+    'Quest observation: each layer was clean monocularly; binocular doubling was reported. Eye modes change presentation visibility only.',
+    `Local horizon: ${LOCAL_HORIZON_SAMPLE_COUNT} samples at ${DEFAULT_LOCAL_HORIZON_DISPLAY_SETTINGS.presentationRadiusMeters} m; WGS84 geodetic-up Tier 1 tangent plane`,
+  ];
   celestialDiagnostics.replaceChildren(
     ...diagnostics.map((diagnostic) => {
       const item = document.createElement('li');
@@ -231,6 +307,11 @@ function setImmersivePresentation(active: boolean): void {
   controls.enabled = !active;
   scene.background = active ? null : desktopBackground;
   renderer.setClearColor(desktopBackground, active ? 0 : 1);
+  if (!active) {
+    celestialAxis.applyEyePresentationViews();
+    celestialEquator.applyEyePresentationViews();
+    localHorizon.applyEyePresentationViews();
+  }
 }
 
 function renderState(state: XRState): void {
@@ -464,6 +545,10 @@ useCurrentTimeButton.addEventListener('click', () => {
   showBelowHorizonInput,
   belowHorizonModeSelect,
   showCelestialEquatorInput,
+  showLocalHorizonInput,
+  axisEyeModeSelect,
+  equatorEyeModeSelect,
+  horizonEyeModeSelect,
 ].forEach((control) => {
   control.addEventListener('change', renderCelestialAxis);
 });
@@ -474,7 +559,21 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-renderer.setAnimationLoop(() => {
+function applyEyePresentationForFrame(frame?: XRFrame): void {
+  let views: readonly XRView[] | undefined;
+  if (renderer.xr.isPresenting && frame) {
+    const referenceSpace = renderer.xr.getReferenceSpace();
+    const pose = referenceSpace ? frame.getViewerPose(referenceSpace) : null;
+    views = pose?.views;
+  }
+  celestialAxis.applyEyePresentationViews(views, renderer.xr.isPresenting);
+  celestialEquator.applyEyePresentationViews(views, renderer.xr.isPresenting);
+  localHorizon.applyEyePresentationViews(views, renderer.xr.isPresenting);
+  updateEyePresentationStatus();
+}
+
+renderer.setAnimationLoop((_time, frame) => {
+  applyEyePresentationForFrame(frame);
   if (!renderer.xr.isPresenting) controls.update();
   renderer.render(scene, camera);
 });
@@ -482,6 +581,7 @@ renderer.setAnimationLoop(() => {
 window.addEventListener('pagehide', () => {
   celestialAxis.dispose();
   celestialEquator.dispose();
+  localHorizon.dispose();
 }, { once: true });
 
 async function initializeCapabilityState(): Promise<void> {

@@ -1,9 +1,15 @@
 import * as THREE from 'three';
 import type { CelestialEquatorPresentationModel } from '../presentation/celestialEquatorPresentationModel';
+import type { EyePresentationMode } from '../presentation/eyePresentationMode';
 import {
   createCelestialEquatorCameraRelativeFrame,
   type CelestialEquatorCameraRelativeFrame,
 } from './celestialEquatorCameraRelativeFrame';
+import {
+  createEyePresentationLayerFilter,
+  type EyePresentationDiagnostics,
+  type XrViewIdentitySource,
+} from './eyePresentationLayerFilter';
 
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.999;
 
@@ -42,6 +48,9 @@ export interface CelestialEquatorGroupHandle {
   readonly group: THREE.Group;
   update(model: CelestialEquatorPresentationModel): void;
   clear(): void;
+  setEyePresentationMode(mode: EyePresentationMode): void;
+  applyEyePresentationViews(views?: readonly XrViewIdentitySource[], xrPresenting?: boolean): void;
+  getEyePresentationDiagnostics(): EyePresentationDiagnostics;
   dispose(): void;
   createFrameForCamera(camera: THREE.Camera): CelestialEquatorCameraRelativeFrame;
 }
@@ -64,6 +73,7 @@ export function createCelestialEquatorGroup(
   line.frustumCulled = false;
   line.renderOrder = 21;
   group.add(line);
+  const eyeFilter = createEyePresentationLayerFilter(group);
 
   let currentModel: CelestialEquatorPresentationModel | undefined;
   let disposed = false;
@@ -137,11 +147,21 @@ export function createCelestialEquatorGroup(
       group.userData.snapshotCacheKey = undefined;
       group.userData.acceptedCalibrationRevision = undefined;
     },
+    setEyePresentationMode(mode: EyePresentationMode): void {
+      eyeFilter.setMode(mode);
+    },
+    applyEyePresentationViews(views?: readonly XrViewIdentitySource[], xrPresenting = false): void {
+      eyeFilter.applyViews(views, xrPresenting);
+    },
+    getEyePresentationDiagnostics(): EyePresentationDiagnostics {
+      return eyeFilter.diagnostics;
+    },
     dispose(): void {
       if (disposed) return;
       disposed = true;
       currentModel = undefined;
       invalidate();
+      eyeFilter.dispose();
       line.onBeforeRender = () => undefined;
       group.visible = false;
       group.removeFromParent();

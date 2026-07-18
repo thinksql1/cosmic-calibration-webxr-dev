@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 2C mean celestial equator independently validated, integrated, and published; physical Quest testing pending
+**Current phase:** Milestone 2D eye-presentation modes and local horizon implemented locally; independent gate pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -29,10 +29,18 @@ readiness, visibility, reset, recalibration, teardown, and clean-console checks 
 commit `0926cbf` retains the feature branch. Documentation commit `54d64d0` was pushed normally;
 GitHub Actions run #14 passed 21 files / 299 tests, build, artifact upload, and Pages deployment.
 Hosted observer/time/axis/equator controls, default-hidden visibility, readiness, reset clearing,
-and repository-subpath assets pass. Physical Quest testing remains pending.
+and repository-subpath assets pass. The user reports the equator good and workable; axis and
+equator each form one clean line in either eye independently, while binocular viewing produces
+doubled lines. This is a **CONDITIONAL PASS** classified as binocular fusion/stereo presentation,
+with no conclusively proven cause and no unreported subtest results inferred.
 The user's existing Milestone 2B physical concerns remain separate and unresolved: the pole-to-core
 axis appeared curved, and the Earth-core distance did not feel perceptually obvious. Milestone 2C
 does not claim to repair either observation.
+Milestone 2D now adds presentation-only `both`/`left`/`right` modes independently to axis/poles,
+equator, and local horizon. It also adds a default-hidden 96-sample, 24 m observer-origin local
+tangent-plane horizon using canonical ENU and the existing calibrated parent. WGS84 geodetic up is
+disclosed as the Tier 1 approximation to astronomical vertical. The scientific axis, Earth core,
+P03 pole, celestial equator, camera-relative transforms, and linear depth contract are unchanged.
 
 ## One-paragraph state summary
 
@@ -201,7 +209,11 @@ normal local integration now pass; publication must succeed before the physical 
   mean celestial equator; precession, bodies, clocks, and other deferred layers remain excluded.
 - Milestone 2C adds only the P03 mean celestial equator: a validated snapshot-owned,
   Earth-core-centred projective great circle with one visibility control. Independent validation,
-  integration and publication pass; physical Quest acceptance remains pending.
+  integration and publication pass; physical acceptance is conditional on the supplied clean-
+  monocular/binocular-doubling evidence.
+- Milestone 2D locally reconciles that evidence and adds independent eye presentation plus a
+  bounded calibrated local horizon. Its builder validation is in progress; independent review,
+  integration, publication, and physical Quest acceptance remain pending.
 
 ## Blocked
 
@@ -250,6 +262,10 @@ normal local integration now pass; publication must succeed before the physical 
 - At a phone-sized `360 x 640` desktop viewport, the celestial controls can overlap the north-
   simulation panel. The supported desktop validation widths (`1024` through `1440` pixels) pass;
   physical Quest panel readability remains part of the required acceptance test.
+- Published Quest evidence reports binocular doubling for the axis and equator even though each
+  eye independently receives one clean line. This is not classified as duplicate geometry. The
+  new eye modes are experimental and may create binocular rivalry; their comfort/effectiveness and
+  the local horizon's perceptual value remain physically unverified.
 
 ## Important unknowns
 
@@ -296,7 +312,7 @@ normal local integration now pass; publication must succeed before the physical 
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | One bounded physical Quest acceptance task for the celestial equator | Milestone 2C published; no later layer started |
+| `NEXT_TASK.md` | One bounded independent eye-mode/local-horizon integration gate | Milestone 2D local builder complete; no later layer started |
 
 ## Environment
 
@@ -376,8 +392,11 @@ normal local integration now pass; publication must succeed before the physical 
 | 2026-07-18 | Milestone 2B physical Quest acceptance reconciliation | CONDITIONAL PASS; the user physically tested the published hardened geocentric Earth-core axis and reported, “I tested it and can work with this.” No blocking physical defect was reported. Detailed A–K observations, device/version data, and individual physical subtest results were not captured and are not inferred. The current implementation is accepted as the workable baseline for subsequent celestial work | User-reported Quest evidence; `357b4d6` / `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-18 | Milestone 2C local celestial-equator implementation | PASS locally for type-check, 21 files / 299 tests, build, dependency/diff checks, and development/production-preview readiness/reset/console checks. It consumes the immutable P03 equator basis and science-owned horizontal sampling plane, renders 96 homogeneous projective samples under the existing calibrated parent, and leaves the Earth-core/pole renderer unchanged. No independent gate, merge, push, deployment, or Quest test | `feature/milestone-2c-celestial-equator`; `docs/CELESTIAL_EQUATOR.md` |
 | 2026-07-18 | Milestone 2C independent gate, integration, and publication | PASS; independent probes covered five latitudes, longitude/elevation variation, plane/seam/antipode invariants, malformed-basis rejection, asymmetric eye poses, translation invariance, and same-yaw accepted-recalibration identity. Feature and merged `master` pass clean install, type-check, 21 files / 299 tests, build, dependency/workflow/diff checks, development/preview readiness/visibility/reset/recalibration/teardown, visual control comparison, and clean consoles. Normal merge `0926cbf` retains the feature branch; normal push of `54d64d0` triggered GitHub Actions run #14, which passed build and Pages deployment. Hosted controls, default-hidden equator visibility, readiness, reset, and subpath assets pass. Physical Quest acceptance remains pending. Existing axis-curvature and core-distance perception concerns are unchanged | `master`; `docs/CELESTIAL_EQUATOR.md`; GitHub Actions run #14 |
+| 2026-07-18 | Milestone 2C physical evidence reconciliation | CONDITIONAL PASS; user reports the equator good/workable and one clean axis/equator line through either eye independently, with doubling only binocularly. No individual-eye duplicate was observed. Classified as binocular fusion/stereo presentation without claiming an exact cause or inventing other checklist evidence | User-reported Quest evidence; `docs/BINOCULAR_PRESENTATION_MODES.md` |
+| 2026-07-18 | Milestone 2D local eye modes and horizon implementation | PASS for clean install, type-check, 26 files / 340 tests, build, dependency/diff, development, and production-preview checks. Actual `XRView.eye` identity controls independent axis/equator/horizon layer masks without scene copies; reversed order, monoscopic fallback, and missing-view suppression are tested. A 96-sample 24 m calibrated local tangent-plane horizon contains exact cardinals, uses linear non-writing depth, and owns reusable/idempotently disposable resources. Controls/readiness/reset/same-yaw rebuild/reload and clean consoles pass. Independent review, integration, publication, and Quest acceptance NOT RUN | `feature/milestone-2d-eye-modes-local-horizon`; `docs/BINOCULAR_PRESENTATION_MODES.md`; `docs/LOCAL_ASTRONOMICAL_HORIZON.md` |
 
 ## Current decision horizon
 
-Run the published celestial equator's bounded physical Quest acceptance test. Do
-not begin precession, ecliptic, body, temporal, media, relational, or contemplative layers.
+Independently validate and publish the eye-presentation modes and local horizon circle. Do not
+begin physical acceptance, precession, ecliptic, body, temporal, media, relational, or
+contemplative layers before that gate passes.

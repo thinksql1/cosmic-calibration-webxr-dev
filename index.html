@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A minimal WebXR true-north and mean Earth-axis reference experience."
+      content="A calibrated WebXR Earth-axis, celestial-equator, and local-horizon reference experience."
     />
-    <title>Cosmic Calibration · Earth Axis</title>
+    <title>Cosmic Calibration · Celestial Coordinates</title>
   </head>
   <body>
     <main id="app" aria-label="Cosmic Calibration WebXR reference experience">
       <section class="status-panel" aria-labelledby="app-title">
-        <p class="eyebrow">Milestone 2B · Geocentric mean Earth axis</p>
+        <p class="eyebrow">Milestone 2D · Calibrated celestial coordinates</p>
         <h1 id="app-title">Cosmic Calibration</h1>
         <p id="status" class="status" role="status" aria-live="polite"></p>
         <button id="enter-ar" type="button" hidden>Enter AR</button>
@@ -46,7 +46,7 @@
       </section>
       <section id="celestial-panel" class="celestial-panel" aria-labelledby="celestial-title">
         <p class="eyebrow">Scientific celestial layer</p>
-        <h2 id="celestial-title">Earth Core, Axis, Poles &amp; Celestial Equator</h2>
+        <h2 id="celestial-title">Earth Core, Axis, Equator &amp; Local Horizon</h2>
         <p id="celestial-status" class="calibration-status" role="status" aria-live="polite"></p>
         <p id="celestial-detail" class="status-detail"></p>
         <p id="celestial-limitations" class="scientific-limitations"></p>
@@ -87,7 +87,7 @@
         </details>
 
         <details open>
-          <summary>Axis &amp; equator display</summary>
+          <summary>Celestial &amp; horizon display</summary>
           <div class="toggle-grid">
             <label><input id="show-celestial-axis" type="checkbox" checked />Axis</label>
             <label><input id="show-earth-core" type="checkbox" checked />Earth core</label>
@@ -95,13 +95,36 @@
             <label><input id="show-pole-labels" type="checkbox" checked />NCP/SCP labels</label>
             <label><input id="show-below-horizon" type="checkbox" checked />Below-horizon segment</label>
             <label><input id="show-celestial-equator" type="checkbox" />Celestial equator</label>
+            <label><input id="show-local-horizon" type="checkbox" />Local horizon</label>
           </div>
           <label class="select-label" for="below-horizon-mode">Below-horizon treatment</label>
           <select id="below-horizon-mode">
             <option value="above-horizon-emphasis" selected>Subdue below horizon</option>
             <option value="full-axis">Show full axis equally</option>
           </select>
-          <p class="simulation-note">World-scale WGS84 model: the core is at its modeled geocentric position. NCP/SCP and the optional mean celestial equator are projective directions at infinity; finite marker size and render extent are visual only. The room floor is not an opaque Earth surface.</p>
+          <div class="eye-mode-grid" aria-label="XR eye presentation modes">
+            <label for="axis-eye-mode">Axis &amp; poles eye mode</label>
+            <select id="axis-eye-mode">
+              <option value="both" selected>Both eyes</option>
+              <option value="left">Left eye only</option>
+              <option value="right">Right eye only</option>
+            </select>
+            <label for="equator-eye-mode">Celestial equator eye mode</label>
+            <select id="equator-eye-mode">
+              <option value="both" selected>Both eyes</option>
+              <option value="left">Left eye only</option>
+              <option value="right">Right eye only</option>
+            </select>
+            <label for="horizon-eye-mode">Local horizon eye mode</label>
+            <select id="horizon-eye-mode">
+              <option value="both" selected>Both eyes</option>
+              <option value="left">Left eye only</option>
+              <option value="right">Right eye only</option>
+            </select>
+          </div>
+          <p class="simulation-note">Eye modes are reversible XR presentation controls for investigating binocular doubling. Assigning different layers to different eyes may cause binocular rivalry. Desktop remains a visible mono fallback for every mode.</p>
+          <p id="eye-presentation-status" class="simulation-note" aria-live="polite"></p>
+          <p class="simulation-note">World-scale WGS84 model: the core is geocentric, while NCP/SCP and the mean celestial equator are projective directions. The optional 24 m local horizon is intentionally observer-origin and tangent-plane based; its radius is a visual reference, not distance to the natural horizon. The room floor is not an opaque Earth surface.</p>
         </details>
 
         <details>
@@ -116,6 +139,7 @@
         <span>N/S/E/W appear only after calibration</span>
         <span>Earth core is modeled geocentrically at world scale</span>
         <span>NCP/SCP are antipodal P03 mean-pole directions, not Polaris</span>
+        <span>Local horizon uses calibrated east/north at altitude zero</span>
       </aside>
       <div id="scene" aria-hidden="true"></div>
     </main>

@@ -2,7 +2,12 @@
 
 Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A provides the validated non-visual astronomy foundation. The integrated Milestone 2B replacement models the WGS84 Earth core at world scale and one coherent P03 mean axis with antipodal projective NCP/SCP directions.
 
-Scientific geometry and contemplative interpretation remain separate layers. Milestone 2C adds only the validated mean celestial equator; it adds no automatic heading, compass, geolocation, magnetic-declination behavior, precession trajectory, celestial body, or contemplative sequence.
+Scientific geometry and contemplative interpretation remain separate layers. The published
+Milestone 2C mean celestial equator has a conditional physical pass: it is good/workable and each
+eye receives one clean line, while binocular viewing produces doubled axis/equator lines. Local
+Milestone 2D adds reversible per-layer eye presentation and a calibrated local-horizon reference;
+it adds no automatic heading, geolocation, precession, ecliptic, body, clock, or contemplative
+system.
 
 ## Milestone 2 architecture status
 
@@ -26,8 +31,10 @@ regression pass. The user has physically tested the published hardened geocentri
 accepted it as workable with no blocking issue reported. This is conditional physical acceptance:
 detailed A–K observations were not individually captured. Milestone 2C adds an integrated and
 published mean celestial-equator implementation based on the same immutable P03 snapshot and
-geocentric Earth-core axis; its independent gate and GitHub Actions run #14 pass with 299 tests,
-while physical Quest validation remains pending.
+geocentric Earth-core axis; its independent gate and GitHub Actions run #14 pass with 299 tests.
+Quest evidence conditionally accepts the equator while identifying binocular-only doubling. The
+local Milestone 2D feature provides independent `both`/`left`/`right` eye modes and a default-hidden
+24 m local tangent-plane horizon; independent integration and physical acceptance remain pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -40,6 +47,8 @@ while physical Quest validation remains pending.
 - [Earth axis and celestial poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md)
 - [Geocentric rendering precision](docs/GEOCENTRIC_RENDERING_PRECISION.md)
 - [WebXR depth contract](docs/WEBXR_DEPTH_CONTRACT.md)
+- [Binocular presentation modes](docs/BINOCULAR_PRESENTATION_MODES.md)
+- [Local astronomical horizon](docs/LOCAL_ASTRONOMICAL_HORIZON.md)
 
 ## Current scope
 
@@ -54,7 +63,11 @@ The shared desktop/XR scene contains:
   canonical ENU conversion, frozen provider provenance, and a bounded P03 mean-pole provider;
 - manual in-memory observer input, explicit UTC fixtures, a WGS84-modeled Earth-core point, and
   one camera-relative/homogeneous geocentric P03 mean-axis group with antipodal projective NCP/SCP
-  directions and no raw large-world GPU positions.
+  directions and no raw large-world GPU positions;
+- an optional homogeneous mean celestial equator plus independent eye modes for axis/equator/local
+  horizon; and
+- a default-hidden 96-sample, 24 m calibrated local tangent-plane horizon distinct from the
+  1.5 m room-floor diagnostic ring.
 
 The room X and Z axes have no geographic meaning before calibration. Geographic geometry is hidden until a valid physical or simulated calibration is captured.
 

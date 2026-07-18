@@ -4,6 +4,20 @@
 
 ### Added
 
+- Reconciled the published Milestone 2C Quest evidence as a conditional pass: the equator is good
+  and workable, and axis/equator each form one clean line in either eye independently, while
+  binocular viewing doubles both. The likely category is binocular fusion/stereo presentation;
+  no exact cause or unreported physical result is invented.
+- Added independent `both`, `left`, and `right` XR-eye presentation modes for axis/poles,
+  celestial equator, and local horizon. Filtering uses actual `XRView.eye` identity, creates no
+  per-eye geometry, leaves scientific state unchanged, and retains a visible desktop/mono fallback.
+- Added a default-hidden 96-sample local astronomical-horizon Tier 1 reference at a bounded 24 m
+  presentation radius. It spans canonical east/north around the calibrated observer tangent
+  origin, aligns with existing cardinals under one parent yaw, uses linear non-writing depth, and
+  discloses WGS84 geodetic up as the current approximation to astronomical vertical.
+- Added DEC-024/DEC-025, binocular/horizon contracts, a Quest follow-up procedure, and 41
+  deterministic eye-filter/horizon/calibration/depth/lifecycle regressions for 340 total tests.
+
 - Added the local Milestone 2C mean celestial-equator layer: a 96-sample homogeneous projective
   great circle from the immutable P03 snapshot's validated equator basis and science-owned local
   sampling plane. It is centred scientifically on the modeled WGS84 Earth core, perpendicular to

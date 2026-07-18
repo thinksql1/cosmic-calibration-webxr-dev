@@ -1,9 +1,15 @@
 import * as THREE from 'three';
 import type { EarthAxisPresentationModel } from '../presentation/earthAxisPresentationModel';
+import type { EyePresentationMode } from '../presentation/eyePresentationMode';
 import {
   createEarthAxisCameraRelativeFrame,
   type EarthAxisCameraRelativeFrame,
 } from './earthAxisCameraRelativeFrame';
+import {
+  createEyePresentationLayerFilter,
+  type EyePresentationDiagnostics,
+  type XrViewIdentitySource,
+} from './eyePresentationLayerFilter';
 
 type PoleLabelTextureFactory = (text: 'NCP' | 'SCP', color: string) => THREE.Texture;
 
@@ -187,6 +193,9 @@ export interface EarthAxisGroupHandle {
   readonly group: THREE.Group;
   update(model: EarthAxisPresentationModel): void;
   clear(): void;
+  setEyePresentationMode(mode: EyePresentationMode): void;
+  applyEyePresentationViews(views?: readonly XrViewIdentitySource[], xrPresenting?: boolean): void;
+  getEyePresentationDiagnostics(): EyePresentationDiagnostics;
   dispose(): void;
   createFrameForCamera(camera: THREE.Camera): EarthAxisCameraRelativeFrame;
 }
@@ -232,6 +241,7 @@ export function createEarthAxisGroup(
     northLabel,
     southLabel,
   );
+  const eyeFilter = createEyePresentationLayerFilter(group);
 
   const ownedObjects = [
     northSegment,
@@ -371,11 +381,21 @@ export function createEarthAxisGroup(
       group.userData.snapshotCacheKey = undefined;
       group.userData.acceptedCalibrationRevision = undefined;
     },
+    setEyePresentationMode(mode: EyePresentationMode): void {
+      eyeFilter.setMode(mode);
+    },
+    applyEyePresentationViews(views?: readonly XrViewIdentitySource[], xrPresenting = false): void {
+      eyeFilter.applyViews(views, xrPresenting);
+    },
+    getEyePresentationDiagnostics(): EyePresentationDiagnostics {
+      return eyeFilter.diagnostics;
+    },
     dispose(): void {
       if (disposed) return;
       disposed = true;
       currentModel = undefined;
       invalidateFrameCache();
+      eyeFilter.dispose();
       group.visible = false;
       group.removeFromParent();
       const geometries = new Set<THREE.BufferGeometry>();

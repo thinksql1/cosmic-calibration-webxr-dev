@@ -100,4 +100,21 @@ describe('celestial-equator projective Three.js group', () => {
     expect(handle.group.children).toHaveLength(0);
     expect(() => handle.update(model())).toThrow('disposed');
   });
+
+  it('applies an independent eye mode without changing projective science or geometry', () => {
+    const handle = createCelestialEquatorGroup(CELESTIAL_EQUATOR_SAMPLE_COUNT);
+    const source = model();
+    handle.update(source);
+    const geometry = (handle.group.children[0] as THREE.LineLoop).geometry;
+    const sourceBefore = JSON.stringify(source);
+    handle.setEyePresentationMode('left');
+    handle.applyEyePresentationViews([{ eye: 'right' }, { eye: 'left' }]);
+    expect(handle.getEyePresentationDiagnostics()).toMatchObject({
+      mode: 'left',
+      renderedEyes: ['left'],
+      layerMask: 4,
+    });
+    expect((handle.group.children[0] as THREE.LineLoop).geometry).toBe(geometry);
+    expect(JSON.stringify(source)).toBe(sourceBefore);
+  });
 });

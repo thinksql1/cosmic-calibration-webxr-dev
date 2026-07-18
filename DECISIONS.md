@@ -272,6 +272,36 @@
   science layer preserves the shared plane without fabricating an axis-only transform for general
   celestial coordinates. Homogeneous directions avoid unsafe large GPU positions.
 
+### DEC-024: Keep XR eye presentation separate from scientific coordinates
+- **Date:** 2026-07-18
+- **Status:** Accepted locally; independent integration and physical validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Give the axis/poles, celestial equator, and local horizon independent `both`,
+  `left`, and `right` presentation modes. Bind left/right through the browser-provided
+  `XRView.eye` identity each frame and use view index only for the corresponding Three.js XR
+  subcamera layer channel. Do not clone geometry, alter per-eye scientific transforms, or change
+  snapshots, calibration, P03 values, Earth-core placement, or depth. Desktop and `eye: none`
+  remain visible monoscopic fallbacks.
+- **Rationale:** Physical Quest evidence reports one clean line in each eye independently but
+  doubled axis/equator lines binocularly. Presentation filtering permits diagnosis and reversible
+  accessibility experiments without misclassifying the report as duplicate geometry or changing
+  scientific truth. Different layers in different eyes may cause binocular rivalry and are not
+  claimed universally comfortable.
+
+### DEC-025: Render the Tier 1 local horizon in the calibrated observer tangent plane
+- **Date:** 2026-07-18
+- **Status:** Accepted locally; independent integration and physical validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Render a default-hidden, 96-sample, bounded 24 m local-horizon circle centered on
+  the calibrated observer tangent origin. Canonical east/north span the plane, WGS84 geodetic up
+  is its Tier 1 normal, ENU maps to application basis once, and the geographic parent applies yaw
+  once. Use finite local coordinates and linear non-writing/non-testing depth. Keep the existing
+  room-floor ring, geocentric Earth axis, and projective celestial equator scientifically distinct.
+- **Rationale:** The local horizon is observer-centered by definition and supplies an embodied
+  reference for axis/equator tilt. The 24 m radius is presentation scale, not distance to a natural
+  horizon. A gravity-defined astronomical vertical may differ through unmodeled deflection of the
+  vertical, so diagnostics disclose the WGS84 geodetic-up Tier 1 approximation.
+
 ## Proposed decisions awaiting review
 
 None yet.

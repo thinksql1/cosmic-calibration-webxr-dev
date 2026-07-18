@@ -7,9 +7,11 @@ The geocentric scientific model and its hardened renderer are integrated and pub
 and calibration contracts but rejected raw `10^13 m` GPU coordinates, global logarithmic depth,
 and missing disposal. The remediation replaced those paths and added deterministic
 precision/depth/lifecycle coverage; the independent re-gate, integration, publication, and hosted
-regression passed. The user physically tested the published experience and accepted it as workable
-with no blocking issue reported. Physical acceptance is **CONDITIONAL PASS** because detailed A–K
-observations were not individually captured.
+regression passed. The user physically tested the published experience and accepted it as
+workable. Later bounded evidence clarifies that the axis is one clean line in either eye
+independently but appears doubled with both eyes open. No duplicated line was observed within an
+individual eye. Physical acceptance remains **CONDITIONAL PASS** and the exact binocular-fusion
+cause is not claimed as proven.
 
 ## Scientific model — unchanged
 
@@ -138,6 +140,10 @@ The restrained diagnostics distinguish scientific values from rendering policy:
 
 Per-eye transient values remain available on the scene group's diagnostic `userData` for defect
 triage but are not continuously copied into the normal UI.
+
+The local Milestone 2D branch adds reversible `both`, `left`, and `right` visibility modes to the
+unchanged renderer. These presentation modes do not alter this document's scientific, projective,
+camera-relative, depth, or calibration contracts.
 
 ## Validation and remaining risk
 

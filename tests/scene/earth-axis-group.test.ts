@@ -149,6 +149,23 @@ describe('geocentric Earth-axis Three.js group', () => {
     expect(southMarker.geometry).toBe(geometry);
   });
 
+  it('filters the persistent axis and pole system by physical XR eye only', () => {
+    const handle = createEarthAxisGroup(labelFactory);
+    const source = model();
+    handle.update(source);
+    const snapshotBefore = JSON.stringify(source);
+    handle.setEyePresentationMode('right');
+    handle.applyEyePresentationViews([{ eye: 'right' }, { eye: 'left' }]);
+    expect(handle.getEyePresentationDiagnostics()).toMatchObject({
+      mode: 'right',
+      viewEyes: ['right', 'left'],
+      renderedEyes: ['right'],
+      layerMask: 2,
+    });
+    handle.group.children.forEach((child) => expect(child.layers.mask).toBe(2));
+    expect(JSON.stringify(source)).toBe(snapshotBefore);
+  });
+
   it('clears readiness without disposing reusable owned resources', () => {
     const handle = createEarthAxisGroup(labelFactory);
     handle.update(model());
