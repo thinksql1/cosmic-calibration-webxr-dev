@@ -2,7 +2,7 @@
 
 Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 established a physically validated Quest 3 passthrough and floor-relative reference frame. Milestone 1 adds an explicit, user-driven calibration from the room-relative frame to a pre-marked true-north direction. Milestone 2A provides the validated non-visual astronomy foundation. The integrated Milestone 2B replacement models the WGS84 Earth core at world scale and one coherent P03 mean axis with antipodal projective NCP/SCP directions.
 
-Scientific geometry and contemplative interpretation remain separate layers. Milestone 2C locally adds only the validated mean celestial equator; it adds no automatic heading, compass, geolocation, magnetic-declination behavior, precession trajectory, celestial body, or contemplative sequence.
+Scientific geometry and contemplative interpretation remain separate layers. Milestone 2C adds only the validated mean celestial equator; it adds no automatic heading, compass, geolocation, magnetic-declination behavior, precession trajectory, celestial body, or contemplative sequence.
 
 ## Milestone 2 architecture status
 
@@ -24,9 +24,10 @@ explicit resource ownership. The independent renderer gate and normal local inte
 291 tests. GitHub Actions run #11 and the hosted geocentric controls/readiness/reset/subpath-assets
 regression pass. The user has physically tested the published hardened geocentric experience and
 accepted it as workable with no blocking issue reported. This is conditional physical acceptance:
-detailed A–K observations were not individually captured. Milestone 2C now adds a local,
+detailed A–K observations were not individually captured. Milestone 2C adds an integrated,
 unpublished mean celestial-equator implementation based on the same immutable P03 snapshot and
-geocentric Earth-core axis; independent review, publication, and Quest validation remain pending.
+geocentric Earth-core axis; its independent gate passes with 299 tests, while publication and
+Quest validation remain pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)

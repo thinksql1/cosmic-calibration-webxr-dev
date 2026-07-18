@@ -2,7 +2,10 @@
 
 ## Status
 
-Milestone 2C implements the mean celestial-equator layer locally on `feature/milestone-2c-celestial-equator`. Independent integration, publication, and physical Quest validation remain pending.
+Milestone 2C's independent scientific/rendering gate and normal integration pass. Merge `0926cbf`
+retains `feature/milestone-2c-celestial-equator`; publication and physical Quest validation remain
+pending. Existing physical impressions that the axis appeared curved and that the Earth-core
+distance was not perceptually obvious remain separate Milestone 2B concerns, not resolved 2C claims.
 
 ## Scientific definition
 
@@ -25,7 +28,7 @@ The finite Earth core remains camera-relative binary64 CPU data. Equator directi
 
 ## Limits and pending validation
 
-Deterministic tests cover plane invariants, closure, antipodes, observer relationships, Float32 directions, calibration, depth, and disposal. The local type-check, 299-test suite, production build, and development/production-preview controls, readiness, reset, shader compilation, and console checks pass. Independent integration, publication, and physical Quest testing of readability, world locking, below-horizon interpretation, stereo, and comfort remain pending.
+Deterministic tests cover plane invariants, closure, antipodes, observer relationships, Float32 directions, calibration, depth, and disposal. Independent probes and both feature/merged validation pass the 299-test suite, production build, development/production-preview controls, readiness, visibility, reset, recalibration, shader compilation, teardown, and console checks. Publication and physical Quest testing of readability, world locking, below-horizon interpretation, stereo, apparent curvature, depth impression, and comfort remain pending.
 
 ## Exclusions
 

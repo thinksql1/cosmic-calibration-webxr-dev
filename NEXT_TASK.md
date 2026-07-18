@@ -4,28 +4,30 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Independently validate and publish the celestial equator
+**Title:** Run the physical Quest acceptance test for the celestial equator
 
 ## Recommended execution
 
 - **Codex model:** GPT-5.6 Sol
-- **Reasoning effort:** Max
-- **Branch:** `feature/milestone-2c-celestial-equator`
-- **Why:** this is a high-value scientific/rendering integration gate across the P03 basis,
-  projective circle, per-eye rendering, calibration hierarchy, lifecycle, publication, and
-  physical-test preparation.
+- **Reasoning effort:** High
+- **Branch:** `master`
+- **Why:** the scientific, projective-rendering, automated, desktop, integration, and publication
+  gates are complete; only physical Quest evidence can establish stereo fusion, world locking,
+  passthrough readability, depth impression, and comfort.
 
-## Required gate
+## Required physical checks
 
-- Independently verify snapshot-only P03-basis consumption, Earth-core-centred projective-circle
-  semantics, sampling closure/orthogonality/antipodes, observer relationships, per-eye rendering,
-  linear XR depth, single-yaw calibration, readiness/reset, disposal, source boundaries, full
-  tests, desktop/preview behavior, and documentation accuracy.
-- If and only if the gate passes, merge normally into `master`, revalidate, push normally, verify
-  GitHub Actions and Pages, and prepare—not perform—the physical Quest acceptance procedure.
+- Calibrate true north, establish celestial readiness, and toggle the equator on and off.
+- Verify the ring's tilt at the observer latitude and its perpendicular relationship to NCP/SCP
+  and the modeled Earth-core axis.
+- Inspect full-circle continuity, seam visibility, stereo unity, world locking, small-motion
+  parallax, line smoothness/thickness, passthrough readability, depth impression, reset,
+  recalibration, exit/re-entry, and comfort.
+- Record whether the equator worsens or clarifies the existing physical impressions that the axis
+  appeared curved and that the Earth-core distance was not perceptually obvious.
 
 ## Exclusions
 
 Do not implement precession trajectories, ecliptic, Sun, Moon, planets, temporal clocks, media,
-game integration, AI enhancement, relational circuits, or contemplative sequencing. Do not change
-the accepted Earth-core/pole renderer or add dependencies.
+game integration, AI enhancement, relational circuits, or contemplative sequencing. Production
+repairs require a separate bounded task after physical evidence.

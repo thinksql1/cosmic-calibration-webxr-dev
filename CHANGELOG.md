@@ -14,6 +14,11 @@
   lifecycle regressions. The local suite passes 21 files / 299 tests with type-check, production
   build, dependency/diff, and development/preview checks. Independent validation, integration,
   publication, and physical Quest testing remain pending.
+- Independently validated and normally integrated the celestial equator in merge `0926cbf`.
+  Temporary probes reproduced plane, seam, antipode, observer, asymmetric-eye, translation,
+  malformed-basis, and accepted-recalibration behavior; merged `master` passes 299 tests and the
+  production/desktop gate. Publication and physical Quest acceptance remain pending. The existing
+  axis-curvature and Earth-core distance-perception concerns remain separate and unresolved.
 
 ### Changed
 

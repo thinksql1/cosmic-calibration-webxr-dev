@@ -258,8 +258,8 @@
 
 ### DEC-023: Render the mean celestial equator as a geocentric homogeneous projective great circle
 - **Date:** 2026-07-18
-- **Status:** Accepted for local Milestone 2C implementation; independent validation, integration,
-  publication, and physical Quest validation pending
+- **Status:** Accepted, independently validated, and integrated; publication and physical Quest
+  validation pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** Consume the immutable P03 snapshot's validated GCRS equator basis and its
   science-owned horizontal sampling basis. Render the complete mean-equator locus as 96 bounded
