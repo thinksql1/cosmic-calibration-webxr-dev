@@ -25,9 +25,17 @@ The immutable ready result contains:
   the surface observer at local origin, observer-to-core and observer-to-axis distances, exact
   antipodal pole directions, and the declared mean-sea-level/ellipsoid-height Tier 1 treatment;
 - a deterministic unit, orthogonal, right-handed equator-plane pair whose cross product is the same north mean-pole normal; the basis owns a separately frozen normalized copy and never aliases its caller's pole object;
+- a validated immutable `observerHorizontalEquator` plane: its normal is the existing
+  observer-horizontal mean axis, while its deterministic right-handed ENU sampling pair carries
+  the `LOCAL_CANONICAL_UNLABELED` phase. The source GCRS P03 basis/model/provider provenance is
+  retained and validated; the local phase parameterizes only the unlabeled full great-circle
+  locus, not individual celestial coordinates;
 - exact provider names/versions (the P03 registry, model provenance, and cache key all use `Cosmic Calibration P03 mean-pole provider@1.0.0`), cache identity, creation sequence, and Tier 1 warnings.
 
-North and south are exact negations. The equator basis prepares a future great-circle layer only; it does not contain vertices, a rendering radius, Three.js objects, labels, or a visual equator. Sun/Moon diagnostics remain outside this initial snapshot to avoid disguising validation calls as visible features or paying for unrequested body calculations.
+North and south are exact negations. Neither equator form contains vertices, a rendering radius,
+Three.js objects, or labels; Milestone 2C presentation consumes the immutable plane to render an
+unlabeled projective great-circle locus. Sun/Moon diagnostics remain outside this snapshot to
+avoid disguising validation calls as visible features or paying for unrequested body calculations.
 
 ## Failure output
 
@@ -47,6 +55,11 @@ basis conversion remains outside science and the calibrated geographic yaw enter
 presentation parent. No snapshot calculation imports Three.js or relies on a visible scene
 matrix. Provider output and state inputs are cloned into recursively frozen snapshot values, so a
 caller cannot mutate cache content through nested provenance, warnings, or vectors.
+
+For the complete unlabeled equator only, the local plane normal is sufficient: any in-plane
+rotation changes sampling phase but not the great-circle locus. This must not be used to assign
+right ascension, equinox, star, or body directions in local ENU; those require their own reviewed
+celestial-to-horizontal transform.
 
 The additional placement contract is
 `WGS84 surface observer -> Earth-fixed observer position -> modeled Earth-center displacement ->

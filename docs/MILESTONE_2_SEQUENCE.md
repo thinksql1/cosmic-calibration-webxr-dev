@@ -182,6 +182,9 @@ Sun, Moon, planets, animated/general time controls, automatic location, and pers
 
 ## Milestone 2C - mean celestial equator
 
+**Current result:** implemented locally on `feature/milestone-2c-celestial-equator`; independent
+validation, integration, publication, and physical Quest testing are pending.
+
 **Objective:** render the great circle perpendicular to the exact same P03 mean axis used by 2B.
 
 **Inputs:** accepted 2B axis, shared presentation radius, and geometric-horizon relationship.

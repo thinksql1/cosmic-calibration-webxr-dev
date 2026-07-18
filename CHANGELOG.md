@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Added
+
+- Added the local Milestone 2C mean celestial-equator layer: a 96-sample homogeneous projective
+  great circle from the immutable P03 snapshot's validated equator basis and science-owned local
+  sampling plane. It is centred scientifically on the modeled WGS84 Earth core, perpendicular to
+  the accepted mean axis, controlled by one visibility toggle, and uses the existing per-eye
+  camera-relative/linear-depth/disposal contracts without changing the Earth-axis renderer.
+
+- Added DEC-023 and bounded snapshot, circle-math, projective-frame, calibration, depth, and
+  lifecycle regressions. The local suite passes 21 files / 299 tests with type-check, production
+  build, dependency/diff, and development/preview checks. Independent validation, integration,
+  publication, and physical Quest testing remain pending.
+
 ### Changed
 
 - Replaced the local `1.8 m` observer-centered Earth-axis proxy on an unintegrated feature branch

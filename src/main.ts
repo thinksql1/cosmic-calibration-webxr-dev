@@ -12,6 +12,7 @@ import {
   createGeographicReferenceGroup,
 } from './scene/createGeographicReference';
 import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
+import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
 import { createScientificProviderRegistry } from './science/providers/scientificProviderRegistry';
@@ -28,6 +29,11 @@ import {
   type BelowHorizonDisplayMode,
   type EarthAxisDisplaySettings,
 } from './presentation/earthAxisPresentationModel';
+import {
+  createCelestialEquatorPresentationModel,
+  DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
+  type CelestialEquatorDisplaySettings,
+} from './presentation/celestialEquatorPresentationModel';
 import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
@@ -84,6 +90,7 @@ const showMarkersInput = requireElement<HTMLInputElement>('#show-pole-markers');
 const showLabelsInput = requireElement<HTMLInputElement>('#show-pole-labels');
 const showBelowHorizonInput = requireElement<HTMLInputElement>('#show-below-horizon');
 const belowHorizonModeSelect = requireElement<HTMLSelectElement>('#below-horizon-mode');
+const showCelestialEquatorInput = requireElement<HTMLInputElement>('#show-celestial-equator');
 const celestialOverlayControls = [
   ...celestialPanel.querySelectorAll<HTMLElement>('button, input, select, summary'),
 ];
@@ -102,7 +109,9 @@ const desktopBackground = new THREE.Color(0x071014);
 const scene = createReferenceScene();
 const geographicReference = createGeographicReferenceGroup();
 const celestialAxis = createEarthAxisGroup();
+const celestialEquator = createCelestialEquatorGroup(96);
 geographicReference.add(celestialAxis.group);
+geographicReference.add(celestialEquator.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
 
@@ -162,6 +171,13 @@ function currentAxisDisplaySettings(): EarthAxisDisplaySettings {
   });
 }
 
+function currentEquatorDisplaySettings(): CelestialEquatorDisplaySettings {
+  return Object.freeze({
+    ...DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
+    showEquator: showCelestialEquatorInput.checked,
+  });
+}
+
 function renderCelestialAxis(): void {
   selectedUtcOutput.value = simulationClock.current.instant.utcIso;
   const result = scientificSnapshotService.capture({
@@ -174,8 +190,9 @@ function renderCelestialAxis(): void {
   celestialStatus.textContent = view.status;
   celestialDetail.textContent = view.detail;
   celestialLimitations.textContent = view.limitations;
+  const diagnostics = [...view.diagnostics];
   celestialDiagnostics.replaceChildren(
-    ...view.diagnostics.map((diagnostic) => {
+    ...diagnostics.map((diagnostic) => {
       const item = document.createElement('li');
       item.textContent = diagnostic;
       return item;
@@ -185,10 +202,28 @@ function renderCelestialAxis(): void {
 
   if (result.kind !== 'ready') {
     celestialAxis.clear();
+    celestialEquator.clear();
     return;
   }
   celestialAxis.update(
     createEarthAxisPresentationModel(result.snapshot, currentAxisDisplaySettings()),
+  );
+  const equatorModel = createCelestialEquatorPresentationModel(
+    result.snapshot,
+    currentEquatorDisplaySettings(),
+  );
+  celestialEquator.update(equatorModel);
+  celestialDiagnostics.append(
+    ...[
+      `Equator ${equatorModel.terminology}; ${equatorModel.sampleCount} projective samples`,
+      `Equator basis ${equatorModel.provenance.frame} from ${equatorModel.provenance.sourceBasisFrame}; ${equatorModel.provenance.samplingPhase}`,
+      `Equator render strategy ${equatorModel.renderStrategy}`,
+      `Equator depth contract ${equatorModel.depthContract}`,
+    ].map((diagnostic) => {
+      const item = document.createElement('li');
+      item.textContent = diagnostic;
+      return item;
+    }),
   );
 }
 
@@ -428,6 +463,7 @@ useCurrentTimeButton.addEventListener('click', () => {
   showLabelsInput,
   showBelowHorizonInput,
   belowHorizonModeSelect,
+  showCelestialEquatorInput,
 ].forEach((control) => {
   control.addEventListener('change', renderCelestialAxis);
 });
@@ -445,6 +481,7 @@ renderer.setAnimationLoop(() => {
 
 window.addEventListener('pagehide', () => {
   celestialAxis.dispose();
+  celestialEquator.dispose();
 }, { once: true });
 
 async function initializeCapabilityState(): Promise<void> {

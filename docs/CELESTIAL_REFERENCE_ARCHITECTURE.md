@@ -386,6 +386,13 @@ date/Earth-rotation transform.
 - **Validation:** unit length, closure, every sample perpendicular to the axis, antipodal sample
   pairs, and known latitude/horizon cases.
 
+**Milestone 2C implementation:** the local, unpublished layer consumes the immutable snapshot's
+validated GCRS P03 basis plus its science-owned observer-horizontal sampling basis. The unlabelled
+local basis changes only sample phase, never the full equatorial locus; it avoids treating the
+axis-only Earth-rotation shortcut as a general celestial-coordinate transform. The renderer uses
+96 homogeneous projective directions and existing camera-relative core context, not a finite or
+observer-centred ring. Independent integration, publication, and Quest validation remain pending.
+
 ## Horizon model
 
 The project distinguishes:

@@ -256,6 +256,22 @@
   the scientific line and per-eye world direction without large GPU translations. Explicit
   ownership prevents repeated session/readiness transitions from leaking GPU resources.
 
+### DEC-023: Render the mean celestial equator as a geocentric homogeneous projective great circle
+- **Date:** 2026-07-18
+- **Status:** Accepted for local Milestone 2C implementation; independent validation, integration,
+  publication, and physical Quest validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Consume the immutable P03 snapshot's validated GCRS equator basis and its
+  science-owned horizontal sampling basis. Render the complete mean-equator locus as 96 bounded
+  homogeneous `w = 0` directions, with no finite celestial radius or observer-centred hoop. The
+  modeled WGS84 Earth core remains the scientific center of the projective limit and the accepted
+  geocentric axis remains the normal. The same calibrated geographic parent applies yaw once; the
+  existing linear non-writing XR overlay/depth and resource-ownership contracts remain unchanged.
+- **Rationale:** A full unlabeled great circle is invariant under rotations of its in-plane sampling
+  phase. Validating the GCRS P03 basis while deriving a deterministic local parameterization in the
+  science layer preserves the shared plane without fabricating an axis-only transform for general
+  celestial coordinates. Homogeneous directions avoid unsafe large GPU positions.
+
 ## Proposed decisions awaiting review
 
 None yet.

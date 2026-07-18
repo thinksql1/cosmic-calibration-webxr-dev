@@ -2,6 +2,7 @@ import { AstronomyContractError } from '../astronomy/errors';
 import { createMeanEquatorBasis } from '../frames/earthAxisState';
 import { createObserverHorizontalEarthAxis } from '../frames/observerHorizontalEarthAxis';
 import { createObserverGeocentricEarthAxis } from '../frames/observerGeocentricEarthAxis';
+import { createObserverHorizontalMeanEquator } from '../frames/observerHorizontalEquator';
 import {
   ASTRONOMY_ENGINE_PROVIDER,
   ASTRONOMY_ENGINE_VERSION,
@@ -157,6 +158,7 @@ function verifyAxis(snapshot: {
   readonly observerHorizontalEarthAxis: ScientificSnapshot['observerHorizontalEarthAxis'];
   readonly observerGeocentricEarthAxis: ScientificSnapshot['observerGeocentricEarthAxis'];
   readonly equatorBasis: ScientificSnapshot['equatorBasis'];
+  readonly observerHorizontalEquator: ScientificSnapshot['observerHorizontalEquator'];
 }): ScientificIssue | undefined {
   const { north, south } = snapshot.earthAxis;
   const vectors = [
@@ -165,6 +167,15 @@ function verifyAxis(snapshot: {
     snapshot.equatorBasis.first.x, snapshot.equatorBasis.first.y, snapshot.equatorBasis.first.z,
     snapshot.equatorBasis.second.x, snapshot.equatorBasis.second.y, snapshot.equatorBasis.second.z,
     snapshot.equatorBasis.normal.x, snapshot.equatorBasis.normal.y, snapshot.equatorBasis.normal.z,
+    snapshot.observerHorizontalEquator.normal.east,
+    snapshot.observerHorizontalEquator.normal.north,
+    snapshot.observerHorizontalEquator.normal.up,
+    snapshot.observerHorizontalEquator.first.east,
+    snapshot.observerHorizontalEquator.first.north,
+    snapshot.observerHorizontalEquator.first.up,
+    snapshot.observerHorizontalEquator.second.east,
+    snapshot.observerHorizontalEquator.second.north,
+    snapshot.observerHorizontalEquator.second.up,
     snapshot.observerGeocentricEarthAxis.earthCore.east,
     snapshot.observerGeocentricEarthAxis.earthCore.north,
     snapshot.observerGeocentricEarthAxis.earthCore.up,
@@ -236,6 +247,37 @@ function verifyAxis(snapshot: {
   ) {
     return issue('INVARIANT_FAILURE', 'Equator basis must be perpendicular to the shared pole and internally orthogonal.');
   }
+  const localEquator = snapshot.observerHorizontalEquator;
+  const localDot = (
+    left: { east: number; north: number; up: number },
+    right: { east: number; north: number; up: number },
+  ) => left.east * right.east + left.north * right.north + left.up * right.up;
+  const localLength = (value: { east: number; north: number; up: number }) =>
+    Math.hypot(value.east, value.north, value.up);
+  const localCross = {
+    east: localEquator.first.north * localEquator.second.up - localEquator.first.up * localEquator.second.north,
+    north: localEquator.first.up * localEquator.second.east - localEquator.first.east * localEquator.second.up,
+    up: localEquator.first.east * localEquator.second.north - localEquator.first.north * localEquator.second.east,
+  };
+  if (
+    localEquator.frame !== 'HORIZONTAL_ENU' ||
+    localEquator.model !== 'IAU_P03_PRECESSION_ONLY' ||
+    localEquator.terminology !== 'MEAN_EQUATOR_OF_DATE' ||
+    localEquator.sourceBasisFrame !== 'GCRS' ||
+    localEquator.handedness !== 'right-handed' ||
+    localEquator.provenance.provider !== snapshot.earthAxis.provenance.provider ||
+    localEquator.provenance.providerVersion !== snapshot.earthAxis.provenance.providerVersion ||
+    Math.abs(localLength(localEquator.normal) - 1) > 1e-12 ||
+    Math.abs(localLength(localEquator.first) - 1) > 1e-12 ||
+    Math.abs(localLength(localEquator.second) - 1) > 1e-12 ||
+    Math.abs(localDot(localEquator.normal, horizontalNorth) - 1) > 1e-12 ||
+    Math.abs(localDot(localEquator.first, localEquator.normal)) > 1e-12 ||
+    Math.abs(localDot(localEquator.second, localEquator.normal)) > 1e-12 ||
+    Math.abs(localDot(localEquator.first, localEquator.second)) > 1e-12 ||
+    Math.abs(localDot(localCross, localEquator.normal) - 1) > 1e-12
+  ) {
+    return issue('INVARIANT_FAILURE', 'Observer-horizontal equator samples must preserve the validated P03 plane and handedness.');
+  }
   return undefined;
 }
 
@@ -291,6 +333,9 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
     const observerGeocentricEarthAxis = immutableClone(
       createObserverGeocentricEarthAxis(observerHorizontalEarthAxis, validation.observer),
     );
+    const observerHorizontalEquator = immutableClone(
+      createObserverHorizontalMeanEquator(observerHorizontalEarthAxis, equatorBasis),
+    );
     const revisions: ScientificRevisions = Object.freeze({
       observer: readyObserver.revision,
       time: normalizedInput.clock.revision,
@@ -302,6 +347,7 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
       observerHorizontalEarthAxis,
       observerGeocentricEarthAxis,
       equatorBasis,
+      observerHorizontalEquator,
     };
     const invariantFailure = verifyAxis(candidate);
     if (invariantFailure) return Object.freeze({ kind: 'not-ready', errors: Object.freeze([invariantFailure]), warnings: snapshotWarnings });
@@ -320,12 +366,14 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
         applicationBasis: 'ENU_EAST_TO_X__UP_TO_Y__NORTH_TO_NEGATIVE_Z',
         calibratedYawApplication: 'presentation-parent-only',
         celestialAxisPipeline: 'GCRS_P03_MEAN_DATE_AXIS_TO_WGS84_EARTH_FIXED_TO_HORIZONTAL_ENU',
+        celestialEquatorPipeline: 'VALIDATED_GCRS_P03_BASIS_TO_LOCAL_UNLABELED_HORIZONTAL_ENU_PLANE',
         geocentricPlacement: 'WGS84_SURFACE_ORIGIN_TO_MODELED_EARTH_CENTER_IN_HORIZONTAL_ENU',
       }),
       earthAxis,
       observerHorizontalEarthAxis,
       observerGeocentricEarthAxis,
       equatorBasis,
+      observerHorizontalEquator,
       providers: Object.freeze({
         astronomyEngineVersion: normalizedInput.providers.astronomy.version,
         meanPoleProviderVersion: normalizedInput.providers.meanPole.version,

@@ -47,6 +47,25 @@ describe('scientific snapshot builder', () => {
     expect(dot(cross, snapshot.earthAxis.north)).toBeCloseTo(1, 12);
     expect(snapshot.frameContract.calibratedYawApplication).toBe('presentation-parent-only');
     expect(snapshot.frameContract.celestialAxisPipeline).toBe('GCRS_P03_MEAN_DATE_AXIS_TO_WGS84_EARTH_FIXED_TO_HORIZONTAL_ENU');
+    expect(snapshot.frameContract.celestialEquatorPipeline).toBe(
+      'VALIDATED_GCRS_P03_BASIS_TO_LOCAL_UNLABELED_HORIZONTAL_ENU_PLANE',
+    );
+    const horizontalEquator = snapshot.observerHorizontalEquator;
+    const localDot = (
+      a: { east: number; north: number; up: number },
+      b: { east: number; north: number; up: number },
+    ) => a.east * b.east + a.north * b.north + a.up * b.up;
+    expect(horizontalEquator).toMatchObject({
+      frame: 'HORIZONTAL_ENU',
+      model: 'IAU_P03_PRECESSION_ONLY',
+      terminology: 'MEAN_EQUATOR_OF_DATE',
+      sourceBasisFrame: 'GCRS',
+      handedness: 'right-handed',
+      samplingPhase: 'LOCAL_CANONICAL_UNLABELED',
+    });
+    expect(localDot(horizontalEquator.normal, snapshot.observerHorizontalEarthAxis.north.direction)).toBeCloseTo(1, 12);
+    expect(localDot(horizontalEquator.first, horizontalEquator.normal)).toBeCloseTo(0, 12);
+    expect(localDot(horizontalEquator.second, horizontalEquator.normal)).toBeCloseTo(0, 12);
     expect(snapshot.observerHorizontalEarthAxis).toMatchObject({
       model: 'IAU_P03_PRECESSION_ONLY',
       sourceFrame: 'GCRS',

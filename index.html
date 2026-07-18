@@ -46,7 +46,7 @@
       </section>
       <section id="celestial-panel" class="celestial-panel" aria-labelledby="celestial-title">
         <p class="eyebrow">Scientific celestial layer</p>
-        <h2 id="celestial-title">Earth Core, Axis &amp; Celestial Poles</h2>
+        <h2 id="celestial-title">Earth Core, Axis, Poles &amp; Celestial Equator</h2>
         <p id="celestial-status" class="calibration-status" role="status" aria-live="polite"></p>
         <p id="celestial-detail" class="status-detail"></p>
         <p id="celestial-limitations" class="scientific-limitations"></p>
@@ -87,20 +87,21 @@
         </details>
 
         <details open>
-          <summary>Axis display</summary>
+          <summary>Axis &amp; equator display</summary>
           <div class="toggle-grid">
             <label><input id="show-celestial-axis" type="checkbox" checked />Axis</label>
             <label><input id="show-earth-core" type="checkbox" checked />Earth core</label>
             <label><input id="show-pole-markers" type="checkbox" checked />Pole markers</label>
             <label><input id="show-pole-labels" type="checkbox" checked />NCP/SCP labels</label>
             <label><input id="show-below-horizon" type="checkbox" checked />Below-horizon segment</label>
+            <label><input id="show-celestial-equator" type="checkbox" />Celestial equator</label>
           </div>
           <label class="select-label" for="below-horizon-mode">Below-horizon treatment</label>
           <select id="below-horizon-mode">
             <option value="above-horizon-emphasis" selected>Subdue below horizon</option>
             <option value="full-axis">Show full axis equally</option>
           </select>
-          <p class="simulation-note">World-scale WGS84 model: the core is at its modeled geocentric position. NCP/SCP are antipodal directions at infinity; finite marker size and render extent are visual only. The room floor is not an opaque Earth surface.</p>
+          <p class="simulation-note">World-scale WGS84 model: the core is at its modeled geocentric position. NCP/SCP and the optional mean celestial equator are projective directions at infinity; finite marker size and render extent are visual only. The room floor is not an opaque Earth surface.</p>
         </details>
 
         <details>
