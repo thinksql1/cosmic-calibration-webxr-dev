@@ -162,5 +162,11 @@ After independent integration and publication of Milestone 2D, perform this boun
    horizon scale/readability, and whether the existing axis-curvature/core-distance impressions
    change. Stop immediately for discomfort.
 
-Physical Milestone 2D acceptance remains **NOT RUN** until this published headset procedure is
-performed.
+**Milestone 2D physical acceptance: PASS for the reported bounded usability scope.** The user
+physically tested the deployed spatial-reference experience and reported, “Just tested... that is
+incredible... this is really coming together nicely.” This confirms positive headset use of the
+visible experience without supplying individual results for the procedure above. In particular,
+do not infer `both`/`left`/`right` combinations, binocular-rivalry outcomes, horizon/cardinal
+alignment, world locking, reset/re-entry, performance, or comfort details. The procedure remains
+the regression checklist for any later Quest evidence. See
+[Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).

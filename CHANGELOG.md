@@ -4,6 +4,14 @@
 
 ### Added
 
+- Reconciled the successful Milestone 2D Meta Quest physical report as a bounded usability PASS:
+  the user described the deployed spatial-reference experience as incredible and really coming
+  together nicely. No detailed eye-mode, angular, drift, lifecycle, performance, or comfort
+  measurements were invented; no production code changed.
+- Added a durable long-term product roadmap that separates scientific truth, presentation,
+  interaction, environmental, interpretive, and geographic/cultural concerns; records future
+  capability families and their evidence/privacy/performance guardrails; and explicitly preserves
+  the current physical eye-mode/local-horizon acceptance task without authorizing later work.
 - Reconciled the published Milestone 2C Quest evidence as a conditional pass: the equator is good
   and workable, and axis/equator each form one clean line in either eye independently, while
   binocular viewing doubles both. The likely category is binocular fusion/stereo presentation;

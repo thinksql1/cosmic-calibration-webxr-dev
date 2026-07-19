@@ -48,4 +48,8 @@ XR mode and label the active behavior as a desktop/mono fallback.
 These modes are experimental presentation/accessibility tools for diagnosis or relief of reported
 doubling. They are reversible and default to `both`. Assigning the axis to one eye and the equator
 to the other is supported, but may create binocular rivalry and is not claimed to be more
-comfortable. Physical Quest validation remains required.
+comfortable. Mode-specific physical Quest validation remains required.
+The later Milestone 2D physical report accepts the overall deployed spatial-reference experience
+as compelling and workable, but does not provide individual `both`/`left`/`right` mode outcomes.
+Those mode-specific observations remain unmeasured; see
+[Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
