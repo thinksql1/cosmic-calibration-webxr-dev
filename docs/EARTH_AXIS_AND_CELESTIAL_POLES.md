@@ -10,8 +10,11 @@ precision/depth/lifecycle coverage; the independent re-gate, integration, public
 regression passed. The user physically tested the published experience and accepted it as
 workable. Later bounded evidence clarifies that the axis is one clean line in either eye
 independently but appears doubled with both eyes open. No duplicated line was observed within an
-individual eye. Physical acceptance remains **CONDITIONAL PASS** and the exact binocular-fusion
-cause is not claimed as proven.
+individual eye. That detailed axis/equator evidence remains **CONDITIONAL PASS** and the exact
+binocular-fusion cause is not claimed as proven. The later Milestone 2D report adds a **PASS for
+bounded physical usability** of the combined deployed spatial-reference experience; it does not
+claim separate angular, world-locking, or eye-mode measurements. See
+[Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
 
 ## Scientific model — unchanged
 

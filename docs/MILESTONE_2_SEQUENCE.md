@@ -219,6 +219,12 @@ ticks, and contemplative sequencing.
 
 ## Milestone 2D - eye-presentation modes and local horizon
 
+**Current result:** independently validated, integrated, published, and physically accepted as the
+current workable spatial-reference baseline. The user described the deployed Meta Quest experience
+as incredible and really coming together nicely. This is a bounded product-usability PASS, not an
+individual measurement of each eye-mode combination, world-locking behavior, angular accuracy, or
+comfort condition.
+
 **Objective:** reconcile the supplied binocular evidence, add independent reversible eye
 presentation for axis/equator/horizon, and add one calibrated local altitude-zero reference circle.
 
@@ -235,9 +241,10 @@ scene copies, preserves all scientific coordinates and depth contracts, and the 
 N/E/S/W, is perpendicular to local up, inherits yaw once, reuses/disposes owned resources, and
 remains distinct from the room-floor ring and celestial equator.
 
-**Physical Quest boundary:** test monocular combinations, rivalry/comfort, horizon/cardinal
-alignment, whether it clarifies the geocentric relationships, world locking, reset/re-entry, and
-readability. Do not claim the modes cure binocular doubling before observation.
+**Physical Quest boundary:** the reported current experience has passed bounded physical usability
+acceptance. Monocular combinations, rivalry/comfort, horizon/cardinal alignment, whether it
+clarifies geocentric relationships, world locking, reset/re-entry, and readability remain
+unmeasured regression cases; do not claim the modes cure binocular doubling before observation.
 
 **Explicit exclusions:** precession, ecliptic, bodies, temporal clocks, broad layer management,
 media, game, AI, and contemplative sequencing.

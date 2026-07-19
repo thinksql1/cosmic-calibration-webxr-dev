@@ -250,14 +250,15 @@ These horizons describe a sensible order of evidence, not dates or commitments.
 
 | Horizon | Candidate focus | Preconditions |
 |---|---|---|
-| Current | Physical acceptance of eye modes and local horizon | Published Milestone 2D; actual Quest observations are still required |
+| Current | Independent long-term precession-model and trajectory-prerequisite review | Milestone 2D is physically accepted as a bounded workable baseline; model/date-domain/fixture evidence is required before any trajectory implementation |
 | Next celestial structures | Precession trajectory or ecliptic, selected only by a future bounded authorization | Current physical evidence, independent science/model review, projective/depth/lifecycle regression gates |
 | Time and bodies | Central time controls, Sun, Moon, then selected planets | Explicit observer persistence/privacy policy where needed, clock/civil-time fixtures, per-body correction and presentation evidence |
 | Geographic knowledge | Local-first places, regions, imports, collections | Data schema/provenance/privacy policy; bounded performance and cultural-review approach |
 | Interpretive/contextual systems | Astrology, tradition-selected layers, Merkaba, contemplative sequencing, media/game/AI context | Stable accepted science layers; opt-in controls, provenance, and hard/soft constraint review |
 
-The current physical Quest task is not superseded by this roadmap. No later horizon may begin
-until project control explicitly selects one bounded task and updates `NEXT_TASK.md`.
+The completed physical Quest task did not supersede the need for bounded sequencing. No later
+horizon may begin until project control explicitly selects one bounded task and updates
+`NEXT_TASK.md`.
 
 ## Evidence required for every future feature
 

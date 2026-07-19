@@ -4,32 +4,34 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the physical Quest acceptance test for eye modes and the local horizon
+**Title:** Independently validate the long-term precession model and trajectory prerequisites
 
-Begin only after the hosted application is confirmed to contain all three eye-mode selectors and
-the local-horizon visibility control.
+Begin with a bounded scientific/model review only. Do not implement a trajectory or any new
+visible celestial geometry until the adopted long-term precession model, date domain, epoch,
+direction, sampling/error policy, source provenance, and independent reference fixtures are
+accepted.
 
-## Required physical checks
+## Required review checks
 
-- Test `both`, `left`, and `right` independently for axis/poles, celestial equator, and horizon.
-- Test axis right/equator left/horizon both, axis left/equator right/horizon both, all-left,
-  all-right, and all-both combinations.
-- Record whether monocular selection removes doubling and whether split-eye presentation causes
-  binocular rivalry, discomfort, or improved fusion. Do not presume one mode is universally best.
-- Verify the 24 m local horizon aligns with the calibrated local horizontal plane and N/E/S/W,
-  remains distinct from the celestial equator, and clarifies the axis, NCP altitude, equator tilt,
-  and Earth-core relationship without appearing head-locked.
-- Verify world locking, show/hide, reset/recalibration, exit/re-entry, readability, and comfort.
+- Select and document one precession-only long-term model; do not extrapolate the bounded P03
+  normal-date provider to a full cycle without evidence.
+- Establish explicit frame, epoch, time-scale, date-domain, north/south antipode, and current-axis
+  contact contracts.
+- Collect independent authoritative fixtures and predeclare sampling/error tolerances before any
+  presentation work.
+- Decide whether the model can support a later projective trajectory without changing the accepted
+  Earth-core, axis, equator, depth, calibration, eye-presentation, or local-horizon contracts.
 
 ## Exclusions
 
-Do not implement precession, ecliptic, Sun, Moon, planets, temporal clocks, broad layer
-management, media, game integration, AI enhancement, relational circuits, or contemplative
-sequencing. Production repairs require a separate bounded task after physical evidence.
+Do not implement a precession trajectory, ecliptic, Sun, Moon, planets, temporal clocks, broad
+layer management, media, game integration, AI enhancement, relational circuits, or contemplative
+sequencing. This task is validation/research only; a later feature task requires a separate
+authorization.
 
 ## Recommended execution
 
 - **Model:** GPT-5.6
 - **Reasoning effort:** High
-- **Why:** physical binocular fusion, eye suppression, world locking, calibrated horizon
-  alignment, passthrough readability, lifecycle, and comfort require direct Quest evidence.
+- **Why:** long-date precession model selection requires careful frame/time-scale/date-domain
+  reasoning, independent fixtures, and strict separation from the accepted bounded P03 provider.

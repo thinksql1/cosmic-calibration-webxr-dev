@@ -35,7 +35,9 @@ geocentric Earth-core axis; its independent gate and GitHub Actions run #14 pass
 Quest evidence conditionally accepts the equator while identifying binocular-only doubling. The
 published Milestone 2D feature provides independent `both`/`left`/`right` eye modes and a
 default-hidden 24 m local tangent-plane horizon. GitHub Actions run #16 and hosted desktop
-regression pass with 340 tests; physical acceptance remains pending.
+regression pass with 340 tests. The user has physically tested the deployed spatial-reference
+experience and accepted it as a compelling workable baseline; detailed mode-by-mode and
+quantitative Quest observations remain unmeasured.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -52,6 +54,7 @@ regression pass with 340 tests; physical acceptance remains pending.
 - [WebXR depth contract](docs/WEBXR_DEPTH_CONTRACT.md)
 - [Binocular presentation modes](docs/BINOCULAR_PRESENTATION_MODES.md)
 - [Local astronomical horizon](docs/LOCAL_ASTRONOMICAL_HORIZON.md)
+- [Milestone 2D physical acceptance](docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md)
 
 ## Current scope
 

@@ -76,8 +76,10 @@ contract, accepted-calibration revision, eye mode, active XR-view identities, an
 ## Pending validation and exclusions
 
 Automated and desktop evidence cannot establish headset fusion, readability, world locking,
-comfort, or whether the horizon improves the user's interpretation of the geocentric layers.
-Independent integration/publication and physical Quest acceptance remain pending.
+comfort, or whether the horizon improves the user's interpretation of the geocentric layers. The
+user has accepted the deployed spatial-reference experience as compelling and workable, but did
+not separately report those checklist-level horizon observations; they remain regression evidence,
+not inferred PASS results. See [Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
 
 No precession trajectory, ecliptic, Sun, Moon, planet, temporal clock, geolocation, media, game,
 AI, or contemplative system is included.
