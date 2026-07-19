@@ -18,6 +18,9 @@ passes.
 - Reproduce generic-provider, malformed-provider, observer-mismatch, civil-resolver, aggregation,
   rollover, and sampling-policy cache probes. Confirm no generic error reaches the public path
   boundary and no failed path is cached.
+- Verify the observer revision, provenance-schema version, and WGS84 model remain distinct and
+  consistent across path/samples/notches; confirm early temporal failures receive uniform complete
+  context and one production scheduler advance changes all seven supported body directions.
 - Verify the observer and warning contracts are complete, deeply immutable, and serializable;
   retain existing ordinary/DST scheduling, exact notch, live-cadence, and lifecycle evidence.
 - Run full automated validation and desktop/preview regression before considering a normal merge.

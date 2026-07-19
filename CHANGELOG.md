@@ -4,6 +4,14 @@
 
 ### Added
 
+- Closed the remaining local Milestone 2F scientific contracts: daily-path observer provenance now
+  carries an explicit application-owned schema version distinct from observer revision and WGS84
+  model identity; path, sample, notch, cache identity, and temporal diagnostics retain it.
+  Temporal failures now pass through one immutable context-enrichment boundary, including early
+  invalid sampling-policy failures, and a deterministic shared-clock regression proves one
+  simulated hour changes the directions of all seven supported bodies. The suite passes 416 tests.
+  Integration, deployment, and Quest acceptance remain pending.
+
 - Hardened the local Milestone 2F daily Sun-path science boundary with immutable full observer
   provenance on paths/samples/notches, deterministic structured warning disclosure, and
   context-rich `TEMPORAL_PATH_FAILURE` handling for otherwise generic path-construction failures.

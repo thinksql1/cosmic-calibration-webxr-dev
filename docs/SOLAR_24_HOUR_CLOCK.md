@@ -39,7 +39,7 @@ exact matching path sample; they are never produced by equal-angle division or i
 selected policy is `LOCAL_CIVIL_DAY_EXACT_HOURS_PLUS_10_MINUTES_V1`, with at most 192 samples.
 This is a smooth bounded presentation policy, not an unvalidated sub-arcminute path claim.
 
-The science cache key includes observer value/revision, selected civil date, IANA resolver and
+The science cache key includes observer value/revision/provenance-schema version, selected civil date, IANA resolver and
 time-zone revision, provider descriptor/version, correction/frame policy, configuration revision,
 and sampling-policy version. A path is stable within its civil day and is not recomputed each
 minute. It rebuilds for observer, date/local-midnight, time-zone, provider, configuration, or
@@ -47,8 +47,12 @@ policy changes. The current live body state has its own active-time behavior.
 
 Every ready path carries a detached, recursively immutable observer provenance record: WGS84
 geodetic latitude, east-positive longitude, elevation and datum, optional source/uncertainty,
-and observer revision. The same validated observer is retained on every path sample and civil
-notch. The result also carries a deterministic, immutable warning list: Tier-1 UTC≈UT1, the
+observer revision, and the application-owned
+`SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_V1` semantic schema identifier. Observer revision,
+provenance-schema version, and `WGS84_GEODETIC` model identity remain distinct. The same complete
+record is retained and validated on every path sample and civil notch; mixed observer values,
+revisions, schema versions, or geodetic models cannot aggregate into a ready path. The result also
+carries a deterministic, immutable warning list: Tier-1 UTC≈UT1, the
 airless/no-refraction policy when active, browser-`Intl` resolver provenance, selected time-zone
 source, lack of persisted time-zone state, and the bounded precision claim. Warnings are
 scientific disclosure only; they never convert a failed path into a ready result.
@@ -56,9 +60,12 @@ scientific disclosure only; they never convert a failed path into a ready result
 The public daily-path boundary never exposes a generic exception. Existing specific scientific
 errors retain their code and gain detached temporal operation context; unexpected provider,
 aggregation, sample, notch, and bounded-cache failures use `TEMPORAL_PATH_FAILURE`. Failure
-context includes observer, date, zone/source/revision, provider, correction/frame and sampling
-policy, plus sample or civil-boundary detail where applicable. Failed paths are never cached and
-a failed rollover cannot return a prior-day path.
+context includes observer provenance/schema, date, zone/source/revision, provider,
+correction/frame, configuration, and sampling policy, plus sample or civil-boundary detail where
+applicable. One uniform enrichment boundary also completes early failures such as invalid
+sampling-policy input; an existing `TEMPORAL_PATH_FAILURE` code alone is not treated as complete
+diagnostic context. Failed paths are never cached and a failed rollover cannot return a prior-day
+path.
 
 ## Rendering and depth
 
@@ -81,6 +88,11 @@ least once per real minute at rate `1`; existing accelerated rates shorten that 
 paused and frozen modes remain deterministic. The entire daily geometry is cached until its civil
 identity changes; the live Sun, Moon, and planet state refresh together. The current civil-hour
 notch and Sun emphasis move with the refreshed snapshot.
+
+A deterministic production-path regression advances this shared clock by exactly one simulated
+hour and verifies measurable ENU-direction changes for Sun, Moon, Mercury, Venus, Mars, Jupiter,
+and Saturn through one scheduler refresh. It introduces no body-specific timers and makes no new
+precision claim.
 
 ## Controls and lifecycle
 

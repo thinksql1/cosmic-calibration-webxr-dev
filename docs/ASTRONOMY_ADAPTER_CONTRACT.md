@@ -219,6 +219,12 @@ diagnostic context records only safe observer/date/time-zone/provider/frame/corr
 data and a causal code or message; it never exposes a provider implementation, browser/XR object,
 cache instance, mutable exception, or stack trace.
 
+Daily-path observer diagnostics additionally carry the immutable application-owned
+`SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_V1` schema identity, separately from observer-state revision
+and the `WGS84_GEODETIC` model identity. The solar temporal service applies one uniform context
+enrichment boundary even to an existing `TEMPORAL_PATH_FAILURE`, preserving its precise fields
+while adding any missing safe scientific context.
+
 ### Actual-body provider identity and validation
 
 The body layer uses one frozen application-owned descriptor:

@@ -3,7 +3,13 @@ import { AstronomyContractError } from '../../src/science/astronomy/errors';
 import { createSimulationInstant } from '../../src/science/astronomy/time';
 import type { ApparentTopocentricBodyResult } from '../../src/science/astronomy/types';
 import {
+  assertSolarDailyPathObserverProvenance,
+  SOLAR_DAILY_PATH_OBSERVER_MODEL,
+  SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION,
   SolarDailyPathService,
+  type SolarDailyHourNotch,
+  type SolarDailyPathObserverProvenance,
+  type SolarDailyPathSample,
   type SolarDailyPathWarning,
 } from '../../src/science/temporal/solarDailyPath';
 import { resolveTimeZone } from '../../src/science/temporal/civilTime';
@@ -49,6 +55,28 @@ function snapshot(
 }
 
 const detroit = resolveTimeZone('America/Detroit', 'user-selected');
+
+const observerProvenanceMismatchCases: readonly [
+  string,
+  (value: SolarDailyPathObserverProvenance) => SolarDailyPathObserverProvenance,
+][] = [
+  ['observer values', (value) => ({
+    ...value,
+    observer: { ...value.observer, latitudeDeg: value.observer.latitudeDeg + 1 },
+  }) as SolarDailyPathObserverProvenance],
+  ['observer revision', (value) => ({
+    ...value,
+    observerRevision: value.observerRevision + 1,
+  })],
+  ['observer provenance schema version', (value) => ({
+    ...value,
+    observerProvenanceSchemaVersion: 'SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_V0',
+  }) as unknown as SolarDailyPathObserverProvenance],
+  ['geodetic model identity', (value) => ({
+    ...value,
+    geodeticModel: 'NOT_WGS84',
+  }) as unknown as SolarDailyPathObserverProvenance],
+];
 
 function expectContractError(
   operation: () => unknown,
@@ -142,8 +170,22 @@ describe('observer-relative daily apparent Sun path', () => {
     });
     expect(path.provenance.observerRevision).toBe(1);
     expect(path.provenance.observerModel).toBe('WGS84_GEODETIC');
-    for (const sample of path.samples) expect(sample.observer).toEqual(path.provenance.observer);
-    for (const notch of path.hourNotches) expect(notch.observer).toEqual(path.provenance.observer);
+    expect(path.provenance.observerProvenanceSchemaVersion)
+      .toBe(SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION);
+    expect(path.provenance.observerProvenance).toEqual({
+      observerProvenanceSchemaVersion: SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION,
+      observerRevision: path.provenance.observerRevision,
+      geodeticModel: SOLAR_DAILY_PATH_OBSERVER_MODEL,
+      observer: path.provenance.observer,
+    });
+    for (const sample of path.samples) {
+      expect(sample.observer).toEqual(path.provenance.observer);
+      expect(sample.observerProvenance).toEqual(path.provenance.observerProvenance);
+    }
+    for (const notch of path.hourNotches) {
+      expect(notch.observer).toEqual(path.provenance.observer);
+      expect(notch.observerProvenance).toEqual(path.provenance.observerProvenance);
+    }
     expect(path.warnings.map((warning) => warning.code)).toEqual([
       'TIER_1_UTC_APPROXIMATES_UT1',
       'AIRLESS_APPARENT_TOPOCENTRIC_POSITION',
@@ -154,6 +196,8 @@ describe('observer-relative daily apparent Sun path', () => {
       'NO_PRECISION_CLAIM_BEYOND_TIER_1',
     ]);
     expect(Object.isFrozen(path.provenance.observer)).toBe(true);
+    expect(Object.isFrozen(path.provenance.observerProvenance)).toBe(true);
+    expect(Object.isFrozen(path.provenance.observerProvenance.observer.uncertainty)).toBe(true);
     expect(Object.isFrozen(path.warnings)).toBe(true);
     expect(Object.isFrozen(path.warnings[0]!.context)).toBe(true);
     expect(JSON.parse(JSON.stringify(path.provenance.observer))).toMatchObject({ latitudeDeg: 42 });
@@ -169,8 +213,106 @@ describe('observer-relative daily apparent Sun path', () => {
       });
     }).toThrow();
     expect(path.warnings).toHaveLength(7);
+    expect(JSON.parse(JSON.stringify(path.provenance.observerProvenance))).toEqual(
+      path.provenance.observerProvenance,
+    );
     const browserPath = service.capture(snapshot(), resolveTimeZone('America/Detroit', 'browser-intl'), 2);
     expect(browserPath.warnings.some((warning) => warning.code === 'BROWSER_DEFAULT_TIME_ZONE_SOURCE')).toBe(true);
+  });
+
+  it.each(observerProvenanceMismatchCases)(
+    'rejects mixed %s in samples and notches',
+    (_label, alterProvenance) => {
+    const path = new SolarDailyPathService(createScientificProviderRegistry()).capture(snapshot(), detroit, 1);
+    const expected = path.provenance.observerProvenance;
+    expect(expected.observerRevision).toBe(1);
+    expect(expected.observerProvenanceSchemaVersion).not.toBe(String(expected.observerRevision));
+    expect(expected.observerProvenanceSchemaVersion).not.toBe(expected.geodeticModel);
+
+    const mismatchedSample = {
+      ...path.samples[0]!,
+      observerProvenance: alterProvenance(path.samples[0]!.observerProvenance),
+    } as SolarDailyPathSample;
+    const sampleError = expectContractError(
+      () => assertSolarDailyPathObserverProvenance(
+        expected,
+        [mismatchedSample, ...path.samples.slice(1)],
+        path.hourNotches,
+      ),
+      'TEMPORAL_PATH_FAILURE',
+    );
+    expect(sampleError.context).toMatchObject({
+      operation: 'SolarDailyPathService.capture.validateObserverProvenance',
+      details: { sampleIndex: 0 },
+    });
+
+    const mismatchedNotch = {
+      ...path.hourNotches[0]!,
+      observerProvenance: alterProvenance(path.hourNotches[0]!.observerProvenance),
+    } as SolarDailyHourNotch;
+    const notchError = expectContractError(
+      () => assertSolarDailyPathObserverProvenance(
+        expected,
+        path.samples,
+        [mismatchedNotch, ...path.hourNotches.slice(1)],
+      ),
+      'TEMPORAL_PATH_FAILURE',
+    );
+    expect(notchError.context).toMatchObject({
+      operation: 'SolarDailyPathService.capture.validateObserverProvenance',
+      details: { civilHourBoundaryIndex: 0 },
+    });
+  });
+
+  it('uniformly enriches an early invalid sampling-policy failure before cache access', () => {
+    const service = new SolarDailyPathService(createScientificProviderRegistry());
+    const cachedValidPath = service.capture(snapshot(), detroit, 7);
+    const error = expectContractError(
+      () => service.capture(snapshot(), detroit, 7, undefined, {
+        id: 'INVALID_ZERO_CADENCE_V1',
+        cadenceMinutes: 0,
+        maximumSamples: 192,
+      }),
+      'TEMPORAL_PATH_FAILURE',
+    );
+    expect(error.context?.operation).toBe('SolarDailyPathService.capture.samplingPolicy');
+    expect(error.context?.details).toMatchObject({
+      temporalFailureContextSchemaVersion: 'SOLAR_DAILY_PATH_FAILURE_CONTEXT_V1',
+      observer: { latitudeDeg: 42, longitudeDegEast: -83, elevationMeters: 250 },
+      observerRevision: 1,
+      observerProvenance: {
+        observerProvenanceSchemaVersion: SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION,
+        observerRevision: 1,
+        geodeticModel: SOLAR_DAILY_PATH_OBSERVER_MODEL,
+      },
+      selectedCivilDate: { year: 2025, month: 6, day: 21 },
+      timeZone: { ianaName: 'America/Detroit', source: 'user-selected', revision: 7 },
+      provider: {
+        expected: { provider: 'Astronomy Engine', providerVersion: '2.1.19' },
+        active: { provider: 'Astronomy Engine', providerVersion: '2.1.19' },
+      },
+      correctionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS',
+      framePolicy: { sourceFrame: 'EQD_TRUE', outputFrame: 'HORIZONTAL_ENU' },
+      samplingPolicy: { id: 'INVALID_ZERO_CADENCE_V1', cadenceMinutes: 0, maximumSamples: 192 },
+      scientificConfigurationRevision: 0,
+    });
+    expect(Object.isFrozen(error.context)).toBe(true);
+    expect(Object.isFrozen(error.context?.details)).toBe(true);
+    expect(Object.isFrozen((error.context?.details as { observerProvenance: object }).observerProvenance)).toBe(true);
+    expect(JSON.parse(JSON.stringify(error))).toMatchObject({
+      code: 'TEMPORAL_PATH_FAILURE',
+      context: {
+        operation: 'SolarDailyPathService.capture.samplingPolicy',
+        details: {
+          observerProvenance: {
+            observerProvenanceSchemaVersion: SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION,
+          },
+          samplingPolicy: { cadenceMinutes: 0 },
+        },
+      },
+    });
+    expect(service.cacheSize).toBe(1);
+    expect(service.capture(snapshot(), detroit, 7)).toBe(cachedValidPath);
   });
 
   it('wraps unexpected provider exceptions as immutable TEMPORAL_PATH_FAILURE diagnostics without caching them', () => {

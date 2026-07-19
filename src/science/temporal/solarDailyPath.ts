@@ -51,6 +51,18 @@ export interface SolarDailyPathWarning {
 }
 
 const MAX_CACHED_DAILY_PATHS = 8;
+export const SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION =
+  'SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_V1' as const;
+export const SOLAR_DAILY_PATH_OBSERVER_MODEL = 'WGS84_GEODETIC' as const;
+const SOLAR_DAILY_PATH_FAILURE_CONTEXT_SCHEMA_VERSION =
+  'SOLAR_DAILY_PATH_FAILURE_CONTEXT_V1' as const;
+
+export interface SolarDailyPathObserverProvenance {
+  readonly observerProvenanceSchemaVersion: typeof SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION;
+  readonly observerRevision: number;
+  readonly geodeticModel: typeof SOLAR_DAILY_PATH_OBSERVER_MODEL;
+  readonly observer: ValidatedObserver;
+}
 
 export interface SolarDailyPathSample {
   readonly instant: SimulationInstant;
@@ -59,6 +71,7 @@ export interface SolarDailyPathSample {
   readonly azimuthDeg: number;
   readonly aboveHorizon: boolean;
   readonly observer: ValidatedObserver;
+  readonly observerProvenance: SolarDailyPathObserverProvenance;
 }
 
 export interface SolarDailyHourNotch extends SolarDailyPathSample {
@@ -80,6 +93,8 @@ export interface SolarDailyPath {
     readonly observer: ValidatedObserver;
     readonly observerRevision: number;
     readonly observerModel: 'WGS84_GEODETIC';
+    readonly observerProvenanceSchemaVersion: typeof SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION;
+    readonly observerProvenance: SolarDailyPathObserverProvenance;
     readonly pathSamplingPolicyId: string;
     readonly pathSamplingPolicy: SolarDailyPathSamplingPolicy;
   };
@@ -107,6 +122,7 @@ function createCacheKey(
   return JSON.stringify({
     observer: snapshot.observer.observer,
     observerRevision: snapshot.revisions.observer,
+    observerProvenanceSchemaVersion: SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION,
     selectedCivilDate: date,
     timeZone: timeZone.ianaName,
     timeZoneResolverVersion: timeZone.resolverVersion,
@@ -125,14 +141,76 @@ function createCacheKey(
   });
 }
 
-function toSample(result: ApparentTopocentricBodyResult, observer: ValidatedObserver): SolarDailyPathSample {
+function createObserverProvenance(snapshot: ScientificSnapshot): SolarDailyPathObserverProvenance {
+  return immutableClone({
+    observerProvenanceSchemaVersion: SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION,
+    observerRevision: snapshot.revisions.observer,
+    geodeticModel: SOLAR_DAILY_PATH_OBSERVER_MODEL,
+    observer: snapshot.observer.observer,
+  });
+}
+
+function sameObserverProvenance(
+  left: SolarDailyPathObserverProvenance,
+  right: SolarDailyPathObserverProvenance,
+): boolean {
+  return (
+    left.observerProvenanceSchemaVersion === right.observerProvenanceSchemaVersion &&
+    left.observerRevision === right.observerRevision &&
+    left.geodeticModel === right.geodeticModel &&
+    left.observer.kind === right.observer.kind &&
+    left.observer.latitudeDeg === right.observer.latitudeDeg &&
+    left.observer.longitudeDegEast === right.observer.longitudeDegEast &&
+    left.observer.elevationMeters === right.observer.elevationMeters &&
+    left.observer.horizontalDatum === right.observer.horizontalDatum &&
+    left.observer.verticalDatum === right.observer.verticalDatum &&
+    left.observer.source === right.observer.source &&
+    left.observer.uncertainty?.horizontalMeters === right.observer.uncertainty?.horizontalMeters &&
+    left.observer.uncertainty?.verticalMeters === right.observer.uncertainty?.verticalMeters
+  );
+}
+
+export function assertSolarDailyPathObserverProvenance(
+  expected: SolarDailyPathObserverProvenance,
+  samples: readonly SolarDailyPathSample[],
+  hourNotches: readonly SolarDailyHourNotch[],
+): void {
+  const mismatchedSampleIndex = samples.findIndex(
+    (sample) => !sameObserverProvenance(sample.observerProvenance, expected),
+  );
+  const mismatchedNotchIndex = hourNotches.findIndex(
+    (notch) => !sameObserverProvenance(notch.observerProvenance, expected),
+  );
+  if (mismatchedSampleIndex < 0 && mismatchedNotchIndex < 0) return;
+  throw new AstronomyContractError(
+    'TEMPORAL_PATH_FAILURE',
+    'Solar daily-path aggregation mixed incompatible observer provenance.',
+    immutableClone({
+      operation: 'SolarDailyPathService.capture.validateObserverProvenance',
+      expected: { ...expected },
+      actual: mismatchedSampleIndex >= 0
+        ? { ...samples[mismatchedSampleIndex]!.observerProvenance }
+        : { ...hourNotches[mismatchedNotchIndex]!.observerProvenance },
+      details: {
+        ...(mismatchedSampleIndex >= 0 ? { sampleIndex: mismatchedSampleIndex } : {}),
+        ...(mismatchedNotchIndex >= 0 ? { civilHourBoundaryIndex: mismatchedNotchIndex } : {}),
+      },
+    }),
+  );
+}
+
+function toSample(
+  result: ApparentTopocentricBodyResult,
+  observerProvenance: SolarDailyPathObserverProvenance,
+): SolarDailyPathSample {
   return Object.freeze({
     instant: result.horizontal.provenance.simulationInstant,
     direction: result.horizontal.direction,
     altitudeDeg: result.horizontal.altitudeDeg,
     azimuthDeg: result.horizontal.azimuthDeg,
     aboveHorizon: result.aboveHorizon,
-    observer,
+    observer: observerProvenance.observer,
+    observerProvenance,
   });
 }
 
@@ -222,6 +300,7 @@ function temporalDetails(
   return immutableClone({
     observer: snapshot.observer.observer,
     observerRevision: snapshot.revisions.observer,
+    observerProvenance: createObserverProvenance(snapshot),
     selectedCivilDate: selectedDate,
     timeZone: {
       ianaName: timeZone.ianaName,
@@ -240,6 +319,7 @@ function temporalDetails(
       outputFrame: 'HORIZONTAL_ENU',
     },
     samplingPolicy,
+    scientificConfigurationRevision: snapshot.revisions.configuration,
     ...details,
   });
 }
@@ -255,32 +335,53 @@ function withTemporalContext(
   details: Readonly<Record<string, unknown>> = {},
   activeProvider: unknown = snapshot.providers.astronomy,
 ): AstronomyContractError {
-  if (error instanceof AstronomyContractError && error.code === 'TEMPORAL_PATH_FAILURE') return error;
   if (
     error instanceof AstronomyContractError &&
-    error.context?.operation?.startsWith('SolarDailyPathService.capture')
+    error.context?.details?.temporalFailureContextSchemaVersion === SOLAR_DAILY_PATH_FAILURE_CONTEXT_SCHEMA_VERSION
   ) return error;
   const code: AstronomyContractErrorCode = error instanceof AstronomyContractError
     ? error.code
     : 'TEMPORAL_PATH_FAILURE';
   const safeCause = error instanceof AstronomyContractError
-    ? { code: error.code, context: error.context }
+    ? { code: error.code, message: error.message }
     : { message: error instanceof Error ? error.message : String(error) };
+  const existingContext = error instanceof AstronomyContractError ? error.context : undefined;
+  const existingDetails = existingContext?.details ?? {};
+  const underlyingCode = existingContext?.underlyingCode ?? (
+    error instanceof AstronomyContractError && error.code !== 'TEMPORAL_PATH_FAILURE'
+      ? error.code
+      : undefined
+  );
   return new AstronomyContractError(
     code,
     error instanceof AstronomyContractError
       ? error.message
       : 'Solar daily-path construction failed unexpectedly.',
     immutableClone({
-      operation,
-      ...(error instanceof AstronomyContractError ? { underlyingCode: error.code } : {}),
+      operation: code === 'TEMPORAL_PATH_FAILURE' && existingContext?.operation
+        ? existingContext.operation
+        : operation,
+      ...(existingContext?.expected === undefined ? {} : { expected: existingContext.expected }),
+      ...(existingContext?.actual === undefined ? {} : { actual: existingContext.actual }),
+      ...(existingContext?.mismatchedFields === undefined
+        ? {}
+        : { mismatchedFields: existingContext.mismatchedFields }),
+      ...(underlyingCode === undefined ? {} : { underlyingCode }),
       details: temporalDetails(
         snapshot,
         timeZone,
         timeZoneRevision,
         selectedDate,
         samplingPolicy,
-        { ...details, cause: safeCause },
+        {
+          ...details,
+          ...(existingContext?.operation && existingContext.operation !== operation
+            ? { causeOperation: existingContext.operation }
+            : {}),
+          ...existingDetails,
+          temporalFailureContextSchemaVersion: SOLAR_DAILY_PATH_FAILURE_CONTEXT_SCHEMA_VERSION,
+          cause: safeCause,
+        },
         activeProvider,
       ),
     }),
@@ -306,14 +407,15 @@ export class SolarDailyPathService {
     let resolvedDate: LocalCivilDate | undefined = selectedDate;
     let samplingPolicy: SolarDailyPathSamplingPolicy = requestedSamplingPolicy;
     try {
-      samplingPolicy = validateSamplingPolicy(requestedSamplingPolicy);
       resolvedDate = selectedDate ?? localCivilDateAt(snapshot.clock.instant, timeZone);
+      samplingPolicy = validateSamplingPolicy(requestedSamplingPolicy);
       const activeProvider = assertActiveProviderIdentity(snapshot, this.providers);
       const cacheKey = createCacheKey(snapshot, activeProvider, timeZone, timeZoneRevision, resolvedDate, samplingPolicy);
       const cached = this.cache.get(cacheKey);
       if (cached) return cached;
 
       const schedule = createLocalCivilDaySchedule(resolvedDate, timeZone);
+    const observerProvenance = createObserverProvenance(snapshot);
     const instants = new Map<number, SimulationInstant>();
     for (
       let unixMilliseconds = schedule.start.unixMilliseconds;
@@ -357,7 +459,7 @@ export class SolarDailyPathService {
           ...snapshot,
           clock: Object.freeze({ ...snapshot.clock, instant }),
         }));
-        byUnixMilliseconds.set(instant.unixMilliseconds, immutableClone(toSample(result, snapshot.observer.observer)));
+        byUnixMilliseconds.set(instant.unixMilliseconds, immutableClone(toSample(result, observerProvenance)));
       } catch (error) {
         throw withTemporalContext(
           error,
@@ -404,6 +506,7 @@ export class SolarDailyPathService {
       }
       return Object.freeze({ ...sample, civil, pathSampleIndex });
     }));
+    assertSolarDailyPathObserverProvenance(observerProvenance, samples, hourNotches);
     const path = immutableClone({
       kind: 'READY_SOLAR_DAILY_APPARENT_PATH' as const,
       cacheKey,
@@ -418,6 +521,8 @@ export class SolarDailyPathService {
         observer: snapshot.observer.observer,
         observerRevision: snapshot.revisions.observer,
         observerModel: 'WGS84_GEODETIC' as const,
+        observerProvenanceSchemaVersion: SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_SCHEMA_VERSION,
+        observerProvenance,
         pathSamplingPolicyId: samplingPolicy.id,
         pathSamplingPolicy: samplingPolicy,
       },

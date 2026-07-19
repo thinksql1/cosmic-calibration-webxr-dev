@@ -49,7 +49,7 @@ The published Milestone 2E body layer passed final independent provider/provenan
 regression. Physical Quest acceptance of the body markers remains pending.
 The user subsequently reported positive bounded Quest use of the body markers, plausibly
 identifying Sun, Mercury, and Venus; absent labels limited other identification and the user noted
-that the celestial equator is not the Sun's path. Local Milestone 2F passes 410 automated tests,
+that the celestial equator is not the Sun's path. Local Milestone 2F passes 416 automated tests,
 type-check, and production build; its independent review and Quest acceptance remain pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)

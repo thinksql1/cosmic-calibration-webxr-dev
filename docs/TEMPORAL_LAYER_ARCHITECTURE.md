@@ -256,7 +256,8 @@ be joined or styled in a way that implies a circular lunar orbit around the obse
 ```text
 TemporalPath
   layerId
-  observerProvenance                     WGS84 values, datum, source/uncertainty, revision
+  observerProvenance                     WGS84 values, datum, source/uncertainty, revision,
+                                         application-owned semantic schema version
   scheduleId and scheduleDefinition
   sourceStart/sourceEnd
   selectedTimeZone and tzdata provenance
@@ -282,6 +283,13 @@ The public temporal-path boundary returns only a ready immutable result or an
 lower-layer scientific errors retain their code and are enriched with immutable temporal operation
 context. Failed paths never enter the cache or fall back to stale geometry during local-date
 rollover.
+
+The observer record keeps three independent identifiers: the mutable observer-state revision,
+`SOLAR_DAILY_PATH_OBSERVER_PROVENANCE_V1` provenance schema, and `WGS84_GEODETIC` geodetic model.
+Every sample and civil-hour notch must match all three plus the observer values. A single
+idempotent enrichment boundary completes both newly caught and already-typed temporal failures;
+the code `TEMPORAL_PATH_FAILURE` is not itself evidence that required date/zone/provider/frame/
+correction/sampling context is present.
 
 ## Explicitly deferred
 

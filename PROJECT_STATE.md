@@ -87,12 +87,14 @@ simulation clock advances visible body state through one bounded application sch
 once per minute at normal real-time rate. The celestial equator remains a wholly separate P03
 reference. The projective line/notches preserve below-horizon directions without celestial-scale
 GPU coordinates; their visual style and the live Sun emphasis are presentation-only. The local
-work now passes 410 deterministic tests, type-check, and build. The bounded remediation adds
-complete immutable WGS84 observer provenance on the returned path and every sample/notch,
+work now passes 416 deterministic tests, type-check, and build. The bounded remediation adds
+complete immutable, explicitly schema-versioned WGS84 observer provenance on the returned path
+and every sample/notch,
 deterministic structured scientific warnings, `TEMPORAL_PATH_FAILURE` wrapping for generic
 aggregation/provider failures, temporal error context, failed-path cache rejection, and a
-sampling-policy cache-isolation regression. Independent revalidation, publication, and physical
-Quest validation remain pending.
+sampling-policy cache-isolation regression, uniform early-failure enrichment, and a permanent
+production-path regression proving one simulated hour changes all seven supported body
+directions. Independent revalidation, publication, and physical Quest validation remain pending.
 
 ## One-paragraph state summary
 
