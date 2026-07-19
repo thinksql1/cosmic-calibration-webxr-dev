@@ -4,9 +4,9 @@ Cosmic Calibration is a mixed-reality cosmic-navigation project. Milestone 0 est
 
 Scientific geometry and contemplative interpretation remain separate layers. The published
 Milestone 2C mean celestial equator has a conditional physical pass: it is good/workable and each
-eye receives one clean line, while binocular viewing produces doubled axis/equator lines. Local
-Milestone 2D publishes reversible per-layer eye presentation and a calibrated local-horizon
-reference. The current local Milestone 2E implementation adds a default-hidden actual-direction
+eye receives one clean line, while binocular viewing produces doubled axis/equator lines. Published
+Milestone 2D provides reversible per-layer eye presentation and a calibrated local-horizon
+reference. Published Milestone 2E adds a default-hidden actual-direction
 layer for Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn using the same explicit observer,
 UTC clock, correction, provenance, calibrated-parent, and linear-depth contracts. It adds no
 automatic heading, geolocation, precession, ecliptic, projection mode, phase, labels, paths, or
@@ -41,6 +41,9 @@ default-hidden 24 m local tangent-plane horizon. GitHub Actions run #16 and host
 regression pass with 340 tests. The user has physically tested the deployed spatial-reference
 experience and accepted it as a compelling workable baseline; detailed mode-by-mode and
 quantitative Quest observations remain unmeasured.
+The published Milestone 2E body layer passed final independent provider/provenance/cache review,
+383 automated tests, normal integration, GitHub Actions/Pages deployment, and hosted desktop
+regression. Physical Quest acceptance of the body markers remains pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)

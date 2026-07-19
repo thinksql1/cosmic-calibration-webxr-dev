@@ -254,8 +254,8 @@ media, game, AI, and contemplative sequencing.
 
 ## Milestone 2E - actual solar-system body directions
 
-**Current result:** implemented locally on `feature/actual-solar-system-bodies`; independent
-integration/publication and physical Quest acceptance remain pending.
+**Current result:** independently validated, normally integrated as `b24b3e9`, and published by
+successful GitHub Actions run `29703133387`; physical Quest acceptance remains pending.
 
 **Objective:** render the actual apparent topocentric directions of Sun, Moon, Mercury, Venus,
 Mars, Jupiter, and Saturn as one optional bounded marker layer.

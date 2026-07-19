@@ -84,7 +84,9 @@ Provider identity and complete equatorial/horizontal provenance are adversariall
 body state can become ready. The adapter's independent JPL fixture depth remains strongest for the
 established Sun/Moon cases; independent major-planet fixture expansion is a non-blocking future
 scientific-validation improvement.
-Desktop validation must verify readiness, all seven markers, global visibility, reset/recalibration,
+Final independent validation, normal integration, GitHub Actions/Pages publication, and hosted
+desktop regression pass with 383 tests. Hosted verification confirms readiness, the default-hidden
+global control, seven-body diagnostic, repeated visibility toggling, subpath assets, clean console,
 and coexistence with the axis/equator/horizon. Physical Quest acceptance remains pending and must
 check general Sun/Moon direction, planet separation, below-horizon continuity, brightness,
 world-locking, calibration, session lifecycle, and absence of duplicate markers.

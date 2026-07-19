@@ -304,7 +304,7 @@
 
 ### DEC-026: Present the first body layer as actual apparent topocentric directions
 - **Date:** 2026-07-19
-- **Status:** Accepted; local implementation pending independent integration and physical review
+- **Status:** Accepted, independently validated, integrated, and published; physical Quest review pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** The first visible body layer consists only of Sun, Moon, Mercury, Venus, Mars,
   Jupiter, and Saturn. Each consumes the immutable observer/time/configuration state through the

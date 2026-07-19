@@ -4,19 +4,18 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Independently revalidate and integrate the actual solar-system body layer
+**Title:** Run the physical Quest acceptance test for actual solar-system body placement
 
-Review the provider-identity descriptor, registry/snapshot agreement, active-provider cache key,
-equatorial and horizontal provenance validation, cross-result agreement, deep immutability, and
-the retained actual-direction presentation/lifecycle boundaries before any merge or publication.
-Confirm adversarial provider-name/version/adapter mismatches and malformed provenance fail safely.
+Test the published default-hidden Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn marker layer
+in Meta Quest immersive passthrough after true-north calibration. Record only observed physical
+evidence; do not infer angular accuracy or comfort from the automated and hosted desktop gates.
 
 ## Required review checks
 
-- Verify no cache entry can cross provider identity, correction-profile, observer, or explicit-time
-  boundaries, and presentation still maps only validated ENU directions under one calibration yaw.
-- Run the full automated/build regression gate before normal integration; physical Quest evidence
-  remains unavailable until independent review, integration, and publication pass.
+- Confirm the seven markers are present when enabled, remain coherent with the horizon, Earth
+  axis/poles, and celestial equator, preserve below-horizon continuation, and remain world-locked.
+- Check fixed-pixel readability, comfortable Sun brightness, toggle off/on, recalibration, reset,
+  exit/re-entry, reload, and absence of duplicated or stale markers.
 
 ## Exclusions
 
@@ -26,7 +25,7 @@ media, game integration, AI enhancement, relational circuits, or contemplative s
 
 ## Recommended execution
 
-- **Model:** GPT-5.6 Sol
+- **Model:** GPT-5.6 Terra
 - **Reasoning effort:** High
-- **Why:** adversarial revalidation must independently reason about provider identity, provenance,
-  cache isolation, and the boundary between immutable science and presentation.
+- **Why:** the remaining gate is bounded physical-evidence collection and precise reconciliation,
+  not further implementation or scientific-model redesign.

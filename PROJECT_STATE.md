@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Actual solar-system body directions remediated locally ahead of the preserved long-term precession prerequisite review; independent revalidation, integration, and physical acceptance pending
+**Current phase:** Actual solar-system body directions independently validated, integrated, and published; physical Quest acceptance pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -66,8 +66,14 @@ one frozen provider descriptor, derives cache identity from that active descript
 malformed equatorial/horizontal provenance before a ready body state can exist. The follow-up
 diagnostic remediation preserves complete immutable expected/actual provider capability snapshots
 and deterministic mismatch fields, so frame/profile/body/capability-only failures remain visible.
-Independent
-revalidation, integration/publication, and Quest body acceptance remain pending.
+Final independent revalidation found no blocking or material defect. Feature and merged `master`
+pass clean install, type-check, 30 files / 383 tests, production build, dependency/diff checks,
+adversarial identity/provenance/cache probes, development/preview lifecycle checks, and clean
+browser consoles. Normal merge `b24b3e9` retains the feature branch. GitHub Actions run
+`29703133387` passed install, type-check, tests, build, artifact upload, and Pages deployment.
+Hosted horizon/axis/poles/equator controls remain available; the body layer starts hidden, toggles
+to the seven validated directions without duplication, loads repository-subpath assets, and has no
+blocking console errors. Physical Quest body acceptance remains pending.
 
 ## One-paragraph state summary
 
@@ -244,13 +250,14 @@ normal local integration now pass; publication must succeed before the physical 
   bounded physical usability is accepted without inferring checklist-level eye-mode or numerical
    outcomes.
 - Milestone 2E actual solar-system placement is intentionally promoted before the long-term
-  precession prerequisite review. It is a local seven-body actual-direction implementation only;
-  standard independent, hosted, and Quest evidence gates remain required before projection modes.
+  precession prerequisite review. Its seven-body actual-direction layer passed independent review,
+  normal integration, automation, deployment, and hosted regression; physical Quest acceptance is
+  the only active gate before projection modes.
 
 ## Blocked
 
-- None. Physical acceptance is intentionally gated on independent integration and hosted
-  verification rather than treated as local builder evidence.
+- None. The published body layer is intentionally gated on user-performed physical Quest evidence
+  rather than treated as accepted from automated or hosted desktop evidence.
 
 ## Known defects or limitations
 
@@ -341,11 +348,11 @@ normal local integration now pass; publication must succeed before the physical 
 | `docs/MILESTONE_2_SEQUENCE.md` | Bounded 2A0 through later-layer dependency and acceptance sequence | Current sequence |
 | `docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md` | Focused positive Quest acceptance record, accepted scope, and unmeasured cases | Current physical baseline evidence |
 | `docs/OFFICIAL_ASTRONOMY_SOURCES.md` | Official/primary source, capability, limitation, version, and license register | Research evidence current as of 2026-07-16 |
-| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run #16 passed for integrated Milestone 2D at `46cf613`; hosted desktop PASS |
+| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run `29703133387` passed for integrated Milestone 2E at `b24b3e9`; hosted desktop PASS |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | Independent revalidation and integration gate for the actual solar-system body layer | Provider/provenance/cache remediation must pass before publication or Quest body acceptance |
+| `NEXT_TASK.md` | Physical Quest acceptance test for actual solar-system body placement | Published body layer awaits user-performed headset evidence |
 
 ## Environment
 
@@ -356,8 +363,8 @@ normal local integration now pass; publication must succeed before the physical 
 | Runtime dependencies | Three.js `0.185.1`; Astronomy Engine `2.1.19` | Yes; exact versions pinned |
 | Development dependencies | Vite `8.1.4`; TypeScript `7.0.2`; Vitest `4.1.10`; Three/WebXR types | Yes |
 | Build command | `npm run build` | Passed |
-| Test command | `npm run test` | 340/340 passed across 26 files during 2D integration and again during the 2026-07-19 documentation reconciliation |
-| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Last recorded hosted desktop regression: run #16 for Milestone 2D at `46cf613`; no deployment change in this reconciliation |
+| Test command | `npm run test` | 383/383 passed across 30 files on the feature branch and merged `master` during the final Milestone 2E gate |
+| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run `29703133387` deployed `b24b3e9`; hosted Milestone 2E desktop regression PASS |
 
 ## Risks
 
@@ -432,12 +439,12 @@ normal local integration now pass; publication must succeed before the physical 
 | 2026-07-18 | Milestone 2D independent gate and integration | PASS; actual-eye filtering, reversed/repeated/single/none/missing view handling, independent layer state, immutable science, 96-sample ENU/cardinal/seam invariants, `+/-90` and `180` degree yaw, same-yaw revision reuse, linear depth, and idempotent lifecycle pass independent inspection and temporary probes. Feature and merged `master` pass clean install, type-check, 26 files / 340 tests, build, dependency/workflow/diff checks, development/preview fallback, reset/reload, and clean consoles. Normal merge `79705c9` retains the feature branch. Publication and physical Quest acceptance remain pending | `master`; `docs/BINOCULAR_PRESENTATION_MODES.md`; `docs/LOCAL_ASTRONOMICAL_HORIZON.md` |
 | 2026-07-18 | Milestone 2D publication and hosted regression | PASS; normal non-force push of `46cf613`, GitHub Actions run #16 install/type-check/340-test/build/upload/deploy success, and hosted axis/equator/horizon controls, three eye selectors, default-hidden horizon, desktop fallback, readiness, reset, relative assets, and clean console verified. Physical Quest eye filtering and horizon acceptance remain NOT RUN | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29657256876`; `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-19 | Milestone 2D physical Quest acceptance reconciliation | PASS for the reported bounded usability scope; the user physically tested the deployed Meta Quest spatial-reference experience and described it as incredible and really coming together nicely. The experience ran and no blocking issue was reported. Individual eye modes, angular error, drift, reset/re-entry, performance, and comfort observations were not supplied and are not inferred | User-reported Quest evidence; `docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md` |
+| 2026-07-19 | Milestone 2E actual-body final gate, integration, and publication | PASS; complete provider identity/mismatch diagnostics, equatorial/horizontal provenance, cache isolation, immutable results, projective rendering, and lifecycle passed direct review and adversarial probes. Feature and merged `master` pass 30 files / 383 tests, type-check, build, dependencies/diff, development/preview, and clean-console checks. Normal merge `b24b3e9` retained the feature branch; Actions run `29703133387` passed build/deploy and hosted body-layer regression | `master`; `docs/SOLAR_SYSTEM_BODY_LAYER.md`; physical Quest acceptance pending |
 
 ## Current decision horizon
 
-Independently revalidate and integrate the actual solar-system body layer. The local remediation
-must first prove registry/snapshot provider identity, active-provider cache isolation, and complete
-equatorial/horizontal provenance rejection. Physical Quest acceptance may begin only after that
-gate, integration, and publication. The long-term precession model/trajectory prerequisite review
-remains planned future work and must establish its own model/date-domain/fixture contract before any
-path.
+Run the physical Quest acceptance test for actual solar-system body placement. The independent
+scientific/diagnostic/cache gate, normal integration, automation, publication, and hosted desktop
+regression pass; the remaining evidence must come from the user's headset. The long-term precession
+model/trajectory prerequisite review remains planned future work and must establish its own
+model/date-domain/fixture contract before any path.

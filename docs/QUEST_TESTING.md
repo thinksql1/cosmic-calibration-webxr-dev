@@ -173,11 +173,13 @@ the regression checklist for any later Quest evidence. See
 
 ## Milestone 2E actual solar-system body placement (pending)
 
-After independent integration and publication, test the default-hidden seven-body layer using the
+Test the published default-hidden seven-body layer using the
 selected observer and UTC instant. Confirm that Sun/Moon directions are broadly plausible, planets
 remain separated rather than sharing a decorative path, below-horizon bodies remain represented
 according to the documented overlay convention, and all markers remain world-locked with the
 horizon, celestial equator, and axis. Check Sun-marker comfort/brightness, show/hide, reset,
-recalibration, exit/re-entry, and absence of duplicated markers. This procedure does not measure
+recalibration, exit/re-entry, reload, and absence of duplicated or stale markers. Verify each
+required marker is present when enabled: Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn;
+not every body is expected to be above the horizon. This procedure does not measure
 angular accuracy, identify Moon phase, or authorize projection/labels/temporal paths. **Physical
 Quest acceptance: NOT RUN.**

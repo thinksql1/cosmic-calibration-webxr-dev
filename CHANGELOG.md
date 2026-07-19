@@ -4,6 +4,12 @@
 
 ### Added
 
+- Independently validated and normally integrated the actual solar-system body layer with merge
+  `b24b3e9`. The feature and merged `master` pass 383 tests, type-check, production build,
+  dependency/diff checks, adversarial provider/provenance/cache probes, and development/preview
+  regression. GitHub Actions run `29703133387` passed build and Pages deployment; hosted controls,
+  default-hidden behavior, seven-body diagnostics, repeated toggling, relative assets, and browser
+  console health pass. Physical Quest acceptance remains pending.
 - Hardened the local actual-body scientific boundary with one immutable Astronomy Engine
   apparent-topocentric provider descriptor. The derived body service now validates active
   registry/snapshot agreement, derives its cache key from that active descriptor, verifies both
@@ -11,7 +17,7 @@
   Adversarial local tests cover name/version/adapter mismatches, cache isolation, cross-result
   disagreement, and nested immutability. A follow-up diagnostic remediation now preserves full
   immutable expected/actual provider capability snapshots and deterministic mismatch fields for
-  frame/profile/body/capability-only rejections. Independent revalidation remains pending.
+  frame/profile/body/capability-only rejections.
 
 - Added a local bounded actual solar-system body layer for Sun, Moon, Mercury, Venus, Mars,
   Jupiter, and Saturn. It consumes the existing explicit observer/clock configuration through the
