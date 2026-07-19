@@ -170,3 +170,14 @@ do not infer `both`/`left`/`right` combinations, binocular-rivalry outcomes, hor
 alignment, world locking, reset/re-entry, performance, or comfort details. The procedure remains
 the regression checklist for any later Quest evidence. See
 [Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
+
+## Milestone 2E actual solar-system body placement (pending)
+
+After independent integration and publication, test the default-hidden seven-body layer using the
+selected observer and UTC instant. Confirm that Sun/Moon directions are broadly plausible, planets
+remain separated rather than sharing a decorative path, below-horizon bodies remain represented
+according to the documented overlay convention, and all markers remain world-locked with the
+horizon, celestial equator, and axis. Check Sun-marker comfort/brightness, show/hide, reset,
+recalibration, exit/re-entry, and absence of duplicated markers. This procedure does not measure
+angular accuracy, identify Moon phase, or authorize projection/labels/temporal paths. **Physical
+Quest acceptance: NOT RUN.**

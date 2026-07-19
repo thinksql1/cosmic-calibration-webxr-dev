@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A calibrated WebXR Earth-axis, celestial-equator, and local-horizon reference experience."
+      content="A calibrated WebXR Earth-axis, celestial-equator, local-horizon, and actual solar-system direction experience."
     />
     <title>Cosmic Calibration · Celestial Coordinates</title>
   </head>
   <body>
     <main id="app" aria-label="Cosmic Calibration WebXR reference experience">
       <section class="status-panel" aria-labelledby="app-title">
-        <p class="eyebrow">Milestone 2D · Calibrated celestial coordinates</p>
+        <p class="eyebrow">Milestone 2E · Actual celestial directions</p>
         <h1 id="app-title">Cosmic Calibration</h1>
         <p id="status" class="status" role="status" aria-live="polite"></p>
         <button id="enter-ar" type="button" hidden>Enter AR</button>
@@ -46,7 +46,7 @@
       </section>
       <section id="celestial-panel" class="celestial-panel" aria-labelledby="celestial-title">
         <p class="eyebrow">Scientific celestial layer</p>
-        <h2 id="celestial-title">Earth Core, Axis, Equator &amp; Local Horizon</h2>
+        <h2 id="celestial-title">Earth Core, Axis, Equator, Horizon &amp; Bodies</h2>
         <p id="celestial-status" class="calibration-status" role="status" aria-live="polite"></p>
         <p id="celestial-detail" class="status-detail"></p>
         <p id="celestial-limitations" class="scientific-limitations"></p>
@@ -96,6 +96,7 @@
             <label><input id="show-below-horizon" type="checkbox" checked />Below-horizon segment</label>
             <label><input id="show-celestial-equator" type="checkbox" />Celestial equator</label>
             <label><input id="show-local-horizon" type="checkbox" />Local horizon</label>
+            <label><input id="show-solar-system-bodies" type="checkbox" />Solar-system bodies</label>
           </div>
           <label class="select-label" for="below-horizon-mode">Below-horizon treatment</label>
           <select id="below-horizon-mode">
@@ -125,6 +126,7 @@
           <p class="simulation-note">Eye modes are reversible XR presentation controls for investigating binocular doubling. Assigning different layers to different eyes may cause binocular rivalry. Desktop remains a visible mono fallback for every mode.</p>
           <p id="eye-presentation-status" class="simulation-note" aria-live="polite"></p>
           <p class="simulation-note">World-scale WGS84 model: the core is geocentric, while NCP/SCP and the mean celestial equator are projective directions. The optional 24 m local horizon is intentionally observer-origin and tangent-plane based; its radius is a visual reference, not distance to the natural horizon. The room floor is not an opaque Earth surface.</p>
+          <p class="simulation-note">Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn are actual apparent topocentric directions at the selected observer and UTC instant. Their marker centers are projective directions, not literal distances or diameters; Moon phase, labels, and projection modes are deferred.</p>
         </details>
 
         <details>

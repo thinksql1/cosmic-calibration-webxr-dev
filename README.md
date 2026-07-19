@@ -6,7 +6,10 @@ Scientific geometry and contemplative interpretation remain separate layers. The
 Milestone 2C mean celestial equator has a conditional physical pass: it is good/workable and each
 eye receives one clean line, while binocular viewing produces doubled axis/equator lines. Local
 Milestone 2D publishes reversible per-layer eye presentation and a calibrated local-horizon
-reference; it adds no automatic heading, geolocation, precession, ecliptic, body, clock, or
+reference. The current local Milestone 2E implementation adds a default-hidden actual-direction
+layer for Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn using the same explicit observer,
+UTC clock, correction, provenance, calibrated-parent, and linear-depth contracts. It adds no
+automatic heading, geolocation, precession, ecliptic, projection mode, phase, labels, paths, or
 contemplative system.
 
 ## Milestone 2 architecture status
@@ -55,6 +58,7 @@ quantitative Quest observations remain unmeasured.
 - [Binocular presentation modes](docs/BINOCULAR_PRESENTATION_MODES.md)
 - [Local astronomical horizon](docs/LOCAL_ASTRONOMICAL_HORIZON.md)
 - [Milestone 2D physical acceptance](docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md)
+- [Actual solar-system body layer](docs/SOLAR_SYSTEM_BODY_LAYER.md)
 
 ## Current scope
 
@@ -73,7 +77,10 @@ The shared desktop/XR scene contains:
 - an optional homogeneous mean celestial equator plus independent eye modes for axis/equator/local
   horizon; and
 - a default-hidden 96-sample, 24 m calibrated local tangent-plane horizon distinct from the
-  1.5 m room-floor diagnostic ring.
+  1.5 m room-floor diagnostic ring; and
+- a default-hidden seven-marker actual apparent topocentric Sun/Moon/Mercury/Venus/Mars/Jupiter/
+  Saturn direction layer. Marker centers are projective directions, not literal body distances or
+  diameters; Moon phase, labels, and projections are deferred.
 
 The room X and Z axes have no geographic meaning before calibration. Geographic geometry is hidden until a valid physical or simulated calibration is captured.
 

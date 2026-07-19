@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 2D physically accepted as the current workable baseline; long-term precession-model prerequisites selected next
+**Current phase:** Actual solar-system body directions implemented locally ahead of the preserved long-term precession prerequisite review; independent integration and physical acceptance pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -55,6 +55,13 @@ ran, the visible reference feature was present, and no blocking issue was report
 mode combinations, angular measurements, drift, lifecycle/recenter coverage, and long-duration
 comfort were not reported and are not inferred. The accepted baseline remains a hybrid scientific
 presentation: geocentric/projective Earth core, axis, and equator; observer-centered local horizon.
+The user explicitly promoted bounded actual Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn
+placement ahead of the previously selected long-term precession prerequisite review. The local body
+layer uses the existing Astronomy Engine adapter and central clock to create immutable airless
+apparent-topocentric EQD_TRUE/HORIZONTAL_ENU values, retains below-horizon truth, and renders only
+homogeneous projective marker directions below the calibrated geographic parent. It has no phase,
+labels, pointing, projection, ecliptic, paths, stars, or new temporal controls. Precession review
+remains planned; independent integration/publication and Quest body acceptance remain pending.
 
 ## One-paragraph state summary
 
@@ -229,7 +236,10 @@ normal local integration now pass; publication must succeed before the physical 
   calibrated local horizon. Independent review, normal integration, publication, and hosted
   desktop regression pass. The user now reports a successful, compelling headset experience;
   bounded physical usability is accepted without inferring checklist-level eye-mode or numerical
-  outcomes.
+   outcomes.
+- Milestone 2E actual solar-system placement is intentionally promoted before the long-term
+  precession prerequisite review. It is a local seven-body actual-direction implementation only;
+  standard independent, hosted, and Quest evidence gates remain required before projection modes.
 
 ## Blocked
 
@@ -419,6 +429,6 @@ normal local integration now pass; publication must succeed before the physical 
 
 ## Current decision horizon
 
-Independently validate the long-term precession model and trajectory prerequisites. Do not
-implement a trajectory, ecliptic, body, temporal, media, relational, or contemplative layer until
-that bounded scientific review has accepted its model/date-domain/fixture contract.
+Run the physical Quest acceptance test for actual solar-system body placement after independent
+integration and publication. The long-term precession model/trajectory prerequisite review remains
+planned future work and must establish its own model/date-domain/fixture contract before any path.

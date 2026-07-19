@@ -3,6 +3,7 @@ import packageManifest from '../../package.json';
 import {
   ASTRONOMY_ENGINE_PROVIDER,
   ASTRONOMY_ENGINE_VERSION,
+  getApparentTopocentricBody,
   getApparentTopocentricEquatorial,
   getObserverRelativePosition,
 } from '../../src/science/astronomy/astronomyEngineAdapter';
@@ -154,6 +155,23 @@ describe('Astronomy Engine adapter against JPL Horizons', () => {
 
     expect(result.altitudeDeg).toBeLessThan(-70);
     expect(result.direction.up).toBeLessThan(0);
+  });
+
+  it('returns one typed actual-position result for every bounded body without exposing provider objects', () => {
+    const instant = createSimulationInstant('2025-06-21T16:00:00.000Z', 'frozen-test');
+    const observer = createObserver({ latitudeDeg: 42, longitudeDegEast: -83, elevationMeters: 250 });
+    for (const body of ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'] as const) {
+      const result = getApparentTopocentricBody(body, instant, observer, 'AE_APPARENT_TOPOCENTRIC_AIRLESS');
+      expect(result).toMatchObject({
+        kind: 'VALID_APPARENT_TOPOCENTRIC_BODY',
+        body,
+        validity: 'VALID',
+        correctionProfile: { id: 'AE_APPARENT_TOPOCENTRIC_AIRLESS' },
+        equatorial: { frame: 'EQD_TRUE', center: 'TOPOCENTRIC' },
+        horizontal: { frame: 'HORIZONTAL_ENU', center: 'TOPOCENTRIC' },
+      });
+      expect(Object.isFrozen(result)).toBe(true);
+    }
   });
 
   it('tags provider, version, units, correction profile, observer, and instant', () => {

@@ -34,8 +34,9 @@ The immutable ready result contains:
 
 North and south are exact negations. Neither equator form contains vertices, a rendering radius,
 Three.js objects, or labels; Milestone 2C presentation consumes the immutable plane to render an
-unlabeled projective great-circle locus. Sun/Moon diagnostics remain outside this snapshot to
-avoid disguising validation calls as visible features or paying for unrequested body calculations.
+unlabeled projective great-circle locus. Actual body results remain outside this structural snapshot
+in the separate `SolarSystemBodyStateService`, avoiding P03 snapshot bloat while preserving explicit
+observer/time/configuration/provider cache identity and readiness gating.
 
 ## Failure output
 

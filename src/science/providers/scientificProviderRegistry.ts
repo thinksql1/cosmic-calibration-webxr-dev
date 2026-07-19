@@ -1,6 +1,7 @@
 import {
   ASTRONOMY_ENGINE_PROVIDER,
   ASTRONOMY_ENGINE_VERSION,
+  getApparentTopocentricBody,
   getObserverRelativePosition,
   toTerrestrialTime,
 } from '../astronomy/astronomyEngineAdapter';
@@ -16,6 +17,7 @@ export interface ScientificProviderRegistry {
     readonly version: typeof ASTRONOMY_ENGINE_VERSION;
     readonly validationStatus: 'validated-2A0';
     readonly getObserverRelativePosition: typeof getObserverRelativePosition;
+    readonly getApparentTopocentricBody: typeof getApparentTopocentricBody;
   };
   readonly meanPole: {
     readonly provider: typeof P03_MEAN_POLE_PROVIDER;
@@ -33,6 +35,7 @@ export function createScientificProviderRegistry(): ScientificProviderRegistry {
       version: ASTRONOMY_ENGINE_VERSION,
       validationStatus: 'validated-2A0',
       getObserverRelativePosition,
+      getApparentTopocentricBody,
     }),
     meanPole: Object.freeze({
       provider: P03_MEAN_POLE_PROVIDER,

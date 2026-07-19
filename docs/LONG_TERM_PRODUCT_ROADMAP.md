@@ -135,12 +135,12 @@ the body direction.
 
 | Capability | Status | Required honesty and scope |
 |---|---|---|
-| Apparent Sun | Planned | Use an explicit observer/time/correction profile. Distinguish geometric from apparent/refraction-aware direction and never encourage unaided solar viewing. Keep actual/projection/both modes distinct. |
+| Apparent Sun | Implemented locally; independent validation/Quest acceptance pending | Uses the explicit observer/time/correction profile and a visibility-safe actual-direction marker. Projection/both modes remain deferred; never encourage unaided solar viewing. |
 | Solar temporal path and events | Planned after current Sun direction | Use central clock and validated civil-time resolver; keep below-horizon samples and declare sunrise/sunset limb/refraction conventions. |
-| Apparent Moon | Planned | Preserve material topocentric parallax, phase/illumination provenance, distance metadata, and an explicit actual/projection/both mode. |
+| Apparent Moon | Implemented locally; independent validation/Quest acceptance pending | Preserves material topocentric parallax in the apparent direction and provenance. Phase/illumination, literal distance, and projection/both modes remain deferred. |
 | Moon study scale | Exploratory | Separate true angular size, enhanced study size, and focused-Moon mode. All enhancement is declared presentation, not a physical claim. |
 | Lunar temporal paths | Planned after Moon direction | Support next-24-hour and local-midnight approaches only when the sampling/phase contracts are independently validated; never show a circular observer-centered lunar orbit. |
-| Planets | Planned one body at a time | Prioritize naked-eye planets only after each body has a correction profile, date domain, fixtures, label policy, and physical review. No all-at-once planetarium default. |
+| Mercury, Venus, Mars, Jupiter, Saturn | Implemented locally as one bounded actual-direction set; independent validation/Quest acceptance pending | One Tier 1 correction profile and immutable provenance; no labels, disks, rings, paths, zodiac, or all-at-once planetarium default. |
 | Object pointing and labels | Planned shared utility | Use angular/screen-space rules, object-specific constraints, collision handling, and source/model diagnostics. A pointer remains an aid, not an astronomical measurement. |
 
 ### 3. Interpretation and contemplative options
@@ -250,9 +250,9 @@ These horizons describe a sensible order of evidence, not dates or commitments.
 
 | Horizon | Candidate focus | Preconditions |
 |---|---|---|
-| Current | Independent long-term precession-model and trajectory-prerequisite review | Milestone 2D is physically accepted as a bounded workable baseline; model/date-domain/fixture evidence is required before any trajectory implementation |
-| Next celestial structures | Precession trajectory or ecliptic, selected only by a future bounded authorization | Current physical evidence, independent science/model review, projective/depth/lifecycle regression gates |
-| Time and bodies | Central time controls, Sun, Moon, then selected planets | Explicit observer persistence/privacy policy where needed, clock/civil-time fixtures, per-body correction and presentation evidence |
+| Current | Actual Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn direction layer | User explicitly promoted this bounded layer ahead of precession review; independent validation, publication, and physical Quest evidence remain required |
+| Next celestial structures | Celestial-equator projection/combined body mode or precession review, selected only by a future bounded authorization | Actual body-layer acceptance plus projective/depth/lifecycle regression gates; precession still requires model/date-domain/fixture review |
+| Time and bodies | Central time controls, paths, phase, and later bodies | Explicit observer persistence/privacy policy where needed, clock/civil-time fixtures, per-body correction and presentation evidence |
 | Geographic knowledge | Local-first places, regions, imports, collections | Data schema/provenance/privacy policy; bounded performance and cultural-review approach |
 | Interpretive/contextual systems | Astrology, tradition-selected layers, Merkaba, contemplative sequencing, media/game/AI context | Stable accepted science layers; opt-in controls, provenance, and hard/soft constraint review |
 

@@ -15,6 +15,7 @@ import {
 import {
   CORRECTION_PROFILES,
   type CorrectionProfileId,
+  type ApparentTopocentricBodyResult,
   type EquatorialPositionResult,
   type ObserverRelativeBody,
   type ObserverRelativePositionResult,
@@ -59,7 +60,15 @@ function providerObserver(observer: ValidatedObserver): Observer {
 }
 
 function providerBody(body: ObserverRelativeBody): Body {
-  return body === 'Sun' ? Body.Sun : Body.Moon;
+  switch (body) {
+    case 'Sun': return Body.Sun;
+    case 'Moon': return Body.Moon;
+    case 'Mercury': return Body.Mercury;
+    case 'Venus': return Body.Venus;
+    case 'Mars': return Body.Mars;
+    case 'Jupiter': return Body.Jupiter;
+    case 'Saturn': return Body.Saturn;
+  }
 }
 
 function provenance(
@@ -201,5 +210,42 @@ export function getObserverRelativePosition(
       'HORIZONTAL_ENU',
       correctionProfile,
     ),
+  });
+}
+
+/**
+ * Returns one typed actual-position result for the body layer. This is the
+ * only public route that combines equatorial and horizontal provider values;
+ * scene and presentation code receive no Astronomy Engine values or objects.
+ */
+export function getApparentTopocentricBody(
+  body: ObserverRelativeBody,
+  instant: SimulationInstant,
+  observer: ValidatedObserver,
+  correctionProfile: HorizontalCorrectionProfile,
+): ApparentTopocentricBodyResult {
+  const equatorial = getApparentTopocentricEquatorial(body, instant, observer);
+  const horizontal = getObserverRelativePosition(
+    body,
+    instant,
+    observer,
+    correctionProfile,
+  );
+  const celestialEquatorRelation =
+    equatorial.declinationDeg > 0
+      ? 'NORTH'
+      : equatorial.declinationDeg < 0
+        ? 'SOUTH'
+        : 'ON';
+  return Object.freeze({
+    kind: 'VALID_APPARENT_TOPOCENTRIC_BODY',
+    body,
+    equatorial,
+    horizontal,
+    aboveHorizon: horizontal.altitudeDeg >= 0,
+    celestialEquatorRelation,
+    correctionProfile: CORRECTION_PROFILES[correctionProfile],
+    warnings: Object.freeze([]) as readonly [],
+    validity: 'VALID',
   });
 }

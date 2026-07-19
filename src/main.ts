@@ -14,9 +14,11 @@ import {
 import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
 import { createLocalHorizonGroup } from './scene/createLocalHorizonGroup';
+import { createSolarSystemBodiesGroup } from './scene/createSolarSystemBodiesGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
 import { createScientificProviderRegistry } from './science/providers/scientificProviderRegistry';
+import { SolarSystemBodyStateService } from './science/bodies/solarSystemBodyState';
 import { ScientificSnapshotService } from './science/snapshot/scientificSnapshotService';
 import { GeographicCalibrationStateAdapter } from './science/state/geographicCalibrationState';
 import { ObserverStateStore } from './science/state/observerState';
@@ -44,6 +46,11 @@ import {
   DEFAULT_LOCAL_HORIZON_DISPLAY_SETTINGS,
   LOCAL_HORIZON_SAMPLE_COUNT,
 } from './presentation/localHorizonPresentationModel';
+import {
+  createSolarSystemBodyPresentationModel,
+  DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
+  type SolarSystemBodyDisplaySettings,
+} from './presentation/solarSystemBodyPresentationModel';
 import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
@@ -102,6 +109,7 @@ const showBelowHorizonInput = requireElement<HTMLInputElement>('#show-below-hori
 const belowHorizonModeSelect = requireElement<HTMLSelectElement>('#below-horizon-mode');
 const showCelestialEquatorInput = requireElement<HTMLInputElement>('#show-celestial-equator');
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
+const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const axisEyeModeSelect = requireElement<HTMLSelectElement>('#axis-eye-mode');
 const equatorEyeModeSelect = requireElement<HTMLSelectElement>('#equator-eye-mode');
 const horizonEyeModeSelect = requireElement<HTMLSelectElement>('#horizon-eye-mode');
@@ -126,9 +134,11 @@ const geographicReference = createGeographicReferenceGroup();
 const celestialAxis = createEarthAxisGroup();
 const celestialEquator = createCelestialEquatorGroup(96);
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
+const solarSystemBodies = createSolarSystemBodiesGroup();
 geographicReference.add(celestialAxis.group);
 geographicReference.add(celestialEquator.group);
 geographicReference.add(localHorizon.group);
+geographicReference.add(solarSystemBodies.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
 
@@ -164,9 +174,9 @@ const simulationClock = new SimulationClock(
 );
 const scientificConfiguration = new ScientificConfigurationStore();
 const scientificCalibration = new GeographicCalibrationStateAdapter();
-const scientificSnapshotService = new ScientificSnapshotService(
-  createScientificProviderRegistry(),
-);
+const scientificProviders = createScientificProviderRegistry();
+const scientificSnapshotService = new ScientificSnapshotService(scientificProviders);
+const solarSystemBodyStateService = new SolarSystemBodyStateService(scientificProviders);
 let currentXrState: XRState = checkingState;
 let controllerManager: NorthCalibrationControllerManager | undefined;
 let scientificOriginIdentity = 'desktop-simulation';
@@ -192,6 +202,13 @@ function currentEquatorDisplaySettings(): CelestialEquatorDisplaySettings {
   return Object.freeze({
     ...DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
     showEquator: showCelestialEquatorInput.checked,
+  });
+}
+
+function currentSolarSystemBodyDisplaySettings(): SolarSystemBodyDisplaySettings {
+  return Object.freeze({
+    ...DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
+    showBodies: showSolarSystemBodiesInput.checked,
   });
 }
 
@@ -279,6 +296,7 @@ function renderCelestialAxis(): void {
   if (result.kind !== 'ready') {
     celestialAxis.clear();
     celestialEquator.clear();
+    solarSystemBodies.clear();
     return;
   }
   celestialAxis.update(
@@ -289,12 +307,21 @@ function renderCelestialAxis(): void {
     currentEquatorDisplaySettings(),
   );
   celestialEquator.update(equatorModel);
+  const bodyState = solarSystemBodyStateService.capture(result.snapshot);
+  const bodyModel = createSolarSystemBodyPresentationModel(
+    result.snapshot,
+    bodyState,
+    currentSolarSystemBodyDisplaySettings(),
+  );
+  solarSystemBodies.update(bodyModel);
   celestialDiagnostics.append(
     ...[
       `Equator ${equatorModel.terminology}; ${equatorModel.sampleCount} projective samples`,
       `Equator basis ${equatorModel.provenance.frame} from ${equatorModel.provenance.sourceBasisFrame}; ${equatorModel.provenance.samplingPhase}`,
       `Equator render strategy ${equatorModel.renderStrategy}`,
       `Equator depth contract ${equatorModel.depthContract}`,
+      `Bodies: ${bodyModel.markers.length} actual apparent topocentric directions; ${bodyModel.provenance.correctionProfile}; below-horizon positions retained`,
+      `Bodies render strategy ${bodyModel.renderStrategy}; ${bodyModel.presentationRadiusPolicy}`,
     ].map((diagnostic) => {
       const item = document.createElement('li');
       item.textContent = diagnostic;
@@ -546,6 +573,7 @@ useCurrentTimeButton.addEventListener('click', () => {
   belowHorizonModeSelect,
   showCelestialEquatorInput,
   showLocalHorizonInput,
+  showSolarSystemBodiesInput,
   axisEyeModeSelect,
   equatorEyeModeSelect,
   horizonEyeModeSelect,
@@ -582,6 +610,7 @@ window.addEventListener('pagehide', () => {
   celestialAxis.dispose();
   celestialEquator.dispose();
   localHorizon.dispose();
+  solarSystemBodies.dispose();
 }, { once: true });
 
 async function initializeCapabilityState(): Promise<void> {

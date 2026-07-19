@@ -128,7 +128,18 @@ export interface ResultProvenance {
   readonly validationFixture?: string;
 }
 
-export type ObserverRelativeBody = 'Sun' | 'Moon';
+/** Bodies intentionally supported by the bounded actual-position layer. */
+export const SUPPORTED_SOLAR_SYSTEM_BODIES = Object.freeze([
+  'Sun',
+  'Moon',
+  'Mercury',
+  'Venus',
+  'Mars',
+  'Jupiter',
+  'Saturn',
+] as const);
+
+export type ObserverRelativeBody = (typeof SUPPORTED_SOLAR_SYSTEM_BODIES)[number];
 
 export interface EquatorialPositionResult {
   readonly body: ObserverRelativeBody;
@@ -162,6 +173,23 @@ export interface ObserverRelativePositionResult {
   };
   readonly direction: EnuUnitDirection;
   readonly provenance: ResultProvenance;
+}
+
+/**
+ * One provider-owned apparent topocentric result, kept free of rendering
+ * types. Horizontal coordinates preserve below-horizon truth rather than
+ * clamping a body to a display horizon.
+ */
+export interface ApparentTopocentricBodyResult {
+  readonly kind: 'VALID_APPARENT_TOPOCENTRIC_BODY';
+  readonly body: ObserverRelativeBody;
+  readonly equatorial: EquatorialPositionResult;
+  readonly horizontal: ObserverRelativePositionResult;
+  readonly aboveHorizon: boolean;
+  readonly celestialEquatorRelation: 'NORTH' | 'ON' | 'SOUTH';
+  readonly correctionProfile: CorrectionProfile;
+  readonly warnings: readonly [];
+  readonly validity: 'VALID';
 }
 
 export interface TerrestrialTime {

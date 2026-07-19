@@ -4,6 +4,14 @@
 
 ### Added
 
+- Added a local bounded actual solar-system body layer for Sun, Moon, Mercury, Venus, Mars,
+  Jupiter, and Saturn. It consumes the existing explicit observer/clock configuration through the
+  Astronomy Engine adapter, preserves actual apparent topocentric altitude/azimuth and
+  below-horizon truth, and renders only projective marker directions with a global visibility
+  toggle. No phase, labels, pointing, paths, ecliptic, projection, or new clock was added.
+- Recorded the user's intentional promotion of actual body placement ahead of the still-planned
+  long-term precession prerequisite review. Independent integration/publication and Quest body
+  acceptance remain pending.
 - Reconciled the successful Milestone 2D Meta Quest physical report as a bounded usability PASS:
   the user described the deployed spatial-reference experience as incredible and really coming
   together nicely. No detailed eye-mode, angular, drift, lifecycle, performance, or comfort

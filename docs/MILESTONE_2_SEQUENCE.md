@@ -28,8 +28,10 @@ axis and NCP/SCP presentation layer. Its independent, automated, desktop, workfl
 gates pass and it is integrated and published normally. The user has physically tested the
 hardened geocentric replacement and celestial equator. The equator is good/workable and each eye
 individually receives one clean axis/equator line, while binocular viewing doubles both layers.
-Milestone 2D therefore adds bounded eye-presentation modes and a local tangent-plane horizon before
-any precession or body work.
+Milestone 2D therefore adds bounded eye-presentation modes and a local tangent-plane horizon. The
+user has now explicitly promoted bounded actual Sun/Moon/major-planet placement ahead of the
+previously selected long-term precession prerequisite review; that review remains planned and is
+not silently removed.
 
 ## Sequence overview
 
@@ -39,7 +41,8 @@ any precession or body work.
       -> 2B mean Earth axis and antipodal celestial poles
           -> 2C mean celestial equator
               -> 2D eye-presentation modes and local horizon
-                  -> later validated precession/ecliptic/body/temporal milestones
+                   -> 2E actual apparent Sun/Moon/major-planet directions
+                       -> later validated precession/ecliptic/projection/temporal milestones
 ```
 
 Every milestone consumes the same observer, time, frame, provenance, and correction contracts.
@@ -248,6 +251,34 @@ unmeasured regression cases; do not claim the modes cure binocular doubling befo
 
 **Explicit exclusions:** precession, ecliptic, bodies, temporal clocks, broad layer management,
 media, game, AI, and contemplative sequencing.
+
+## Milestone 2E - actual solar-system body directions
+
+**Current result:** implemented locally on `feature/actual-solar-system-bodies`; independent
+integration/publication and physical Quest acceptance remain pending.
+
+**Objective:** render the actual apparent topocentric directions of Sun, Moon, Mercury, Venus,
+Mars, Jupiter, and Saturn as one optional bounded marker layer.
+
+**Inputs:** immutable observer/time scientific snapshot, the validated Astronomy Engine adapter,
+one explicit Tier 1 correction profile, canonical ENU, and the existing calibrated geographic
+parent.
+
+**Outputs:** typed provider-provenanced equatorial/horizontal body results, a separate bounded
+observer/time/configuration/provider cache, and homogeneous projective actual-direction markers.
+
+**Acceptance criteria:** every marker preserves its apparent altitude/azimuth and below-horizon
+truth; presentation maps ENU once, applies geographic yaw only through the parent, uploads no raw
+astronomical-distance GPU values, and does not add Moon phase, labels, pointing, ecliptic,
+projection, temporal paths, or a broad planetarium interface.
+
+**Physical Quest boundary:** test the actual body layer before beginning celestial-equator
+projection or a later precession/ecliptic structure. The prior precession prerequisite review
+remains a planned scientific task after this promoted bounded layer.
+
+**Explicit exclusions:** Uranus, Neptune, Pluto, small bodies, stars, labels, pointing, Moon
+phase, planet disks/rings, ecliptic, projection modes, declination connectors, paths, animation,
+and temporal controls.
 
 ## Later validated precession trajectories
 

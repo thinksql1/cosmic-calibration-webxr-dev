@@ -4,34 +4,32 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Independently validate the long-term precession model and trajectory prerequisites
+**Title:** Run the physical Quest acceptance test for actual solar-system body placement
 
-Begin with a bounded scientific/model review only. Do not implement a trajectory or any new
-visible celestial geometry until the adopted long-term precession model, date domain, epoch,
-direction, sampling/error policy, source provenance, and independent reference fixtures are
-accepted.
+Test the default-hidden actual-direction markers for Sun, Moon, Mercury, Venus, Mars, Jupiter,
+and Saturn only after their independent local implementation/review and publication. Confirm
+marker visibility, general Sun/Moon direction, planet separation, below-horizon continuity,
+calibration/world locking, comfortable Sun-marker brightness, reset/recalibration, session
+exit/re-entry, and absence of duplicate markers. Do not infer angular precision from this physical
+check.
 
 ## Required review checks
 
-- Select and document one precession-only long-term model; do not extrapolate the bounded P03
-  normal-date provider to a full cycle without evidence.
-- Establish explicit frame, epoch, time-scale, date-domain, north/south antipode, and current-axis
-  contact contracts.
-- Collect independent authoritative fixtures and predeclare sampling/error tolerances before any
-  presentation work.
-- Decide whether the model can support a later projective trajectory without changing the accepted
-  Earth-core, axis, equator, depth, calibration, eye-presentation, or local-horizon contracts.
+- Verify actual apparent placement against the horizon and celestial-equator references without
+  treating either as a projection target.
+- Test all seven markers as one bounded layer, including bodies currently below the horizon.
+- Record only observed headset behavior; Moon phase, labels, pointing, temporal motion, and
+  projection modes remain out of scope.
 
 ## Exclusions
 
-Do not implement a precession trajectory, ecliptic, Sun, Moon, planets, temporal clocks, broad
-layer management, media, game integration, AI enhancement, relational circuits, or contemplative
-sequencing. This task is validation/research only; a later feature task requires a separate
-authorization.
+Do not implement celestial-equator projection, combined display, declination connectors, Moon
+phase, labels, pointing, stars, precession, ecliptic, temporal clocks, broad layer management,
+media, game integration, AI enhancement, relational circuits, or contemplative sequencing.
 
 ## Recommended execution
 
 - **Model:** GPT-5.6
-- **Reasoning effort:** High
-- **Why:** long-date precession model selection requires careful frame/time-scale/date-domain
-  reasoning, independent fixtures, and strict separation from the accepted bounded P03 provider.
+- **Reasoning effort:** Medium
+- **Why:** a physical acceptance coordinator must distinguish the limited observed body-layer
+  experience from automated scientific evidence without inventing measurements.
