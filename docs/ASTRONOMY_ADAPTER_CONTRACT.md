@@ -211,6 +211,22 @@ unsupported vertical datum, invalid angle, unsupported frame contract, unsupport
 profile, and mean-pole domain failure. Raw provider objects and stack traces do not cross the
 public data boundary.
 
+### Actual-body provider identity and validation
+
+The body layer uses one frozen application-owned descriptor:
+`ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_V1`. It binds the Astronomy Engine name/version, body-adapter
+version, supported Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn set, supported airless/normal
+correction profiles, and the `EQD_TRUE -> HORIZONTAL_ENU` frame contract. The structural snapshot
+retains a recursively frozen copy; `SolarSystemBodyStateService` verifies the active registry
+descriptor against it before invoking the adapter or consulting its cache.
+
+Each returned equatorial and horizontal result is then checked independently for body, observer,
+instant, provider/version/adapter-version, correction profile, source/output frame, units, finite coordinates, and
+unit direction. The pair must agree on every shared provenance field while retaining their named
+output-frame distinction. `PROVIDER_IDENTITY_MISMATCH`, `UNSUPPORTED_PROVIDER_CAPABILITY`, and
+`MALFORMED_PROVIDER_RESULT` are fatal structured errors. They cannot produce a ready body state or
+reuse a cached body result.
+
 ## Numerical validation
 
 The tolerance was declared as `0.02 degrees` before provider results were compared. It is slightly

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createSimulationInstant } from '../../../src/science/astronomy/time';
 import { createScientificProviderRegistry } from '../../../src/science/providers/scientificProviderRegistry';
+import { ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_IDENTITY } from '../../../src/science/providers/astronomyProviderIdentity';
 import { GeographicCalibrationStateAdapter } from '../../../src/science/state/geographicCalibrationState';
 import { ObserverStateStore } from '../../../src/science/state/observerState';
 import { SimulationClock } from '../../../src/science/state/simulationClock';
@@ -85,7 +86,10 @@ describe('scientific snapshot builder', () => {
     expect(snapshot.observerGeocentricEarthAxis.earthCore).not.toEqual(
       snapshot.observerGeocentricEarthAxis.observerSurfaceOrigin,
     );
-    expect(snapshot.providers).toEqual({ astronomyEngineVersion: '2.1.19', meanPoleProviderVersion: '1.0.0' });
+    expect(snapshot.providers).toEqual({
+      astronomy: ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_IDENTITY,
+      meanPoleProviderVersion: '1.0.0',
+    });
     expect(snapshot.warnings).toHaveLength(6);
     expect(snapshot.warnings).toContainEqual(expect.objectContaining({
       code: 'HEIGHT_DATUM_REFERENCE_DIFFERENCE',

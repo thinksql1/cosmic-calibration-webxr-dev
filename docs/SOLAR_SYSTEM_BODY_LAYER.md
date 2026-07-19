@@ -48,12 +48,22 @@ parented, and owns/disposes only its Points geometry and shader material.
 
 ## State and cache
 
-`SolarSystemBodyStateService` is deliberately separate from the structural P03 snapshot. Its
-bounded frozen/paused cache key includes the validated observer and observer revision, complete
-explicit simulation clock/instant/source/revision state, configuration correction profile and
-revision, Astronomy Engine version, and the fixed body list. Active unpaused time bypasses cache.
-Calibration is presentation-only for body directions, so yaw is not baked into this scientific
-cache; the containing immutable scientific snapshot still gates readiness.
+`SolarSystemBodyStateService` is deliberately separate from the structural P03 snapshot. Before a
+provider call or cache lookup, it requires the active registry's immutable
+`ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_V1` descriptor to equal the descriptor retained by the
+snapshot and enabled Tier 1 configuration. The descriptor contains provider name/version, adapter
+version, supported body-set identifier, supported correction profiles, and the EQD_TRUE to
+HORIZONTAL_ENU frame contract. A mismatch is a fatal structured scientific error, never a warning
+or a cache hit.
+
+Its bounded frozen/paused cache key includes that active descriptor, the validated observer and
+observer revision, complete explicit simulation clock/instant/source/revision state, configuration
+correction profile and revision, the fixed body list/body-set identifier, and frame policy. Active
+unpaused time bypasses cache. Both equatorial and horizontal results must independently match the
+requested body, observer, instant, provider identity, correction profile, frame, units, and finite
+unit-direction contract before a recursively frozen body state is returned. Calibration is
+presentation-only for body directions, so yaw is not baked into this scientific cache; the
+containing immutable scientific snapshot still gates readiness.
 
 ## Controls and current exclusions
 
@@ -68,6 +78,10 @@ Sun/Moon/planet temporal paths, stars, or precession geometry.
 Automated tests cover supported identifiers, deterministic frozen observer/time computation,
 provider/frame/correction provenance, below-horizon retention, ENU/application signs,
 direction-only rendering, bounded GPU attributes, depth policy, group ownership, and disposal.
+Provider identity and complete equatorial/horizontal provenance are adversarially validated before a
+body state can become ready. The adapter's independent JPL fixture depth remains strongest for the
+established Sun/Moon cases; independent major-planet fixture expansion is a non-blocking future
+scientific-validation improvement.
 Desktop validation must verify readiness, all seven markers, global visibility, reset/recalibration,
 and coexistence with the axis/equator/horizon. Physical Quest acceptance remains pending and must
 check general Sun/Moon direction, planet separation, below-horizon continuity, brightness,

@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Actual solar-system body directions implemented locally ahead of the preserved long-term precession prerequisite review; independent integration and physical acceptance pending
+**Current phase:** Actual solar-system body directions remediated locally ahead of the preserved long-term precession prerequisite review; independent revalidation, integration, and physical acceptance pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -61,7 +61,10 @@ layer uses the existing Astronomy Engine adapter and central clock to create imm
 apparent-topocentric EQD_TRUE/HORIZONTAL_ENU values, retains below-horizon truth, and renders only
 homogeneous projective marker directions below the calibrated geographic parent. It has no phase,
 labels, pointing, projection, ecliptic, paths, stars, or new temporal controls. Precession review
-remains planned; independent integration/publication and Quest body acceptance remain pending.
+remains planned. A local remediation now binds the active body registry and immutable snapshot to
+one frozen provider descriptor, derives cache identity from that active descriptor, and rejects
+malformed equatorial/horizontal provenance before a ready body state can exist. Independent
+revalidation, integration/publication, and Quest body acceptance remain pending.
 
 ## One-paragraph state summary
 
@@ -339,7 +342,7 @@ normal local integration now pass; publication must succeed before the physical 
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | One bounded long-term precession-model prerequisite review | Validation/research only; no trajectory or later celestial layer authorized |
+| `NEXT_TASK.md` | Independent revalidation and integration gate for the actual solar-system body layer | Provider/provenance/cache remediation must pass before publication or Quest body acceptance |
 
 ## Environment
 
@@ -429,6 +432,9 @@ normal local integration now pass; publication must succeed before the physical 
 
 ## Current decision horizon
 
-Run the physical Quest acceptance test for actual solar-system body placement after independent
-integration and publication. The long-term precession model/trajectory prerequisite review remains
-planned future work and must establish its own model/date-domain/fixture contract before any path.
+Independently revalidate and integrate the actual solar-system body layer. The local remediation
+must first prove registry/snapshot provider identity, active-provider cache isolation, and complete
+equatorial/horizontal provenance rejection. Physical Quest acceptance may begin only after that
+gate, integration, and publication. The long-term precession model/trajectory prerequisite review
+remains planned future work and must establish its own model/date-domain/fixture contract before any
+path.

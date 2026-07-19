@@ -4,6 +4,13 @@
 
 ### Added
 
+- Hardened the local actual-body scientific boundary with one immutable Astronomy Engine
+  apparent-topocentric provider descriptor. The derived body service now validates active
+  registry/snapshot agreement, derives its cache key from that active descriptor, verifies both
+  EQD_TRUE and HORIZONTAL_ENU provenance, and rejects malformed results with structured errors.
+  Adversarial local tests cover name/version/adapter mismatches, cache isolation, cross-result
+  disagreement, and nested immutability. Independent revalidation remains pending.
+
 - Added a local bounded actual solar-system body layer for Sun, Moon, Mercury, Venus, Mars,
   Jupiter, and Saturn. It consumes the existing explicit observer/clock configuration through the
   Astronomy Engine adapter, preserves actual apparent topocentric altitude/azimuth and

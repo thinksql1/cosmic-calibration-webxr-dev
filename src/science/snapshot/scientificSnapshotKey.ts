@@ -40,8 +40,7 @@ export function createScientificSnapshotKey(input: ScientificSnapshotKeyInput): 
     refractionPolicy: input.configuration.refractionPolicy,
     meanPoleModel: input.configuration.meanPoleModel,
     enabledProviders: input.configuration.enabledProviders,
-    astronomyProvider: input.providers.astronomy.provider,
-    astronomyProviderVersion: input.providers.astronomy.version,
+    astronomyProviderIdentity: input.providers.astronomy.identity,
     meanPoleProvider: input.providers.meanPole.provider,
     meanPoleProviderVersion: input.providers.meanPole.version,
   });

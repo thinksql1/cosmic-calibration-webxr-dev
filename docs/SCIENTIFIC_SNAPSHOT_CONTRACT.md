@@ -30,13 +30,21 @@ The immutable ready result contains:
   the `LOCAL_CANONICAL_UNLABELED` phase. The source GCRS P03 basis/model/provider provenance is
   retained and validated; the local phase parameterizes only the unlabeled full great-circle
   locus, not individual celestial coordinates;
-- exact provider names/versions (the P03 registry, model provenance, and cache key all use `Cosmic Calibration P03 mean-pole provider@1.0.0`), cache identity, creation sequence, and Tier 1 warnings.
+- exact provider identities: the frozen Astronomy Engine apparent-topocentric descriptor contains
+  name/version, adapter version, body-set, correction-profile, and frame capabilities; the P03
+  registry/model provenance uses `Cosmic Calibration P03 mean-pole provider@1.0.0`; cache identity,
+  creation sequence, and Tier 1 warnings.
 
 North and south are exact negations. Neither equator form contains vertices, a rendering radius,
 Three.js objects, or labels; Milestone 2C presentation consumes the immutable plane to render an
 unlabeled projective great-circle locus. Actual body results remain outside this structural snapshot
 in the separate `SolarSystemBodyStateService`, avoiding P03 snapshot bloat while preserving explicit
 observer/time/configuration/provider cache identity and readiness gating.
+
+The derived body service must compare the active registry descriptor with the snapshot descriptor
+before any provider call or cache lookup. It derives its own cache identity from that active
+validated descriptor and rejects mismatched or malformed equatorial/horizontal provenance as a
+fatal structured error.
 
 ## Failure output
 

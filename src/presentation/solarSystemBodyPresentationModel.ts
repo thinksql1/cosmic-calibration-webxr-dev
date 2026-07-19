@@ -79,7 +79,8 @@ function validateInputs(snapshot: ScientificSnapshot, state: SolarSystemBodyStat
     state.snapshotIdentity.timeRevision !== snapshot.revisions.time ||
     state.snapshotIdentity.configurationRevision !== snapshot.revisions.configuration ||
     state.snapshotIdentity.instantUtc !== snapshot.clock.instant.utcIso ||
-    state.provenance.providerVersion !== snapshot.providers.astronomyEngineVersion ||
+    state.provenance.identity.providerVersion !== snapshot.providers.astronomy.providerVersion ||
+    state.provenance.identity.provider !== snapshot.providers.astronomy.provider ||
     state.correctionProfile !== snapshot.configuration.bodyCorrectionProfile ||
     state.bodies.length !== 7
   ) {
@@ -137,8 +138,8 @@ export function createSolarSystemBodyPresentationModel(
       configurationRevision: snapshot.revisions.configuration,
     }),
     provenance: Object.freeze({
-      provider: state.provenance.provider,
-      providerVersion: state.provenance.providerVersion,
+      provider: state.provenance.identity.provider,
+      providerVersion: state.provenance.identity.providerVersion,
       sourceFrame: state.provenance.sourceFrame,
       outputFrame: state.provenance.outputFrame,
       correctionProfile: state.correctionProfile,

@@ -4,22 +4,19 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the physical Quest acceptance test for actual solar-system body placement
+**Title:** Independently revalidate and integrate the actual solar-system body layer
 
-Test the default-hidden actual-direction markers for Sun, Moon, Mercury, Venus, Mars, Jupiter,
-and Saturn only after their independent local implementation/review and publication. Confirm
-marker visibility, general Sun/Moon direction, planet separation, below-horizon continuity,
-calibration/world locking, comfortable Sun-marker brightness, reset/recalibration, session
-exit/re-entry, and absence of duplicate markers. Do not infer angular precision from this physical
-check.
+Review the provider-identity descriptor, registry/snapshot agreement, active-provider cache key,
+equatorial and horizontal provenance validation, cross-result agreement, deep immutability, and
+the retained actual-direction presentation/lifecycle boundaries before any merge or publication.
+Confirm adversarial provider-name/version/adapter mismatches and malformed provenance fail safely.
 
 ## Required review checks
 
-- Verify actual apparent placement against the horizon and celestial-equator references without
-  treating either as a projection target.
-- Test all seven markers as one bounded layer, including bodies currently below the horizon.
-- Record only observed headset behavior; Moon phase, labels, pointing, temporal motion, and
-  projection modes remain out of scope.
+- Verify no cache entry can cross provider identity, correction-profile, observer, or explicit-time
+  boundaries, and presentation still maps only validated ENU directions under one calibration yaw.
+- Run the full automated/build regression gate before normal integration; physical Quest evidence
+  remains unavailable until independent review, integration, and publication pass.
 
 ## Exclusions
 
@@ -29,7 +26,7 @@ media, game integration, AI enhancement, relational circuits, or contemplative s
 
 ## Recommended execution
 
-- **Model:** GPT-5.6
-- **Reasoning effort:** Medium
-- **Why:** a physical acceptance coordinator must distinguish the limited observed body-layer
-  experience from automated scientific evidence without inventing measurements.
+- **Model:** GPT-5.6 Sol
+- **Reasoning effort:** High
+- **Why:** adversarial revalidation must independently reason about provider identity, provenance,
+  cache isolation, and the boundary between immutable science and presentation.

@@ -9,6 +9,7 @@ import type { ObserverStateReady } from '../state/observerState';
 import type { SimulationClockState } from '../state/simulationClock';
 import type { ScientificConfiguration } from '../state/scientificConfiguration';
 import type { VerticalDatum } from '../astronomy/types';
+import type { AstronomyProviderIdentity } from '../providers/astronomyProviderIdentity';
 
 export type ScientificIssueCode =
   | 'OBSERVER_MISSING'
@@ -70,7 +71,7 @@ export interface ScientificSnapshot {
   readonly equatorBasis: MeanEquatorBasis;
   readonly observerHorizontalEquator: ObserverHorizontalMeanEquator;
   readonly providers: {
-    readonly astronomyEngineVersion: string;
+    readonly astronomy: AstronomyProviderIdentity;
     readonly meanPoleProviderVersion: string;
   };
   readonly warnings: readonly ScientificWarning[];

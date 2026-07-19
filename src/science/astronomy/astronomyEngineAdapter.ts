@@ -7,6 +7,11 @@ import {
   Observer,
   SetDeltaTFunction,
 } from 'astronomy-engine';
+import {
+  APPARENT_TOPOCENTRIC_ADAPTER_VERSION,
+  ASTRONOMY_ENGINE_PROVIDER,
+  ASTRONOMY_ENGINE_VERSION,
+} from '../providers/astronomyProviderIdentity';
 import { AstronomyContractError } from './errors';
 import {
   horizontalAnglesToEnu,
@@ -25,8 +30,10 @@ import {
   type ValidatedObserver,
 } from './types';
 
-export const ASTRONOMY_ENGINE_PROVIDER = 'Astronomy Engine';
-export const ASTRONOMY_ENGINE_VERSION = '2.1.19';
+export {
+  ASTRONOMY_ENGINE_PROVIDER,
+  ASTRONOMY_ENGINE_VERSION,
+};
 const JULIAN_DATE_J2000 = 2_451_545;
 const DAYS_PER_JULIAN_CENTURY = 36_525;
 
@@ -80,6 +87,7 @@ function provenance(
   return Object.freeze({
     provider: ASTRONOMY_ENGINE_PROVIDER,
     providerVersion: ASTRONOMY_ENGINE_VERSION,
+    adapterVersion: APPARENT_TOPOCENTRIC_ADAPTER_VERSION,
     simulationInstant: instant,
     observer,
     sourceFrame: 'EQD_TRUE',
@@ -112,7 +120,17 @@ export function getApparentTopocentricEquatorial(
   body: ObserverRelativeBody,
   instant: SimulationInstant,
   observer: ValidatedObserver,
+  correctionProfile: HorizontalCorrectionProfile = 'AE_APPARENT_TOPOCENTRIC_AIRLESS',
 ): EquatorialPositionResult {
+  if (
+    correctionProfile !== 'AE_APPARENT_TOPOCENTRIC_AIRLESS' &&
+    correctionProfile !== 'AE_APPARENT_TOPOCENTRIC_NORMAL_REFRACTION'
+  ) {
+    throw new AstronomyContractError(
+      'UNSUPPORTED_CORRECTION_PROFILE',
+      `Unsupported equatorial correction profile: ${String(correctionProfile)}`,
+    );
+  }
   const time = providerTime(instant);
   const equatorial = Equator(
     providerBody(body),
@@ -147,7 +165,7 @@ export function getApparentTopocentricEquatorial(
       instant,
       observer,
       'EQD_TRUE',
-      'AE_APPARENT_TOPOCENTRIC_AIRLESS',
+      correctionProfile,
     ),
   });
 }
@@ -224,7 +242,12 @@ export function getApparentTopocentricBody(
   observer: ValidatedObserver,
   correctionProfile: HorizontalCorrectionProfile,
 ): ApparentTopocentricBodyResult {
-  const equatorial = getApparentTopocentricEquatorial(body, instant, observer);
+  const equatorial = getApparentTopocentricEquatorial(
+    body,
+    instant,
+    observer,
+    correctionProfile,
+  );
   const horizontal = getObserverRelativePosition(
     body,
     instant,

@@ -310,7 +310,10 @@
   Jupiter, and Saturn. Each consumes the immutable observer/time/configuration state through the
   validated Astronomy Engine adapter under one explicit Tier 1 correction profile, retains
   EQD_TRUE/HORIZONTAL_ENU provenance and below-horizon truth, and maps to the calibrated scene
-  only as a homogeneous projective apparent direction. Marker color/size improve visibility but
+  only as a homogeneous projective apparent direction. The active registry and immutable snapshot
+  must agree on one frozen provider name/version/adapter/body-set/frame descriptor before a body
+  call or cache lookup; both result forms must validate that descriptor and their shared
+  observer/instant/profile provenance. Marker color/size improve visibility but
   do not claim literal body size or distance. Geographic yaw stays parent-only.
 - **Rationale:** Actual direction is the authoritative basis for later teaching projections. A
   bounded projective marker layer can be validated against the established horizon/equator/axis

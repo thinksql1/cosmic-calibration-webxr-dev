@@ -120,6 +120,7 @@ export const CORRECTION_PROFILES = Object.freeze({
 export interface ResultProvenance {
   readonly provider: string;
   readonly providerVersion: string;
+  readonly adapterVersion: string;
   readonly simulationInstant: SimulationInstant;
   readonly observer?: ValidatedObserver;
   readonly sourceFrame: CelestialFrameTag;

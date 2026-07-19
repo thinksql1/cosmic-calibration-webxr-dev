@@ -7,6 +7,7 @@ import {
   getApparentTopocentricEquatorial,
   getObserverRelativePosition,
 } from '../../src/science/astronomy/astronomyEngineAdapter';
+import { APPARENT_TOPOCENTRIC_ADAPTER_VERSION } from '../../src/science/providers/astronomyProviderIdentity';
 import { angularSeparationDeg } from '../../src/science/astronomy/frameTransforms';
 import { createObserver } from '../../src/science/astronomy/observer';
 import { createSimulationInstant } from '../../src/science/astronomy/time';
@@ -191,6 +192,7 @@ describe('Astronomy Engine adapter against JPL Horizons', () => {
     expect(result.provenance).toMatchObject({
       provider: ASTRONOMY_ENGINE_PROVIDER,
       providerVersion: ASTRONOMY_ENGINE_VERSION,
+      adapterVersion: APPARENT_TOPOCENTRIC_ADAPTER_VERSION,
       simulationInstant: instant,
       observer,
       sourceFrame: 'EQD_TRUE',

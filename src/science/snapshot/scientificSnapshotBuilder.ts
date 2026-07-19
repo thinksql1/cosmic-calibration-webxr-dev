@@ -1,12 +1,9 @@
 import { AstronomyContractError } from '../astronomy/errors';
+import { isValidatedAstronomyProviderIdentity } from '../providers/astronomyProviderIdentity';
 import { createMeanEquatorBasis } from '../frames/earthAxisState';
 import { createObserverHorizontalEarthAxis } from '../frames/observerHorizontalEarthAxis';
 import { createObserverGeocentricEarthAxis } from '../frames/observerGeocentricEarthAxis';
 import { createObserverHorizontalMeanEquator } from '../frames/observerHorizontalEquator';
-import {
-  ASTRONOMY_ENGINE_PROVIDER,
-  ASTRONOMY_ENGINE_VERSION,
-} from '../astronomy/astronomyEngineAdapter';
 import {
   P03_MEAN_POLE_PROVIDER,
   P03_MEAN_POLE_PROVIDER_VERSION,
@@ -130,12 +127,12 @@ function validateInput(input: ScientificSnapshotInput): SnapshotInputValidation 
     errors.push(issue('UNSUPPORTED_CONFIGURATION', 'Scientific configuration does not satisfy the complete validated Tier 1 contract.'));
   }
   const providersSupported =
-    input.providers.astronomy.provider === ASTRONOMY_ENGINE_PROVIDER &&
-    input.providers.astronomy.version === ASTRONOMY_ENGINE_VERSION &&
+    isValidatedAstronomyProviderIdentity(input.providers.astronomy.identity) &&
     input.providers.meanPole.provider === P03_MEAN_POLE_PROVIDER &&
     input.providers.meanPole.version === P03_MEAN_POLE_PROVIDER_VERSION &&
     typeof input.providers.meanPole.getMeanPole === 'function' &&
-    typeof input.providers.astronomy.getObserverRelativePosition === 'function';
+    typeof input.providers.astronomy.getObserverRelativePosition === 'function' &&
+    typeof input.providers.astronomy.getApparentTopocentricBody === 'function';
   if (!providersSupported) {
     errors.push(issue('UNSUPPORTED_CONFIGURATION', 'Scientific provider registry is not compatible with the validated Tier 1 provider contract.'));
   }
@@ -375,7 +372,7 @@ export function buildScientificSnapshot(input: ScientificSnapshotInput): Scienti
       equatorBasis,
       observerHorizontalEquator,
       providers: Object.freeze({
-        astronomyEngineVersion: normalizedInput.providers.astronomy.version,
+        astronomy: normalizedInput.providers.astronomy.identity,
         meanPoleProviderVersion: normalizedInput.providers.meanPole.version,
       }),
       warnings: snapshotWarnings,
