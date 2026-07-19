@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Local Milestone 2F 24-hour apparent Sun path and bounded live celestial updates implemented; independent validation, integration, deployment, and physical Quest acceptance pending
+**Current phase:** Milestone 2F 24-hour apparent Sun path and bounded live celestial updates independently validated, integrated, and published; physical Quest acceptance pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -79,7 +79,7 @@ limited identification of other bodies. The user also noticed that the celestial
 match the Sun's path. This is feedback, not a complete seven-body, angular-accuracy, lifecycle,
 or comfort acceptance record.
 
-Milestone 2F now locally adds an observer-relative apparent Sun trace over the explicit IANA
+Milestone 2F adds an observer-relative apparent Sun trace over the explicit IANA
 local civil day. The immutable science service samples the airless apparent-topocentric Sun every
 ten minutes plus every valid civil-hour boundary; ordinary and DST 23/25-hour schedules retain
 their actual UTC instants, skipped hours, and repeated-hour metadata. The established central
@@ -94,7 +94,14 @@ deterministic structured scientific warnings, `TEMPORAL_PATH_FAILURE` wrapping f
 aggregation/provider failures, temporal error context, failed-path cache rejection, and a
 sampling-policy cache-isolation regression, uniform early-failure enrichment, and a permanent
 production-path regression proving one simulated hour changes all seven supported body
-directions. Independent revalidation, publication, and physical Quest validation remain pending.
+directions. Final independent review found no blocking or material defect. Feature and merged
+`master` pass clean install, type-check, 36 files / 416 tests, production build,
+dependency/diff checks, deterministic civil-time/provenance/failure/cache/motion probes, and
+development/production-preview regression. Normal merge `31be4cc` retains the feature branch.
+GitHub Actions run `29707073636` passed install, type-check, tests, build, artifact upload, and
+Pages deployment. Hosted controls, path/notch visibility, repeated toggling, zone override,
+repository-relative assets, clean console, and a 60.45-second live-clock advance pass. Physical
+Quest acceptance remains pending and is not inferred from desktop evidence.
 
 ## One-paragraph state summary
 
@@ -274,11 +281,14 @@ normal local integration now pass; publication must succeed before the physical 
   precession prerequisite review. Its seven-body actual-direction layer passed independent review,
   normal integration, automation, deployment, and hosted regression; physical Quest acceptance is
   the only active gate before projection modes.
+- Milestone 2F 24-hour Sun path and bounded live updates passed final independent review, normal
+  integration, automation, Pages deployment, and hosted desktop regression. Physical Quest
+  acceptance is the only active gate.
 
 ## Blocked
 
-- None. The published body layer is intentionally gated on user-performed physical Quest evidence
-  rather than treated as accepted from automated or hosted desktop evidence.
+- None. The published solar-temporal layer is intentionally gated on user-performed physical
+  Quest evidence rather than treated as accepted from automated or hosted desktop evidence.
 
 ## Known defects or limitations
 
@@ -353,7 +363,7 @@ normal local integration now pass; publication must succeed before the physical 
 | `src/science/astronomy/` | Typed observer/time/frame/correction contracts, Astronomy Engine adapter, ENU math, and P03 mean-pole provider | Milestone 2A0 bounded validation PASS; consumed only through the scientific snapshot |
 | `src/science/state/`, `src/science/snapshot/`, `src/science/frames/`, `src/science/providers/` | Revisioned scientific state, immutable P03 snapshot/equator basis, axis-specific WGS84 observer-horizontal transform, and exact-key cache | 2A integrated/published; 2B transform independent/automated PASS and integrated; no Three.js import |
 | `src/presentation/earthAxisPresentationModel.ts`, `src/presentation/mapEnuToApplicationBasis.ts` | Pure snapshot-to-geocentric-axis model and ENU metric/direction mapping to application `(east, up, -north)` | Local geocentric replacement PASS; independent integration pending; yaw excluded by API |
-| `tests/` | Capability, session, calibration, controller, adapter, fixtures, scientific state, geocentric placement, projective precision, depth, presentation, scene, and lifecycle tests | 26 files / 340 tests passing on integrated `master` |
+| `tests/` | Capability, session, calibration, controller, adapter, fixtures, scientific state, temporal/civil-time, geocentric placement, projective precision, depth, presentation, scene, and lifecycle tests | 36 files / 416 tests passing on integrated `master` |
 | `README.md` | Commands, workflow, conventions, deployment, and limits | Current |
 | `docs/ARCHITECTURE.md` | Frame separation, yaw convention, lifecycle, and module boundaries | Current |
 | `docs/CALIBRATION.md` | Physical setup, calibration procedure, limits, and troubleshooting | Current |
@@ -365,15 +375,15 @@ normal local integration now pass; publication must succeed before the physical 
 | `docs/SCIENTIFIC_STATE_FOUNDATION.md`, `docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md`, `docs/SCIENTIFIC_CACHE_POLICY.md` | Milestone 2A state, snapshot, readiness, cache, and presentation-boundary contracts | Final independent gate PASS; integrated and published |
 | `docs/MEAN_POLE_MODEL_VALIDATION.md` | P03 model, TT, matrix direction, fixtures, tolerances, corrections, and domain | Direct bounded provider validated |
 | `docs/CELESTIAL_VALIDATION_STRATEGY.md` | Pure, golden, cross-reference, visual/Quest, and error-budget validation plan | First JPL/SOFA fixtures captured; later layers pending |
-| `docs/TEMPORAL_LAYER_ARCHITECTURE.md` | Central simulation clock and future solar/lunar sampling and label policies | Architecture only |
+| `docs/TEMPORAL_LAYER_ARCHITECTURE.md` | Central simulation clock, bounded live refresh, solar daily-path sampling, civil-time, and label policies | Milestone 2F implemented, independently validated, and published |
 | `docs/MILESTONE_2_SEQUENCE.md` | Bounded 2A0 through later-layer dependency and acceptance sequence | Current sequence |
 | `docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md` | Focused positive Quest acceptance record, accepted scope, and unmeasured cases | Current physical baseline evidence |
 | `docs/OFFICIAL_ASTRONOMY_SOURCES.md` | Official/primary source, capability, limitation, version, and license register | Research evidence current as of 2026-07-16 |
-| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run `29703133387` passed for integrated Milestone 2E at `b24b3e9`; hosted desktop PASS |
+| `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run `29707073636` passed for integrated Milestone 2F at `31be4cc`; hosted desktop PASS |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | Physical Quest acceptance test for actual solar-system body placement | Published body layer awaits user-performed headset evidence |
+| `NEXT_TASK.md` | Physical Quest acceptance test for the 24-hour Sun path and real-time celestial updates | Published temporal layer awaits user-performed headset evidence |
 
 ## Environment
 
@@ -384,8 +394,8 @@ normal local integration now pass; publication must succeed before the physical 
 | Runtime dependencies | Three.js `0.185.1`; Astronomy Engine `2.1.19` | Yes; exact versions pinned |
 | Development dependencies | Vite `8.1.4`; TypeScript `7.0.2`; Vitest `4.1.10`; Three/WebXR types | Yes |
 | Build command | `npm run build` | Passed |
-| Test command | `npm run test` | 383/383 passed across 30 files on the feature branch and merged `master` during the final Milestone 2E gate |
-| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run `29703133387` deployed `b24b3e9`; hosted Milestone 2E desktop regression PASS |
+| Test command | `npm run test` | 416/416 passed across 36 files on the feature branch and merged `master` during the final Milestone 2F gate |
+| Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run `29707073636` deployed `31be4cc`; hosted Milestone 2F desktop regression PASS |
 
 ## Risks
 
@@ -461,11 +471,11 @@ normal local integration now pass; publication must succeed before the physical 
 | 2026-07-18 | Milestone 2D publication and hosted regression | PASS; normal non-force push of `46cf613`, GitHub Actions run #16 install/type-check/340-test/build/upload/deploy success, and hosted axis/equator/horizon controls, three eye selectors, default-hidden horizon, desktop fallback, readiness, reset, relative assets, and clean console verified. Physical Quest eye filtering and horizon acceptance remain NOT RUN | `https://github.com/thinksql1/cosmic-calibration-webxr/actions/runs/29657256876`; `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 | 2026-07-19 | Milestone 2D physical Quest acceptance reconciliation | PASS for the reported bounded usability scope; the user physically tested the deployed Meta Quest spatial-reference experience and described it as incredible and really coming together nicely. The experience ran and no blocking issue was reported. Individual eye modes, angular error, drift, reset/re-entry, performance, and comfort observations were not supplied and are not inferred | User-reported Quest evidence; `docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md` |
 | 2026-07-19 | Milestone 2E actual-body final gate, integration, and publication | PASS; complete provider identity/mismatch diagnostics, equatorial/horizontal provenance, cache isolation, immutable results, projective rendering, and lifecycle passed direct review and adversarial probes. Feature and merged `master` pass 30 files / 383 tests, type-check, build, dependencies/diff, development/preview, and clean-console checks. Normal merge `b24b3e9` retained the feature branch; Actions run `29703133387` passed build/deploy and hosted body-layer regression | `master`; `docs/SOLAR_SYSTEM_BODY_LAYER.md`; physical Quest acceptance pending |
+| 2026-07-19 | Milestone 2F final gate, integration, and publication | PASS; civil-day/DST semantics, exact hour notches, observer schema provenance, structured warnings/failures, cache isolation, all-seven one-hour motion, presentation, and lifecycle passed direct review and deterministic probes. Feature and merged `master` pass 36 files / 416 tests, type-check, build, dependencies/diff, development/preview, and clean-console checks. Normal merge `31be4cc` retained the feature branch; Actions run `29707073636` passed build/deploy and hosted path/notch/live-clock regression. Physical Quest acceptance remains pending | `master`; `docs/SOLAR_24_HOUR_CLOCK.md`; `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 
 ## Current decision horizon
 
-Run the physical Quest acceptance test for actual solar-system body placement. The independent
-scientific/diagnostic/cache gate, normal integration, automation, publication, and hosted desktop
-regression pass; the remaining evidence must come from the user's headset. The long-term precession
-model/trajectory prerequisite review remains planned future work and must establish its own
-model/date-domain/fixture contract before any path.
+Run the physical Quest acceptance test for the 24-hour Sun path and real-time celestial updates.
+The independent scientific/temporal/provenance/cache gate, normal integration, automation,
+publication, and hosted desktop regression pass; the remaining evidence must come from the user's
+headset. Do not begin labels, ecliptic, orbital paths, Moon phase, precession, or other later work.

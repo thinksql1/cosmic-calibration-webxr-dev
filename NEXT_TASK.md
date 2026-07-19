@@ -4,26 +4,21 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Independently revalidate and integrate the 24-hour Sun path and real-time celestial updates
+**Title:** Run the physical Quest acceptance test for the 24-hour Sun path and real-time celestial updates
 
-Independently review the local observer-relative apparent Sun path, its civil-hour notches, and
-the bounded real-time body refresh before any integration or publication. Verify complete
-immutable observer provenance, deterministic scientific warnings, structured temporal failures,
-cache rejection/isolation, civil-time and DST correctness, live cadence, lifecycle, regression,
-and desktop behavior. Merge and publish only if every blocking scientific and rendering gate
-passes.
+Physically test the published observer-relative apparent Sun path, civil-hour notches, and bounded
+real-time body refresh in Meta Quest passthrough. Record only directly observed evidence; do not
+infer angular accuracy, long-duration stability, or unperformed lifecycle checks.
 
 ## Required review checks
 
-- Reproduce generic-provider, malformed-provider, observer-mismatch, civil-resolver, aggregation,
-  rollover, and sampling-policy cache probes. Confirm no generic error reaches the public path
-  boundary and no failed path is cached.
-- Verify the observer revision, provenance-schema version, and WGS84 model remain distinct and
-  consistent across path/samples/notches; confirm early temporal failures receive uniform complete
-  context and one production scheduler advance changes all seven supported body directions.
-- Verify the observer and warning contracts are complete, deeply immutable, and serializable;
-  retain existing ordinary/DST scheduling, exact notch, live-cadence, and lifecycle evidence.
-- Run full automated validation and desktop/preview regression before considering a normal merge.
+- Open the deployed application, enter passthrough, calibrate true north, and confirm the horizon,
+  axis, poles, celestial equator, and actual body markers remain coherent.
+- Enable the Sun daily path and civil-hour notches; confirm the notches lie on the path, the path
+  differs from the celestial equator, and above- and below-horizon portions remain understandable.
+- Confirm the current Sun lies on or closely follows the path, leave the application open across a
+  minute boundary, and observe whether body positions update without a jump or duplicate geometry.
+- Check world locking, visibility/comfort, toggle cycles, recalibration, and immersive exit/re-entry.
 
 ## Exclusions
 
@@ -33,8 +28,8 @@ AI enhancement, or contemplative sequencing.
 
 ## Recommended execution
 
-- **Model:** GPT-5.6 Sol
+- **Model:** GPT-5.6 Terra
 - **Reasoning effort:** High
-- **Why:** independent review must adversarially verify structured temporal failures, observer
-  provenance, warning disclosure, cache safety, civil-time correctness, live updates, and release
-  readiness before physical evidence can be collected.
+- **Why:** bounded physical-evidence reconciliation should preserve the exact Quest observations,
+  distinguish measured behavior from unmeasured cases, and close the milestone without beginning
+  later celestial features.

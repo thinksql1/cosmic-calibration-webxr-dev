@@ -10,7 +10,7 @@ reference. Published Milestone 2E adds a default-hidden actual-direction
 layer for Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn using the same explicit observer,
 UTC clock, correction, provenance, calibrated-parent, and linear-depth contracts. It adds no
 automatic heading, geolocation, precession, ecliptic, projection mode, phase, labels, paths, or
-contemplative system. Local Milestone 2F adds an optional observer-relative apparent Sun path for
+contemplative system. Published Milestone 2F adds an optional observer-relative apparent Sun path for
 the selected explicit IANA civil day, exact valid civil-hour notches on that path, and bounded live
 updates through the same central simulation clock. The path is not the celestial equator or an
 annual ecliptic; labels and other body paths remain deferred.
@@ -49,8 +49,9 @@ The published Milestone 2E body layer passed final independent provider/provenan
 regression. Physical Quest acceptance of the body markers remains pending.
 The user subsequently reported positive bounded Quest use of the body markers, plausibly
 identifying Sun, Mercury, and Venus; absent labels limited other identification and the user noted
-that the celestial equator is not the Sun's path. Local Milestone 2F passes 416 automated tests,
-type-check, and production build; its independent review and Quest acceptance remain pending.
+that the celestial equator is not the Sun's path. Milestone 2F passes final independent review,
+416 automated tests, type-check, production build, normal integration, GitHub Actions/Pages
+deployment, and hosted desktop regression. Physical Quest acceptance remains pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -166,14 +167,14 @@ Calibration is in memory only. Reloading, session exit, boundary reset, room cha
 ## Static hosting
 
 Vite uses `base: './'`, keeping emitted assets relative for GitHub Pages project subpaths. The
-current hosted Milestone 1 site is:
+current hosted application is:
 
 `https://thinksql1.github.io/cosmic-calibration-webxr/`
 
-GitHub Pages workflow run #16 deployed integrated Milestone 2D commit `46cf613`. Hosted desktop
-verification confirmed the observer/time/axis/equator/local-horizon controls, all three eye-mode
-selectors, desktop fallback, simulation/reset behavior, repository-subpath assets, and clean
-browser diagnostics.
+GitHub Pages workflow run `29707073636` deployed integrated Milestone 2F merge `31be4cc`. Hosted
+desktop verification confirmed the existing horizon/axis/poles/equator/body layers, Sun-path and
+civil-hour-notch controls, repeated toggling, zone override, repository-relative assets, a bounded
+live-clock advance, and clean browser diagnostics.
 
 ## Validation boundary
 
@@ -190,4 +191,4 @@ hosted build is the geocentric replacement, not the earlier observer-centered pr
 
 ## Explicitly deferred
 
-Local-storage persistence, automatic geolocation, automatic compass access, headset magnetometer access, magnetic declination, true-versus-magnetic-north correction, automatic north detection, raw provider-result caching, spatial anchors, plane detection, hit testing, hand tracking, precession/ecliptic geometry, body projections/paths, temporal clocks, animated/general time controls, audio, 360 video, backend services, accounts, and analytics are absent. The [long-term product roadmap](docs/LONG_TERM_PRODUCT_ROADMAP.md) records possible future families without changing this current scope.
+Local-storage persistence, automatic geolocation, automatic compass access, headset magnetometer access, magnetic declination, true-versus-magnetic-north correction, automatic north detection, raw provider-result caching, spatial anchors, plane detection, hit testing, hand tracking, precession/ecliptic geometry, additional body projections/paths, broad time controls, audio, 360 video, backend services, accounts, and analytics are absent. The [long-term product roadmap](docs/LONG_TERM_PRODUCT_ROADMAP.md) records possible future families without changing this current scope.

@@ -4,6 +4,13 @@
 
 ### Added
 
+- Independently validated and normally integrated Milestone 2F with merge `31be4cc`. The feature
+  and merged `master` pass 36 files / 416 tests, type-check, production build, dependency/diff
+  checks, civil-time/provenance/failure/cache/motion probes, and development/preview regression.
+  GitHub Actions run `29707073636` passed build and Pages deployment; hosted path/notch controls,
+  zone override, repeated toggling, live-clock advancement, assets, existing layers, and console
+  health pass. Physical Quest acceptance remains pending.
+
 - Closed the remaining local Milestone 2F scientific contracts: daily-path observer provenance now
   carries an explicit application-owned schema version distinct from observer revision and WGS84
   model identity; path, sample, notch, cache identity, and temporal diagnostics retain it.
