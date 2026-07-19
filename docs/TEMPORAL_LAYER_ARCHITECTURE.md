@@ -2,9 +2,11 @@
 
 ## Purpose
 
-This document defines one central time model and future Sun/Moon sampling contracts. It does not
-add time controls, ephemerides, geometry, or labels. All future celestial layers must consume the
-same simulation snapshot; no layer may call `new Date()` independently during rendering.
+This document defines one central time model and Sun/Moon sampling contracts. Milestone 2F now
+implements the bounded apparent-Sun civil-day path and live body-refresh subset described below;
+labels, events, Moon paths, a general time-control system, and broader temporal features remain
+deferred. All celestial layers consume the same simulation snapshot; no scientific provider may
+call `new Date()` independently.
 
 UTC, UT1, TT, civil-time, and provider claims trace to the [official astronomy source
 register](OFFICIAL_ASTRONOMY_SOURCES.md).
@@ -13,7 +15,12 @@ register](OFFICIAL_ASTRONOMY_SOURCES.md).
 
 ### Implemented non-visual subset
 
-Milestone 2A implements the deterministic core as `frozen` or explicit-tick `realtime`, paused state, signed finite rate, immutable UTC instant, and revision. It deliberately does not implement an ambient live clock, IANA time-zone/locale label state, calendar selection, temporal controls, or any solar/lunar calculation. The planned richer state contract below remains future temporal-layer architecture.
+Milestone 2A implements the deterministic core as `frozen` or explicit-tick `realtime`, paused
+state, signed finite rate, immutable UTC instant, and revision. Milestone 2F adds an explicit
+browser-`Intl` IANA civil-time state, a cached local-day apparent-Sun schedule, and a
+presentation-owned scheduler that feeds explicit elapsed milliseconds to the one central clock.
+It does not add an ambient scientific clock, persisted time zone, editable calendar system, labels,
+events, or Moon/planet paths.
 
 ### State contract
 
@@ -87,10 +94,9 @@ Scientific calculation cadence is distinct from XR rendering cadence.
 
 - Static frame geometry recalculates only when observer, time-model, or pole-model revisions
   change.
-- Live Sun/Moon/body directions are sampled on a configurable scientific cadence selected by an
-  angular-change/error test, with one second as the initial engineering ceiling between updates
-  in ordinary live mode. This is a performance starting point, not an astronomical accuracy
-  claim.
+- Live Sun/Moon/body directions refresh through the bounded application scheduler no less than
+  once per real minute at normal rate (and more often for existing accelerated rates). This is a
+  freshness ceiling, not an astronomical accuracy claim or an interpolation guarantee.
 - Accelerated time chooses sample spacing from simulation rate and an angular interpolation-error
   budget; it does not simply recompute once per render frame.
 - Visual interpolation uses normalized spherical interpolation between two validated unit
@@ -99,8 +105,9 @@ Scientific calculation cadence is distinct from XR rendering cadence.
   invalidation, or discontinuity disables interpolation across the boundary.
 - Labels update only when their formatted value or selected sample changes.
 
-The render loop reads the newest immutable scientific snapshot. It never mutates the simulation
-clock or ephemeris result.
+The render loop supplies monotonic elapsed input to the presentation scheduler, which is the sole
+caller of the central clock's explicit `tick`; it never mutates an ephemeris result. Science
+continues to receive only immutable clock state.
 
 ## Invalidation matrix
 

@@ -45,7 +45,7 @@ export interface SolarSystemBodyState {
   };
 }
 
-function immutableClone<T>(value: T): T {
+export function immutableClone<T>(value: T): T {
   if (Array.isArray(value)) {
     return Object.freeze(value.map((entry) => immutableClone(entry))) as T;
   }
@@ -263,7 +263,7 @@ function assertHorizontalResult(
   assertProvenance(result.provenance, identity, observer, instant, profile, 'HORIZONTAL_ENU', 'horizontal');
 }
 
-function assertBodyResult(
+export function assertValidApparentTopocentricBodyResult(
   result: ApparentTopocentricBodyResult,
   body: ObserverRelativeBody,
   identity: AstronomyProviderIdentity,
@@ -320,7 +320,7 @@ function assertBodyResult(
   }
 }
 
-function assertActiveProviderIdentity(
+export function assertActiveProviderIdentity(
   snapshot: ScientificSnapshot,
   providers: ScientificProviderRegistry,
 ): AstronomyProviderIdentity {
@@ -425,7 +425,7 @@ export class SolarSystemBodyStateService {
         snapshot.observer.observer,
         snapshot.configuration.bodyCorrectionProfile,
       );
-      assertBodyResult(result, body, activeProvider, snapshot);
+      assertValidApparentTopocentricBodyResult(result, body, activeProvider, snapshot);
       return immutableClone(result);
     }));
     const state = immutableClone({

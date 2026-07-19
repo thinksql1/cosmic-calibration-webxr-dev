@@ -183,3 +183,27 @@ required marker is present when enabled: Sun, Moon, Mercury, Venus, Mars, Jupite
 not every body is expected to be above the horizon. This procedure does not measure
 angular accuracy, identify Moon phase, or authorize projection/labels/temporal paths. **Physical
 Quest acceptance: NOT RUN.**
+
+## Milestone 2F 24-hour Sun path and live celestial updates (pending)
+
+**Physical Quest acceptance: NOT RUN.** This checklist is for the published temporal layer; it
+does not establish numerical angular accuracy, real-time ephemeris precision, DST behavior on an
+actual transition day, or long-duration comfort.
+
+1. Open the deployed application, enter immersive passthrough, and complete true-north
+   calibration. Confirm the horizon, axis/poles, celestial equator, and existing body-layer
+   controls remain available.
+2. Enable solar-system bodies, the Sun daily path, and civil-hour notches. Confirm the current Sun
+   marker is present and lies on or closely follows the warm observer-relative path.
+3. Confirm the path is visibly different from the celestial equator, includes a subdued
+   below-horizon continuation, and the modest hour notches lie directly on the path rather than on
+   the equator.
+4. Check world locking during gentle head turns and safe small lateral movement. The path and
+   notches must not follow the headset or turn into a nearby ring.
+5. Leave real-time mode running through at least one minute boundary. Confirm Sun and other body
+   markers refresh without a one-hour freeze, a jump to a decorative path, or duplicate geometry.
+6. Check readability in normal passthrough, comfortable Sun brightness, show/hide, below-horizon
+   policy, recalibration, reset, exit/re-entry, reload, and no stale markers.
+
+Record only observed results. Do not infer all seven identities, a daylight-saving transition,
+recenter/tracking-loss coverage, exact drift, or comfort duration from this short procedure.

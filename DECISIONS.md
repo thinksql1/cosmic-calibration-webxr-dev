@@ -323,6 +323,24 @@
   ecliptic, astrology, or a second temporal system. The user explicitly promoted this layer ahead
   of, but did not cancel, the planned long-term precession prerequisite review.
 
+### DEC-027: Derive the daily apparent Sun path from explicit IANA civil time while retaining UTC astronomy
+- **Date:** 2026-07-19
+- **Status:** Accepted locally; independent validation, integration, deployment, and physical Quest
+  acceptance pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Use the existing central UTC `SimulationClock` and approved airless apparent
+  topocentric provider to calculate an observer-relative Sun path for the selected local civil
+  date. Resolve that date and its valid hourly boundaries through an explicit browser `Intl` IANA
+  time-zone identifier, retaining skipped/repeated DST hours exactly as distinct UTC instants with
+  metadata. Render only bounded homogeneous projective directions below the calibrated geographic
+  parent; civil-hour notches lie on independently calculated Sun samples, never on the celestial
+  equator. A presentation-owned scheduler advances the central clock from explicit monotonic
+  elapsed input and refreshes live body state no less than once per minute at normal rate.
+- **Rationale:** Civil time defines a human daily clock, whereas UTC defines the scientific input to
+  astronomy. Keeping the contracts separate avoids a decorative 24-segment equator, a false fixed
+  civil day at DST transitions, and an ambient second scientific clock. The path remains a bounded
+  apparent observer reference and does not imply a geocentric physical solar orbit.
+
 ## Proposed decisions awaiting review
 
 None yet.

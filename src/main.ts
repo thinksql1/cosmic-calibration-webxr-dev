@@ -15,15 +15,19 @@ import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
 import { createLocalHorizonGroup } from './scene/createLocalHorizonGroup';
 import { createSolarSystemBodiesGroup } from './scene/createSolarSystemBodiesGroup';
+import { createSolarDailyPathGroup } from './scene/createSolarDailyPathGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
 import { createScientificProviderRegistry } from './science/providers/scientificProviderRegistry';
 import { SolarSystemBodyStateService } from './science/bodies/solarSystemBodyState';
+import { SolarDailyPathService } from './science/temporal/solarDailyPath';
 import { ScientificSnapshotService } from './science/snapshot/scientificSnapshotService';
 import { GeographicCalibrationStateAdapter } from './science/state/geographicCalibrationState';
 import { ObserverStateStore } from './science/state/observerState';
 import { ScientificConfigurationStore } from './science/state/scientificConfiguration';
 import { SimulationClock } from './science/state/simulationClock';
+import { CivilTimeZoneStateStore } from './science/state/civilTimeZoneState';
+import { browserResolvedTimeZone } from './science/temporal/civilTime';
 import {
   createEarthAxisPresentationModel,
   createEarthAxisStatusViewModel,
@@ -51,6 +55,12 @@ import {
   DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
   type SolarSystemBodyDisplaySettings,
 } from './presentation/solarSystemBodyPresentationModel';
+import {
+  createSolarDailyPathPresentationModel,
+  DEFAULT_SOLAR_DAILY_PATH_DISPLAY_SETTINGS,
+  type SolarDailyPathDisplaySettings,
+} from './presentation/solarDailyPathPresentationModel';
+import { RealtimeCelestialUpdateScheduler } from './temporal/realtimeCelestialUpdateScheduler';
 import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
@@ -101,6 +111,8 @@ const timePresetButtons = [
   ...document.querySelectorAll<HTMLButtonElement>('[data-time-utc]'),
 ];
 const useCurrentTimeButton = requireElement<HTMLButtonElement>('#use-current-time');
+const civilTimeZoneInput = requireElement<HTMLInputElement>('#civil-time-zone');
+const civilTimeZoneError = requireElement<HTMLParagraphElement>('#civil-time-zone-error');
 const showAxisInput = requireElement<HTMLInputElement>('#show-celestial-axis');
 const showEarthCoreInput = requireElement<HTMLInputElement>('#show-earth-core');
 const showMarkersInput = requireElement<HTMLInputElement>('#show-pole-markers');
@@ -110,6 +122,9 @@ const belowHorizonModeSelect = requireElement<HTMLSelectElement>('#below-horizon
 const showCelestialEquatorInput = requireElement<HTMLInputElement>('#show-celestial-equator');
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
+const showSolarDailyPathInput = requireElement<HTMLInputElement>('#show-solar-daily-path');
+const showSolarHourNotchesInput = requireElement<HTMLInputElement>('#show-solar-hour-notches');
+const showSolarPathBelowHorizonInput = requireElement<HTMLInputElement>('#show-solar-path-below-horizon');
 const axisEyeModeSelect = requireElement<HTMLSelectElement>('#axis-eye-mode');
 const equatorEyeModeSelect = requireElement<HTMLSelectElement>('#equator-eye-mode');
 const horizonEyeModeSelect = requireElement<HTMLSelectElement>('#horizon-eye-mode');
@@ -135,10 +150,12 @@ const celestialAxis = createEarthAxisGroup();
 const celestialEquator = createCelestialEquatorGroup(96);
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 const solarSystemBodies = createSolarSystemBodiesGroup();
+const solarDailyPath = createSolarDailyPathGroup();
 geographicReference.add(celestialAxis.group);
 geographicReference.add(celestialEquator.group);
 geographicReference.add(localHorizon.group);
 geographicReference.add(solarSystemBodies.group);
+geographicReference.add(solarDailyPath.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
 
@@ -177,6 +194,9 @@ const scientificCalibration = new GeographicCalibrationStateAdapter();
 const scientificProviders = createScientificProviderRegistry();
 const scientificSnapshotService = new ScientificSnapshotService(scientificProviders);
 const solarSystemBodyStateService = new SolarSystemBodyStateService(scientificProviders);
+const solarDailyPathService = new SolarDailyPathService(scientificProviders);
+const civilTimeZoneState = new CivilTimeZoneStateStore();
+const realtimeCelestialUpdates = new RealtimeCelestialUpdateScheduler();
 let currentXrState: XRState = checkingState;
 let controllerManager: NorthCalibrationControllerManager | undefined;
 let scientificOriginIdentity = 'desktop-simulation';
@@ -209,6 +229,18 @@ function currentSolarSystemBodyDisplaySettings(): SolarSystemBodyDisplaySettings
   return Object.freeze({
     ...DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
     showBodies: showSolarSystemBodiesInput.checked,
+    emphasizeSun: showSolarDailyPathInput.checked || showSolarHourNotchesInput.checked,
+    showSunOnly: !showSolarSystemBodiesInput.checked &&
+      (showSolarDailyPathInput.checked || showSolarHourNotchesInput.checked),
+  });
+}
+
+function currentSolarDailyPathDisplaySettings(): SolarDailyPathDisplaySettings {
+  return Object.freeze({
+    ...DEFAULT_SOLAR_DAILY_PATH_DISPLAY_SETTINGS,
+    showPath: showSolarDailyPathInput.checked,
+    showHourNotches: showSolarHourNotchesInput.checked,
+    showBelowHorizon: showSolarPathBelowHorizonInput.checked,
   });
 }
 
@@ -297,6 +329,7 @@ function renderCelestialAxis(): void {
     celestialAxis.clear();
     celestialEquator.clear();
     solarSystemBodies.clear();
+    solarDailyPath.clear();
     return;
   }
   celestialAxis.update(
@@ -314,6 +347,44 @@ function renderCelestialAxis(): void {
     currentSolarSystemBodyDisplaySettings(),
   );
   solarSystemBodies.update(bodyModel);
+  if (civilTimeZoneState.current.kind !== 'ready') {
+    solarDailyPath.clear();
+    celestialDiagnostics.append(
+      Object.assign(document.createElement('li'), {
+        textContent: 'Sun path unavailable: choose a valid IANA civil time zone.',
+      }),
+    );
+  } else {
+    try {
+      const pathState = solarDailyPathService.capture(
+        result.snapshot,
+        civilTimeZoneState.current.timeZone,
+        civilTimeZoneState.current.revision,
+      );
+      const pathModel = createSolarDailyPathPresentationModel(
+        result.snapshot,
+        bodyState,
+        pathState,
+        currentSolarDailyPathDisplaySettings(),
+      );
+      solarDailyPath.update(pathModel);
+      celestialDiagnostics.append(
+        ...[
+          `Sun path: ${pathModel.selectedCivilDate} in ${pathModel.timeZone}; ${pathModel.samples.length} apparent samples and ${pathModel.hourNotches.length} valid civil-hour notches`,
+          `Sun path ${pathModel.renderStrategy}; ${pathModel.provenance.samplingPolicy}; below-horizon path ${pathModel.pathVisible && currentSolarDailyPathDisplaySettings().showBelowHorizon ? 'available' : 'suppressed by presentation'}`,
+        ].map((diagnostic) => {
+          const item = document.createElement('li');
+          item.textContent = diagnostic;
+          return item;
+        }),
+      );
+    } catch (error) {
+      solarDailyPath.clear();
+      const item = document.createElement('li');
+      item.textContent = `Sun path unavailable: ${error instanceof Error ? error.message : 'scientific path calculation failed.'}`;
+      celestialDiagnostics.append(item);
+    }
+  }
   celestialDiagnostics.append(
     ...[
       `Equator ${equatorModel.terminology}; ${equatorModel.sampleCount} projective samples`,
@@ -514,6 +585,26 @@ bearingPresetButtons.forEach((button) => {
 });
 updateBearingOutput();
 
+function applyCivilTimeZone(source: 'browser-intl' | 'user-selected'): void {
+  try {
+    civilTimeZoneState.set(civilTimeZoneInput.value.trim(), source);
+    civilTimeZoneError.textContent = '';
+  } catch (error) {
+    civilTimeZoneState.clear();
+    civilTimeZoneError.textContent = error instanceof Error ? error.message : 'Civil time zone is invalid.';
+  }
+  renderCelestialAxis();
+}
+
+try {
+  const browserTimeZone = browserResolvedTimeZone();
+  civilTimeZoneInput.value = browserTimeZone.ianaName;
+  civilTimeZoneState.set(browserTimeZone.ianaName, 'browser-intl');
+} catch (error) {
+  civilTimeZoneError.textContent = error instanceof Error ? error.message : 'Browser civil time zone is unavailable.';
+}
+civilTimeZoneInput.addEventListener('change', () => applyCivilTimeZone('user-selected'));
+
 function applyObserver(source = 'manual observer entry'): void {
   try {
     observerState.set({
@@ -561,7 +652,15 @@ timePresetButtons.forEach((button) => {
   button.addEventListener('click', () => selectTime(button.dataset.timeUtc ?? '', 'user-selected'));
 });
 useCurrentTimeButton.addEventListener('click', () => {
-  selectTime(new Date().toISOString(), 'system-selected');
+  try {
+    simulationClock.selectFrozen(createSimulationInstant(new Date().toISOString(), 'system-selected'));
+    simulationClock.startRealtime();
+    realtimeCelestialUpdates.reset(performance.now());
+    observerError.textContent = '';
+  } catch (error) {
+    observerError.textContent = error instanceof Error ? error.message : 'Current UTC instant is invalid.';
+  }
+  renderCelestialAxis();
 });
 
 [
@@ -574,6 +673,9 @@ useCurrentTimeButton.addEventListener('click', () => {
   showCelestialEquatorInput,
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
+  showSolarDailyPathInput,
+  showSolarHourNotchesInput,
+  showSolarPathBelowHorizonInput,
   axisEyeModeSelect,
   equatorEyeModeSelect,
   horizonEyeModeSelect,
@@ -601,6 +703,8 @@ function applyEyePresentationForFrame(frame?: XRFrame): void {
 }
 
 renderer.setAnimationLoop((_time, frame) => {
+  const update = realtimeCelestialUpdates.advance(_time, simulationClock);
+  if (update.shouldRefreshScientificState) renderCelestialAxis();
   applyEyePresentationForFrame(frame);
   if (!renderer.xr.isPresenting) controls.update();
   renderer.render(scene, camera);
@@ -611,6 +715,7 @@ window.addEventListener('pagehide', () => {
   celestialEquator.dispose();
   localHorizon.dispose();
   solarSystemBodies.dispose();
+  solarDailyPath.dispose();
 }, { once: true });
 
 async function initializeCapabilityState(): Promise<void> {

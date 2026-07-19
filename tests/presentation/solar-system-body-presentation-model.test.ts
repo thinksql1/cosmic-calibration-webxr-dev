@@ -44,4 +44,16 @@ describe('actual solar-system body presentation model', () => {
     expect(Object.isFrozen(model)).toBe(true);
     expect(() => createSolarSystemBodyPresentationModel(snapshot, Object.freeze({ ...bodies, snapshotIdentity: { ...bodies.snapshotIdentity, timeRevision: 99 } }))).toThrow('active immutable scientific snapshot');
   });
+
+  it('keeps the current Sun marker authoritative for a path-only presentation without enabling other bodies', () => {
+    const { snapshot, bodies } = fixture();
+    const model = createSolarSystemBodyPresentationModel(snapshot, bodies, {
+      showBodies: false,
+      showSunOnly: true,
+      emphasizeSun: true,
+    });
+    expect(model.visible).toBe(true);
+    expect(model.markers.find((marker) => marker.body === 'Sun')!.style.pixelDiameter).toBe(22);
+    expect(model.markers.filter((marker) => marker.body !== 'Sun').every((marker) => marker.style.opacity === 0)).toBe(true);
+  });
 });

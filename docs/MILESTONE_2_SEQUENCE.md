@@ -29,9 +29,11 @@ gates pass and it is integrated and published normally. The user has physically 
 hardened geocentric replacement and celestial equator. The equator is good/workable and each eye
 individually receives one clean axis/equator line, while binocular viewing doubles both layers.
 Milestone 2D therefore adds bounded eye-presentation modes and a local tangent-plane horizon. The
-user has now explicitly promoted bounded actual Sun/Moon/major-planet placement ahead of the
-previously selected long-term precession prerequisite review; that review remains planned and is
-not silently removed.
+user explicitly promoted bounded actual Sun/Moon/major-planet placement ahead of the previously
+selected long-term precession prerequisite review; that review remains planned and is not silently
+removed. The user then authorized the bounded 2F apparent-Sun civil-day path and live-update
+milestone ahead of that physical body-layer checklist; its independent and physical gates remain
+required.
 
 ## Sequence overview
 
@@ -42,7 +44,8 @@ not silently removed.
           -> 2C mean celestial equator
               -> 2D eye-presentation modes and local horizon
                    -> 2E actual apparent Sun/Moon/major-planet directions
-                       -> later validated precession/ecliptic/projection/temporal milestones
+                       -> 2F 24-hour apparent Sun path and live celestial updates
+                           -> later validated precession/ecliptic/projection/temporal milestones
 ```
 
 Every milestone consumes the same observer, time, frame, provenance, and correction contracts.
@@ -279,6 +282,26 @@ remains a planned scientific task after this promoted bounded layer.
 **Explicit exclusions:** Uranus, Neptune, Pluto, small bodies, stars, labels, pointing, Moon
 phase, planet disks/rings, ecliptic, projection modes, declination connectors, paths, animation,
 and temporal controls.
+
+## Milestone 2F - 24-hour apparent Sun path and live celestial updates
+
+**Current result:** implemented locally on `feature/solar-24-hour-clock`; independent validation,
+integration, deployment, and physical Quest acceptance are pending.
+
+**Objective:** derive a selected local civil-day observer-relative apparent Sun path and exact
+valid civil-hour notches from the existing airless topocentric provider, while advancing visible
+body state through the central simulation clock.
+
+**Outputs:** an explicit IANA `Intl` civil-time contract; actual 23/24/25-hour schedule handling;
+a bounded ten-minute-plus-exact-hour path cache; homogeneous projective path/notch rendering;
+current-Sun emphasis; and a one-minute-or-better bounded live refresh cadence.
+
+**Physical Quest boundary:** test path/equator distinction, notch placement, below-horizon
+continuity, path readability, live refresh, world locking, lifecycle, and comfort before adding
+labels, ecliptic, or another temporal layer.
+
+**Explicit exclusions:** hour labels, rise/set events, annual Sun path, ecliptic, Moon/planet
+paths, phases, new time controls, location persistence, stars, and precession.
 
 ## Later validated precession trajectories
 

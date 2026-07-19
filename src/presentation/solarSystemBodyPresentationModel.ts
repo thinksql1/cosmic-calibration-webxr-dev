@@ -8,10 +8,14 @@ import {
 
 export interface SolarSystemBodyDisplaySettings {
   readonly showBodies: boolean;
+  /** A presentation-only cue used when the daily Sun path is visible. */
+  readonly emphasizeSun?: boolean;
+  /** Lets the daily Sun path retain its authoritative live Sun marker without enabling the other bodies. */
+  readonly showSunOnly?: boolean;
 }
 
 export const DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS: SolarSystemBodyDisplaySettings =
-  Object.freeze({ showBodies: false });
+  Object.freeze({ showBodies: false, emphasizeSun: false });
 
 export interface SolarSystemBodyStyle {
   readonly colorHex: number;
@@ -116,7 +120,11 @@ export function createSolarSystemBodyPresentationModel(
       azimuthDeg: result.horizontal.azimuthDeg,
       aboveHorizon: result.aboveHorizon,
       celestialEquatorRelation: result.celestialEquatorRelation,
-      style: BODY_STYLES[result.body],
+      style: result.body === 'Sun' && settings.emphasizeSun === true
+        ? Object.freeze({ ...BODY_STYLES.Sun, pixelDiameter: 22, opacity: 0.98 })
+        : settings.showSunOnly === true && settings.showBodies !== true
+          ? Object.freeze({ ...BODY_STYLES[result.body], opacity: 0 })
+          : BODY_STYLES[result.body],
     });
   }));
   return Object.freeze({
@@ -127,7 +135,7 @@ export function createSolarSystemBodyPresentationModel(
     gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES',
     presentationRadiusPolicy: 'DIRECTION_AT_INFINITY_NO_FINITE_CELESTIAL_DISTANCE',
     markers,
-    visible: settings.showBodies,
+    visible: settings.showBodies || settings.showSunOnly === true,
     snapshotIdentity: Object.freeze({
       snapshotCacheKey: snapshot.cacheKey,
       bodyCacheKey: state.cacheKey,

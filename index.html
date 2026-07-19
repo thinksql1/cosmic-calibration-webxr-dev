@@ -83,6 +83,10 @@
               <button type="button" data-time-utc="2050-01-01T00:00:00.000Z">2050</button>
               <button id="use-current-time" type="button">Use current time</button>
             </div>
+            <label for="civil-time-zone">Civil time zone (IANA)</label>
+            <input id="civil-time-zone" type="text" autocomplete="off" spellcheck="false" aria-describedby="civil-time-zone-error" />
+            <p id="civil-time-zone-error" class="input-error" role="alert"></p>
+            <p class="simulation-note">UTC remains authoritative for astronomy. This explicit IANA zone defines the displayed local civil day and handles valid daylight-saving hour boundaries.</p>
           </div>
         </details>
 
@@ -97,6 +101,9 @@
             <label><input id="show-celestial-equator" type="checkbox" />Celestial equator</label>
             <label><input id="show-local-horizon" type="checkbox" />Local horizon</label>
             <label><input id="show-solar-system-bodies" type="checkbox" />Solar-system bodies</label>
+            <label><input id="show-solar-daily-path" type="checkbox" />Sun daily path</label>
+            <label><input id="show-solar-hour-notches" type="checkbox" />Sun civil-hour notches</label>
+            <label><input id="show-solar-path-below-horizon" type="checkbox" checked />Sun path below horizon</label>
           </div>
           <label class="select-label" for="below-horizon-mode">Below-horizon treatment</label>
           <select id="below-horizon-mode">
@@ -127,6 +134,7 @@
           <p id="eye-presentation-status" class="simulation-note" aria-live="polite"></p>
           <p class="simulation-note">World-scale WGS84 model: the core is geocentric, while NCP/SCP and the mean celestial equator are projective directions. The optional 24 m local horizon is intentionally observer-origin and tangent-plane based; its radius is a visual reference, not distance to the natural horizon. The room floor is not an opaque Earth surface.</p>
           <p class="simulation-note">Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn are actual apparent topocentric directions at the selected observer and UTC instant. Their marker centers are projective directions, not literal distances or diameters; Moon phase, labels, and projection modes are deferred.</p>
+          <p class="simulation-note">The optional Sun path is an observer-relative apparent trace across the selected local civil day. Its notches are independently calculated at valid civil-hour boundaries on the path itself, including below-horizon positions; it is neither the celestial equator nor an annual ecliptic.</p>
         </details>
 
         <details>

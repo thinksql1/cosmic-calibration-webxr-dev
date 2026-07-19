@@ -6,10 +6,11 @@ This document preserves the product's long-term direction without authorizing im
 is a scope-curation record, not a delivery schedule, a scientific claim, or a backlog that may be
 started opportunistically.
 
-The current baseline is the published Milestone 2D experience: the immutable scientific snapshot,
-the WGS84 Earth-core and P03 mean-axis presentation, the projective celestial equator, reversible
-per-layer eye-presentation modes, and the default-hidden local astronomical horizon. Its only
-active next task remains the physical Quest acceptance test for eye modes and the local horizon.
+The current baseline includes the published Milestone 2E actual-body layer: the immutable
+scientific snapshot, WGS84 Earth-core and P03 mean-axis presentation, projective celestial
+equator, reversible per-layer eye-presentation modes, local astronomical horizon, and seven
+actual apparent body directions. Local Milestone 2F now adds the bounded civil-day Sun path and
+live-update implementation; its independent and physical gates remain pending.
 
 Every item below is **planned**, **exploratory**, **deferred**, or **research required** until a
 separate bounded task is authorized. Existing milestone gates, physical Quest evidence, and the
@@ -136,7 +137,7 @@ the body direction.
 | Capability | Status | Required honesty and scope |
 |---|---|---|
 | Apparent Sun | Implemented locally; independent validation/Quest acceptance pending | Uses the explicit observer/time/correction profile and a visibility-safe actual-direction marker. Projection/both modes remain deferred; never encourage unaided solar viewing. |
-| Solar temporal path and events | Planned after current Sun direction | Use central clock and validated civil-time resolver; keep below-horizon samples and declare sunrise/sunset limb/refraction conventions. |
+| Solar temporal path and events | Local 24-hour apparent-path subset implemented; review/Quest pending | Uses central clock and explicit IANA `Intl` civil resolver; retains below-horizon samples and exact valid civil-hour boundaries. Sunrise/sunset limb/refraction events remain deferred. |
 | Apparent Moon | Implemented locally; independent validation/Quest acceptance pending | Preserves material topocentric parallax in the apparent direction and provenance. Phase/illumination, literal distance, and projection/both modes remain deferred. |
 | Moon study scale | Exploratory | Separate true angular size, enhanced study size, and focused-Moon mode. All enhancement is declared presentation, not a physical claim. |
 | Lunar temporal paths | Planned after Moon direction | Support next-24-hour and local-midnight approaches only when the sampling/phase contracts are independently validated; never show a circular observer-centered lunar orbit. |

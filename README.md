@@ -10,7 +10,10 @@ reference. Published Milestone 2E adds a default-hidden actual-direction
 layer for Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn using the same explicit observer,
 UTC clock, correction, provenance, calibrated-parent, and linear-depth contracts. It adds no
 automatic heading, geolocation, precession, ecliptic, projection mode, phase, labels, paths, or
-contemplative system.
+contemplative system. Local Milestone 2F adds an optional observer-relative apparent Sun path for
+the selected explicit IANA civil day, exact valid civil-hour notches on that path, and bounded live
+updates through the same central simulation clock. The path is not the celestial equator or an
+annual ecliptic; labels and other body paths remain deferred.
 
 ## Milestone 2 architecture status
 
@@ -44,6 +47,10 @@ quantitative Quest observations remain unmeasured.
 The published Milestone 2E body layer passed final independent provider/provenance/cache review,
 383 automated tests, normal integration, GitHub Actions/Pages deployment, and hosted desktop
 regression. Physical Quest acceptance of the body markers remains pending.
+The user subsequently reported positive bounded Quest use of the body markers, plausibly
+identifying Sun, Mercury, and Venus; absent labels limited other identification and the user noted
+that the celestial equator is not the Sun's path. Local Milestone 2F passes 400 automated tests,
+type-check, and production build; its independent review and Quest acceptance remain pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)
@@ -62,6 +69,7 @@ regression. Physical Quest acceptance of the body markers remains pending.
 - [Local astronomical horizon](docs/LOCAL_ASTRONOMICAL_HORIZON.md)
 - [Milestone 2D physical acceptance](docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md)
 - [Actual solar-system body layer](docs/SOLAR_SYSTEM_BODY_LAYER.md)
+- [24-hour apparent Sun path](docs/SOLAR_24_HOUR_CLOCK.md)
 
 ## Current scope
 
@@ -83,7 +91,10 @@ The shared desktop/XR scene contains:
   1.5 m room-floor diagnostic ring; and
 - a default-hidden seven-marker actual apparent topocentric Sun/Moon/Mercury/Venus/Mars/Jupiter/
   Saturn direction layer. Marker centers are projective directions, not literal body distances or
-  diameters; Moon phase, labels, and projections are deferred.
+  diameters; Moon phase, labels, and projections are deferred; and
+- an optional projective Sun-only daily apparent path with valid IANA local-civil-hour notches,
+  below-horizon continuity, and central-clock real-time refresh. It is distinct from the P03
+  celestial equator and does not represent a physical solar orbit or annual ecliptic.
 
 The room X and Z axes have no geographic meaning before calibration. Geographic geometry is hidden until a valid physical or simulated calibration is captured.
 

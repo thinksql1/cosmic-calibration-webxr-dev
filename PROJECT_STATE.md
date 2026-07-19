@@ -4,7 +4,7 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Actual solar-system body directions independently validated, integrated, and published; physical Quest acceptance pending
+**Current phase:** Local Milestone 2F 24-hour apparent Sun path and bounded live celestial updates implemented; independent validation, integration, deployment, and physical Quest acceptance pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -73,7 +73,22 @@ browser consoles. Normal merge `b24b3e9` retains the feature branch. GitHub Acti
 `29703133387` passed install, type-check, tests, build, artifact upload, and Pages deployment.
 Hosted horizon/axis/poles/equator controls remain available; the body layer starts hidden, toggles
 to the seven validated directions without duplication, loads repository-subpath assets, and has no
-blocking console errors. Physical Quest body acceptance remains pending.
+blocking console errors. The user has since reported positive bounded Quest use of the body layer:
+markers were visible and Sun, Mercury, and Venus were plausibly identifiable, while missing labels
+limited identification of other bodies. The user also noticed that the celestial equator does not
+match the Sun's path. This is feedback, not a complete seven-body, angular-accuracy, lifecycle,
+or comfort acceptance record.
+
+Milestone 2F now locally adds an observer-relative apparent Sun trace over the explicit IANA
+local civil day. The immutable science service samples the airless apparent-topocentric Sun every
+ten minutes plus every valid civil-hour boundary; ordinary and DST 23/25-hour schedules retain
+their actual UTC instants, skipped hours, and repeated-hour metadata. The established central
+simulation clock advances visible body state through one bounded application scheduler at least
+once per minute at normal real-time rate. The celestial equator remains a wholly separate P03
+reference. The projective line/notches preserve below-horizon directions without celestial-scale
+GPU coordinates; their visual style and the live Sun emphasis are presentation-only. The local
+work passes 400 deterministic tests, type-check, and build; independent review, publication, and
+physical Quest validation are pending.
 
 ## One-paragraph state summary
 

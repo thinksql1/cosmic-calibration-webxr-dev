@@ -4,6 +4,16 @@
 
 ### Added
 
+- Added a bounded local 24-hour apparent Sun path with exact valid civil-hour notches, an explicit
+  IANA `Intl` time-zone contract, daylight-saving 23/25-hour handling, below-horizon continuity,
+  projective linear-depth rendering, and a live-Sun emphasis. The existing central simulation
+  clock now advances visible Sun, Moon, and planet state through one minute-or-better real-time
+  refresh cadence; no second scientific clock, labels, ecliptic, phase, or body path was added.
+- Recorded reported Quest feedback for the published actual-body layer: it operated, markers were
+  visible, and the user plausibly identified Sun, Mercury, and Venus. Labels were absent and
+  limited identification of other bodies; the user also observed that the celestial equator is not
+  the Sun's path. No angular, lifecycle, comfort, or all-seven identity claim is inferred.
+
 - Independently validated and normally integrated the actual solar-system body layer with merge
   `b24b3e9`. The feature and merged `master` pass 383 tests, type-check, production build,
   dependency/diff checks, adversarial provider/provenance/cache probes, and development/preview

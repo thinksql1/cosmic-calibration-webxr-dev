@@ -73,7 +73,9 @@ One default-hidden **Solar-system bodies** control reveals or hides the complete
 layer. There are no per-body controls, labels, pointing aids, search, persistent storage, network
 lookup, a second clock, Moon phase/limb/diameter rendering, planet disks/rings/paths, ecliptic,
 celestial-equator projection, combined actual-plus-projected display, declination connectors,
-Sun/Moon/planet temporal paths, stars, or precession geometry.
+Moon/planet temporal paths, stars, or precession geometry. The separate Sun civil-day path and
+central-clock refresh are documented in [Solar 24-Hour Clock](SOLAR_24_HOUR_CLOCK.md); they do not
+add labels, alter the body-science contract, or project any body to the celestial equator.
 
 ## Verification and Quest follow-up
 
@@ -90,3 +92,9 @@ global control, seven-body diagnostic, repeated visibility toggling, subpath ass
 and coexistence with the axis/equator/horizon. Physical Quest acceptance remains pending and must
 check general Sun/Moon direction, planet separation, below-horizon continuity, brightness,
 world-locking, calibration, session lifecycle, and absence of duplicate markers.
+
+The user subsequently reported positive bounded Quest use: the layer operated, markers were
+visible, and Sun, Mercury, and Venus were plausibly identifiable. Missing labels limited
+identification of other bodies, and the user observed that the celestial equator is not the Sun's
+path. This feedback does not establish exact angular accuracy, all-seven identification,
+long-duration updates, lifecycle coverage, or comfort telemetry.
