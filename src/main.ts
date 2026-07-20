@@ -62,6 +62,11 @@ import {
   type SolarDailyPathDisplaySettings,
 } from './presentation/solarDailyPathPresentationModel';
 import { RealtimeCelestialUpdateScheduler } from './temporal/realtimeCelestialUpdateScheduler';
+import {
+  applyBasicDiagnosticMaterials,
+  createSimpleUnifiedRootDiagnostic,
+  createXrPerEyeDiagnostics,
+} from './diagnostics/xrPerEyeDiagnostics';
 import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
@@ -129,6 +134,19 @@ const axisEyeModeSelect = requireElement<HTMLSelectElement>('#axis-eye-mode');
 const equatorEyeModeSelect = requireElement<HTMLSelectElement>('#equator-eye-mode');
 const horizonEyeModeSelect = requireElement<HTMLSelectElement>('#horizon-eye-mode');
 const eyePresentationStatus = requireElement<HTMLParagraphElement>('#eye-presentation-status');
+const xrDiagnostics = createXrPerEyeDiagnostics();
+const diagnosticPreset = xrDiagnostics.preset;
+if (xrDiagnostics.enabled) {
+  showAxisInput.checked = diagnosticPreset.axis;
+  showEarthCoreInput.checked = diagnosticPreset.core;
+  showMarkersInput.checked = diagnosticPreset.markers;
+  showLabelsInput.checked = diagnosticPreset.labels;
+  showCelestialEquatorInput.checked = diagnosticPreset.equator;
+  showLocalHorizonInput.checked = diagnosticPreset.horizon;
+  showSolarSystemBodiesInput.checked = diagnosticPreset.bodies;
+  showSolarDailyPathInput.checked = diagnosticPreset.sunPath;
+  showSolarHourNotchesInput.checked = diagnosticPreset.sunPath;
+}
 const celestialOverlayControls = [
   ...celestialPanel.querySelectorAll<HTMLElement>('button, input, select, summary'),
 ];
@@ -141,6 +159,7 @@ const domOverlayControls: EventTarget[] = [
   simulateNorthButton,
   ...bearingPresetButtons,
   ...celestialOverlayControls,
+  ...document.querySelectorAll<HTMLElement>('#xr-diagnostic-panel button, #xr-diagnostic-panel select, #xr-diagnostic-panel summary'),
 ];
 
 const desktopBackground = new THREE.Color(0x071014);
@@ -155,12 +174,29 @@ const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 const solarSystemBodies = createSolarSystemBodiesGroup();
 const solarDailyPath = createSolarDailyPathGroup();
-geographicReference.add(geocentricCelestialStructure);
+if (xrDiagnostics.enabled && diagnosticPreset.legacyAxisRoot) {
+  geocentricCelestialStructure.remove(celestialAxis.group);
+  geographicReference.add(geocentricCelestialStructure, celestialAxis.group);
+} else {
+  geographicReference.add(geocentricCelestialStructure);
+}
+if (xrDiagnostics.enabled && diagnosticPreset.simpleUnifiedRoot) {
+  geocentricCelestialStructure.add(createSimpleUnifiedRootDiagnostic());
+}
 geographicReference.add(localHorizon.group);
 geographicReference.add(solarSystemBodies.group);
 geographicReference.add(solarDailyPath.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
+if (xrDiagnostics.enabled) {
+  applyBasicDiagnosticMaterials(geocentricCelestialStructure, diagnosticPreset.basicTarget);
+  if (diagnosticPreset.legacyAxisRoot) {
+    applyBasicDiagnosticMaterials(celestialAxis.group, diagnosticPreset.basicTarget);
+  }
+  if (diagnosticPreset.disableFrustumCulling) {
+    geocentricCelestialStructure.traverse((object) => { object.frustumCulled = false; });
+  }
+}
 
 const camera = new THREE.PerspectiveCamera(
   54,
@@ -179,6 +215,12 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
 renderer.xr.setReferenceSpaceType('local-floor');
 sceneHost.append(renderer.domElement);
+if (xrDiagnostics.enabled && diagnosticPreset.disableApplicationClipping) {
+  renderer.clippingPlanes = [];
+  renderer.localClippingEnabled = false;
+}
+xrDiagnostics.installGlobalCapture(renderer);
+xrDiagnostics.instrument(geographicReference);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0.45, 0);
@@ -204,6 +246,24 @@ let currentXrState: XRState = checkingState;
 let controllerManager: NorthCalibrationControllerManager | undefined;
 let scientificOriginIdentity = 'desktop-simulation';
 let xrOriginSequence = 0;
+let previousCalibrationKind: NorthCalibrationState['kind'] | undefined;
+
+function diagnosticSnapshot(label: string, state: NorthCalibrationState): void {
+  xrDiagnostics.snapshot(
+    label,
+    state.kind === 'calibrated' ? state.calibration.yawRadians : undefined,
+    {
+      referenceSpaceType: 'local-floor',
+      renderer,
+      camera,
+      geographicRoot: geographicReference,
+      geocentricRoot: geocentricCelestialStructure,
+      horizon: localHorizon.group,
+      earthAxis: celestialAxis.group,
+      equator: celestialEquator.group,
+    },
+  );
+}
 
 function currentAxisDisplaySettings(): EarthAxisDisplaySettings {
   return Object.freeze({
@@ -458,6 +518,15 @@ function renderCalibrationState(state: NorthCalibrationState): void {
   const xrActive = currentXrState.kind === 'session-active';
   const calibrationActive = isCalibrationActive(state);
   const interaction = controllerManager?.currentInteraction;
+  xrDiagnostics.setCalibrationState(state.kind);
+  if (state.kind === 'calibrating' && previousCalibrationKind !== 'calibrating') {
+    xrDiagnostics.record('calibration.start');
+    diagnosticSnapshot('before-calibration', state);
+  }
+  if (state.kind === 'calibrated' && previousCalibrationKind !== 'calibrated') {
+    xrDiagnostics.record('calibration.completion.begin');
+    diagnosticSnapshot('before-calibrated-apply', state);
+  }
   applyCalibrationToGeographicGroup(geographicReference, state);
   scientificCalibration.update(state, scientificOriginIdentity);
   controllerManager?.updateRayVisibility();
@@ -499,6 +568,11 @@ function renderCalibrationState(state: NorthCalibrationState): void {
   resetNorthButton.hidden = state.kind === 'uncalibrated';
   desktopSimulation.hidden = xrActive;
   renderCelestialAxis();
+  if (state.kind === 'calibrated' && previousCalibrationKind !== 'calibrated') {
+    diagnosticSnapshot('after-calibration', state);
+    xrDiagnostics.record('calibration.completion.end');
+  }
+  previousCalibrationKind = state.kind;
 }
 
 northCalibration.subscribe(renderCalibrationState);
@@ -555,6 +629,7 @@ enterArButton.addEventListener('click', () => {
 });
 
 calibrateButton.addEventListener('click', () => {
+  xrDiagnostics.record('calibration.start.request');
   controllerManager?.beginCalibration();
 });
 
@@ -705,11 +780,24 @@ function applyEyePresentationForFrame(frame?: XRFrame): void {
 }
 
 renderer.setAnimationLoop((_time, frame) => {
-  const update = realtimeCelestialUpdates.advance(_time, simulationClock);
-  if (update.shouldRefreshScientificState) renderCelestialAxis();
-  applyEyePresentationForFrame(frame);
-  if (!renderer.xr.isPresenting) controls.update();
-  renderer.render(scene, camera);
+  xrDiagnostics.frameEntry();
+  let completed = false;
+  try {
+    xrDiagnostics.operation('realtime-update');
+    const update = realtimeCelestialUpdates.advance(_time, simulationClock);
+    if (update.shouldRefreshScientificState) renderCelestialAxis();
+    xrDiagnostics.operation('eye-presentation');
+    applyEyePresentationForFrame(frame);
+    xrDiagnostics.operation('desktop-controls');
+    if (!renderer.xr.isPresenting) controls.update();
+    xrDiagnostics.operation('renderer.render');
+    renderer.render(scene, camera);
+    xrDiagnostics.operation('frame-complete');
+    completed = true;
+  } finally {
+    xrDiagnostics.frameCompletion(completed);
+    xrDiagnostics.flushPanel();
+  }
 });
 
 window.addEventListener('pagehide', () => {
@@ -718,6 +806,7 @@ window.addEventListener('pagehide', () => {
   localHorizon.dispose();
   solarSystemBodies.dispose();
   solarDailyPath.dispose();
+  xrDiagnostics.dispose();
 }, { once: true });
 
 async function initializeCapabilityState(): Promise<void> {
