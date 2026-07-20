@@ -23,7 +23,7 @@ preserves that finite center without raw Earth-scale GPU vertices. Its current l
 remediation keeps static Float32 ring directions, uploads rounded per-eye finite-core uniforms, and
 uses a continuous default spindle style. The surface observer and local horizon remain offset and
 observer-centered. P03, WGS84, calibration, bodies, Sun path, and time science are unchanged. The
-local suite passes 40 files / 438 tests, but this branch is not independently revalidated,
+local suite passes 438/438 tests across 40 files, but this branch is not independently revalidated,
 integrated, deployed, or physically Quest-tested; those gates remain pending.
 
 ## Milestone 2 architecture status
@@ -58,11 +58,14 @@ quantitative Quest observations remain unmeasured.
 The published Milestone 2E body layer passed final independent provider/provenance/cache review,
 383 automated tests, normal integration, GitHub Actions/Pages deployment, and hosted desktop
 regression. Physical Quest acceptance of the body markers remains pending.
-The user subsequently reported positive bounded Quest use of the body markers, plausibly
-identifying Sun, Mercury, and Venus; absent labels limited other identification and the user noted
-that the celestial equator is not the Sun's path. Milestone 2F passes final independent review,
-416 automated tests, type-check, production build, normal integration, GitHub Actions/Pages
-deployment, and hosted desktop regression. Physical Quest acceptance remains pending.
+The user subsequently described the already deployed body and Sun-clock experience as beautiful
+and compelling, plausibly identifying Sun, Mercury, and Venus. Absent labels limited other
+identification, and the user noted that the celestial equator is not the Sun's path. This
+observation concerns the published seven-body layer, daily Sun path, civil-hour notches, and live
+updates; it is not physical acceptance of the unmerged rigid spindle/unified geocentric
+correction. Milestone 2F passes final independent review, 416 automated tests, type-check,
+production build, normal integration, GitHub Actions/Pages deployment, and hosted desktop
+regression. Physical Quest acceptance remains pending.
 
 - [Celestial reference architecture](docs/CELESTIAL_REFERENCE_ARCHITECTURE.md)
 - [Astronomy Engine evaluation](docs/ASTRONOMY_ENGINE_EVALUATION.md)

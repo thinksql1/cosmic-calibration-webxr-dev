@@ -4,6 +4,11 @@
 
 ### Added
 
+- Normalized the remaining celestial and temporal project records: published baseline, local
+  spindle correction, historical milestone evidence, and genuinely deferred work are now
+  explicitly separated. Historical plans are retained for traceability without overriding current
+  state. No production code, tests, dependencies, workflow, deployment, or physical Quest
+  acceptance changed; independent integration remains pending.
 - Reconciled stale project records with the published celestial baseline: the WGS84 Earth core,
   geocentric axis/poles, celestial equator, observer-centered horizon, body markers, Sun path,
   civil-hour notches, and live updates are already published; the rigid spindle, unified
@@ -17,7 +22,7 @@
   its real render callback, avoiding callback-time geometry uploads after Three.js has prepared a
   draw. Permanent production-boundary tests cover shader-facing uploads, fitted projected
   core/ring agreement, Michigan/lateral/vertical views, eye routing, immutability, disposal, and
-  non-degenerate spindle visibility. The local suite passes 40 files / 438 tests, type-check,
+  non-degenerate spindle visibility. The local suite passes 438/438 tests across 40 files, type-check,
   build, diff/dependency checks, and desktop development/preview smoke checks. Integration,
   deployment, and physical Quest acceptance remain pending.
 - Unified the finite WGS84 Earth core, rigid P03 spindle, exact projective NCP/SCP directions, and
@@ -71,10 +76,13 @@
   projective linear-depth rendering, and a live-Sun emphasis. The existing central simulation
   clock now advances visible Sun, Moon, and planet state through one minute-or-better real-time
   refresh cadence; no second scientific clock, labels, ecliptic, phase, or body path was added.
-- Recorded reported Quest feedback for the published actual-body layer: it operated, markers were
-  visible, and the user plausibly identified Sun, Mercury, and Venus. Labels were absent and
-  limited identification of other bodies; the user also observed that the celestial equator is not
-  the Sun's path. No angular, lifecycle, comfort, or all-seven identity claim is inferred.
+- Recorded reported Quest feedback for the previously deployed body and Sun-clock experience: it
+  was beautiful and compelling; markers were visible; and the user plausibly identified Sun,
+  Mercury, and Venus. Labels were absent and limited identification of other bodies; the user also
+  observed that the celestial equator is not the Sun's path. This observation concerns the
+  published body markers, daily Sun path, civil-hour notches, and live updates—not the unmerged
+  rigid spindle/unified geocentric correction. No angular, lifecycle, comfort, or all-seven
+  identity claim is inferred.
 
 - Independently validated and normally integrated the actual solar-system body layer with merge
   `b24b3e9`. The feature and merged `master` pass 383 tests, type-check, production build,
@@ -287,14 +295,16 @@
   Milestone 1 build without force-push, history rewrite, branch deletion, or custom-domain changes.
 - Completed Milestone 1 from reported physical Quest 3 acceptance evidence and replaced the
   physical-test task with one Milestone 2 celestial reference-frame architecture task.
-- Began Milestone 2 planning only. No celestial, astronomy-library, temporal, source, dependency,
-  workflow, deployment, or configuration implementation was performed.
+- **Historical Milestone 2 planning state:** began Milestone 2 planning only. No celestial,
+  astronomy-library, temporal, source, dependency, workflow, deployment, or configuration
+  implementation was performed at that point.
 - Defined Astronomy Engine adoption behind validation wrappers; selected canonical ENU as the
   scientific horizontal boundary and P03 precession-only mean pole/equator of date as the initial
   structural target, gated by a dedicated provider proof.
-- Defined one UTC simulation clock, explicit IANA civil-time schedules, sampled scientific
-  precession trajectories, independently optional temporal layers, and strict separation between
-  scientific coordinates and contemplative presentation.
+- **Historical planning contract:** defined one UTC simulation clock, explicit IANA civil-time
+  schedules, sampled scientific precession trajectories, independently optional solar/lunar
+  temporal capabilities, and strict separation between scientific coordinates and contemplative
+  presentation. Later published milestones implemented the bounded body and Sun-clock subset.
 - Replaced the architecture-planning task with one bounded non-visual astronomy-adapter and
   mean-pole validation spike. No dependency was installed and no Milestone 2 source work began.
 - Completed the bounded Milestone 2A0 spike on its feature branch without visible geometry,
@@ -389,8 +399,9 @@
 - Milestone 1 physical acceptance is limited to the reported Quest 3 flow. No laboratory-grade
   angular-error measurement, Quest OS/browser version, controller-by-controller coverage,
   DOM-overlay availability, or targeted pose-loss observation was supplied.
-- The physical marker remains the trusted reference. Automatic heading, compass, geolocation,
-  magnetic correction, persistence, and visible astronomy remain absent.
+- **Historical Milestone 1 limitation (superseded by later published celestial milestones):** the
+  physical marker remained the trusted reference, while automatic heading, compass, geolocation,
+  magnetic correction, persistence, and visible astronomy were absent at that milestone.
 - Milestone 2A0 validation is Tier 1 and operation-specific. It does not establish a complete
   astronomy-provider accuracy claim, physical XR pointing accuracy, or visible celestial behavior.
 - The P03 provider is restricted to J2000.0 plus or minus one Julian century and is not the

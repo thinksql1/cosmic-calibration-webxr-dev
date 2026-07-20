@@ -6,15 +6,19 @@ This document preserves the product's long-term direction without authorizing im
 is a scope-curation record, not a delivery schedule, a scientific claim, or a backlog that may be
 started opportunistically.
 
-The current baseline includes the published Milestone 2E actual-body layer: the immutable
-scientific snapshot, WGS84 Earth-core and P03 mean-axis presentation, projective celestial
-equator, reversible per-layer eye-presentation modes, local astronomical horizon, and seven
-actual apparent body directions. The published Milestone 2F baseline adds the bounded civil-day
-Sun path and live-update implementation; its physical Quest gate remains pending.
+The current published baseline includes true-north calibration, observer-centered local horizon,
+WGS84 Earth core, geocentric P03 axis/poles, celestial equator, reversible eye presentation, and
+default-hidden actual apparent markers for Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn.
+It also includes the central simulation clock, IANA/DST-aware civil-day handling, the bounded
+observer-relative daily Sun path, civil-hour notches, live celestial updates, scientific
+provenance, and structured warnings/errors. The local `fix/earth-axis-spindle` branch adds a
+rigid continuous spindle, unified finite core/axis/equator/pole presentation, and renderer-boundary
+validation; it remains unmerged, undeployed, and physically unaccepted.
 
-Every item below is **planned**, **exploratory**, **deferred**, or **research required** until a
-separate bounded task is authorized. Existing milestone gates, physical Quest evidence, and the
-dependency sequence in [Milestone 2 Sequence](MILESTONE_2_SEQUENCE.md) remain controlling.
+Except entries explicitly marked as part of the published baseline, every item below is
+**planned**, **exploratory**, **deferred**, or **research required** until a separate bounded task
+is authorized. Existing milestone gates, physical Quest evidence, and the dependency sequence in
+[Milestone 2 Sequence](MILESTONE_2_SEQUENCE.md) remain controlling.
 
 ## Product north star
 
@@ -120,7 +124,7 @@ ambient `new Date()` loop, or independently interpreted civil time.
 
 #### Shared three-mode contract
 
-For Sun, Moon, planets, and other bodies, future presentation should support only clearly named
+For future extensions of the published Sun, Moon, and body presentation, use only clearly named
 modes:
 
 1. **Actual direction** — the validated apparent or declared physical direction for one observer,
@@ -251,9 +255,9 @@ These horizons describe a sensible order of evidence, not dates or commitments.
 
 | Horizon | Candidate focus | Preconditions |
 |---|---|---|
-| Current | Actual Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn direction layer | User explicitly promoted this bounded layer ahead of precession review; independent validation, publication, and physical Quest evidence remain required |
-| Next celestial structures | Celestial-equator projection/combined body mode or precession review, selected only by a future bounded authorization | Actual body-layer acceptance plus projective/depth/lifecycle regression gates; precession still requires model/date-domain/fixture review |
-| Time and bodies | Central time controls, paths, phase, and later bodies | Explicit observer persistence/privacy policy where needed, clock/civil-time fixtures, per-body correction and presentation evidence |
+| Current | Independent integration gate for the local rigid spindle and unified geocentric core/axis/equator/pole presentation | Records reconciliation, existing technical validation, normal integration/deployment gates, and later physical Quest evidence; no feature expansion |
+| Next celestial structures | Celestial-equator projection/combined body mode or precession review, selected only by a future bounded authorization | Published body/temporal baseline remains intact; projection needs its own science/presentation gate, and precession still requires model/date-domain/fixture review |
+| Time and bodies | Broad time controls, annual or multi-day paths, lunar phase/cycle visualization, planetary trails, and later bodies | Explicit observer persistence/privacy policy where needed, clock/civil-time fixtures, per-body correction and presentation evidence |
 | Geographic knowledge | Local-first places, regions, imports, collections | Data schema/provenance/privacy policy; bounded performance and cultural-review approach |
 | Interpretive/contextual systems | Astrology, tradition-selected layers, Merkaba, contemplative sequencing, media/game/AI context | Stable accepted science layers; opt-in controls, provenance, and hard/soft constraint review |
 

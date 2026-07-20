@@ -7,6 +7,15 @@
 **Date recorded:** 2026-07-19 America/New_York
 **Evidence source:** direct user report after a Meta Quest headset test of the deployed application
 
+## Historical status notice
+
+This file records the Milestone 2D published state and its bounded physical evidence. It is not a
+current roadmap or implementation-status authority. Later milestones implemented and published
+the seven-body layer plus central-clock live updates, daily Sun path, and civil-hour notches.
+Future-work statements in this record are historical to Milestone 2D unless explicitly updated.
+They do not establish physical acceptance of the current local rigid-spindle/unified-geocentric
+correction, which remains unmerged, undeployed, and **NOT RUN** on Quest.
+
 ## User-provided evidence
 
 The user reported:
@@ -74,12 +83,14 @@ regression evidence and must not be represented as separately verified results.
   or natural visual horizon.
 - Celestial directions are projective; marker and line visibility are presentation conventions,
   not literal celestial distances or a claim of environmental occlusion.
-- The broader long-term geocentric locations, relationship circuits, body layers, real-time clock,
-  and persistence goals remain future roadmap work, not part of this acceptance.
+- The broader long-term geocentric locations, relationship circuits, persistence, advanced
+  time-control UI, lunar-cycle visualization, annual paths, and other later roadmap goals were
+  outside this Milestone 2D acceptance. Body layers and central-clock live updates were
+  implemented and published later; they were not evidence available to this milestone report.
 
 ## Follow-up
 
-Milestone 2D is accepted as the current workable physical baseline. The next bounded task is an
-independent scientific review of the long-term precession model and trajectory prerequisites. It
-must not implement the trajectory until its model, validity domain, fixtures, sampling, and
-presentation contract have been accepted.
+At the time of this milestone, the planned follow-up was an independent scientific review of the
+long-term precession model and trajectory prerequisites. That planning note is superseded as the
+current task by `NEXT_TASK.md`; no trajectory work is authorized here. A future trajectory still
+requires an accepted model, validity domain, fixtures, sampling, and presentation contract.

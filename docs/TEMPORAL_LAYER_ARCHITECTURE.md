@@ -1,12 +1,18 @@
 # Temporal Layer Architecture
 
-## Purpose
+## Purpose and status
 
-This document defines one central time model and Sun/Moon sampling contracts. Milestone 2F now
-implements the bounded apparent-Sun civil-day path and live body-refresh subset described below;
-labels, events, Moon paths, a general time-control system, and broader temporal features remain
-deferred. All celestial layers consume the same simulation snapshot; no scientific provider may
-call `new Date()` independently.
+**Status: partially implemented temporal architecture.** This document began as a design record;
+its future-tense solar and lunar sections retain rationale for the capabilities that were later
+implemented or remain deferred. Current temporal implementation status is governed by
+`PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, and [Solar 24-Hour Clock](SOLAR_24_HOUR_CLOCK.md).
+
+The published baseline implements one central simulation clock; deterministic frozen and paused
+modes; bounded live refresh; apparent Sun, Moon, and seven-body state; explicit IANA-zone
+civil-day resolution with DST fold/gap metadata; a daily observer-relative apparent Sun path; and
+exact civil-hour notches. Labels, event-jump controls, broad time manipulation, richer lunar
+temporal visualization, and planetary trajectories remain deferred. All celestial layers consume
+the same simulation snapshot; no scientific provider may call `new Date()` independently.
 
 UTC, UT1, TT, civil-time, and provider claims trace to the [official astronomy source
 register](OFFICIAL_ASTRONOMY_SOURCES.md).
@@ -48,8 +54,9 @@ SimulationSnapshot
 
 The stored simulation instant is an absolute UTC timeline value. A live or accelerated clock is
 derived from one UTC anchor and a monotonic elapsed clock, not by accumulating render-frame
-deltas. Pausing freezes the absolute instant. A negative rate is reserved for a later time-control
-milestone and is not implemented now.
+deltas. Pausing freezes the absolute instant. A negative rate, along with user-facing
+accelerated/reverse controls and arbitrary historical/future date selection, is reserved for a
+later time-control milestone.
 
 ### Time-scale separation
 
@@ -122,7 +129,12 @@ continues to receive only immutable clock state.
 | Provider/model version | invalidate | invalidate provider-derived events | unchanged | rebuild with new provenance |
 | Time-zone database version | instant geometry unchanged | invalidate civil schedules | unchanged | labels/sampled civil layers rebuild |
 
-## Future solar temporal clock
+## Implemented daily Sun-path subset and deferred extensions
+
+The published 2F layer implements the apparent Sun daily path, exact civil-hour notches,
+below-horizon continuity, and central-clock refresh described in this section. The design options
+below remain useful only where they extend that published subset, such as rendered labels,
+sunrise/sunset events, annual or multi-day paths, and a broader time-control surface.
 
 ### Scientific source
 
@@ -180,7 +192,7 @@ correction profile and provider provenance
 Sun path, ticks, labels, current position, and sunrise/sunset annotations remain independently
 optional layer IDs. Label density never changes marker coordinates.
 
-## Future Moon next-24-hour clock
+## Deferred Moon next-24-hour temporal visualization
 
 ### Sampling convention
 
@@ -208,7 +220,7 @@ future alternate selected-civil-day lunar mode would be a different schedule ID.
 The path is the sampled apparent direction through time, not a representation of the Moon's
 orbital plane.
 
-## Future local-midnight lunar-cycle clock
+## Deferred local-midnight lunar-cycle visualization
 
 ### Definition of midnight
 
@@ -293,11 +305,14 @@ correction/sampling context is present.
 
 ## Explicitly deferred
 
-- User-facing clock/date/rate controls.
+- User-facing accelerated, reverse, pause/resume, date, and rate controls; arbitrary historical
+  and future time selection; and event-jump controls.
 - Geolocation and automatic time-zone selection.
 - Leap-second-aware browser timeline implementation.
 - Live IERS data, UT1 corrections, and polar motion.
-- Sun/Moon ephemeris calls and geometry.
-- Sunrise/sunset, phase symbols, paths, ticks, labels, or animation.
+- Rendered civil-hour labels, sunrise/sunset events, annual Sun paths, multi-day paths, analemma,
+  persistent trails, and richer animation controls.
+- Moon phase/orientation and next-24-hour or local-midnight lunar-cycle visualizations.
+- Planetary trajectory/orbit visualization; ecliptic; Uranus, Neptune, Pluto; audio; and
+  contemplative sequences.
 - Persistence of location, time, layer state, or calibration.
-- Planets, ecliptic, orbital paths, audio, and contemplative sequences.
