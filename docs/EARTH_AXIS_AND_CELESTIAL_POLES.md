@@ -16,12 +16,12 @@ bounded physical usability** of the combined deployed spatial-reference experien
 claim separate angular, world-locking, or eye-mode measurements. See
 [Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
 
-The current `fix/earth-axis-spindle` correction responds to newer physical feedback that the axle
+The published `fix/earth-axis-spindle` correction responds to newer physical feedback that the axle
 read as bowed or hinged at the core. Investigation confirmed the analytic line, pole antipodes,
 parent hierarchy, and one-yaw path were already correct. The visual seam came from two separately
-styled/rasterized line objects and a core quad drawn over their joint. The local correction replaces
+styled/rasterized line objects and a core quad drawn over their joint. The correction replaces
 them with one authoritative descriptor and one projectively clipped constant-width strip. It is
-automated- and desktop-validated but is not merged, published, deployed, or physically accepted.
+independently validated, merged, published, and desktop-regressed, but is not physically accepted.
 See [Rigid Earth-Axis Spindle](EARTH_AXIS_SPINDLE.md).
 
 ## Scientific model — unchanged

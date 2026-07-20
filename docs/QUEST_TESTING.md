@@ -4,7 +4,7 @@ Desktop success is not Quest success. Record each physical criterion as **PASS**
 
 ## Unified geocentric core, spindle, poles, and equator — pending
 
-**Physical Quest acceptance: NOT RUN.** After independent integration and deployment:
+**Physical Quest acceptance: NOT RUN.** Integration and deployment are complete; on physical Quest:
 
 1. Open deployed application in passthrough.
 2. Calibrate true north.
@@ -239,5 +239,5 @@ recenter/tracking-loss coverage, exact drift, or comfort duration from this shor
 ## Rigid Earth-axis spindle correction
 
 The canonical 23-step unified-geocentric procedure above supersedes the historical spindle-only
-checklist. Physical acceptance remains **NOT RUN** until the corrected local branch is independently
-integrated and deployed.
+checklist. The correction is independently integrated and deployed; physical acceptance remains
+**NOT RUN** until this checklist is executed on Quest.

@@ -13,8 +13,8 @@ This file records the Milestone 2D published state and its bounded physical evid
 current roadmap or implementation-status authority. Later milestones implemented and published
 the seven-body layer plus central-clock live updates, daily Sun path, and civil-hour notches.
 Future-work statements in this record are historical to Milestone 2D unless explicitly updated.
-They do not establish physical acceptance of the current local rigid-spindle/unified-geocentric
-correction, which remains unmerged, undeployed, and **NOT RUN** on Quest.
+They do not establish physical acceptance of the later rigid-spindle/unified-geocentric
+correction, which is now published but remains **NOT RUN** on Quest.
 
 ## User-provided evidence
 

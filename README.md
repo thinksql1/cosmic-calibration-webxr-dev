@@ -15,16 +15,17 @@ the selected explicit IANA civil day, exact valid civil-hour notches on that pat
 updates through the same central simulation clock. The path is not the celestial equator or an
 annual ecliptic; labels and other body paths remain deferred.
 
-The local `fix/earth-axis-spindle` branch, based on `7e541f3`, corrects the user-observed bowed/hinged axis presentation
+The published `fix/earth-axis-spindle` work corrects the user-observed bowed/hinged axis presentation
 and unifies the finite Earth core, spindle, projective poles, and celestial-equatorial plane under
 one Earth-centered presentation contract. The equator is a bounded two-Earth-radius reference
 ring centered on the core and perpendicular to the same axis; bounded homogeneous rendering
-preserves that finite center without raw Earth-scale GPU vertices. Its current local renderer-gate
-remediation keeps static Float32 ring directions, uploads rounded per-eye finite-core uniforms, and
+preserves that finite center without raw Earth-scale GPU vertices. The renderer keeps static
+Float32 ring directions, uploads rounded per-eye finite-core uniforms, and
 uses a continuous default spindle style. The surface observer and local horizon remain offset and
 observer-centered. P03, WGS84, calibration, bodies, Sun path, and time science are unchanged. The
-local suite passes 438/438 tests across 40 files, but this branch is not independently revalidated,
-integrated, deployed, or physically Quest-tested; those gates remain pending.
+feature and merged `master` pass 438/438 tests across 40 files. Merge
+`1acedcdac660214a7cbc9cf0ace469f1c2e3c20d`, Actions run `29769161186`, Pages deployment, and
+bounded hosted desktop regression pass; physical Quest acceptance remains pending.
 
 ## Milestone 2 architecture status
 
@@ -62,7 +63,7 @@ The user subsequently described the already deployed body and Sun-clock experien
 and compelling, plausibly identifying Sun, Mercury, and Venus. Absent labels limited other
 identification, and the user noted that the celestial equator is not the Sun's path. This
 observation concerns the published seven-body layer, daily Sun path, civil-hour notches, and live
-updates; it is not physical acceptance of the unmerged rigid spindle/unified geocentric
+updates; it is not physical acceptance of the now-published rigid spindle/unified geocentric
 correction. Milestone 2F passes final independent review, 416 automated tests, type-check,
 production build, normal integration, GitHub Actions/Pages deployment, and hosted desktop
 regression. Physical Quest acceptance remains pending.
@@ -142,7 +143,7 @@ See [Architecture](docs/ARCHITECTURE.md) and [Calibration](docs/CALIBRATION.md) 
 
 ## Scientific foundation status
 
-Milestone 2A provides an explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. The published Milestone 2B baseline consumes that snapshot without direct provider calls, maps the mean axis into horizontal ENU, computes the modeled WGS84 Earth center relative to the surface observer, and maps both into the calibrated geographic parent once. NCP/SCP remain directions at infinity; the `10^13 m` finite points are diagnostics only. The local unified correction preserves this science while changing only the spindle/equator presentation contract. The GPU consumes per-eye camera-relative core values and homogeneous unit directions under a linear non-writing depth contract. The manual observer/time controls remain in-memory diagnostics, not geolocation or a general time system. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md), [Earth Axis and Celestial Poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md), [Geocentric Rendering Precision](docs/GEOCENTRIC_RENDERING_PRECISION.md), and [WebXR Depth Contract](docs/WEBXR_DEPTH_CONTRACT.md).
+Milestone 2A provides an explicit observer/UTC-clock/calibration/configuration snapshot pipeline with a validated P03 mean axis and equator basis. Its runtime boundary owns immutable instants/vectors, rejects malformed clocks before providers, and keys cache provenance explicitly. The published Milestone 2B baseline consumes that snapshot without direct provider calls, maps the mean axis into horizontal ENU, computes the modeled WGS84 Earth center relative to the surface observer, and maps both into the calibrated geographic parent once. NCP/SCP remain directions at infinity; the `10^13 m` finite points are diagnostics only. The published unified correction preserves this science while changing only the spindle/equator presentation contract. The GPU consumes per-eye camera-relative core values and homogeneous unit directions under a linear non-writing depth contract. The manual observer/time controls remain in-memory diagnostics, not geolocation or a general time system. See [Scientific State Foundation](docs/SCIENTIFIC_STATE_FOUNDATION.md), [Scientific Snapshot Contract](docs/SCIENTIFIC_SNAPSHOT_CONTRACT.md), [Scientific Cache Policy](docs/SCIENTIFIC_CACHE_POLICY.md), [Earth Axis and Celestial Poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md), [Geocentric Rendering Precision](docs/GEOCENTRIC_RENDERING_PRECISION.md), and [WebXR Depth Contract](docs/WEBXR_DEPTH_CONTRACT.md).
 
 ## Physical north-marker workflow
 
@@ -188,10 +189,11 @@ current hosted application is:
 
 `https://thinksql1.github.io/cosmic-calibration-webxr/`
 
-GitHub Pages workflow run `29707073636` deployed integrated Milestone 2F merge `31be4cc`. Hosted
-desktop verification confirmed the existing horizon/axis/poles/equator/body layers, Sun-path and
-civil-hour-notch controls, repeated toggling, zone override, repository-relative assets, a bounded
-live-clock advance, and clean browser diagnostics.
+GitHub Pages workflow run `29769161186` deployed unified-geocentric merge
+`1acedcdac660214a7cbc9cf0ace469f1c2e3c20d`. Hosted desktop verification confirmed calibration,
+horizon/core/spindle/poles/equator geometry and parallax, bodies, Sun path, civil-hour notches,
+repeated toggling, reset/recalibration, repository-relative assets, live-clock advance, and clean
+browser diagnostics.
 
 ## Validation boundary
 
@@ -199,9 +201,9 @@ Pure math, state transitions, controller integration, existing XR lifecycle, typ
 desktop simulation are locally testable. The reported Quest 3 Milestone 1 acceptance flow passed
 for controller-based calibration and usable lifecycle behavior. That evidence does not establish
 laboratory-grade angular accuracy, broad device coverage, or unreported edge-case outcomes.
-The geocentric replacement's local automated/development checks cover WGS84 core placement, one
+The geocentric replacement's automated/development checks cover WGS84 core placement, one
 centerline, exact projective antipodes, ENU mapping, controls, readiness, and console health. The
-local spindle correction additionally covers strict core/endpoint incidence, projected
+published spindle correction additionally covers strict core/endpoint incidence, projected
 collinearity across representative cameras, calibration/recalibration and rigid-parent invariance,
 one-object toggle/reset/re-entry lifecycle, and bounded single-strip rendering.
 Independent review, integration, production-preview closeout, publication, and hosted regression

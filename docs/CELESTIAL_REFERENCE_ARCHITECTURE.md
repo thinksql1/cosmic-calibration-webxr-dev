@@ -10,9 +10,9 @@ implementation sequence is superseded where later milestones are explicitly reco
 Milestones 2A through 2F and the published geocentric baseline now implement much of this design:
 the WGS84 Earth core, axis/poles, celestial equator, observer-centered local horizon, apparent
 Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn directions, civil-day Sun path, civil-hour notches,
-central clock, live refresh, provenance, warnings, and errors. The unmerged
-`fix/earth-axis-spindle` branch changes only the spindle/core/equator presentation contract and
-remains local, undeployed, and physically unaccepted.
+central clock, live refresh, provenance, warnings, and errors. The published unified-geocentric
+correction changes only the spindle/core/equator presentation contract; physical Quest acceptance
+remains pending.
 
 Current implementation authority is `PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, and the focused
 feature documents. This document defines frames, scientific ownership, transforms,
@@ -36,9 +36,9 @@ The architecture preserves the validated Milestone 1 convention:
 Milestones 2A through 2F form the published master baseline: immutable P03 axis/equator-basis
 snapshots, WGS84 Earth-core placement, projective NCP/SCP directions, the mean celestial equator,
 eye modes, observer-centered horizon, actual body markers, and the civil-day Sun path/live clock.
-The local `fix/earth-axis-spindle` branch changes only the core/axis/equator presentation into one
-unified finite Earth-centered assembly. It has passed technical independent review, but the final
-independent integration re-gate, integration, deployment, and physical Quest acceptance remain
+The published unified-geocentric correction changes only the core/axis/equator presentation into
+one finite Earth-centered assembly. Technical independent review, the final independent
+integration re-gate, integration, and deployment passed; physical Quest acceptance remains
 pending. Calibration yaw remains presentation-parent work. See [Earth Axis and Celestial
 Poles](EARTH_AXIS_AND_CELESTIAL_POLES.md).
 
@@ -397,11 +397,11 @@ may it be reused for stars or other layers that require a complete date/Earth-ro
   pairs, and known latitude/horizon cases.
 
 **Milestone 2C implementation:** the published layer consumes the immutable snapshot's validated
-GCRS P03 basis plus its science-owned observer-horizontal sampling basis. The local unified
+GCRS P03 basis plus its science-owned observer-horizontal sampling basis. The published unified
 correction preserves that science while rendering 96 bounded homogeneous samples of a finite
 Earth-core-centred reference ring in the infinite equatorial plane. It is not an observer-centred
-ring. Independent integration, publication, and Quest validation remain pending only for the local
-unified correction.
+ring. Integration and publication passed; Quest validation remains pending for the unified
+correction.
 
 ## Horizon model
 

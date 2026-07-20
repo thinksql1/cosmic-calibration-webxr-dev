@@ -107,10 +107,10 @@ dot(point_GCRS, north_GCRS) = 0
 
 The first two rows of `M` are orthonormal GCRS-expressed basis axes in that plane. Tests prove both
 are perpendicular to the third-row pole and to each other. The published equator derives its
-orientation from this normal/basis rather than independently orienting a ring. The local
-`fix/earth-axis-spindle` branch retains that science while unifying the finite Earth core,
-spindle, equatorial plane/ring, and pole directions in one presentation contract. That local
-presentation correction is not integrated, deployed, or physically Quest-accepted.
+orientation from this normal/basis rather than independently orienting a ring. The published
+`fix/earth-axis-spindle` work retains that science while unifying the finite Earth core, spindle,
+equatorial plane/ring, and pole directions in one presentation contract. That presentation
+correction is integrated and deployed but not physically Quest-accepted.
 
 ## Corrections included and excluded
 
@@ -211,5 +211,5 @@ Still open or deferred:
 Integrated Milestone 2B consumes this provider only through the validated scientific snapshot for
 its observer-horizontal axis and pole presentation. The celestial equator is implemented and
 published from the same validated P03 relationship; precession-trajectory geometry remains
-unimplemented. Physical Quest acceptance of the current local spindle/core/equator presentation
+unimplemented. Physical Quest acceptance of the published spindle/core/equator presentation
 correction remains NOT RUN.

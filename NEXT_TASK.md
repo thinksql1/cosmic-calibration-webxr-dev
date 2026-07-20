@@ -4,20 +4,18 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Independently revalidate and integrate the unified geocentric axis, core, and celestial-equator structure
+**Title:** Run the physical Quest acceptance test for the unified geocentric celestial structure
 
-Independently verify the unmerged correction and, only if the gate passes, perform normal
-non-rewriting integration into `master`. Verify Earth-centered core/equator identity, axis
-perpendicularity, pole alignment, observer offset, transform invariance, presentation coherence,
-lifecycle, and deployment readiness. Physical Quest acceptance remains separate evidence.
+Execute the canonical pending 23-step checklist in `docs/QUEST_TESTING.md` on physical Quest
+hardware against the deployed unified geocentric build. Record only observed PASS, FAIL,
+UNCERTAIN, or NOT RUN results and preserve exact device/browser evidence where available.
 
 ## Exclusions
 
-Do not push, deploy, perform or infer physical Quest acceptance, add labels or celestial features,
-change astronomy/calibration/observer science, rewrite history, squash, or delete the feature
-branch.
+Do not infer unobserved results, add labels or celestial features, change astronomy/calibration/
+observer science, rewrite history, or begin another feature.
 
 ## Recommended execution
 
-- **Model:** GPT-5.6 Sol
+- **Model:** GPT-5.6 Terra
 - **Reasoning effort:** High

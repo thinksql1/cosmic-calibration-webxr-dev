@@ -146,7 +146,7 @@ physical Quest acceptance.
 
 ## Focused Quest checklist
 
-Physical acceptance remains **NOT RUN** for this local correction. The canonical pending 23-step
+Physical acceptance remains **NOT RUN** for this published correction. The canonical pending 23-step
 unified-geocentric procedure is maintained in [Quest testing](QUEST_TESTING.md); do not infer any
 physical result from automated or desktop evidence.
 

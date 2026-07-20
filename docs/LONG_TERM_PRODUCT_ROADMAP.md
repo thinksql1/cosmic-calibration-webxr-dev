@@ -11,9 +11,9 @@ WGS84 Earth core, geocentric P03 axis/poles, celestial equator, reversible eye p
 default-hidden actual apparent markers for Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn.
 It also includes the central simulation clock, IANA/DST-aware civil-day handling, the bounded
 observer-relative daily Sun path, civil-hour notches, live celestial updates, scientific
-provenance, and structured warnings/errors. The local `fix/earth-axis-spindle` branch adds a
-rigid continuous spindle, unified finite core/axis/equator/pole presentation, and renderer-boundary
-validation; it remains unmerged, undeployed, and physically unaccepted.
+provenance, and structured warnings/errors. It also includes the published rigid continuous
+spindle, unified finite core/axis/equator/pole presentation, and renderer-boundary validation;
+physical Quest acceptance of that correction remains pending.
 
 Except entries explicitly marked as part of the published baseline, every item below is
 **planned**, **exploratory**, **deferred**, or **research required** until a separate bounded task
@@ -255,7 +255,7 @@ These horizons describe a sensible order of evidence, not dates or commitments.
 
 | Horizon | Candidate focus | Preconditions |
 |---|---|---|
-| Current | Independent integration gate for the local rigid spindle and unified geocentric core/axis/equator/pole presentation | Records reconciliation, existing technical validation, normal integration/deployment gates, and later physical Quest evidence; no feature expansion |
+| Current | Physical Quest acceptance for the published rigid spindle and unified geocentric core/axis/equator/pole presentation | Canonical pending 23-step checklist and observed device evidence; no feature expansion |
 | Next celestial structures | Celestial-equator projection/combined body mode or precession review, selected only by a future bounded authorization | Published body/temporal baseline remains intact; projection needs its own science/presentation gate, and precession still requires model/date-domain/fixture review |
 | Time and bodies | Broad time controls, annual or multi-day paths, lunar phase/cycle visualization, planetary trails, and later bodies | Explicit observer persistence/privacy policy where needed, clock/civil-time fixtures, per-body correction and presentation evidence |
 | Geographic knowledge | Local-first places, regions, imports, collections | Data schema/provenance/privacy policy; bounded performance and cultural-review approach |

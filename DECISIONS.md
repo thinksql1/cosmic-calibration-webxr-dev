@@ -343,8 +343,8 @@
 
 ### DEC-028: Render the Earth rotational axis from one authoritative spindle descriptor
 - **Date:** 2026-07-19
-- **Status:** Accepted locally; independent revalidation, integration, deployment, and physical
-  Quest acceptance pending
+- **Status:** Accepted, independently validated, integrated, and published; physical Quest
+  acceptance pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** The Earth-axis presentation owns one validated descriptor containing the finite
   WGS84 core, one normalized P03 axis direction, its exact component-negated antipode, bounded
@@ -361,8 +361,8 @@
 
 ### DEC-029: Present the core, axis, poles, and celestial equator as one geocentric assembly
 - **Date:** 2026-07-20
-- **Status:** Accepted locally; independent revalidation, integration, deployment, and physical
-  Quest acceptance pending
+- **Status:** Accepted, independently validated, integrated, and published; physical Quest
+  acceptance pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** Create one immutable `GeocentricCelestialStructurePresentation` per ready snapshot.
   Its Earth-core anchor is also the celestial-equator center; its normalized positive axis is also

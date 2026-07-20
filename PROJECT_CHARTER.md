@@ -94,8 +94,8 @@ This is a hypothesis, not a binding permanent architecture: Vite and TypeScript 
 |---|---|---|
 | Orientation | Repository, requirements, and constraints reconciled | Complete |
 | First vertical slice | One end-to-end path works and is validated | Complete (Milestones 0 and 1) |
-| Core capability | Required behaviors are implemented and tested | Published Milestone 2 baseline; local geocentric correction pending independent integration gate |
-| Production/readiness review | Acceptance rubric is satisfied | Published baseline complete; local correction pending independent review |
+| Core capability | Required behaviors are implemented and tested | Unified geocentric structure independently validated, integrated, and published; physical Quest acceptance pending |
+| Production/readiness review | Acceptance rubric is satisfied | Automated, build, workflow, Pages, and hosted desktop gates pass; physical Quest gate pending |
 | Handoff/launch | Documentation and operational ownership are complete | Not started |
 
 ## Completion definition

@@ -4,6 +4,14 @@
 
 ### Added
 
+- Independently revalidated and normally integrated the unified geocentric celestial structure
+  with merge `1acedcdac660214a7cbc9cf0ace469f1c2e3c20d`. Feature and merged `master` pass
+  438/438 tests across 40 files, type-check, production build, diff, and dependency checks with no
+  technical drift after the prior review. GitHub Actions run `29769161186` passed install,
+  type-check, tests, build, artifact upload, and Pages deployment. Hosted desktop regression
+  passed for calibration, horizon, core/spindle/equator/poles, parallax, toggles/reset/
+  recalibration, seven bodies, Sun path, civil-hour notches, live updates, relative assets, and
+  console health. Physical Quest acceptance remains pending.
 - Normalized the remaining celestial and temporal project records: published baseline, local
   spindle correction, historical milestone evidence, and genuinely deferred work are now
   explicitly separated. Historical plans are retained for traceability without overriding current
