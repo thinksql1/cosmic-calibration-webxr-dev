@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import type { EarthAxisPresentationModel } from '../../src/presentation/earthAxisPresentationModel';
 import {
   CAMERA_RELATIVE_CORE_COMPONENT_BUDGET_METERS,
+  classifyEarthAxisProjectedSide,
   createEarthAxisCameraRelativeFrame,
+  projectEarthAxisCenterline,
 } from '../../src/scene/earthAxisCameraRelativeFrame';
 import {
   WGS84_INVERSE_FLATTENING,
@@ -55,6 +57,8 @@ function geocentricFixture(
     markerVisible: true,
     labelVisible: true,
   });
+  const north = endpoint('NCP', 1);
+  const south = endpoint('SCP', -1);
   return Object.freeze({
     kind: 'ready',
     model: 'IAU_P03_PRECESSION_ONLY',
@@ -62,7 +66,7 @@ function geocentricFixture(
     precisionTier: 'TIER_1',
     presentationKind: 'GEOCENTRIC_WORLD_SCALE_EARTH_CORE_AXIS',
     poleTopology: 'ANTIPODAL_PROJECTIVE_DIRECTIONS_AT_INFINITY',
-    renderStrategy: 'CAMERA_RELATIVE_CORE_AND_HOMOGENEOUS_PROJECTIVE_POLES',
+    renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_SPINDLE_AND_PROJECTIVE_POLES',
     depthContract: 'LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY',
     gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES',
     observerSurfaceOrigin: Object.freeze({ x: 0, y: 0, z: 0 }),
@@ -75,8 +79,28 @@ function geocentricFixture(
     poleRenderConvergenceUpperBoundArcseconds: 0.14,
     observerToCoreDistanceMeters: Math.hypot(core.x, core.y, core.z),
     observerToAxisDistanceMeters: Math.abs(observerX),
-    north: endpoint('NCP', 1),
-    south: endpoint('SCP', -1),
+    spindle: Object.freeze({
+      kind: 'RIGID_EARTH_ROTATIONAL_AXIS_SPINDLE',
+      validity: 'VALIDATED',
+      lineContract: 'ONE_CORE_ONE_DIRECTION_ONE_EXACT_ANTIPODE',
+      renderTopology: 'ONE_PROJECTIVELY_CLIPPED_SCREEN_SPACE_SPINDLE',
+      coordinateFrameIdentity: 'APPLICATION_BASIS_UNCALIBRATED_BELOW_GEOGRAPHIC_PARENT',
+      earthCore: core,
+      northDirection: north.directionApplication,
+      southDirection: south.directionApplication,
+      displayExtentMeters: 1e13,
+      calibrationRevision: 1,
+      acceptedCalibrationRevision: 1,
+      observerRevision: 1,
+      provenance: Object.freeze({
+        model: 'IAU_P03_PRECESSION_ONLY',
+        provider: 'fixture',
+        providerVersion: '1.0.0',
+        simulationInstantUtc: '2025-06-21T16:00:00.000Z',
+      }),
+    }),
+    north,
+    south,
     snapshotIdentity: Object.freeze({ cacheKey: 'fixture', creationSequence: 1, observerRevision: 1, timeRevision: 1, calibrationRevision: 1, acceptedCalibrationRevision: 1 }),
   });
 }
@@ -86,6 +110,52 @@ function cameraMatrix(
   rotation = new THREE.Quaternion(),
 ): THREE.Matrix4 {
   return new THREE.Matrix4().compose(position, rotation, new THREE.Vector3(1, 1, 1));
+}
+
+function assertHomogeneousSpindleCollinearity(
+  frame: ReturnType<typeof createEarthAxisCameraRelativeFrame>,
+): void {
+  const core = new THREE.Vector4(
+    frame.spindleCore.x,
+    frame.spindleCore.y,
+    frame.spindleCore.z,
+    frame.spindleCore.w,
+  );
+  const north = new THREE.Vector4(
+    frame.spindleNorthEndpoint.x,
+    frame.spindleNorthEndpoint.y,
+    frame.spindleNorthEndpoint.z,
+    frame.spindleNorthEndpoint.w,
+  );
+  const south = new THREE.Vector4(
+    frame.spindleSouthEndpoint.x,
+    frame.spindleSouthEndpoint.y,
+    frame.spindleSouthEndpoint.z,
+    frame.spindleSouthEndpoint.w,
+  );
+  const coreToNorth = north.clone().sub(core);
+  const coreToSouth = south.clone().sub(core);
+  expect(coreToNorth.w).toBe(0);
+  expect(coreToSouth.w).toBe(0);
+  expect(coreToSouth.x).toBeCloseTo(-coreToNorth.x, 14);
+  expect(coreToSouth.y).toBeCloseTo(-coreToNorth.y, 14);
+  expect(coreToSouth.z).toBeCloseTo(-coreToNorth.z, 14);
+  expect(new THREE.Vector3(
+    coreToNorth.x,
+    coreToNorth.y,
+    coreToNorth.z,
+  ).cross(new THREE.Vector3(
+    coreToSouth.x,
+    coreToSouth.y,
+    coreToSouth.z,
+  )).length()).toBeLessThan(1e-14);
+}
+
+function cameraQuaternionForDirection(direction: THREE.Vector3): THREE.Quaternion {
+  return new THREE.Quaternion().setFromUnitVectors(
+    new THREE.Vector3(0, 0, -1),
+    direction.clone().normalize(),
+  );
 }
 
 describe('camera-relative homogeneous geocentric rendering frame', () => {
@@ -222,7 +292,120 @@ describe('camera-relative homogeneous geocentric rendering frame', () => {
         );
         expect(frame.float32CoreQuantizationErrorMeters).toBeLessThan(1);
         expect(frame.float32DirectionAngularErrorArcseconds).toBeLessThan(0.03);
+        assertHomogeneousSpindleCollinearity(frame);
       }
+    }
+  });
+
+  it('keeps one projected centerline incident with south, core, and north for representative views', () => {
+    const model = geocentricFixture(42.7325, 250);
+    const camera = new THREE.PerspectiveCamera(54, 1.4, 0.01, 100);
+    camera.updateProjectionMatrix();
+    const views = [
+      ['north', new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 1.7, 0)],
+      ['south', new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1.7, 0)],
+      ['east', new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1.7, 0)],
+      ['west', new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 1.7, 0)],
+      ['above-core', new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 3, 0)],
+      ['below-core', new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, -1, 0)],
+      ['michigan-oblique', new THREE.Vector3(0.45, -0.18, -0.87), new THREE.Vector3(0.4, 1.65, 0.2)],
+    ] as const;
+
+    for (const [name, direction, position] of views) {
+      const frame = createEarthAxisCameraRelativeFrame(
+        model,
+        new THREE.Matrix4(),
+        cameraMatrix(position, cameraQuaternionForDirection(direction)),
+      );
+      const projected = projectEarthAxisCenterline(frame, camera.projectionMatrix);
+      const projectionAtInfinity = name === 'east' || name === 'west';
+      expect(projected.endOnDegenerate, name).toBe(projectionAtInfinity);
+      expect(projected.maximumUploadedComponentMagnitude, name).toBeLessThanOrEqual(8);
+      if (projectionAtInfinity) {
+        expect(projected.visibleInViewport, name).toBe(false);
+      } else {
+        for (const point of [
+          frame.spindleSouthEndpoint,
+          frame.spindleCore,
+          frame.spindleNorthEndpoint,
+        ]) {
+          const clip = new THREE.Vector4(point.x, point.y, point.z, point.w)
+            .applyMatrix4(camera.projectionMatrix);
+          const incidence =
+            projected.lineNdc.x * clip.x +
+            projected.lineNdc.y * clip.y +
+            projected.lineNdc.z * clip.w;
+          expect(Math.abs(incidence), name).toBeLessThan(1e-12);
+        }
+      }
+      assertHomogeneousSpindleCollinearity(frame);
+    }
+  });
+
+  it('classifies both spindle sides with bounded values when the geocentric core is far offscreen', () => {
+    const model = geocentricFixture(42.7325, 250);
+    const camera = new THREE.PerspectiveCamera(54, 1.4, 0.01, 100);
+    camera.updateProjectionMatrix();
+    const frame = createEarthAxisCameraRelativeFrame(
+      model,
+      new THREE.Matrix4(),
+      cameraMatrix(
+        new THREE.Vector3(0, 1.7, 0),
+        cameraQuaternionForDirection(new THREE.Vector3(0, 0, -1)),
+      ),
+    );
+    const projected = projectEarthAxisCenterline(frame, camera.projectionMatrix);
+    const coreClip = new THREE.Vector4(
+      frame.spindleCore.x,
+      frame.spindleCore.y,
+      frame.spindleCore.z,
+      frame.spindleCore.w,
+    ).applyMatrix4(camera.projectionMatrix);
+    expect(Math.abs(coreClip.y / coreClip.w)).toBeGreaterThan(500);
+    expect(projected.sideClassificationAvailable).toBe(true);
+    expect(projected.maximumUploadedComponentMagnitude).toBeLessThanOrEqual(1);
+
+    const projectedSide = (point: typeof frame.spindleCore) => {
+      const clip = new THREE.Vector4(point.x, point.y, point.z, point.w)
+        .applyMatrix4(camera.projectionMatrix);
+      return classifyEarthAxisProjectedSide(projected, {
+        x: clip.x / clip.w,
+        y: clip.y / clip.w,
+      });
+    };
+    expect(projectedSide(frame.spindleNorthEndpoint)).toBe('north');
+    expect(projectedSide(frame.spindleSouthEndpoint)).toBe('south');
+  });
+
+  it('preserves local and world collinearity through calibration, recalibration, and rigid parents', () => {
+    const model = geocentricFixture(42.7325, 250);
+    const parents = [
+      new THREE.Matrix4(),
+      new THREE.Matrix4().makeRotationY(Math.PI / 2),
+      new THREE.Matrix4().makeRotationY(-Math.PI / 3),
+      new THREE.Matrix4().compose(
+        new THREE.Vector3(4, -2, 7),
+        new THREE.Quaternion().setFromEuler(new THREE.Euler(0.12, 1.7, -0.08)),
+        new THREE.Vector3(1, 1, 1),
+      ),
+      new THREE.Matrix4(),
+    ];
+    for (const parent of parents) {
+      const frame = createEarthAxisCameraRelativeFrame(
+        model,
+        parent,
+        cameraMatrix(new THREE.Vector3(0.2, 1.7, -0.3)),
+      );
+      assertHomogeneousSpindleCollinearity(frame);
+      expect(new THREE.Vector3(
+        frame.northDirectionView.x,
+        frame.northDirectionView.y,
+        frame.northDirectionView.z,
+      ).dot(new THREE.Vector3(
+        frame.southDirectionView.x,
+        frame.southDirectionView.y,
+        frame.southDirectionView.z,
+      ))).toBeCloseTo(-1, 14);
     }
   });
 
@@ -236,17 +419,27 @@ describe('camera-relative homogeneous geocentric rendering frame', () => {
 
   it('rejects non-unit and non-finite projective inputs before GPU upload', () => {
     const valid = geocentricFixture(43);
+    const zeroDirection = Object.freeze({
+      frame: 'APPLICATION_BASIS' as const,
+      units: 'unitless' as const,
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     const invalidDirection = Object.freeze({
       ...valid,
+      spindle: Object.freeze({
+        ...valid.spindle,
+        northDirection: zeroDirection,
+        southDirection: zeroDirection,
+      }),
       north: Object.freeze({
         ...valid.north,
-        directionApplication: Object.freeze({
-          frame: 'APPLICATION_BASIS' as const,
-          units: 'unitless' as const,
-          x: 0,
-          y: 0,
-          z: 0,
-        }),
+        directionApplication: zeroDirection,
+      }),
+      south: Object.freeze({
+        ...valid.south,
+        directionApplication: zeroDirection,
       }),
     });
     expect(() => createEarthAxisCameraRelativeFrame(
@@ -255,9 +448,15 @@ describe('camera-relative homogeneous geocentric rendering frame', () => {
       cameraMatrix(new THREE.Vector3()),
     )).toThrow('finite unit pole direction');
 
+    const invalidCorePoint = Object.freeze({
+      x: Number.NaN,
+      y: valid.earthCore.y,
+      z: valid.earthCore.z,
+    });
     const invalidCore = Object.freeze({
       ...valid,
-      earthCore: Object.freeze({ x: Number.NaN, y: valid.earthCore.y, z: valid.earthCore.z }),
+      earthCore: invalidCorePoint,
+      spindle: Object.freeze({ ...valid.spindle, earthCore: invalidCorePoint }),
     });
     expect(() => createEarthAxisCameraRelativeFrame(
       invalidCore,

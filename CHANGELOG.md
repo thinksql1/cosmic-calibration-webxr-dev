@@ -4,6 +4,14 @@
 
 ### Added
 
+- Added one validated `EarthAxisSpindlePresentation` source containing the WGS84 core, normalized
+  P03 axis direction, exact antipode, bounded extent, frame/revisions, provenance, and validity.
+  Added strict local/world/projected collinearity, camera-view, calibration/recalibration,
+  rigid-parent, toggle/reset/re-entry, pole-agreement, bounded-GPU, depth, and disposal coverage;
+  the complete suite now passes 36 files / 421 tests.
+- Added `docs/EARTH_AXIS_SPINDLE.md`, DEC-028, developer-only spindle diagnostics, and a focused
+  16-step Quest checklist. Physical acceptance, integration, publication, and deployment remain
+  pending.
 - Independently validated and normally integrated Milestone 2F with merge `31be4cc`. The feature
   and merged `master` pass 36 files / 416 tests, type-check, production build, dependency/diff
   checks, civil-time/provenance/failure/cache/motion probes, and development/preview regression.
@@ -111,6 +119,15 @@
 
 ### Changed
 
+- Replaced the two independently colored/faded/rasterized Earth-axis half-lines and core-covered
+  joint with one pale steel, constant-width, projectively clipped spindle mesh/material. Pole
+  markers use the same per-eye direction and exact negation; the spindle draws over the scientific
+  core marker, remains visible through the transparent explanatory treatment, and retains the
+  parent-only yaw plus linear non-writing depth contracts. No scientific or unrelated celestial
+  layer changed.
+- Replaced the initial offscreen-core opacity fallback with a bounded homogeneous projective-side
+  classifier. North/south visibility and emphasis now remain distinct even when the geocentric
+  core projects hundreds of NDC units outside the viewport.
 - Replaced the local `1.8 m` observer-centered Earth-axis proxy on an unintegrated feature branch
   with a WGS84 geocentric world-scale model: the observer stays at the modeled surface origin, an
   actual modeled Earth-core point is placed in local ENU meters, and one P03 mean-axis centerline
@@ -258,6 +275,14 @@
 
 ### Validated
 
+- Rigid-spindle local gate: clean install, type-check, 36 files / 421 tests, production build,
+  dependency/diff checks, and Vite development/production-preview browser regression pass. Camera
+  orbit, `0 -> 90 degree` recalibration, reset/re-entry, three toggle cycles, existing celestial
+  controls, relative preview asset loading, and clean browser consoles pass. Quest acceptance is
+  **NOT RUN**.
+- Independent implementation re-gate: the initial offscreen-core side-control fallback failed;
+  bounded homogeneous classification and its Michigan regression resolved the material finding.
+  The re-gate and post-fix production-browser shader/visibility smoke pass with a clean console.
 - Hosted Milestone 2B verification passes for visible observer/time/axis controls, ready NCP/SCP
   geometry, equator/mid-north/mid-south diagnostics, labels and below-horizon controls,
   reset/not-ready clearing, repository-subpath assets, and a clean browser console. This is

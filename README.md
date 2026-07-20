@@ -15,6 +15,12 @@ the selected explicit IANA civil day, exact valid civil-hour notches on that pat
 updates through the same central simulation clock. The path is not the celestial equator or an
 annual ecliptic; labels and other body paths remain deferred.
 
+The local `fix/earth-axis-spindle` branch corrects the user-observed bowed/hinged axis presentation
+without changing P03, WGS84, calibration, the celestial poles/equator, horizon, bodies, Sun path,
+or time. One authoritative core/direction descriptor now drives one constant-width projectively
+clipped spindle and the exact antipodal pole markers. Automated and desktop validation pass with
+421 tests; independent integration and physical Quest acceptance remain pending.
+
 ## Milestone 2 architecture status
 
 Milestone 2 architecture is complete and its bounded 2A0 validation spike passes. The exact
@@ -66,6 +72,7 @@ deployment, and hosted desktop regression. Physical Quest acceptance remains pen
 - [Earth axis and celestial poles](docs/EARTH_AXIS_AND_CELESTIAL_POLES.md)
 - [Geocentric rendering precision](docs/GEOCENTRIC_RENDERING_PRECISION.md)
 - [WebXR depth contract](docs/WEBXR_DEPTH_CONTRACT.md)
+- [Rigid Earth-axis spindle](docs/EARTH_AXIS_SPINDLE.md)
 - [Binocular presentation modes](docs/BINOCULAR_PRESENTATION_MODES.md)
 - [Local astronomical horizon](docs/LOCAL_ASTRONOMICAL_HORIZON.md)
 - [Milestone 2D physical acceptance](docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md)
@@ -84,8 +91,9 @@ The shared desktop/XR scene contains:
 - non-visual immutable observer/time contracts, tagged scientific frames and correction profiles,
   canonical ENU conversion, frozen provider provenance, and a bounded P03 mean-pole provider;
 - manual in-memory observer input, explicit UTC fixtures, a WGS84-modeled Earth-core point, and
-  one camera-relative/homogeneous geocentric P03 mean-axis group with antipodal projective NCP/SCP
-  directions and no raw large-world GPU positions;
+  one authoritative camera-relative geocentric P03 spindle descriptor rendered as a single
+  projectively clipped constant-width strip with exact antipodal projective NCP/SCP markers and no
+  raw large-world GPU positions;
 - an optional homogeneous mean celestial equator plus independent eye modes for axis/equator/local
   horizon; and
 - a default-hidden 96-sample, 24 m calibrated local tangent-plane horizon distinct from the
@@ -183,7 +191,10 @@ desktop simulation are locally testable. The reported Quest 3 Milestone 1 accept
 for controller-based calibration and usable lifecycle behavior. That evidence does not establish
 laboratory-grade angular accuracy, broad device coverage, or unreported edge-case outcomes.
 The geocentric replacement's local automated/development checks cover WGS84 core placement, one
-centerline, exact projective antipodes, ENU mapping, controls, readiness, and console health.
+centerline, exact projective antipodes, ENU mapping, controls, readiness, and console health. The
+local spindle correction additionally covers strict core/endpoint incidence, projected
+collinearity across representative cameras, calibration/recalibration and rigid-parent invariance,
+one-object toggle/reset/re-entry lifecycle, and bounded single-strip rendering.
 Independent review, integration, production-preview closeout, publication, and hosted regression
 have passed for the hardened geocentric renderer. The user has conditionally accepted the physical
 Quest experience as workable; detailed individual physical observations were not captured. The

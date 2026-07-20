@@ -17,8 +17,9 @@ Scientific and diagnostic values remain immutable JavaScript numbers:
 - calibrated geographic yaw: presentation-parent only.
 
 The `10^13 m` diagnostic coordinates never enter a Three.js attribute, object translation,
-matrix, uniform, or shader. GPU geometry contains only unit quad corners and line coefficients
-`0`/`1`.
+matrix, uniform, or shader. GPU geometry contains only unit quad corners. The spindle receives a
+display-extent-scaled homogeneous core plus one normalized projective image-line equation; all
+uploaded line components are bounded.
 
 ## Camera-relative and projective transform
 
@@ -83,10 +84,12 @@ not amplify that imperceptible signal into false nearby parallax.
 
 ## Axis continuity
 
-Both line segments use the same core-view uniform. Their other endpoint is either the north unit
-direction or its exact negation. The vertex shader performs homogeneous interpolation between
-`(core, w=1)` and `(direction, w=0)`. This preserves one projective centerline without large
-Euclidean endpoints or independent pole placement.
+One spindle descriptor owns the core, normalized north direction, and exact negative south
+direction. For each eye, the renderer takes the homogeneous cross product of the bounded finite
+core image and the shared ideal direction image to obtain one normalized screen-line equation.
+One constant-width strip rasterizes that line; there are no independent north/south line objects,
+orientations, materials, or coincident centerlines. Pole markers still consume the same view
+direction and its exact negation.
 
 ## Supported domain and stop behavior
 

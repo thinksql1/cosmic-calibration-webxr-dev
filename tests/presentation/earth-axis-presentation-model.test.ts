@@ -73,13 +73,26 @@ describe('geocentric Earth-axis presentation model', () => {
     expect(model.north.pointKind).toBe('PROJECTIVE_DIRECTION_AT_INFINITY');
     expect(model.south.pointKind).toBe('PROJECTIVE_DIRECTION_AT_INFINITY');
     expect(model.renderStrategy).toBe(
-      'CAMERA_RELATIVE_CORE_AND_HOMOGENEOUS_PROJECTIVE_POLES',
+      'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_SPINDLE_AND_PROJECTIVE_POLES',
     );
     expect(model.depthContract).toBe(
       'LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY',
     );
     expect(model.gpuCoordinatePolicy).toBe('NO_RAW_LARGE_WORLD_VERTEX_COORDINATES');
     expect(model.earthCore).not.toEqual(model.observerSurfaceOrigin);
+    expect(model.spindle).toMatchObject({
+      kind: 'RIGID_EARTH_ROTATIONAL_AXIS_SPINDLE',
+      validity: 'VALIDATED',
+      lineContract: 'ONE_CORE_ONE_DIRECTION_ONE_EXACT_ANTIPODE',
+      renderTopology: 'ONE_PROJECTIVELY_CLIPPED_SCREEN_SPACE_SPINDLE',
+      earthCore: model.earthCore,
+      displayExtentMeters: CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS,
+    });
+    expect(model.spindle.northDirection).toBe(model.north.directionApplication);
+    expect(model.spindle.southDirection).toBe(model.south.directionApplication);
+    expect(model.spindle.southDirection.x).toBe(-model.spindle.northDirection.x);
+    expect(model.spindle.southDirection.y).toBe(-model.spindle.northDirection.y);
+    expect(model.spindle.southDirection.z).toBe(-model.spindle.northDirection.z);
     expect(south.x).toBeCloseTo(-north.x, 1);
     expect(south.y).toBeCloseTo(-north.y, 1);
     expect(south.z).toBeCloseTo(-north.z, 1);
@@ -88,6 +101,53 @@ describe('geocentric Earth-axis presentation model', () => {
       -1,
     );
     expect(model.poleRenderConvergenceUpperBoundArcseconds).toBeLessThan(0.14);
+  });
+
+  it('makes core, finite display endpoints, and projective pole directions one strict spindle', () => {
+    const model = createEarthAxisPresentationModel(ready(42.7325, 7).snapshot);
+    const north = relativeToCore(model.north.diagnosticFiniteProxyPosition, model.earthCore);
+    const south = relativeToCore(model.south.diagnosticFiniteProxyPosition, model.earthCore);
+    const northLength = Math.hypot(north.x, north.y, north.z);
+    const southLength = Math.hypot(south.x, south.y, south.z);
+    const dot = (
+      north.x * south.x + north.y * south.y + north.z * south.z
+    ) / (northLength * southLength);
+    const cross = {
+      x: north.y * south.z - north.z * south.y,
+      y: north.z * south.x - north.x * south.z,
+      z: north.x * south.y - north.y * south.x,
+    };
+    const lineDirection = {
+      x: model.north.diagnosticFiniteProxyPosition.x - model.south.diagnosticFiniteProxyPosition.x,
+      y: model.north.diagnosticFiniteProxyPosition.y - model.south.diagnosticFiniteProxyPosition.y,
+      z: model.north.diagnosticFiniteProxyPosition.z - model.south.diagnosticFiniteProxyPosition.z,
+    };
+    const southToCore = {
+      x: model.earthCore.x - model.south.diagnosticFiniteProxyPosition.x,
+      y: model.earthCore.y - model.south.diagnosticFiniteProxyPosition.y,
+      z: model.earthCore.z - model.south.diagnosticFiniteProxyPosition.z,
+    };
+    const distanceCross = {
+      x: southToCore.y * lineDirection.z - southToCore.z * lineDirection.y,
+      y: southToCore.z * lineDirection.x - southToCore.x * lineDirection.z,
+      z: southToCore.x * lineDirection.y - southToCore.y * lineDirection.x,
+    };
+    const coreToLineDistance = Math.hypot(
+      distanceCross.x,
+      distanceCross.y,
+      distanceCross.z,
+    ) / Math.hypot(lineDirection.x, lineDirection.y, lineDirection.z);
+
+    expect(dot).toBeCloseTo(-1, 14);
+    expect(Math.hypot(cross.x, cross.y, cross.z) / (northLength * southLength))
+      .toBeLessThan(1e-14);
+    expect(coreToLineDistance).toBeLessThan(1e-9);
+    expect(model.spindle.earthCore).toBe(model.earthCore);
+    expect(model.spindle.calibrationRevision).toBe(model.snapshotIdentity.calibrationRevision);
+    expect(model.spindle.acceptedCalibrationRevision).toBe(7);
+    expect(model.spindle.observerRevision).toBe(model.snapshotIdentity.observerRevision);
+    expect(model.spindle.provenance.provider).toBeTruthy();
+    expect(model.spindle.provenance.providerVersion).toBeTruthy();
   });
 
   it('supports full-axis and above-horizon emphasis without moving the centerline', () => {

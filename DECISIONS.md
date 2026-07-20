@@ -325,7 +325,7 @@
 
 ### DEC-027: Derive the daily apparent Sun path from explicit IANA civil time while retaining UTC astronomy
 - **Date:** 2026-07-19
-- **Status:** Accepted locally; independent validation, integration, deployment, and physical Quest
+- **Status:** Accepted, independently validated, integrated, and published; physical Quest
   acceptance pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** Use the existing central UTC `SimulationClock` and approved airless apparent
@@ -340,6 +340,24 @@
   astronomy. Keeping the contracts separate avoids a decorative 24-segment equator, a false fixed
   civil day at DST transitions, and an ambient second scientific clock. The path remains a bounded
   apparent observer reference and does not imply a geocentric physical solar orbit.
+
+### DEC-028: Render the Earth rotational axis from one authoritative spindle descriptor
+- **Date:** 2026-07-19
+- **Status:** Accepted locally; independent revalidation, integration, deployment, and physical
+  Quest acceptance pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** The Earth-axis presentation owns one validated descriptor containing the finite
+  WGS84 core, one normalized P03 axis direction, its exact component-negated antipode, bounded
+  display extent, coordinate-frame identity, observer/calibration revisions, provenance, and
+  validity. One per-eye projective image-line equation renders one constant-width spindle strip;
+  NCP/SCP markers consume the same direction and exact negation. Separate north/south line objects,
+  materials, rotations, parents, and coincident centerlines are prohibited. Geographic yaw remains
+  parent-only and depth remains layer-local, linear, non-testing, and non-writing.
+- **Rationale:** The prior analytic geometry was collinear, but independently colored, faded,
+  clipped, and rasterized halves plus a core marker over their joint created a perceptual hinge.
+  One descriptor and one strip make collinearity a presentation invariant, preserve the transparent
+  explanatory Earth treatment, and leave every scientific model and unrelated celestial layer
+  unchanged.
 
 ## Proposed decisions awaiting review
 

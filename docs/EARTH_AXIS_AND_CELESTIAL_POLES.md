@@ -16,6 +16,14 @@ bounded physical usability** of the combined deployed spatial-reference experien
 claim separate angular, world-locking, or eye-mode measurements. See
 [Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
 
+The current `fix/earth-axis-spindle` correction responds to newer physical feedback that the axle
+read as bowed or hinged at the core. Investigation confirmed the analytic line, pole antipodes,
+parent hierarchy, and one-yaw path were already correct. The visual seam came from two separately
+styled/rasterized line objects and a core quad drawn over their joint. The local correction replaces
+them with one authoritative descriptor and one projectively clipped constant-width strip. It is
+automated- and desktop-validated but is not merged, published, deployed, or physically accepted.
+See [Rigid Earth-Axis Spindle](EARTH_AXIS_SPINDLE.md).
+
 ## Scientific model — unchanged
 
 The source remains the validated Tier 1 IAU P03 precession-only mean pole/equator of date. It
@@ -65,7 +73,7 @@ screen-space presentation values.
 The render strategy identifier is:
 
 ```text
-CAMERA_RELATIVE_CORE_AND_HOMOGENEOUS_PROJECTIVE_POLES
+CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_SPINDLE_AND_PROJECTIVE_POLES
 ```
 
 For each camera supplied by Three.js — including each XR eye — JavaScript:
@@ -73,27 +81,29 @@ For each camera supplied by Three.js — including each XR eye — JavaScript:
 1. applies the calibrated parent's world rotation once;
 2. subtracts that eye camera's world position from the scientific Earth core in double precision;
 3. rotates the relative core into that eye's view frame;
-4. rotates the unit pole direction into the same view frame; and
-5. uploads only the camera-relative core and unit directions.
+4. rotates the unit pole direction into the same view frame;
+5. forms a bounded homogeneous core and one projective image-line equation; and
+6. uploads only bounded line coefficients, the camera-relative core, and unit directions.
 
-Line geometry contains only homogeneous interpolation coefficients `0` and `1`. The vertex shader
-projects the core with homogeneous `w = 1` and pole directions with `w = 0`. Marker and label
-quads similarly project either the finite camera-relative core or the projective direction. All
-object translations remain zero. No `10^13 m` vertex, object position, or model-view translation
-exists.
+One fullscreen spindle mesh rasterizes a constant-width strip from the image-line equation through
+the homogeneous finite core and ideal axis direction. Pole marker and label quads still project the
+exact oriented `w = 0` directions. All object translations remain zero. No `10^13 m` vertex,
+object position, or model-view translation exists.
 
-The two line segments use the same per-eye core and exact antipodal directions, so their
-projective image is one continuous mathematical line. The display is world-anchored because the
-calibrated world matrix and active eye matrix are recomputed at draw time; it is not based on the
-headset-forward vector and is not screen-locked.
+There are no separate north/south line objects. One shared per-eye core and direction defines the
+entire projected centerline; south remains exact negation for pole markers and bounded diagnostics.
+The display is world-anchored because the calibrated world matrix and active eye matrix are
+recomputed at draw time; the screen-space strip only rasterizes that world-derived centerline and
+does not billboard, bend, or head-lock it.
 
 ## Earth-core presentation
 
 The core remains a finite WGS84 point roughly one Earth radius from the observer. Its actual
 camera-relative vector determines screen direction and per-eye behavior. A restrained fixed-pixel
 marker makes the direction inspectable; it is an appearance proxy and does not replace or move the
-scientific point. The marker is depth-disabled because no room floor or passthrough depth surface
-is a scientifically valid Earth occluder.
+scientific point. The spindle renders over its marker so the marker cannot become a visible joint.
+Both remain depth-disabled because no room floor or passthrough depth surface is a scientifically
+valid Earth occluder.
 
 ## WebXR depth contract
 
@@ -116,7 +126,8 @@ the application has no authoritative environmental or Earth-surface occlusion me
 
 ## Ownership and lifecycle
 
-`createEarthAxisGroup()` owns its line/quad geometries, shader materials, and two label textures.
+`createEarthAxisGroup()` owns its one spindle mesh/material, marker/label quads, and two label
+textures.
 
 - `update()` reuses the existing objects and resources.
 - visibility changes allocate nothing.
@@ -139,7 +150,9 @@ The restrained diagnostics distinguish scientific values from rendering policy:
 - camera-relative/homogeneous strategy;
 - approximate camera-relative core magnitude;
 - linear/non-writing depth contract;
-- calibration revision and P03 provider version.
+- calibration revision and P03 provider version; and
+- one-spindle contract/topology, core-to-line distance, north/south dot product, transform-parent
+  identity, one-yaw policy, projected-line visibility/degeneracy, and local/view direction vectors.
 
 Per-eye transient values remain available on the scene group's diagnostic `userData` for defect
 triage but are not continuously copied into the normal UI.
@@ -150,10 +163,11 @@ camera-relative, depth, or calibration contracts.
 
 ## Validation and remaining risk
 
-Deterministic coverage includes supported latitude/elevation sweeps, per-eye offsets, head
-translation and rotation, exact antipodes, one calibrated yaw, bounded float attributes,
-camera-relative float32 error, homogeneous shader/source boundaries, material depth behavior,
-resource reuse, clear/rebuild, and idempotent disposal.
+Deterministic coverage includes supported latitude/elevation sweeps, per-eye offsets, named and
+oblique camera views, head translation and rotation, exact antipodes, strict local/world/projected
+collinearity, core incidence, calibration/recalibration and rigid-parent transforms, bounded float
+attributes/uniforms, camera-relative float32 error, homogeneous shader/source boundaries, material
+depth behavior, toggles, reset/re-entry, resource reuse, clear/rebuild, and idempotent disposal.
 
 Desktop development and production preview validate shader compilation, controls, orbit,
 readiness/reset, and console health. The user has additionally reported the published Quest

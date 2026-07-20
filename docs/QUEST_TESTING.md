@@ -207,3 +207,32 @@ actual transition day, or long-duration comfort.
 
 Record only observed results. Do not infer all seven identities, a daylight-saving transition,
 recenter/tracking-loss coverage, exact drift, or comfort duration from this short procedure.
+
+## Rigid Earth-axis spindle correction (pending independent integration)
+
+**Physical Quest acceptance: NOT RUN.** The local correction replaces the independently styled
+north/south axis primitives with one authoritative, projectively clipped spindle through the same
+validated WGS84 core and P03 direction. It is not merged, pushed, deployed, or physically accepted.
+
+After independent revalidation, integration, and deployment authorization, record each item as
+`PASS`, `FAIL`, `UNCERTAIN`, or `NOT RUN`:
+
+1. Open the deployed app in Quest passthrough.
+2. Calibrate true north.
+3. Face north and inspect the axis.
+4. Face south and inspect the opposite continuation.
+5. Turn east and west to see the line obliquely.
+6. Confirm the north pole, Earth core, and south pole appear collinear.
+7. Confirm the core does not look like a hinge.
+8. Confirm the line resembles the rigid axle of a spinning top.
+9. Confirm the lower/southern section remains visible through the transparent Earth treatment.
+10. Move the head laterally and vertically.
+11. Confirm parallax does not reveal a bow, split, or offset.
+12. Toggle the axis off and on.
+13. Recalibrate true north.
+14. Exit and re-enter immersive AR.
+15. Confirm no duplicate spindle, stale half, or orphan joint appears.
+16. Confirm the horizon, pole markers, equator, bodies, Sun path, and hour notches remain correct.
+
+This physical task does not authorize labels, additional celestial features, merge, push,
+deployment, or a scientific-model change.

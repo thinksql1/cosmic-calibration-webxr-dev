@@ -21,6 +21,28 @@ function model(overrides: Partial<EarthAxisPresentationModel> = {}): EarthAxisPr
     markerVisible: true,
     labelVisible: true,
   });
+  const north = endpoint('NCP', 1);
+  const south = endpoint('SCP', -1);
+  const spindle = Object.freeze({
+    kind: 'RIGID_EARTH_ROTATIONAL_AXIS_SPINDLE' as const,
+    validity: 'VALIDATED' as const,
+    lineContract: 'ONE_CORE_ONE_DIRECTION_ONE_EXACT_ANTIPODE' as const,
+    renderTopology: 'ONE_PROJECTIVELY_CLIPPED_SCREEN_SPACE_SPINDLE' as const,
+    coordinateFrameIdentity: 'APPLICATION_BASIS_UNCALIBRATED_BELOW_GEOGRAPHIC_PARENT' as const,
+    earthCore: core,
+    northDirection: north.directionApplication,
+    southDirection: south.directionApplication,
+    displayExtentMeters: 1e13,
+    calibrationRevision: 1,
+    acceptedCalibrationRevision: 1,
+    observerRevision: 1,
+    provenance: Object.freeze({
+      model: 'IAU_P03_PRECESSION_ONLY' as const,
+      provider: 'fixture',
+      providerVersion: '1.0.0',
+      simulationInstantUtc: '2025-06-21T16:00:00.000Z',
+    }),
+  });
   return Object.freeze({
     kind: 'ready',
     model: 'IAU_P03_PRECESSION_ONLY',
@@ -28,7 +50,7 @@ function model(overrides: Partial<EarthAxisPresentationModel> = {}): EarthAxisPr
     precisionTier: 'TIER_1',
     presentationKind: 'GEOCENTRIC_WORLD_SCALE_EARTH_CORE_AXIS',
     poleTopology: 'ANTIPODAL_PROJECTIVE_DIRECTIONS_AT_INFINITY',
-    renderStrategy: 'CAMERA_RELATIVE_CORE_AND_HOMOGENEOUS_PROJECTIVE_POLES',
+    renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_SPINDLE_AND_PROJECTIVE_POLES',
     depthContract: 'LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY',
     gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES',
     observerSurfaceOrigin: Object.freeze({ x: 0, y: 0, z: 0 }),
@@ -41,8 +63,9 @@ function model(overrides: Partial<EarthAxisPresentationModel> = {}): EarthAxisPr
     poleRenderConvergenceUpperBoundArcseconds: 0.14,
     observerToCoreDistanceMeters: 6_000_000,
     observerToAxisDistanceMeters: 4_700_000,
-    north: endpoint('NCP', 1),
-    south: endpoint('SCP', -1),
+    spindle,
+    north,
+    south,
     snapshotIdentity: Object.freeze({ cacheKey: 'fixture', creationSequence: 1, observerRevision: 1, timeRevision: 1, calibrationRevision: 1, acceptedCalibrationRevision: 1 }),
     ...overrides,
   });
@@ -55,7 +78,7 @@ describe('geocentric Earth-axis Three.js group', () => {
     const handle = createEarthAxisGroup(labelFactory);
     handle.update(model());
     expect(handle.group.name).toBe('celestial-geocentric-earth-axis-frame');
-    expect(handle.group.children).toHaveLength(7);
+    expect(handle.group.children).toHaveLength(6);
     for (const child of handle.group.children) {
       expect(child.position.toArray()).toEqual([0, 0, 0]);
       const renderable = child as THREE.Mesh | THREE.Line;
@@ -65,10 +88,19 @@ describe('geocentric Earth-axis Three.js group', () => {
       expect(material.depthTest).toBe(false);
       expect(material.depthWrite).toBe(false);
     }
-    const northLine = handle.group.getObjectByName('mean-earth-axis-north-segment') as THREE.Line;
-    expect(Array.from((northLine.geometry.getAttribute('position') as THREE.BufferAttribute).array)).toEqual([
-      0, 0, 0, 1, 0, 0,
-    ]);
+    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Mesh;
+    const core = handle.group.getObjectByName('modeled-earth-core-marker') as THREE.Mesh;
+    expect(spindle).toBeDefined();
+    expect(handle.group.getObjectByName('mean-earth-axis-north-segment')).toBeUndefined();
+    expect(handle.group.getObjectByName('mean-earth-axis-south-segment')).toBeUndefined();
+    expect(spindle.renderOrder).toBeGreaterThan(core.renderOrder);
+    const spindleMaterial = spindle.material as THREE.ShaderMaterial;
+    expect(spindleMaterial.uniforms.uLineNdc).toBeDefined();
+    expect(spindleMaterial.uniforms.uCoreImage).toBeDefined();
+    expect(spindleMaterial.uniforms.uNorthDirectionImage).toBeDefined();
+    expect(spindleMaterial.fragmentShader).toContain('alphaNumerator * betaNumerator');
+    expect(spindleMaterial.fragmentShader).not.toContain('uCoreNdc');
+    expect(spindleMaterial.uniforms).not.toHaveProperty('uDirectionSouthView');
   });
 
   it('derives camera-relative core and exact projective antipodes for the active eye', () => {
@@ -137,13 +169,16 @@ describe('geocentric Earth-axis Three.js group', () => {
     const handle = createEarthAxisGroup(labelFactory);
     const source = model();
     handle.update(source);
-    const southLine = handle.group.getObjectByName('mean-earth-axis-south-segment') as THREE.Line;
+    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Mesh;
     const southMarker = handle.group.getObjectByName('south-celestial-pole-marker') as THREE.Mesh;
     const geometry = southMarker.geometry;
     handle.update(model({
       south: Object.freeze({ ...source.south, segmentVisible: false, markerVisible: false, labelVisible: false }),
     }));
-    expect(southLine.visible).toBe(false);
+    expect(spindle.visible).toBe(true);
+    const spindleMaterial = spindle.material as THREE.ShaderMaterial;
+    expect(spindleMaterial.uniforms.uSouthVisible.value).toBe(0);
+    expect(spindleMaterial.uniforms.uNorthVisible.value).toBe(1);
     expect(southMarker.visible).toBe(false);
     expect(southMarker.position.toArray()).toEqual([0, 0, 0]);
     expect(southMarker.geometry).toBe(geometry);
@@ -175,10 +210,63 @@ describe('geocentric Earth-axis Three.js group', () => {
     handle.clear();
     expect(handle.group.visible).toBe(false);
     expect(handle.group.userData.snapshotCacheKey).toBeUndefined();
-    expect(handle.group.children).toHaveLength(7);
+    expect(handle.group.children).toHaveLength(6);
     expect(dispose).not.toHaveBeenCalled();
     handle.update(model());
     expect(handle.group.visible).toBe(true);
+  });
+
+  it('keeps exactly one spindle through toggles, reset, recalibration, and session re-entry', () => {
+    const handle = createEarthAxisGroup(labelFactory);
+    const initial = model();
+    handle.update(initial);
+    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Mesh;
+    const geometry = spindle.geometry;
+    const material = spindle.material;
+
+    for (let revision = 2; revision <= 4; revision += 1) {
+      handle.update(model({
+        snapshotIdentity: Object.freeze({
+          cacheKey: `revision-${revision}`,
+          creationSequence: revision,
+          observerRevision: revision,
+          timeRevision: 1,
+          calibrationRevision: revision,
+          acceptedCalibrationRevision: revision,
+        }),
+      }));
+      expect(handle.group.children.filter(
+        (child) => child.name === 'mean-earth-axis-rigid-spindle',
+      )).toHaveLength(1);
+      expect(handle.group.getObjectByName('mean-earth-axis-rigid-spindle')).toBe(spindle);
+    }
+
+    handle.update(model({
+      north: Object.freeze({ ...initial.north, segmentVisible: false }),
+      south: Object.freeze({ ...initial.south, segmentVisible: false }),
+    }));
+    expect(spindle.visible).toBe(false);
+    handle.update(initial);
+    expect(spindle.visible).toBe(true);
+
+    handle.clear();
+    expect(handle.group.visible).toBe(false);
+    handle.update(model({
+      snapshotIdentity: Object.freeze({
+        cacheKey: 'session-re-entry',
+        creationSequence: 5,
+        observerRevision: 1,
+        timeRevision: 1,
+        calibrationRevision: 5,
+        acceptedCalibrationRevision: 5,
+      }),
+    }));
+    expect(handle.group.children.filter(
+      (child) => child.name === 'mean-earth-axis-rigid-spindle',
+    )).toHaveLength(1);
+    expect(spindle.geometry).toBe(geometry);
+    expect(spindle.material).toBe(material);
+    expect(handle.group.getObjectByName('axis-core-joint')).toBeUndefined();
   });
 
   it('disposes every unique owned resource exactly once and is idempotent', () => {

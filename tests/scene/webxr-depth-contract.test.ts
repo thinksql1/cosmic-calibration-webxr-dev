@@ -6,7 +6,11 @@ import {
 import { createEarthAxisGroup } from '../../src/scene/createEarthAxisGroup';
 
 const sources = import.meta.glob(
-  ['../../src/main.ts', '../../src/scene/createEarthAxisGroup.ts'],
+  [
+    '../../src/main.ts',
+    '../../src/scene/createEarthAxisGroup.ts',
+    '../../src/scene/earthAxisCameraRelativeFrame.ts',
+  ],
   {
     eager: true,
     query: '?raw',
@@ -16,6 +20,7 @@ const sources = import.meta.glob(
 
 const mainSource = sources['../../src/main.ts'];
 const rendererSource = sources['../../src/scene/createEarthAxisGroup.ts'];
+const frameSource = sources['../../src/scene/earthAxisCameraRelativeFrame.ts'];
 
 describe('WebXR-safe geocentric depth and GPU boundary', () => {
   it('keeps the shared renderer on ordinary linear depth with a tight local far plane', () => {
@@ -25,11 +30,15 @@ describe('WebXR-safe geocentric depth and GPU boundary', () => {
   });
 
   it('uses a homogeneous direction and camera-relative core without raw finite proxies', () => {
-    expect(rendererSource).toContain('vec4(uCoreView, 1.0)');
-    expect(rendererSource).toContain('vec4(uDirectionView, 0.0)');
+    expect(rendererSource).toContain('uniform vec3 uLineNdc');
+    expect(rendererSource).toContain('projectEarthAxisCenterline');
+    expect(frameSource).toContain('frame.spindleCore.w');
+    expect(frameSource).toContain('frame.northDirectionView.z');
+    expect(frameSource).toContain(').applyMatrix4(projectionMatrix)');
     expect(rendererSource).not.toContain('diagnosticFiniteProxyPosition');
     expect(rendererSource).not.toContain('CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS');
     expect(rendererSource).not.toContain('10_000_000_000_000');
+    expect(frameSource).not.toContain('10_000_000_000_000');
   });
 
   it('declares every celestial material as a non-testing, non-writing overlay', () => {
