@@ -2,9 +2,22 @@
 
 ## Status and scope
 
-This document is the architecture contract for future Milestone 2 implementation. It defines
-frames, scientific ownership, transforms, axis/pole/equator models, precision tiers, display
-layers, and invalidation. It contains no application implementation.
+**Status: historical design record / partially implemented architecture.** This document was
+originally written before the current celestial and temporal layers were implemented. It is
+retained for architectural rationale and historical traceability. Its original future-tense
+implementation sequence is superseded where later milestones are explicitly recorded below.
+
+Milestones 2A through 2F and the published geocentric baseline now implement much of this design:
+the WGS84 Earth core, axis/poles, celestial equator, observer-centered local horizon, apparent
+Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn directions, civil-day Sun path, civil-hour notches,
+central clock, live refresh, provenance, warnings, and errors. The unmerged
+`fix/earth-axis-spindle` branch changes only the spindle/core/equator presentation contract and
+remains local, undeployed, and physically unaccepted.
+
+Current implementation authority is `PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, and the focused
+feature documents. This document defines frames, scientific ownership, transforms,
+axis/pole/equator models, precision tiers, display layers, and invalidation; it is not the current
+implementation-status authority.
 
 External model and platform facts trace to the [official astronomy source
 register](OFFICIAL_ASTRONOMY_SOURCES.md). Recommendations and unresolved assumptions are labelled
@@ -20,16 +33,13 @@ The architecture preserves the validated Milestone 1 convention:
 
 ## Implemented foundation and first visual consumer
 
-Milestone 2A implements the application-owned observer, explicit-tick UTC clock, read-only
-geographic-calibration view, Tier 1 configuration, provider registry, immutable P03
-axis/equator-basis snapshot, and bounded exact-key cache described in [Scientific State
-Foundation](SCIENTIFIC_STATE_FOUNDATION.md). Milestone 2B extends that snapshot with a
-validated observer-horizontal Earth-axis result. The local geocentric replacement further adds
-snapshot-owned WGS84 Earth-center placement and consumes both products in one world-scale axis
-with exact antipodal projective NCP/SCP directions. Calibration yaw remains presentation-parent
-work. The replacement is not independently reviewed, integrated, or published. No celestial-equator
-geometry, precession path, body display, temporal
-clock, or contemplative sequence has been added. See [Earth Axis and Celestial
+Milestones 2A through 2F form the published master baseline: immutable P03 axis/equator-basis
+snapshots, WGS84 Earth-core placement, projective NCP/SCP directions, the mean celestial equator,
+eye modes, observer-centered horizon, actual body markers, and the civil-day Sun path/live clock.
+The local `fix/earth-axis-spindle` branch changes only the core/axis/equator presentation into one
+unified finite Earth-centered assembly. It has passed technical independent review, but the final
+independent integration re-gate, integration, deployment, and physical Quest acceptance remain
+pending. Calibration yaw remains presentation-parent work. See [Earth Axis and Celestial
 Poles](EARTH_AXIS_AND_CELESTIAL_POLES.md).
 
 ## Non-negotiable invariants
@@ -59,15 +69,14 @@ XR tracking / local-floor frame                         physical tracking
 ├── room-relative diagnostic frame                     presentation only
 └── calibrated geographic presentation frame           room -> geographic yaw
     ├── local floor/cardinal presentation
-    └── observer-centered celestial presentation frame display mapping only
-        ├── Earth-axis presentation
-        ├── NCP/SCP presentation
-        ├── celestial-equator presentation
-        ├── precession-path presentation               future
-        ├── ecliptic presentation                      future
-        ├── Sun temporal presentation                  future
-        ├── Moon temporal presentation                 future
-        └── other optional presentation layers         future
+    ├── Earth-centered geocentric assembly (core, axis, poles, equator)
+    │   ├── Earth-axis and NCP/SCP presentation
+    │   └── celestial-equator presentation
+    └── observer-centered local presentation
+        ├── local-horizon presentation
+        ├── apparent Sun/Moon/body directions
+        ├── Sun temporal presentation
+        └── other optional observer references         genuinely deferred
 
 Scientific model graph (not Three.js parenting)
 WGS84-like Earth-fixed terrestrial state
@@ -343,7 +352,8 @@ offsets.
 
 - `southAxis = -northAxis` exactly after normalization.
 - NCP and SCP markers are endpoints of one axis object, not separately calculated objects.
-- The mean celestial equator uses the plane through the origin with normal `northAxisMean`.
+- The mean celestial equator uses the plane through the finite Earth core with normal
+  `northAxisMean`; the observer origin must not substitute for that core.
 - A true/CIP equator, if enabled, uses `northAxisTrue` and is a distinct layer/model ID.
 - At ideal geodetic latitude `phi`, the mean NCP altitude in the geometric geodetic horizon is
   `phi`; the SCP is antipodal. Southern observers see the SCP above the horizon.
@@ -366,8 +376,8 @@ requires the resulting north direction to be mean-date `+Z`. Earth rotation abou
 cannot change it. A full WGS84 Earth-fixed-to-ENU basis then yields north pole direction
 `(east 0, north cos(phi), up sin(phi))` for geodetic latitude `phi`; longitude cancels. This
 identity is proven from the tagged P03 result and is deliberately scoped to the rotational axis.
-It must not be reused for the future celestial equator, stars, or bodies, which require a complete
-date/Earth-rotation transform.
+It was not reused for the subsequently implemented celestial equator or Sun/Moon/body layers, nor
+may it be reused for stars or other layers that require a complete date/Earth-rotation transform.
 
 ## Celestial equator
 
@@ -386,12 +396,12 @@ date/Earth-rotation transform.
 - **Validation:** unit length, closure, every sample perpendicular to the axis, antipodal sample
   pairs, and known latitude/horizon cases.
 
-**Milestone 2C implementation:** the local, unpublished layer consumes the immutable snapshot's
-validated GCRS P03 basis plus its science-owned observer-horizontal sampling basis. The unlabelled
-local basis changes only sample phase, never the full equatorial locus; it avoids treating the
-axis-only Earth-rotation shortcut as a general celestial-coordinate transform. The renderer uses
-96 homogeneous projective directions and existing camera-relative core context, not a finite or
-observer-centred ring. Independent integration, publication, and Quest validation remain pending.
+**Milestone 2C implementation:** the published layer consumes the immutable snapshot's validated
+GCRS P03 basis plus its science-owned observer-horizontal sampling basis. The local unified
+correction preserves that science while rendering 96 bounded homogeneous samples of a finite
+Earth-core-centred reference ring in the infinite equatorial plane. It is not an observer-centred
+ring. Independent integration, publication, and Quest validation remain pending only for the local
+unified correction.
 
 ## Horizon model
 
@@ -548,17 +558,17 @@ default composition, not whether its science is optional.
 | `precession-contact` | current mean pole sample | precession presentation | on only with path | time revision | high / date optional | precession paths | no |
 | `nutation-detail` | true-minus-mean pole | celestial presentation | off | time revision | low / optional magnitude | mean + true provider | no |
 | `ecliptic` | named ecliptic frame/model | celestial presentation | off | date/model revision | medium / optional | validated provider | selectable |
-| `sun-current` | apparent topocentric Sun | celestial presentation | off until Sun milestone | time/observer | high / optional | astronomy adapter | yes in Sun mode |
-| `solar-path` | sampled apparent Sun | Sun temporal group | off | selected date/observer/zone | medium / none | temporal sampler | yes in solar-clock mode |
-| `solar-hour-ticks` | civil-hour Sun samples | Sun temporal group | off | date/zone/observer | medium / none | solar path | selectable |
+| `sun-current` | apparent topocentric Sun | celestial presentation | published; off by default | time/observer | high / optional | astronomy adapter | yes in Sun mode |
+| `solar-path` | sampled apparent Sun | Sun temporal group | published; off by default | selected date/observer/zone | medium / none | temporal sampler | yes in solar-clock mode |
+| `solar-hour-ticks` | civil-hour Sun samples | Sun temporal group | published; off by default | date/zone/observer | medium / none | solar path | selectable |
 | `solar-hour-labels` | IANA civil labels | Sun temporal group | off | zone/date/locale | low / density mode | tick instants | no |
-| `moon-current` | apparent topocentric Moon | celestial presentation | off until Moon milestone | time/observer | high / optional | astronomy adapter | yes in Moon mode |
+| `moon-current` | apparent topocentric Moon | celestial presentation | published; off by default | time/observer | high / optional | astronomy adapter | yes in Moon mode |
 | `lunar-next24-path` | elapsed-hour Moon samples | Moon temporal group | off | start/observer | medium / none | temporal sampler | yes in Moon-clock mode |
 | `lunar-hour-ticks` | next-24-hour samples | Moon temporal group | off | start/observer | medium / none | next24 path | selectable |
 | `lunar-midnight-cycle` | local-midnight Moon samples | Moon temporal group | off | zone/cycle/observer | medium / sparse | civil resolver + phase search | selectable |
 | `lunar-labels` | IANA dates/offsets | Moon temporal group | off | zone/locale | low / major-only default | lunar samples | no |
 | `lunar-phase-symbols` | geocentric phase/illumination | Moon temporal group | off | sample times | low / no text default | phase provider | no |
-| `planets` | apparent topocentric bodies | celestial presentation | off | time/observer | medium / selected only | body adapter | selectable |
+| `planets` | seven published apparent bodies | celestial presentation | off by default | time/observer | medium / selected only | body adapter | selectable |
 | `path-traces` | sampled validated body directions | body group | off | selection/time range | low / none | body + temporal sampler | no |
 | `scientific-annotations` | provenance/model/error metadata | presentation overlay | off | model/state | low / demand-only | selected object/layer | no |
 | `contemplative-cues` | presentation sequence only | contemplative root | off | sequence clock | separate / no science claim | validated scientific layers | selectable |
@@ -608,7 +618,10 @@ different direction, or replace missing science with decorative geometry.
 | Location privacy/persistence | No collection or persistence in this milestone; future explicit consent design |
 | General-purpose planetarium expansion | Out of scope; implement only bounded orientation relationships |
 
-## Confirmed, recommended, assumed, deferred
+## Historical planning summary and remaining deferred work
+
+The following labels preserve the original design-state reasoning. They do not override the
+published/local status declared at the top of this document.
 
 - **Confirmed:** existing axes/yaw behavior; official source capabilities and distinctions recorded
   in `OFFICIAL_ASTRONOMY_SOURCES.md`.
@@ -616,6 +629,12 @@ different direction, or replace missing science with decorative geometry.
   canonical ENU intermediary, central time snapshot, and optional layers.
 - **Assumed for planning:** the trusted physical marker continues to represent true north and the
   observer provides a valid geodetic location. Implementation must validate inputs.
-- **Deferred:** geolocation, celestial-equator and later celestial geometry, Sun/Moon/planets,
-  time controls, full-cycle precession, nutation detail, EOP, polar motion, persistence, and
-  contemplative sequencing.
+- **Implemented since this document was written:** WGS84 Earth core; geocentric axis/poles;
+  celestial equator; projective/camera-relative celestial rendering; observer-centered local
+  horizon; apparent Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn; central clock;
+  IANA/DST-aware civil-day handling; daily Sun path; civil-hour notches; provenance; structured
+  warnings/errors; and live refresh.
+- **Genuinely deferred:** geolocation; ecliptic and annual paths; labels/object identification;
+  Moon phase/orientation and lunar temporal paths; planetary trails; Uranus/Neptune/Pluto; stars
+  and constellations; broad accelerated/reverse/historical time controls; full-cycle precession;
+  nutation detail, EOP, polar motion; persistence; and contemplative sequencing.

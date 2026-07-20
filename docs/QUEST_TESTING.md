@@ -2,6 +2,34 @@
 
 Desktop success is not Quest success. Record each physical criterion as **PASS**, **FAIL**, **UNCERTAIN**, or **NOT RUN** with notes and evidence.
 
+## Unified geocentric core, spindle, poles, and equator — pending
+
+**Physical Quest acceptance: NOT RUN.** After independent integration and deployment:
+
+1. Open deployed application in passthrough.
+2. Calibrate true north.
+3. Enable Earth core.
+4. Enable rigid spindle.
+5. Enable NCP and SCP.
+6. Enable celestial equator.
+7. Confirm spindle is perfectly straight.
+8. Confirm spindle passes through the Earth core.
+9. Confirm Earth core is at the visual center of the equator ring.
+10. Confirm spindle crosses the equator at the core.
+11. Confirm spindle and equator appear perpendicular.
+12. Confirm NCP and SCP continue the same axis.
+13. Confirm local horizon remains centered on the observer.
+14. Move laterally.
+15. Move vertically.
+16. Turn north, south, east, and west.
+17. Confirm the geocentric assembly remains rigid and world-locked.
+18. Confirm the ring does not follow the head.
+19. Toggle layers.
+20. Recalibrate.
+21. Exit and re-enter.
+22. Confirm no duplicate or stale geometry.
+23. Confirm Sun path, notches, bodies, and existing layers remain correct.
+
 ## Milestone 0 evidence
 
 Milestone 0 physical Quest 3 acceptance is complete for the tested environment. Immersive AR entry, passthrough, reference geometry, controlled standing-floor alignment, horizon horizontality, zenith/nadir verticality, world locking, exit/re-entry, recenter, comfort, and usability passed. See `PROJECT_STATE.md` for the durable evidence summary.
@@ -207,3 +235,9 @@ actual transition day, or long-duration comfort.
 
 Record only observed results. Do not infer all seven identities, a daylight-saving transition,
 recenter/tracking-loss coverage, exact drift, or comfort duration from this short procedure.
+
+## Rigid Earth-axis spindle correction
+
+The canonical 23-step unified-geocentric procedure above supersedes the historical spindle-only
+checklist. Physical acceptance remains **NOT RUN** until the corrected local branch is independently
+integrated and deployed.

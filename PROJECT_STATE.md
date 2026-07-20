@@ -1,12 +1,12 @@
 # Project State
 
-**Last updated:** 2026-07-19 America/New_York
+**Last updated:** 2026-07-20 America/New_York
 
 **Updated by:** Codex / project control
 
-**Current phase:** Milestone 2F 24-hour apparent Sun path and bounded live celestial updates independently validated, integrated, and published; physical Quest acceptance pending
+**Current phase:** Documentation-only records reconciliation completed locally for the unified geocentric axis/core/equator correction on `fix/earth-axis-spindle`; the technical independent review passed, and the independent integration re-gate remains pending.
 
-**Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
+**Overall status:** **The published `master`/`origin/master` baseline is `ee32c814179e2b9a2ec8b8d116d4139e4ce9e415`; its published Milestone 2F solar-temporal and prior celestial layers remain the deployed baseline.** The published baseline already includes the WGS84 Earth core, geocentric axis/poles, celestial equator, observer-centered local horizon, actual body markers, Sun path, civil-hour notches, and live celestial refresh. The rigid spindle correction, unified finite-core geocentric presentation contract, and renderer-gate remediation are local only on `fix/earth-axis-spindle`; none is integrated, pushed, deployed, or physically accepted. The technical independent review passed its source, rendering, lifecycle, Float32, stereo, visibility, test, build, and dependency gates. Its stale-record blocker is reconciled locally by `94d396a`; an independent integration re-gate remains pending. Historic Milestone evidence below remains scoped to its recorded published commit and must not be read as evidence for the local correction. Milestone 1 is complete; Milestone 2A is published; hardened geocentric Milestone 2B was independently validated, integrated, and published. The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
 single-yaw calibration at `+/-90` and `180` degrees, projective antipodes, linear non-writing XR
 depth, owned-resource disposal, and independent precision maxima. Feature and merged `master`
@@ -103,6 +103,33 @@ Pages deployment. Hosted controls, path/notch visibility, repeated toggling, zon
 repository-relative assets, clean console, and a 60.45-second live-clock advance pass. Physical
 Quest acceptance remains pending and is not inferred from desktop evidence.
 
+The user described the already deployed body and Sun-clock experience as beautiful and compelling.
+That report concerns the published seven-body layer, observer-relative daily Sun path, civil-hour
+notches, and live updates; it does not physically accept the local rigid spindle, unified
+geocentric presentation, or renderer-boundary remediation. The reported plausible identification
+of Sun, Mercury, and Venus, along with absent labels limiting other identification, remains
+bounded feedback rather than all-seven, angular, stereo, lifecycle, or comfort acceptance.
+
+The current local Earth-axis correction reconciles the user's later physical observation that the
+published axis looked bowed or hinged at the Earth core. Investigation confirmed that the
+scientific core and P03 pole directions were already exactly collinear; the presentation split the
+axis into independently colored and faded north/south line objects and then drew the core marker
+over their joint. The feature branch now derives one exact-antipodal spindle descriptor and
+renders one bounded projective screen-space strip through the core. Type-check, 36 files / 421
+tests, production build, dependency/diff checks, and development/production-preview camera,
+toggle, reset, recalibration, asset, and console regression pass. No astronomy, calibration,
+observer, horizon, equator, Sun-path, notch, or body science changed. Integration, deployment, and
+physical Quest acceptance are not performed or inferred.
+
+The clarified local correction now also reconciles the celestial equator with the rigid spindle.
+The prior equator science already had the correct P03 plane normal/basis and WGS84 core, but its
+`w = 0` direction-only renderer discarded the finite center, making the visible ring
+translation-invariant. One `GeocentricCelestialStructurePresentation` now supplies the identical
+core/center, axis/plane normal, exact pole antipodes, orthonormal plane basis, revisions, and
+provenance to both layers. A finite two-WGS84-radius reference ring is rendered as bounded
+homogeneous points below one identity geocentric scene node; the local horizon remains an
+observer-centered sibling. Integration, deployment, and physical Quest acceptance remain NOT RUN.
+
 ## One-paragraph state summary
 
 Milestone 0 is complete and its deployed build remains at
@@ -122,10 +149,11 @@ controller-based north capture, coherent N/S/E/W geometry, world locking, floor 
 cancel/recalibrate/reset, and session lifecycle were usable with no blocking defect observed.
 Milestone 1 is complete. This establishes physical usability for the tested flow, not
 laboratory-grade angular accuracy, broad device coverage, or unreported edge-case outcomes.
-Milestone 2 planning defines explicit scientific frames, a single UTC simulation clock, sampled
-rather than decorative precession paths, independently optional solar/lunar temporal layers,
-precision tiers, error sources, validation gates, and a conservative delivery sequence. Milestone
-2A0 now pins `astronomy-engine@2.1.19` behind application-owned contracts, validates apparent
+Historical Milestone 2 planning defined explicit scientific frames, a single UTC simulation clock,
+sampled rather than decorative precession paths, independently optional solar/lunar temporal
+capabilities, precision tiers, error sources, validation gates, and a conservative delivery
+sequence. Later milestones implemented the bounded body and Sun-clock subset. Milestone 2A0 now
+pins `astronomy-engine@2.1.19` behind application-owned contracts, validates apparent
 topocentric Sun/Moon and canonical ENU against three NASA/JPL Horizons DE441 fixtures, and
 validates an application-owned IAU P03 precession-only mean-pole provider against the full IAU
 SOFA `pmat06` matrix fixture plus J2000/present/future pole vectors. The provider uses explicit TT,
@@ -267,7 +295,7 @@ normal local integration now pass; publication must succeed before the physical 
   rendering, stereo-math, depth, lifecycle, deployment, and practical Quest-use gates are complete.
   Physical acceptance is **CONDITIONAL PASS** because the user tested the hosted build and reported
   it workable without supplying individual A–K observations. The next bounded milestone is the
-  mean celestial equator; precession, bodies, clocks, and other deferred layers remain excluded.
+  now-published celestial equator; later precession and other deferred layers remain excluded.
 - Milestone 2C adds only the P03 mean celestial equator: a validated snapshot-owned,
   Earth-core-centred projective great circle with one visibility control. Independent validation,
   integration and publication pass; physical acceptance is conditional on the supplied clean-
@@ -279,16 +307,23 @@ normal local integration now pass; publication must succeed before the physical 
    outcomes.
 - Milestone 2E actual solar-system placement is intentionally promoted before the long-term
   precession prerequisite review. Its seven-body actual-direction layer passed independent review,
-  normal integration, automation, deployment, and hosted regression; physical Quest acceptance is
-  the only active gate before projection modes.
+  normal integration, automation, deployment, and hosted regression; physical Quest acceptance
+  remains pending and is not the current active task.
 - Milestone 2F 24-hour Sun path and bounded live updates passed final independent review, normal
   integration, automation, Pages deployment, and hosted desktop regression. Physical Quest
-  acceptance is the only active gate.
+  acceptance remains pending but is superseded as the active task by the user's bounded axis
+  correction request.
+- The local rigid spindle and finite Earth-centred equator share one authoritative direction,
+  exact antipode, WGS84 core, calibrated parent, and projective image-line/ring representation.
+  Current renderer-gate remediation preserves that structure while addressing continuity, production
+  upload evidence, public-handle lifecycle contracts, and record consistency. Independent
+  revalidation and integration are the only active task; deployment and physical Quest acceptance
+  remain explicitly unperformed.
 
 ## Blocked
 
-- None. The published solar-temporal layer is intentionally gated on user-performed physical
-  Quest evidence rather than treated as accepted from automated or hosted desktop evidence.
+- None. Published body/solar-temporal physical evidence and corrected-spindle Quest evidence remain
+  pending, but the current bounded work is not blocked on them.
 
 ## Known defects or limitations
 
@@ -320,11 +355,13 @@ normal local integration now pass; publication must succeed before the physical 
   observed offsets.
 - UTC-to-TT uses Astronomy Engine's Espenak-Meeus delta-T implementation and its documented UT1
   approximately equal to UTC policy. No live EOP or leap-second service exists.
-- The previously published Milestone 2B line is an observer-centered `1.8 m` proxy. DEC-021 now
-  supersedes that contract locally: the modeled WGS84 core is placed at world scale, the observer
-  remains on the surface, and NCP/SCP are projective directions at infinity. Finite render points
-  lie `10^13 m` from the core on the exact centerline with a documented sub-`0.14 arcsecond`
-  convergence bound. Quest depth/visibility/comfort remain unverified.
+- The earlier observer-centered `1.8 m` symbolic axis is a superseded historical implementation,
+  not the current published baseline. Published Milestone 2B now uses the world-scale WGS84 Earth
+  core, keeps the observer on the surface, and represents NCP/SCP as projective directions at
+  infinity. Its finite diagnostic points lie `10^13 m` from the core on the exact centerline with
+  a documented sub-`0.14 arcsecond` convergence bound. The current local branch changes only the
+  spindle/core/equator presentation contract and remains undeployed; its physical Quest
+  depth/visibility/comfort acceptance remains pending.
 - Detailed physical Quest observations for axis/pole placement, world locking, below-horizon
   comprehension, readability, stereo, and comfort were not captured individually. The user did
   report the published experience workable and no blocking physical defect; this is a conditional
@@ -336,16 +373,20 @@ normal local integration now pass; publication must succeed before the physical 
   eye independently receives one clean line. This is not classified as duplicate geometry. The
   new eye modes are experimental and may create binocular rivalry; their comfort/effectiveness and
   the local horizon's perceptual value remain physically unverified.
+- The corrected one-strip spindle is validated in desktop development and production-preview
+  cameras, but its spinning-top appearance, through-Earth readability, stereo fusion, and comfort
+  remain unmeasured on physical Quest hardware.
 
 ## Important unknowns
 
 - Exact Quest OS and Quest Browser versions, numerical north-alignment error, controller-specific
   coverage, DOM-overlay availability, and targeted pose-loss behavior for the accepted Milestone 1
   test were not reported.
-- Automatic observer/location acquisition and civil-time label resolution remain unimplemented.
-  Milestone 2B adds only manual in-memory observer entry, generic validation presets, explicit UTC
-  fixtures/current-time injection, and axis diagnostics; no map, geolocation, time zone, or time
-  animation exists.
+- Automatic observer/location acquisition and rendered civil-hour text labels remain unimplemented.
+  The published baseline has manual in-memory observer entry, explicit UTC/current-time injection,
+  IANA time-zone resolution with DST-aware civil-hour metadata, central-clock live updates, and
+  axis diagnostics; it has no map, geolocation, persisted time zone, or broad user-programmable
+  time-control system.
 - Astronomy Engine does not expose the selected mean-only P03 quantity; the validated
   application-owned provider must remain separate from true `EQD` and be independently rechecked
   if its model/version/domain changes.
@@ -369,6 +410,7 @@ normal local integration now pass; publication must succeed before the physical 
 | `docs/CALIBRATION.md` | Physical setup, calibration procedure, limits, and troubleshooting | Current |
 | `docs/QUEST_TESTING.md` | Milestone 0/1 evidence and later-layer physical regression checklists | Milestone 1 Quest 3 PASS; 2B/2C conditional evidence retained; 2D bounded physical-usability PASS with unreported checklist cases preserved |
 | `docs/EARTH_AXIS_AND_CELESTIAL_POLES.md` | Geocentric core, projective pole, world-scale render, controls, limits, and validation evidence | Integrated/published baseline; conditional physical Quest acceptance |
+| `docs/EARTH_AXIS_SPINDLE.md` | Rigid one-line descriptor, projective renderer, root cause, guarantees, desktop evidence, and Quest checklist | Local correction validated; independent integration and physical Quest evidence pending |
 | `docs/CELESTIAL_REFERENCE_ARCHITECTURE.md` | Explicit frame hierarchy, transforms, axis/poles/equator, horizon, precision tiers, and layer contracts | Architecture/2A integrated; first 2B visual consumer integrated |
 | `docs/ASTRONOMY_ENGINE_EVALUATION.md` | Runtime-library capability, limits, responsibility split, alternatives, and adoption gates | `2.1.19` bounded Tier 1 adapter validated |
 | `docs/ASTRONOMY_ADAPTER_CONTRACT.md` | Implemented observer, time, frame, correction, ENU, provenance, error, and provider contract | Milestone 2A0 current evidence |
@@ -376,14 +418,15 @@ normal local integration now pass; publication must succeed before the physical 
 | `docs/MEAN_POLE_MODEL_VALIDATION.md` | P03 model, TT, matrix direction, fixtures, tolerances, corrections, and domain | Direct bounded provider validated |
 | `docs/CELESTIAL_VALIDATION_STRATEGY.md` | Pure, golden, cross-reference, visual/Quest, and error-budget validation plan | First JPL/SOFA fixtures captured; later layers pending |
 | `docs/TEMPORAL_LAYER_ARCHITECTURE.md` | Central simulation clock, bounded live refresh, solar daily-path sampling, civil-time, and label policies | Milestone 2F implemented, independently validated, and published |
-| `docs/MILESTONE_2_SEQUENCE.md` | Bounded 2A0 through later-layer dependency and acceptance sequence | Current sequence |
-| `docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md` | Focused positive Quest acceptance record, accepted scope, and unmeasured cases | Current physical baseline evidence |
+| `docs/CELESTIAL_REFERENCE_ARCHITECTURE.md` | Original Milestone 2 frame, precision, and layer-design rationale | Historical design record; current implementation authority is `PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, and focused feature documents |
+| `docs/MILESTONE_2_SEQUENCE.md` | 2A0–2F milestones plus later dependency-planning material | Published milestone status is current; overlapping later planning is explicitly historical or deferred |
+| `docs/MILESTONE_2D_PHYSICAL_ACCEPTANCE.md` | Positive Milestone 2D Quest evidence and unmeasured cases | Archived milestone-scoped evidence; not acceptance of the current local correction |
 | `docs/OFFICIAL_ASTRONOMY_SOURCES.md` | Official/primary source, capability, limitation, version, and license register | Research evidence current as of 2026-07-16 |
 | `.github/workflows/deploy-pages.yml` | Pages validation/build/deploy configuration | Run `29707073636` passed for integrated Milestone 2F at `31be4cc`; hosted desktop PASS |
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | Physical Quest acceptance test for the 24-hour Sun path and real-time celestial updates | Published temporal layer awaits user-performed headset evidence |
+| `NEXT_TASK.md` | Independently revalidate and integrate the unified geocentric axis, core, and celestial-equator structure | Local correction awaits an independent gate and integration decision |
 
 ## Environment
 
@@ -394,7 +437,7 @@ normal local integration now pass; publication must succeed before the physical 
 | Runtime dependencies | Three.js `0.185.1`; Astronomy Engine `2.1.19` | Yes; exact versions pinned |
 | Development dependencies | Vite `8.1.4`; TypeScript `7.0.2`; Vitest `4.1.10`; Three/WebXR types | Yes |
 | Build command | `npm run build` | Passed |
-| Test command | `npm run test` | 416/416 passed across 36 files on the feature branch and merged `master` during the final Milestone 2F gate |
+| Test command | `npm run test` | 438/438 tests across 40 files passed on the current local renderer-gate remediation; prior unified branch baseline was 432/432, spindle baseline was 421/421, and integrated `master` baseline was 416/416 |
 | Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run `29707073636` deployed `31be4cc`; hosted Milestone 2F desktop regression PASS |
 
 ## Risks
@@ -419,10 +462,13 @@ normal local integration now pass; publication must succeed before the physical 
 
 - The durable [long-term product roadmap](docs/LONG_TERM_PRODUCT_ROADMAP.md) preserves future
   celestial, geographic, interpretive, media, and performance directions. It is not a schedule or
-  authorization: the active physical eye-mode/local-horizon acceptance remains the only next task.
-- After current physical acceptance, candidate work still requires a bounded selection from the
-  established sequence: validated long-term precession, ecliptic, bodies, temporal layers,
-  local-first observer persistence, or geographic knowledge.
+  authorization: independent spindle revalidation and integration is the only next task.
+- After spindle integration, later work still requires a bounded selection from the established
+  sequence: physical acceptance, validated long-term precession, ecliptic, accelerated or reverse
+  simulation-time controls, arbitrary historical/future date selection, annual or multi-day
+  path visualization, time-lapse trails, event-jump controls, richer lunar-cycle visualization,
+  local-first observer persistence, or geographic knowledge. The published central clock,
+  live refresh, civil-day Sun path, and civil-hour notches are not future work.
 - Automatic geolocation, persistent room calibration, automatic heading, magnetic declination,
   star catalogs, audio, hand tracking, persistent anchors, multi-user use, and native
   applications remain deferred.
@@ -473,9 +519,17 @@ normal local integration now pass; publication must succeed before the physical 
 | 2026-07-19 | Milestone 2E actual-body final gate, integration, and publication | PASS; complete provider identity/mismatch diagnostics, equatorial/horizontal provenance, cache isolation, immutable results, projective rendering, and lifecycle passed direct review and adversarial probes. Feature and merged `master` pass 30 files / 383 tests, type-check, build, dependencies/diff, development/preview, and clean-console checks. Normal merge `b24b3e9` retained the feature branch; Actions run `29703133387` passed build/deploy and hosted body-layer regression | `master`; `docs/SOLAR_SYSTEM_BODY_LAYER.md`; physical Quest acceptance pending |
 | 2026-07-19 | Milestone 2F final gate, integration, and publication | PASS; civil-day/DST semantics, exact hour notches, observer schema provenance, structured warnings/failures, cache isolation, all-seven one-hour motion, presentation, and lifecycle passed direct review and deterministic probes. Feature and merged `master` pass 36 files / 416 tests, type-check, build, dependencies/diff, development/preview, and clean-console checks. Normal merge `31be4cc` retained the feature branch; Actions run `29707073636` passed build/deploy and hosted path/notch/live-clock regression. Physical Quest acceptance remains pending | `master`; `docs/SOLAR_24_HOUR_CLOCK.md`; `https://thinksql1.github.io/cosmic-calibration-webxr/` |
 
+| 2026-07-19 | Local rigid Earth-axis spindle correction | Local structural correction; the science remains collinear and one immutable descriptor/one bounded projective strip preserve exact antipodes and core incidence. The subsequent independent renderer review found a default core-opacity seam, so earlier local spindle-presentation acceptance is superseded by the current bounded remediation. Integration, deployment, and physical Quest acceptance are NOT RUN | `fix/earth-axis-spindle`; `docs/EARTH_AXIS_SPINDLE.md` |
+
+| 2026-07-20 | Local unified geocentric structure reconciliation | Local structural correction; the old `w = 0` ring renderer erased the finite Earth-core center while snapshot science and the rigid spindle were correct. One shared core/axis/poles/equatorial-plane descriptor and bounded finite homogeneous ring preserve center, incidence, perpendicularity, parallax, one-yaw transforms, and lifecycle. The independent integration review identified four bounded blockers: default spindle core-opacity seam, production rendering-boundary evidence, restored public-handle lifecycle/eye/immutability assertions, and contradictory records. This remediation addresses those blockers locally; merge, push, deployment, and physical Quest acceptance remain NOT RUN | `fix/earth-axis-spindle`; DEC-029; `docs/CELESTIAL_EQUATOR.md` |
+| 2026-07-20 | Local unified geocentric renderer-gate remediation | PASS locally: default spindle color/opacity are continuous across the core; explicit below-horizon hiding is visibility-only; static Float32 ring directions and per-eye Float32-rounded finite-core/radius uniforms avoid callback-time geometry upload; public-handle eye, immutability, and post-disposal contracts are restored. Production callbacks, fitted projected core/ring agreement, Michigan/lateral/vertical views, and non-degenerate spindle upload are covered. `npm ci`, type-check, 438/438 tests across 40 files, build, diff/dependency checks, and development/production-preview smoke checks pass. Independent revalidation, merge, push, deployment, and physical Quest acceptance remain NOT RUN | `fix/earth-axis-spindle`; `tests/scene/geocentric-production-render-boundary.test.ts` |
+| 2026-07-20 | Cross-document celestial/temporal records normalization | PASS locally: current published baseline, local spindle correction, historical milestone/planning evidence, and genuinely deferred work are explicitly separated; the deployed body/Sun-clock observation is correctly attributed; no production code, tests, dependencies, workflows, deployment, or physical Quest evidence changed. `npm ci`, type-check, 438/438 tests across 40 files, production build, diff check, and dependency audit pass. Independent integration re-gate remains the one active task | `94d396a`; `docs/CELESTIAL_REFERENCE_ARCHITECTURE.md`; `docs/TEMPORAL_LAYER_ARCHITECTURE.md` |
+
 ## Current decision horizon
 
-Run the physical Quest acceptance test for the 24-hour Sun path and real-time celestial updates.
-The independent scientific/temporal/provenance/cache gate, normal integration, automation,
-publication, and hosted desktop regression pass; the remaining evidence must come from the user's
-headset. Do not begin labels, ecliptic, orbital paths, Moon phase, precession, or other later work.
+Independently revalidate and integrate the unified geocentric axis, core, and celestial-equator
+structure. Verify core/equator identity, axis perpendicularity, pole agreement, observer offset,
+single-yaw transform invariance, transparent-Earth presentation, lifecycle, regression evidence,
+and the clean feature commits before a normal integration decision. Do not deploy, perform or
+infer Quest acceptance, or begin labels, ecliptic, orbital paths, Moon phase, precession, or other
+later work.

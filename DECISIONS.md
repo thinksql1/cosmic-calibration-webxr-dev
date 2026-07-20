@@ -325,7 +325,7 @@
 
 ### DEC-027: Derive the daily apparent Sun path from explicit IANA civil time while retaining UTC astronomy
 - **Date:** 2026-07-19
-- **Status:** Accepted locally; independent validation, integration, deployment, and physical Quest
+- **Status:** Accepted, independently validated, integrated, and published; physical Quest
   acceptance pending
 - **Owner:** Darrell Wright / project control
 - **Decision:** Use the existing central UTC `SimulationClock` and approved airless apparent
@@ -340,6 +340,44 @@
   astronomy. Keeping the contracts separate avoids a decorative 24-segment equator, a false fixed
   civil day at DST transitions, and an ambient second scientific clock. The path remains a bounded
   apparent observer reference and does not imply a geocentric physical solar orbit.
+
+### DEC-028: Render the Earth rotational axis from one authoritative spindle descriptor
+- **Date:** 2026-07-19
+- **Status:** Accepted locally; independent revalidation, integration, deployment, and physical
+  Quest acceptance pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** The Earth-axis presentation owns one validated descriptor containing the finite
+  WGS84 core, one normalized P03 axis direction, its exact component-negated antipode, bounded
+  display extent, coordinate-frame identity, observer/calibration revisions, provenance, and
+  validity. One per-eye projective image-line equation renders one constant-width spindle strip;
+  NCP/SCP markers consume the same direction and exact negation. Separate north/south line objects,
+  materials, rotations, parents, and coincident centerlines are prohibited. Geographic yaw remains
+  parent-only and depth remains layer-local, linear, non-testing, and non-writing.
+- **Rationale:** The prior analytic geometry was collinear, but independently colored, faded,
+  clipped, and rasterized halves plus a core marker over their joint created a perceptual hinge.
+  One descriptor and one strip make collinearity a presentation invariant, preserve the transparent
+  explanatory Earth treatment, and leave every scientific model and unrelated celestial layer
+  unchanged.
+
+### DEC-029: Present the core, axis, poles, and celestial equator as one geocentric assembly
+- **Date:** 2026-07-20
+- **Status:** Accepted locally; independent revalidation, integration, deployment, and physical
+  Quest acceptance pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Create one immutable `GeocentricCelestialStructurePresentation` per ready snapshot.
+  Its Earth-core anchor is also the celestial-equator center; its normalized positive axis is also
+  the equatorial-plane normal and NCP direction; SCP is the exact component negation; and two
+  orthonormal basis vectors span the plane through the core. Render a finite explanatory equator
+  reference ring at two WGS84 semi-major radii with bounded homogeneous points
+  `(coreView / radius + directionView, 1 / radius)`. Parent spindle and equator beneath one
+  identity geocentric assembly and apply geographic yaw once on the existing parent. Keep the
+  local horizon observer-centered as a sibling.
+- **Rationale:** DEC-023's `w = 0` ring preserved plane orientation but erased the finite core from
+  visible geometry, so its projected ring could not communicate the clarified core/plane/axis
+  relationship. The finite homogeneous construction is projectively exact, keeps GPU components
+  near unit scale, produces coherent parallax, and leaves all astronomy and calibration science
+  unchanged. This supersedes only DEC-023's rendering-at-infinity choice; its P03 mean-equator
+  science and historical evidence remain valid.
 
 ## Proposed decisions awaiting review
 

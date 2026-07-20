@@ -17,8 +17,9 @@ Scientific and diagnostic values remain immutable JavaScript numbers:
 - calibrated geographic yaw: presentation-parent only.
 
 The `10^13 m` diagnostic coordinates never enter a Three.js attribute, object translation,
-matrix, uniform, or shader. GPU geometry contains only unit quad corners and line coefficients
-`0`/`1`.
+matrix, uniform, or shader. GPU geometry contains only unit quad corners. The spindle receives a
+display-extent-scaled homogeneous core plus one normalized projective image-line equation; all
+uploaded line components are bounded.
 
 ## Camera-relative and projective transform
 
@@ -83,10 +84,12 @@ not amplify that imperceptible signal into false nearby parallax.
 
 ## Axis continuity
 
-Both line segments use the same core-view uniform. Their other endpoint is either the north unit
-direction or its exact negation. The vertex shader performs homogeneous interpolation between
-`(core, w=1)` and `(direction, w=0)`. This preserves one projective centerline without large
-Euclidean endpoints or independent pole placement.
+One spindle descriptor owns the core, normalized north direction, and exact negative south
+direction. For each eye, the renderer takes the homogeneous cross product of the bounded finite
+core image and the shared ideal direction image to obtain one normalized screen-line equation.
+One constant-width strip rasterizes that line; there are no independent north/south line objects,
+orientations, materials, or coincident centerlines. Pole markers still consume the same view
+direction and its exact negation.
 
 ## Supported domain and stop behavior
 
@@ -103,3 +106,21 @@ camera-relative components above the explicit budget are rejected.
 Automated and desktop evidence cannot establish Quest GPU/compositor behavior, physical world
 locking, passthrough readability, or comfort. The independent renderer gate and later physical
 Quest acceptance must keep those results explicitly pending until observed.
+
+## Unified equator boundary
+
+The equator now preserves its finite Earth-core center while retaining bounded GPU values. For
+display radius `R = 12,756,274 m`, the shader receives `coreView / R + directionView` and
+homogeneous `w = 1 / R`. This is exactly equivalent to the finite point
+`coreView + R * directionView`. Across the supported WGS84 observer/elevation domain the spatial
+component budget is below `2`; raw Earth-scale ring coordinates are CPU-only. The equator and
+spindle use the identical shared core and axis-normal objects beneath the same calibrated parent.
+
+The ring's `Float32BufferAttribute` contains static bounded application-basis sample directions and
+is written only when the immutable presentation model changes. Per-eye `onBeforeRender` updates
+only bounded `uCoreViewScaled` and `uRingProjectiveW` uniforms, each explicitly rounded with
+`Math.fround`. This avoids callback-time geometry mutation after Three.js has already uploaded a
+frame's attributes. Production-boundary tests reconstruct the shader-facing projective ring from
+those actual attributes and uniforms, with Float32-appropriate orthogonality/plane tolerances of
+`1e-6` and a fitted projected-center tolerance below `0.02` pixel at the fixed `1440 x 900`
+fixture viewport.

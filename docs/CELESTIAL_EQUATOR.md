@@ -1,39 +1,83 @@
 # Mean Celestial Equator
 
-## Status
-
-Milestone 2C's independent scientific/rendering gate, normal integration, and publication pass.
-Merge `0926cbf` retains `feature/milestone-2c-celestial-equator`; GitHub Actions run #14 passed
-299 tests, build, artifact upload, and Pages deployment from `54d64d0`. The user has now physically
-tested the layer and considers it good and workable. Each eye individually receives one clean
-equator line, while binocular viewing produces a doubled line. This is a **CONDITIONAL PASS**
-categorized as binocular fusion/stereo presentation; the precise cause is not asserted. Existing
-impressions that the axis appeared curved and that the Earth-core distance was not perceptually
-obvious remain separate Milestone 2B concerns.
-
 ## Scientific definition
 
-The layer is the **IAU P03 precession-only mean celestial equator of date**: the great-circle locus perpendicular to the validated mean rotational-axis normal used by NCP/SCP. It consumes the immutable snapshot's validated GCRS P03 basis, provider provenance, observer-horizontal mean-axis normal, frozen right-handed local ENU sampling basis, and WGS84 Earth-core displacement.
+The celestial equator is Earth's equatorial plane extended outward. For the P03 mean pole of date,
+the plane passes through the finite modeled WGS84 Earth core and its unit normal is the same
+rotational-axis direction used by the spindle and NCP. Its deterministic right-handed basis
+vectors `U` and `V` satisfy:
 
-A full unlabelled circle has no preferred phase: rotating U/V within their shared plane changes sampling order but not the locus. Science validates the GCRS P03 basis and creates an explicitly unlabelled deterministic local parameterization; presentation does not recompute P03, sidereal time, or a celestial frame. Conceptually the projective locus is `EarthCore + R × (cos(theta) × U + sin(theta) × V)` as `R` tends to infinity. EarthCore is the modeled WGS84 center, not the observer, and `R` is neither a rendered nor physical celestial distance.
+```text
+center = EarthCore
+normal = northAxisDirection
+dot(U, normal) = dot(V, normal) = dot(U, V) = 0
+|U| = |V| = |normal| = 1
+point(theta) = EarthCore + R * (cos(theta) * U + sin(theta) * V)
+```
+
+NCP and SCP are the positive and exact negative projective extensions of that axis. The local
+horizon is different: it is a bounded tangent circle centered on the surface observer.
+
+## Unified presentation contract
+
+`GeocentricCelestialStructurePresentation` is created once per ready snapshot and passed by
+identity to both the spindle and equator presentation builders. It owns the Earth-core anchor,
+axis and exact antipode, equator normal and two application-basis plane vectors, equator center and
+display radius, projective pole directions, coordinate identity, revisions, provenance, and
+validity. Scene code does not independently solve any of these relationships.
+
+The finite presentation ring has radius `2 * WGS84 semi-major axis = 12,756,274 m`. It is a
+bounded explanatory cross-section of the infinite plane, not a celestial-object distance. Two
+Earth radii keeps every supported surface observer inside the ring and avoids placing an
+equatorial observer directly on it.
 
 ## Rendering contract
 
-The renderer uses 96 directions over `[0, 2π)` and a `LineLoop`, closing from the final sample to sample zero without a duplicated seam vertex. Every sample is a bounded unit direction transformed for the active eye. The shader projects `vec4(directionView, 0.0)`: homogeneous `w = 0` is the projective limit of the Earth-core-centred construction and never uploads astronomical distances.
+The renderer samples one 96-point `LineLoop`. Its static `Float32BufferAttribute` stores bounded
+application-basis unit directions. For camera-relative core `C`, radius `R`, and transformed unit
+ring direction `d`, the per-eye shader combines that direction with bounded uniforms in the exactly
+projectively equivalent form:
 
-The finite Earth core remains camera-relative binary64 CPU data. Equator directions are translation-invariant, rotate once with the calibrated geographic parent, and rotate once into the active eye view. The core and axis retain the circle's geocentric center and normal; no nearby observer-centred hoop is created.
+```text
+position.xyz = C / R + d
+position.w = 1 / R
+```
 
-## Perspective, depth, and lifecycle
+`onBeforeRender` updates only `C / R` and `1 / R` uniforms for the active camera/eye; it does not
+mutate the ring attribute after Three.js has prepared that frame's GPU geometry. Both values are
+explicit Float32-rounded and remain bounded.
 
-- At latitude `0°`, the equator contains local zenith and nadir. At either geographic pole it is the local geometric horizon plane. At mid-latitudes it is tilted relative to the horizon.
-- The layer retains `LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY`: no logarithmic depth, `depthTest = false`, `depthWrite = false`, render order 21, and no second XR layer. The overlay does not claim real-world occlusion.
-- The sole 2C control is **Celestial equator**, default off. It changes presentation only.
-- The group owns one geometry and shader material. `clear()` preserves reusable resources; idempotent `dispose()` releases only resources owned by this group.
+Spatial GPU components remain below the strict budget of `2` instead of using raw million-metre
+vertices. Unlike the superseded `w = 0` direction loop, finite core translation remains in every
+rendered vertex, so camera motion produces coherent parallax and the visible ring remains centered
+on the core in 3D.
 
-## Limits and pending validation
+Axis and equator groups are children of one identity-only
+`geocentric-celestial-structure-frame`. Its parent, `geographic-reference-frame`, applies yaw
+exactly once to the whole rigid assembly. The observer-centered local horizon remains a sibling,
+not a child of the geocentric structure.
 
-Deterministic tests cover plane invariants, closure, antipodes, observer relationships, Float32 directions, calibration, depth, and disposal. Independent probes and both feature/merged validation pass the 299-test suite, production build, development/production-preview controls, readiness, visibility, reset, recalibration, shader compilation, teardown, and console checks. GitHub Actions run #14 and the hosted Pages controls/readiness/reset regression pass. The supplied physical evidence establishes practical use and clean monocular delivery, but not individual results for every prior checklist item. Milestone 2D adds presentation-only per-layer eye modes and a local horizon reference for a new independent and physical gate.
+## Perspective, transparency, and lifecycle
+
+- A 3D right angle can project to a non-right screen angle; acceptance is based on exact 3D plane
+  incidence and perpendicularity, not a constant 2D angle.
+- The equator uses its existing restrained transparent, non-testing, non-writing layer-local depth
+  treatment. Depth testing is not disabled globally and no duplicate rear ring is created.
+- `clear()` preserves the single reusable ring; repeated toggles and re-entry do not allocate a
+  second structure; idempotent `dispose()` releases the owned geometry and material once.
+- P03, WGS84, observer, calibration, body, Sun-path, time, and provider science are unchanged.
+
+## Validation boundary
+
+Permanent tests cover core/center identity, axis/normal and pole identity, exact antipodes,
+orthonormal plane bases, sampled ring-plane residuals, fitted center, observer offset, separate
+local-horizon center, parent translation/rotation/yaw, representative camera transforms,
+homogeneous/direct projection equivalence, GPU bounds, toggle/re-entry reuse, and disposal.
+
+Desktop validation cannot establish Quest stereo fusion, passthrough readability, comfort, or
+physical comprehension. The focused physical checklist remains pending in `docs/QUEST_TESTING.md`.
 
 ## Exclusions
 
-No true/nutated equator, precession, ecliptic, Sun, Moon, planets, stars, temporal clocks, geolocation, media, game integration, AI enhancement, relational circuits, or contemplative sequencing is included.
+This correction adds no ecliptic, annual path, orbital trail, labels, planets, phase, stars,
+constellations, or new astronomy provider.

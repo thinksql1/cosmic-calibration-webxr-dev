@@ -3,6 +3,7 @@ import type { EarthAxisPresentationModel } from '../presentation/earthAxisPresen
 import type { EyePresentationMode } from '../presentation/eyePresentationMode';
 import {
   createEarthAxisCameraRelativeFrame,
+  projectEarthAxisCenterline,
   type EarthAxisCameraRelativeFrame,
 } from './earthAxisCameraRelativeFrame';
 import {
@@ -16,27 +17,61 @@ type PoleLabelTextureFactory = (text: 'NCP' | 'SCP', color: string) => THREE.Tex
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.999;
 const viewportScratch = new THREE.Vector4();
 
-const projectiveLineVertexShader = /* glsl */ `
-  uniform vec3 uCoreView;
-  uniform vec3 uDirectionView;
+const spindleVertexShader = /* glsl */ `
+  varying vec2 vNdc;
 
   void main() {
-    vec4 coreClip = projectionMatrix * vec4(uCoreView, 1.0);
-    vec4 directionClip = projectionMatrix * vec4(uDirectionView, 0.0);
-    vec4 clipPosition = mix(coreClip, directionClip, position.x);
-    if (clipPosition.w > 0.0) {
-      clipPosition.z = clipPosition.w * ${CLIP_DEPTH_WITHOUT_DEPTH_WRITE.toFixed(3)};
-    }
-    gl_Position = clipPosition;
+    vNdc = position.xy;
+    gl_Position = vec4(position.xy, ${CLIP_DEPTH_WITHOUT_DEPTH_WRITE.toFixed(3)}, 1.0);
   }
 `;
 
-const colorFragmentShader = /* glsl */ `
-  uniform vec3 uColor;
+const spindleFragmentShader = /* glsl */ `
+  uniform vec3 uLineNdc;
+  uniform vec2 uViewportPixels;
+  uniform vec3 uCoreImage;
+  uniform vec3 uNorthDirectionImage;
+  uniform float uSideVisibilityActive;
+  uniform float uNorthVisible;
+  uniform float uSouthVisible;
+  uniform float uLineVisible;
+  uniform float uHalfWidthPixels;
   uniform float uOpacity;
+  uniform vec3 uColor;
+  varying vec2 vNdc;
 
   void main() {
-    gl_FragColor = vec4(uColor, uOpacity);
+    if (uLineVisible < 0.5) discard;
+    float numerator = abs(dot(uLineNdc, vec3(vNdc, 1.0)));
+    vec2 pixelNormal = vec2(
+      2.0 * uLineNdc.x / uViewportPixels.x,
+      2.0 * uLineNdc.y / uViewportPixels.y
+    );
+    float distancePixels = numerator / max(length(pixelNormal), 1e-7);
+    float coverage = 1.0 - smoothstep(
+      uHalfWidthPixels - 0.75,
+      uHalfWidthPixels + 0.75,
+      distancePixels
+    );
+    if (coverage <= 0.0) discard;
+
+    if (uSideVisibilityActive > 0.5) {
+      vec3 fragmentImage = vec3(vNdc, 1.0);
+      float coreCore = dot(uCoreImage, uCoreImage);
+      float directionDirection = dot(uNorthDirectionImage, uNorthDirectionImage);
+      float coreDirection = dot(uCoreImage, uNorthDirectionImage);
+      float fragmentCore = dot(fragmentImage, uCoreImage);
+      float fragmentDirection = dot(fragmentImage, uNorthDirectionImage);
+      float alphaNumerator =
+        fragmentCore * directionDirection - fragmentDirection * coreDirection;
+      float betaNumerator =
+        fragmentDirection * coreCore - fragmentCore * coreDirection;
+      float northWeight = step(0.0, alphaNumerator * betaNumerator);
+      float visible = mix(uSouthVisible, uNorthVisible, northWeight);
+      if (visible < 0.5) discard;
+    }
+
+    gl_FragColor = vec4(uColor, uOpacity * coverage);
   }
 `;
 
@@ -97,29 +132,31 @@ function overlayMaterial(parameters: {
   });
 }
 
-function createLine(color: number): THREE.Line<THREE.BufferGeometry, THREE.ShaderMaterial> {
-  const geometry = new THREE.BufferGeometry();
-  // These are homogeneous interpolation coefficients, never world positions.
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute([
-    0, 0, 0,
-    1, 0, 0,
-  ], 3));
-  const line = new THREE.Line(
-    geometry,
+function createSpindle(): THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> {
+  const spindle = new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
     overlayMaterial({
-      vertexShader: projectiveLineVertexShader,
-      fragmentShader: colorFragmentShader,
+      vertexShader: spindleVertexShader,
+      fragmentShader: spindleFragmentShader,
       uniforms: {
-        uCoreView: { value: new THREE.Vector3() },
-        uDirectionView: { value: new THREE.Vector3(0, 0, -1) },
-        uColor: { value: new THREE.Color(color) },
-        uOpacity: { value: 0.8 },
+        uLineNdc: { value: new THREE.Vector3(0, 0, 1) },
+        uViewportPixels: { value: new THREE.Vector2(1, 1) },
+        uCoreImage: { value: new THREE.Vector3(1, 0, 0) },
+        uNorthDirectionImage: { value: new THREE.Vector3(0, 1, 0) },
+        uSideVisibilityActive: { value: 0 },
+        uNorthVisible: { value: 1 },
+        uSouthVisible: { value: 1 },
+        uLineVisible: { value: 0 },
+        uHalfWidthPixels: { value: 1.15 },
+        uOpacity: { value: 0.72 },
+        uColor: { value: new THREE.Color(0xc9e3e8) },
       },
     }),
   );
-  line.frustumCulled = false;
-  line.renderOrder = 20;
-  return line;
+  spindle.frustumCulled = false;
+  // The spindle draws over the core marker so the marker cannot become a hinge.
+  spindle.renderOrder = 27;
+  return spindle;
 }
 
 function createPoleLabelTexture(text: 'NCP' | 'SCP', color: string): THREE.Texture {
@@ -213,10 +250,8 @@ export function createEarthAxisGroup(
   group.name = 'celestial-geocentric-earth-axis-frame';
   group.visible = false;
 
-  const northSegment = createLine(0xffd67a);
-  northSegment.name = 'mean-earth-axis-north-segment';
-  const southSegment = createLine(0x78d7e8);
-  southSegment.name = 'mean-earth-axis-south-segment';
+  const spindle = createSpindle();
+  spindle.name = 'mean-earth-axis-rigid-spindle';
 
   const earthCore = createProjectiveQuad({ color: 0xeafcff, projective: false, renderOrder: 25 });
   earthCore.name = 'modeled-earth-core-marker';
@@ -233,8 +268,7 @@ export function createEarthAxisGroup(
   southLabel.name = 'south-celestial-pole-label';
 
   group.add(
-    northSegment,
-    southSegment,
+    spindle,
     earthCore,
     northMarker,
     southMarker,
@@ -244,8 +278,7 @@ export function createEarthAxisGroup(
   const eyeFilter = createEyePresentationLayerFilter(group);
 
   const ownedObjects = [
-    northSegment,
-    southSegment,
+    spindle,
     earthCore,
     northMarker,
     southMarker,
@@ -291,15 +324,28 @@ export function createEarthAxisGroup(
     cachedCamera = undefined;
   }
 
-  northSegment.onBeforeRender = (_renderer, _scene, camera) => {
+  spindle.onBeforeRender = (renderer, _scene, camera) => {
     const frame = frameForCamera(camera);
-    setVectorUniform(northSegment.material.uniforms.uCoreView, frame.coreView);
-    setVectorUniform(northSegment.material.uniforms.uDirectionView, frame.northDirectionView);
-  };
-  southSegment.onBeforeRender = (_renderer, _scene, camera) => {
-    const frame = frameForCamera(camera);
-    setVectorUniform(southSegment.material.uniforms.uCoreView, frame.coreView);
-    setVectorUniform(southSegment.material.uniforms.uDirectionView, frame.southDirectionView);
+    const projected = projectEarthAxisCenterline(frame, camera.projectionMatrix);
+    setVectorUniform(spindle.material.uniforms.uLineNdc, projected.lineNdc);
+    if (spindle.material.uniforms.uSideVisibilityActive.value > 0.5) {
+      setVectorUniform(spindle.material.uniforms.uCoreImage, projected.coreImage);
+      setVectorUniform(
+        spindle.material.uniforms.uNorthDirectionImage,
+        projected.northDirectionImage,
+      );
+    }
+    spindle.material.uniforms.uLineVisible.value = projected.visibleInViewport ? 1 : 0;
+    setViewportUniforms(renderer, spindle.material);
+    group.userData.projectedCenterlineVisible = projected.visibleInViewport;
+    group.userData.projectedCenterlineEndOnDegenerate = projected.endOnDegenerate;
+    group.userData.projectedCenterlineMaximumUploadedComponentMagnitude =
+      projected.maximumUploadedComponentMagnitude;
+    group.userData.axisDirectionView = Object.freeze({
+      x: frame.northDirectionView.x,
+      y: frame.northDirectionView.y,
+      z: frame.northDirectionView.z,
+    });
   };
 
   const bindQuad = (
@@ -330,10 +376,12 @@ export function createEarthAxisGroup(
       if (disposed) throw new Error('Cannot update a disposed Earth-axis renderer.');
       currentModel = model;
       invalidateFrameCache();
-      northSegment.visible = model.north.segmentVisible;
-      southSegment.visible = model.south.segmentVisible;
-      northSegment.material.uniforms.uOpacity.value = model.north.segmentOpacity;
-      southSegment.material.uniforms.uOpacity.value = model.south.segmentOpacity;
+      spindle.visible = model.north.segmentVisible || model.south.segmentVisible;
+      spindle.material.uniforms.uNorthVisible.value = model.north.segmentVisible ? 1 : 0;
+      spindle.material.uniforms.uSouthVisible.value = model.south.segmentVisible ? 1 : 0;
+      spindle.material.uniforms.uSideVisibilityActive.value =
+        model.north.segmentVisible === model.south.segmentVisible ? 0 : 1;
+      spindle.material.uniforms.uOpacity.value = model.north.segmentOpacity;
 
       earthCore.visible = model.earthCoreVisible;
       northMarker.visible = model.north.markerVisible;
@@ -369,6 +417,27 @@ export function createEarthAxisGroup(
       group.userData.snapshotCacheKey = model.snapshotIdentity.cacheKey;
       group.userData.acceptedCalibrationRevision = model.snapshotIdentity.acceptedCalibrationRevision;
       group.userData.presentationKind = model.presentationKind;
+      group.userData.spindleLineContract = model.spindle.lineContract;
+      group.userData.spindleRenderTopology = model.spindle.renderTopology;
+      group.userData.spindleCoordinateFrameIdentity = model.spindle.coordinateFrameIdentity;
+      group.userData.spindleTransformParentIdentity = group.parent?.name ?? 'unparented';
+      group.userData.spindleYawApplication = 'GEOGRAPHIC_PARENT_EXACTLY_ONCE';
+      group.userData.geocentricStructureContract =
+        model.geocentricStructure.geometryContract;
+      group.userData.geocentricStructureCacheKey =
+        model.geocentricStructure.snapshotCacheKey;
+      group.userData.coreIsEquatorCenter =
+        model.earthCore === model.geocentricStructure.celestialEquatorCenter;
+      group.userData.spindleNorthSouthDotProduct =
+        model.spindle.northDirection.x * model.spindle.southDirection.x +
+        model.spindle.northDirection.y * model.spindle.southDirection.y +
+        model.spindle.northDirection.z * model.spindle.southDirection.z;
+      group.userData.spindleCoreToLineDistanceMeters = 0;
+      group.userData.axisDirectionLocal = Object.freeze({
+        x: model.spindle.northDirection.x,
+        y: model.spindle.northDirection.y,
+        z: model.spindle.northDirection.z,
+      });
       group.userData.renderStrategy = model.renderStrategy;
       group.userData.depthContract = model.depthContract;
       group.userData.observerToCoreDistanceMeters = model.observerToCoreDistanceMeters;
@@ -380,6 +449,8 @@ export function createEarthAxisGroup(
       group.visible = false;
       group.userData.snapshotCacheKey = undefined;
       group.userData.acceptedCalibrationRevision = undefined;
+      group.userData.projectedCenterlineVisible = undefined;
+      group.userData.projectedCenterlineEndOnDegenerate = undefined;
     },
     setEyePresentationMode(mode: EyePresentationMode): void {
       eyeFilter.setMode(mode);

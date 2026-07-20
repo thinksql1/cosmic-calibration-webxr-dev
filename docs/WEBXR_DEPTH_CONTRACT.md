@@ -27,7 +27,7 @@ directions and the Earth core is projected from a camera-relative vector.
 
 ## Celestial overlay behavior
 
-Axis lines, the Earth-core marker, pole markers, and labels use custom shaders. They:
+The one Earth-axis spindle, Earth-core marker, pole markers, and labels use custom shaders. They:
 
 - receive only camera-relative core meters or unit directions;
 - clamp their own visible clip-space depth near the far boundary;
@@ -65,7 +65,7 @@ Committed tests enforce:
 
 - the absence of `logarithmicDepthBuffer` from renderer creation;
 - the `100 m` linear far plane;
-- homogeneous core/direction shader inputs;
+- bounded homogeneous core/direction inputs and one normalized spindle image-line equation;
 - the absence of raw `10^13 m` values in the scene renderer;
 - explicit non-testing/non-writing celestial materials;
 - unchanged default depth behavior for ordinary Three.js materials; and

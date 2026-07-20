@@ -4,32 +4,20 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the physical Quest acceptance test for the 24-hour Sun path and real-time celestial updates
+**Title:** Independently revalidate and integrate the unified geocentric axis, core, and celestial-equator structure
 
-Physically test the published observer-relative apparent Sun path, civil-hour notches, and bounded
-real-time body refresh in Meta Quest passthrough. Record only directly observed evidence; do not
-infer angular accuracy, long-duration stability, or unperformed lifecycle checks.
-
-## Required review checks
-
-- Open the deployed application, enter passthrough, calibrate true north, and confirm the horizon,
-  axis, poles, celestial equator, and actual body markers remain coherent.
-- Enable the Sun daily path and civil-hour notches; confirm the notches lie on the path, the path
-  differs from the celestial equator, and above- and below-horizon portions remain understandable.
-- Confirm the current Sun lies on or closely follows the path, leave the application open across a
-  minute boundary, and observe whether body positions update without a jump or duplicate geometry.
-- Check world locking, visibility/comfort, toggle cycles, recalibration, and immersive exit/re-entry.
+Independently verify the unmerged correction and, only if the gate passes, perform normal
+non-rewriting integration into `master`. Verify Earth-centered core/equator identity, axis
+perpendicularity, pole alignment, observer offset, transform invariance, presentation coherence,
+lifecycle, and deployment readiness. Physical Quest acceptance remains separate evidence.
 
 ## Exclusions
 
-Do not implement labels, ecliptic, celestial-equator projection modes, Moon phase, other body
-paths, stars, precession, persistent location, a broad time-control UI, media, game integration,
-AI enhancement, or contemplative sequencing.
+Do not push, deploy, perform or infer physical Quest acceptance, add labels or celestial features,
+change astronomy/calibration/observer science, rewrite history, squash, or delete the feature
+branch.
 
 ## Recommended execution
 
-- **Model:** GPT-5.6 Terra
+- **Model:** GPT-5.6 Sol
 - **Reasoning effort:** High
-- **Why:** bounded physical-evidence reconciliation should preserve the exact Quest observations,
-  distinguish measured behavior from unmeasured cases, and close the milestone without beginning
-  later celestial features.

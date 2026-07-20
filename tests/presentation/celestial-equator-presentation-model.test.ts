@@ -101,6 +101,6 @@ describe('geocentric projective celestial-equator presentation model', () => {
         provenance: Object.freeze({ ...snapshot.observerHorizontalEquator.provenance, providerVersion: 'mismatch' }),
       }),
     });
-    expect(() => createCelestialEquatorPresentationModel(invalid)).toThrow('validated P03 horizontal equator basis');
+    expect(() => createCelestialEquatorPresentationModel(invalid)).toThrow('validated WGS84 core and P03 equatorial plane');
   });
 });

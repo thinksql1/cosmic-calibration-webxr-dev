@@ -98,16 +98,19 @@ length for both vectors.
 
 ## Mean celestial equator contract
 
-The mean celestial equator of date is not rendered in this spike. Its future plane is already
-well-defined by the same axis:
+The mean celestial equator of date is implemented and published as a bounded reference ring in
+the infinite plane defined by this same axis. Its scientific plane is:
 
 ```text
 dot(point_GCRS, north_GCRS) = 0
 ```
 
 The first two rows of `M` are orthonormal GCRS-expressed basis axes in that plane. Tests prove both
-are perpendicular to the third-row pole and to each other. A later equator implementation must
-derive samples from this normal/basis; it may not orient a ring independently.
+are perpendicular to the third-row pole and to each other. The published equator derives its
+orientation from this normal/basis rather than independently orienting a ring. The local
+`fix/earth-axis-spindle` branch retains that science while unifying the finite Earth core,
+spindle, equatorial plane/ring, and pole directions in one presentation contract. That local
+presentation correction is not integrated, deployed, or physically Quest-accepted.
 
 ## Corrections included and excluded
 
@@ -206,5 +209,7 @@ Still open or deferred:
 - physical Quest observer-horizontal placement and presentation acceptance.
 
 Integrated Milestone 2B consumes this provider only through the validated scientific snapshot for
-its observer-horizontal axis and pole presentation. Celestial-equator and precession geometry
-remain unimplemented, and physical Quest acceptance remains NOT RUN.
+its observer-horizontal axis and pole presentation. The celestial equator is implemented and
+published from the same validated P03 relationship; precession-trajectory geometry remains
+unimplemented. Physical Quest acceptance of the current local spindle/core/equator presentation
+correction remains NOT RUN.

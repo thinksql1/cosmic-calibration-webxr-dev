@@ -93,9 +93,9 @@ This is a hypothesis, not a binding permanent architecture: Vite and TypeScript 
 | Milestone | Exit condition | Status |
 |---|---|---|
 | Orientation | Repository, requirements, and constraints reconciled | Complete |
-| First vertical slice | One end-to-end path works and is validated | Not started |
-| Core capability | Required behaviors are implemented and tested | Not started |
-| Production/readiness review | Acceptance rubric is satisfied | Not started |
+| First vertical slice | One end-to-end path works and is validated | Complete (Milestones 0 and 1) |
+| Core capability | Required behaviors are implemented and tested | Published Milestone 2 baseline; local geocentric correction pending independent integration gate |
+| Production/readiness review | Acceptance rubric is satisfied | Published baseline complete; local correction pending independent review |
 | Handoff/launch | Documentation and operational ownership are complete | Not started |
 
 ## Completion definition
