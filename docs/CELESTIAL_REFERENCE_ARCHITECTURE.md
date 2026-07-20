@@ -37,8 +37,9 @@ Milestones 2A through 2F form the published master baseline: immutable P03 axis/
 snapshots, WGS84 Earth-core placement, projective NCP/SCP directions, the mean celestial equator,
 eye modes, observer-centered horizon, actual body markers, and the civil-day Sun path/live clock.
 The local `fix/earth-axis-spindle` branch changes only the core/axis/equator presentation into one
-unified finite Earth-centered assembly; it remains independently unreviewed, unintegrated, and
-undeployed. Calibration yaw remains presentation-parent work. See [Earth Axis and Celestial
+unified finite Earth-centered assembly. It has passed technical independent review, but the final
+independent integration re-gate, integration, deployment, and physical Quest acceptance remain
+pending. Calibration yaw remains presentation-parent work. See [Earth Axis and Celestial
 Poles](EARTH_AXIS_AND_CELESTIAL_POLES.md).
 
 ## Non-negotiable invariants
