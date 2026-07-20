@@ -4,9 +4,9 @@
 
 **Updated by:** Codex / project control
 
-**Current phase:** Bounded renderer-gate remediation for the local unified geocentric axis/core/equator correction on `fix/earth-axis-spindle`; final validation, independent revalidation, and integration remain pending.
+**Current phase:** Documentation-only reconciliation for the local unified geocentric axis/core/equator correction on `fix/earth-axis-spindle`; the technical independent review passed, while records remediation and the independent integration re-gate remain pending.
 
-**Overall status:** **The published `master`/`origin/master` baseline is `ee32c814179e2b9a2ec8b8d116d4139e4ce9e415`; its published Milestone 2F solar-temporal and prior celestial layers remain the deployed baseline.** The rigid spindle correction, unified finite-core equator correction, and this renderer-gate remediation are local only on `fix/earth-axis-spindle`; none is integrated, pushed, deployed, or physically accepted. Historic Milestone evidence below remains scoped to its recorded published commit and must not be read as evidence for the local correction. Milestone 1 is complete; Milestone 2A is published; hardened geocentric Milestone 2B was independently validated, integrated, and published. The independent renderer gate found no
+**Overall status:** **The published `master`/`origin/master` baseline is `ee32c814179e2b9a2ec8b8d116d4139e4ce9e415`; its published Milestone 2F solar-temporal and prior celestial layers remain the deployed baseline.** The published baseline already includes the WGS84 Earth core, geocentric axis/poles, celestial equator, observer-centered local horizon, actual body markers, Sun path, civil-hour notches, and live celestial refresh. The rigid spindle correction, unified finite-core geocentric presentation contract, and renderer-gate remediation are local only on `fix/earth-axis-spindle`; none is integrated, pushed, deployed, or physically accepted. The technical independent review passed its source, rendering, lifecycle, Float32, stereo, visibility, test, build, and dependency gates; its only blocking finding was stale project records, which this local documentation remediation addresses before an independent integration re-gate. Historic Milestone evidence below remains scoped to its recorded published commit and must not be read as evidence for the local correction. Milestone 1 is complete; Milestone 2A is published; hardened geocentric Milestone 2B was independently validated, integrated, and published. The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
 single-yaw calibration at `+/-90` and `180` degrees, projective antipodes, linear non-writing XR
 depth, owned-resource disposal, and independent precision maxima. Feature and merged `master`
@@ -347,11 +347,13 @@ normal local integration now pass; publication must succeed before the physical 
   observed offsets.
 - UTC-to-TT uses Astronomy Engine's Espenak-Meeus delta-T implementation and its documented UT1
   approximately equal to UTC policy. No live EOP or leap-second service exists.
-- The previously published Milestone 2B line is an observer-centered `1.8 m` proxy. DEC-021 now
-  supersedes that contract locally: the modeled WGS84 core is placed at world scale, the observer
-  remains on the surface, and NCP/SCP are projective directions at infinity. Finite render points
-  lie `10^13 m` from the core on the exact centerline with a documented sub-`0.14 arcsecond`
-  convergence bound. Quest depth/visibility/comfort remain unverified.
+- The earlier observer-centered `1.8 m` symbolic axis is a superseded historical implementation,
+  not the current published baseline. Published Milestone 2B now uses the world-scale WGS84 Earth
+  core, keeps the observer on the surface, and represents NCP/SCP as projective directions at
+  infinity. Its finite diagnostic points lie `10^13 m` from the core on the exact centerline with
+  a documented sub-`0.14 arcsecond` convergence bound. The current local branch changes only the
+  spindle/core/equator presentation contract and remains undeployed; its physical Quest
+  depth/visibility/comfort acceptance remains pending.
 - Detailed physical Quest observations for axis/pole placement, world locking, below-horizon
   comprehension, readability, stereo, and comfort were not captured individually. The user did
   report the published experience workable and no blocking physical defect; this is a conditional
@@ -372,10 +374,11 @@ normal local integration now pass; publication must succeed before the physical 
 - Exact Quest OS and Quest Browser versions, numerical north-alignment error, controller-specific
   coverage, DOM-overlay availability, and targeted pose-loss behavior for the accepted Milestone 1
   test were not reported.
-- Automatic observer/location acquisition and civil-time label resolution remain unimplemented.
-  Milestone 2B adds only manual in-memory observer entry, generic validation presets, explicit UTC
-  fixtures/current-time injection, and axis diagnostics; no map, geolocation, time zone, or time
-  animation exists.
+- Automatic observer/location acquisition and rendered civil-hour text labels remain unimplemented.
+  The published baseline has manual in-memory observer entry, explicit UTC/current-time injection,
+  IANA time-zone resolution with DST-aware civil-hour metadata, central-clock live updates, and
+  axis diagnostics; it has no map, geolocation, persisted time zone, or broad user-programmable
+  time-control system.
 - Astronomy Engine does not expose the selected mean-only P03 quantity; the validated
   application-owned provider must remain separate from true `EQD` and be independently rechecked
   if its model/version/domain changes.

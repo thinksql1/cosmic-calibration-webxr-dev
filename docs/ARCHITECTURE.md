@@ -2,13 +2,19 @@
 
 ## Frames and boundaries
 
-The application uses one shared Three.js scene for desktop and immersive AR while keeping three concepts distinct:
+The application uses one shared Three.js scene for desktop and immersive AR while keeping the
+room, calibrated display, and scientific coordinates distinct:
 
-1. **Room/floor frame:** the established Milestone 0 origin, room-relative axes, horizon ring, and zenith/nadir line.
-2. **Geographic display frame:** a dedicated `geographic-reference-frame` group containing N/S/E/W labels and cardinal axes.
-3. **Future scientific source frame:** not implemented; future source coordinates must remain separate from display rotations.
+1. **Room/floor frame:** the established Milestone 0 origin, room-relative axes, floor ring, and zenith/nadir line.
+2. **Geographic display frame:** `geographic-reference-frame`, which contains calibrated N/S/E/W references and applies accepted north yaw exactly once.
+3. **Scientific state and presentation frames:** immutable observer/WGS84, UTC simulation-clock, Astronomy Engine, P03, and provenance state remain independent of scene transforms. Presentation maps tagged ENU results into the application basis below the geographic parent.
 
-North calibration rotates only the geographic display group around local Y. It never rotates the XR camera, renderer, room/floor frame, controller target-ray objects, or future scientific source data.
+Within the geographic frame, the local horizon remains observer-centered. The Earth core, axis,
+projective poles, and celestial equator form the distinct Earth-centered geocentric assembly.
+Apparent Sun, Moon, and planet directions plus the civil-day Sun path are observer-relative
+references. North calibration rotates only the geographic display group around local Y; it never
+rotates the XR camera, renderer, room/floor frame, controller target-ray objects, or scientific
+source data.
 
 ## Coordinate convention
 
@@ -85,11 +91,16 @@ control cancels `beforexrselect`; the DOM action remains available while the bro
 the paired XR select sequence. Controller events outside the overlay remain functional.
 `local-floor` remains the sole required feature.
 
-## Geographic-reference rendering
+## Geographic and celestial rendering
 
 `src/scene/createGeographicReference.ts` creates thin N/S and E/W lines just above the floor to avoid z-fighting plus lightweight canvas-texture sprites. North is warm and visually distinct; the remaining labels are subdued. The group is hidden while uncalibrated or calibrating and becomes visible immediately after a valid capture.
 
-The existing horizon ring and zenith/nadir line stay in the room/floor group and remain unchanged.
+The existing floor ring and zenith/nadir line stay in the room/floor group and remain unchanged.
+The published scene also contains a WGS84 Earth core, geocentric P03 axis/poles, celestial equator,
+observer-centered local horizon, actual apparent body markers, and an optional apparent Sun path
+with civil-hour notches. Celestial overlays use bounded projective or camera-relative rendering,
+layer-local linear non-writing depth behavior, explicit eye presentation modes where applicable,
+and owned clear/dispose lifecycle contracts.
 
 ## Desktop simulation and UI
 
@@ -107,14 +118,21 @@ Calibration is deliberately in memory only. Session exit, reload, room change, b
 
 ## Module boundaries
 
-- `src/main.ts`: renderer, DOM UI, simulation, and integration wiring.
-- `src/scene/createReferenceScene.ts`: unchanged room/floor reference geometry.
-- `src/scene/createGeographicReference.ts`: geographic-only cardinal display group.
-- `src/calibration/math.ts`: pure projection, signed yaw, bearing, and cardinal math.
-- `src/calibration/state.ts`: calibration state transitions and records.
-- `src/xr/state.ts`: capability and owned immersive-session lifecycle.
-- `src/xr/controllerCalibration.ts`: Three.js target-ray connection, visualization, and select capture.
+- `src/main.ts`: renderer, DOM UI, calibration, scientific-state refresh, layer controls, and integration wiring.
+- `src/scene/`: room/floor geometry; calibrated geographic group; Earth-centered axis/core/poles/equator assembly; observer-centered local horizon; body and Sun-path groups; eye filtering; owned rendering resources and disposal.
+- `src/presentation/`: immutable scientific-state-to-renderer models, application-basis mapping, geocentric structure presentation, and eye presentation modes.
+- `src/science/state/`, `src/science/snapshot/`, and `src/science/frames/`: explicit WGS84 observer state, UTC simulation clock, revisioned immutable snapshots, P03/WGS84 frame transforms, scientific provenance, structured warnings, and errors.
+- `src/science/astronomy/` and `src/science/providers/`: validated Astronomy Engine adapter, P03 mean-pole provider, correction/frame contracts, and provider identity.
+- `src/science/bodies/`: actual apparent Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn state service.
+- `src/science/temporal/` and `src/temporal/`: IANA civil-day/DST resolution, Sun daily-path service, civil-hour metadata, and central-clock live refresh scheduling.
+- `src/calibration/math.ts` and `src/calibration/state.ts`: pure projection/signed-yaw logic and calibration records.
+- `src/xr/state.ts` and `src/xr/controllerCalibration.ts`: capability detection, owned immersive-session lifecycle, target-ray visualization, and native select capture.
+- `tests/` and `.github/workflows/deploy-pages.yml`: deterministic contracts, regression coverage, build validation, Pages artifact, and deployment workflow.
 
 ## Deferred architecture
 
-Persistence, geolocation, automatic heading, magnetic correction, astronomy calculations, celestial rendering, time controls, spatial anchors, hit testing, hand tracking, and experiential layers remain absent.
+Persistence, automatic geolocation, automatic heading, magnetic correction, broad user-programmable
+time controls, rendered civil-hour text labels, spatial anchors, hit testing, hand tracking, stars,
+precession trajectories, ecliptic/annual paths, additional body paths or phases, and experiential
+layers remain deferred. The published astronomy, celestial-rendering, civil-time/DST, provenance,
+warning/error, and live-refresh systems are not deferred.

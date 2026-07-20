@@ -4,6 +4,12 @@
 
 ### Added
 
+- Reconciled stale project records with the published celestial baseline: the WGS84 Earth core,
+  geocentric axis/poles, celestial equator, observer-centered horizon, body markers, Sun path,
+  civil-hour notches, and live updates are already published; the rigid spindle, unified
+  geocentric presentation contract, and renderer-gate remediation remain local. No production
+  code, tests, dependencies, deployment, or physical Quest acceptance changed. Independent
+  integration re-gate remains next.
 - Closed the bounded unified-geocentric renderer gates locally: the default spindle now has one
   pale-steel color and one `0.72` opacity across the core; optional below-horizon hiding uses a
   visibility-only classifier and cannot create a default style seam. The equator now keeps static
