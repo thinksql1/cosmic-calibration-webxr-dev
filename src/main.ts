@@ -13,6 +13,7 @@ import {
 } from './scene/createGeographicReference';
 import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
+import { createGeocentricCelestialStructureGroup } from './scene/createGeocentricCelestialStructureGroup';
 import { createLocalHorizonGroup } from './scene/createLocalHorizonGroup';
 import { createSolarSystemBodiesGroup } from './scene/createSolarSystemBodiesGroup';
 import { createSolarDailyPathGroup } from './scene/createSolarDailyPathGroup';
@@ -41,6 +42,7 @@ import {
   DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
   type CelestialEquatorDisplaySettings,
 } from './presentation/celestialEquatorPresentationModel';
+import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
 import {
   parseEyePresentationMode,
   type EyePresentationMode,
@@ -148,11 +150,14 @@ const scene = createReferenceScene();
 const geographicReference = createGeographicReferenceGroup();
 const celestialAxis = createEarthAxisGroup();
 const celestialEquator = createCelestialEquatorGroup(96);
+const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
+  celestialAxis.group,
+  celestialEquator.group,
+);
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 const solarSystemBodies = createSolarSystemBodiesGroup();
 const solarDailyPath = createSolarDailyPathGroup();
-geographicReference.add(celestialAxis.group);
-geographicReference.add(celestialEquator.group);
+geographicReference.add(geocentricCelestialStructure);
 geographicReference.add(localHorizon.group);
 geographicReference.add(solarSystemBodies.group);
 geographicReference.add(solarDailyPath.group);
@@ -332,12 +337,17 @@ function renderCelestialAxis(): void {
     solarDailyPath.clear();
     return;
   }
-  celestialAxis.update(
-    createEarthAxisPresentationModel(result.snapshot, currentAxisDisplaySettings()),
-  );
+  const geocentricPresentation =
+    createGeocentricCelestialStructurePresentation(result.snapshot);
+  celestialAxis.update(createEarthAxisPresentationModel(
+    result.snapshot,
+    currentAxisDisplaySettings(),
+    geocentricPresentation,
+  ));
   const equatorModel = createCelestialEquatorPresentationModel(
     result.snapshot,
     currentEquatorDisplaySettings(),
+    geocentricPresentation,
   );
   celestialEquator.update(equatorModel);
   const bodyState = solarSystemBodyStateService.capture(result.snapshot);
@@ -387,7 +397,7 @@ function renderCelestialAxis(): void {
   }
   celestialDiagnostics.append(
     ...[
-      `Equator ${equatorModel.terminology}; ${equatorModel.sampleCount} projective samples`,
+      `Equator ${equatorModel.terminology}; ${equatorModel.sampleCount} bounded finite-ring samples`,
       `Equator basis ${equatorModel.provenance.frame} from ${equatorModel.provenance.sourceBasisFrame}; ${equatorModel.provenance.samplingPhase}`,
       `Equator render strategy ${equatorModel.renderStrategy}`,
       `Equator depth contract ${equatorModel.depthContract}`,

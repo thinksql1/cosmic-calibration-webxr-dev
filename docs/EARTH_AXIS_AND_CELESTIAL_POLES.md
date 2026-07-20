@@ -60,6 +60,12 @@ retains the existing datum warning.
 
 ## Scientific projective directions and diagnostic finite proxies
 
+The Earth core, spindle, celestial-equatorial plane, and NCP/SCP directions now share one
+presentation structure. The core is the finite center of the celestial-equator reference ring;
+the spindle passes through it; the equator normal is the same positive axis direction; and SCP is
+its exact component-negated projective direction. The observer remains at the surface-relative
+origin and the local horizon remains observer-centered.
+
 The scientific NCP/SCP values are exact antipodal directions at infinity. The presentation model
 retains `10^13 m` finite points only to reproduce the accepted convergence diagnostic; they never
 cross the hardened GPU boundary. Across the supported observer latitude and elevation domain,

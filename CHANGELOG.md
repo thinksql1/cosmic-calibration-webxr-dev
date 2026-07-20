@@ -4,6 +4,21 @@
 
 ### Added
 
+- Unified the finite WGS84 Earth core, rigid P03 spindle, exact projective NCP/SCP directions, and
+  mean celestial-equatorial plane in one immutable presentation contract and one identity scene
+  assembly. The equator now renders a finite two-Earth-radius reference ring centered on the core
+  with bounded homogeneous coordinates, preserving coherent parallax without raw Earth-scale GPU
+  vertices. The local horizon remains observer-centered and separate.
+- Added permanent core/equator identity, axis/plane perpendicularity, ring-plane/fitted-center,
+  shared-pole, observer-offset, transform/camera, projection-equivalence, GPU-bound, hierarchy,
+  toggle/re-entry, and disposal coverage. DEC-029 supersedes only DEC-023's `w = 0` rendering
+  choice. Clean install, type-check, 39 files / 432 tests, production build, dependency/diff checks,
+  and development/production-preview orbit, calibration, reset, toggle, asset, and console smoke
+  checks pass. An independent final review's hierarchy and unified-transition findings were
+  corrected; its focused recheck and full 432-test gate pass with no remaining findings.
+  Astronomy, calibration, bodies, Sun path, and time science are unchanged.
+  Independent integration, deployment, and physical Quest acceptance remain pending.
+
 - Added one validated `EarthAxisSpindlePresentation` source containing the WGS84 core, normalized
   P03 axis direction, exact antipode, bounded extent, frame/revisions, provenance, and validity.
   Added strict local/world/projected collinearity, camera-view, calibration/recalibration,

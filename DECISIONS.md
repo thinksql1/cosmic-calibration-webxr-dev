@@ -359,6 +359,26 @@
   explanatory Earth treatment, and leave every scientific model and unrelated celestial layer
   unchanged.
 
+### DEC-029: Present the core, axis, poles, and celestial equator as one geocentric assembly
+- **Date:** 2026-07-20
+- **Status:** Accepted locally; independent revalidation, integration, deployment, and physical
+  Quest acceptance pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Create one immutable `GeocentricCelestialStructurePresentation` per ready snapshot.
+  Its Earth-core anchor is also the celestial-equator center; its normalized positive axis is also
+  the equatorial-plane normal and NCP direction; SCP is the exact component negation; and two
+  orthonormal basis vectors span the plane through the core. Render a finite explanatory equator
+  reference ring at two WGS84 semi-major radii with bounded homogeneous points
+  `(coreView / radius + directionView, 1 / radius)`. Parent spindle and equator beneath one
+  identity geocentric assembly and apply geographic yaw once on the existing parent. Keep the
+  local horizon observer-centered as a sibling.
+- **Rationale:** DEC-023's `w = 0` ring preserved plane orientation but erased the finite core from
+  visible geometry, so its projected ring could not communicate the clarified core/plane/axis
+  relationship. The finite homogeneous construction is projectively exact, keeps GPU components
+  near unit scale, produces coherent parallax, and leaves all astronomy and calibration science
+  unchanged. This supersedes only DEC-023's rendering-at-infinity choice; its P03 mean-equator
+  science and historical evidence remain valid.
+
 ## Proposed decisions awaiting review
 
 None yet.

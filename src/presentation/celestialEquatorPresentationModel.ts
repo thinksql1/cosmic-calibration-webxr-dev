@@ -1,11 +1,14 @@
 import type { EnuUnitDirection } from '../science/astronomy/types';
 import type { ScientificSnapshot } from '../science/snapshot/scientificSnapshot';
 import {
-  mapEnuPositionToApplicationBasis,
   mapEnuToApplicationBasis,
   type ApplicationBasisDirection,
   type ApplicationBasisPosition,
 } from './mapEnuToApplicationBasis';
+import {
+  createGeocentricCelestialStructurePresentation,
+  type GeocentricCelestialStructurePresentation,
+} from './geocentricCelestialStructurePresentation';
 
 export const CELESTIAL_EQUATOR_SAMPLE_COUNT = 96;
 export const CELESTIAL_EQUATOR_LINE_OPACITY = 0.48;
@@ -21,21 +24,29 @@ export interface CelestialEquatorSample {
   readonly index: number;
   readonly directionEnu: EnuUnitDirection;
   readonly directionApplication: ApplicationBasisDirection;
+  readonly finitePositionApplication: ApplicationBasisPosition;
 }
 
 export interface CelestialEquatorPresentationModel {
   readonly kind: 'ready';
   readonly model: 'IAU_P03_PRECESSION_ONLY';
   readonly terminology: 'MEAN_CELESTIAL_EQUATOR_OF_DATE';
-  readonly presentationKind: 'GEOCENTRIC_PROJECTIVE_GREAT_CIRCLE_AT_INFINITY';
-  readonly renderStrategy: 'HOMOGENEOUS_PROJECTIVE_EQUATOR_DIRECTIONS_WITH_CAMERA_RELATIVE_CORE';
+  readonly presentationKind:
+    'EARTH_CORE_CENTERED_REFERENCE_RING_IN_CELESTIAL_EQUATORIAL_PLANE';
+  readonly renderStrategy:
+    'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_GEOCENTRIC_EQUATOR_RING';
   readonly depthContract: 'LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY';
   readonly gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES';
   readonly earthCore: ApplicationBasisPosition;
+  readonly center: ApplicationBasisPosition;
+  readonly displayRadiusMeters: number;
   readonly normalEnu: EnuUnitDirection;
   readonly normalApplication: ApplicationBasisDirection;
   readonly firstEnu: EnuUnitDirection;
   readonly secondEnu: EnuUnitDirection;
+  readonly firstApplication: ApplicationBasisDirection;
+  readonly secondApplication: ApplicationBasisDirection;
+  readonly geocentricStructure: GeocentricCelestialStructurePresentation;
   readonly samples: readonly CelestialEquatorSample[];
   readonly sampleCount: number;
   readonly visible: boolean;
@@ -117,28 +128,53 @@ function validateSnapshot(snapshot: ScientificSnapshot): void {
   }
 }
 
-/**
- * Builds a full great-circle direction set from the immutable snapshot. The
- * sample radius is intentionally absent: each entry is the projective limit of
- * EarthCore + R * direction as R tends to infinity, so it cannot be mistaken
- * for a nearby observer-centred hoop or a physical celestial distance.
- */
+function finiteRingPoint(
+  center: ApplicationBasisPosition,
+  direction: ApplicationBasisDirection,
+  radiusMeters: number,
+): ApplicationBasisPosition {
+  return Object.freeze({
+    frame: 'APPLICATION_BASIS',
+    units: 'meters',
+    x: center.x + direction.x * radiusMeters,
+    y: center.y + direction.y * radiusMeters,
+    z: center.z + direction.z * radiusMeters,
+  });
+}
+
+/** Builds a bounded reference cross-section of the infinite equatorial plane. */
 export function createCelestialEquatorPresentationModel(
   snapshot: ScientificSnapshot,
   settings: CelestialEquatorDisplaySettings = DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
+  geocentricStructure: GeocentricCelestialStructurePresentation =
+    createGeocentricCelestialStructurePresentation(snapshot),
 ): CelestialEquatorPresentationModel {
   validateSnapshot(snapshot);
+  if (
+    geocentricStructure.snapshotCacheKey !== snapshot.cacheKey ||
+    geocentricStructure.validity !== 'VALIDATED'
+  ) {
+    throw new Error(
+      'Celestial-equator presentation requires the matching validated geocentric structure.',
+    );
+  }
   const equator = snapshot.observerHorizontalEquator;
   const samples = Object.freeze(Array.from({ length: CELESTIAL_EQUATOR_SAMPLE_COUNT }, (_, index) => {
     const directionEnu = normalizedDirection(
-      equator.first,
-      equator.second,
+      geocentricStructure.equatorialBasisFirstEnu,
+      geocentricStructure.equatorialBasisSecondEnu,
       (index / CELESTIAL_EQUATOR_SAMPLE_COUNT) * Math.PI * 2,
     );
+    const directionApplication = mapEnuToApplicationBasis(directionEnu);
     return Object.freeze({
       index,
       directionEnu,
-      directionApplication: mapEnuToApplicationBasis(directionEnu),
+      directionApplication,
+      finitePositionApplication: finiteRingPoint(
+        geocentricStructure.celestialEquatorCenter,
+        directionApplication,
+        geocentricStructure.celestialEquatorDisplayRadiusMeters,
+      ),
     });
   }));
 
@@ -146,15 +182,20 @@ export function createCelestialEquatorPresentationModel(
     kind: 'ready',
     model: 'IAU_P03_PRECESSION_ONLY',
     terminology: 'MEAN_CELESTIAL_EQUATOR_OF_DATE',
-    presentationKind: 'GEOCENTRIC_PROJECTIVE_GREAT_CIRCLE_AT_INFINITY',
-    renderStrategy: 'HOMOGENEOUS_PROJECTIVE_EQUATOR_DIRECTIONS_WITH_CAMERA_RELATIVE_CORE',
+    presentationKind: 'EARTH_CORE_CENTERED_REFERENCE_RING_IN_CELESTIAL_EQUATORIAL_PLANE',
+    renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_GEOCENTRIC_EQUATOR_RING',
     depthContract: 'LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY',
     gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES',
-    earthCore: mapEnuPositionToApplicationBasis(snapshot.observerGeocentricEarthAxis.earthCore),
-    normalEnu: equator.normal,
-    normalApplication: mapEnuToApplicationBasis(equator.normal),
-    firstEnu: equator.first,
-    secondEnu: equator.second,
+    earthCore: geocentricStructure.earthCore,
+    center: geocentricStructure.celestialEquatorCenter,
+    displayRadiusMeters: geocentricStructure.celestialEquatorDisplayRadiusMeters,
+    normalEnu: geocentricStructure.northAxisDirectionEnu,
+    normalApplication: geocentricStructure.equatorialPlaneNormal,
+    firstEnu: geocentricStructure.equatorialBasisFirstEnu,
+    secondEnu: geocentricStructure.equatorialBasisSecondEnu,
+    firstApplication: geocentricStructure.equatorialBasisFirst,
+    secondApplication: geocentricStructure.equatorialBasisSecond,
+    geocentricStructure,
     samples,
     sampleCount: CELESTIAL_EQUATOR_SAMPLE_COUNT,
     visible: settings.showEquator,
@@ -172,8 +213,8 @@ export function createCelestialEquatorPresentationModel(
       frame: 'HORIZONTAL_ENU',
       sourceBasisFrame: 'GCRS',
       model: 'IAU_P03_PRECESSION_ONLY',
-      provider: snapshot.earthAxis.provenance.provider,
-      providerVersion: snapshot.earthAxis.provenance.providerVersion,
+      provider: geocentricStructure.provenance.provider,
+      providerVersion: geocentricStructure.provenance.providerVersion,
       samplingPhase: equator.samplingPhase,
     }),
   });

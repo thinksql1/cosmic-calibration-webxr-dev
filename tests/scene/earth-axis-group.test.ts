@@ -53,6 +53,11 @@ function model(overrides: Partial<EarthAxisPresentationModel> = {}): EarthAxisPr
     renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_SPINDLE_AND_PROJECTIVE_POLES',
     depthContract: 'LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY',
     gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES',
+    geocentricStructure: Object.freeze({
+      geometryContract: 'ONE_EARTH_CORE_ONE_AXIS_ONE_PERPENDICULAR_EQUATORIAL_PLANE',
+      snapshotCacheKey: 'fixture',
+      celestialEquatorCenter: core,
+    }) as never,
     observerSurfaceOrigin: Object.freeze({ x: 0, y: 0, z: 0 }),
     earthCore: core,
     earthCoreVisible: true,

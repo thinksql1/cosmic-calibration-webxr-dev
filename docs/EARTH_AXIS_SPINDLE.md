@@ -27,7 +27,9 @@ scientific orientation, observer, provider, time, Sun path, or celestial-body de
 
 ## One-line geometry contract
 
-The presentation descriptor `EarthAxisSpindlePresentation` is the only scene-facing axle source:
+The shared `GeocentricCelestialStructurePresentation` is the scene-facing source for the Earth
+core, spindle, celestial poles, and equatorial plane. `EarthAxisSpindlePresentation` is its axle
+view:
 
 - one finite WGS84 Earth-core point;
 - one normalized P03 rotational-axis direction in application basis;
@@ -49,6 +51,11 @@ southFinite = earthCore - north * displayExtent
 
 Presentation no longer maps separately stored north and south directions. Pole endpoint metadata,
 pole markers, the bounded spindle representation, and the scene frame all consume this descriptor.
+
+The same shared structure makes `celestialEquatorCenter` the identical Earth-core object and
+`equatorialPlaneNormal` the identical positive-axis object. Its two orthonormal plane bases are
+perpendicular to the axis. The spindle therefore intersects the celestial-equatorial plane once,
+at the core.
 
 ## Earth core and celestial poles
 
@@ -89,12 +96,12 @@ occluder, or writing non-linear compositor depth. No coincident duplicate center
 
 ## Coordinate frame and yaw policy
 
-The spindle descriptor is in
-`APPLICATION_BASIS_UNCALIBRATED_BELOW_GEOGRAPHIC_PARENT`. It is one child of
-`geographic-reference-frame`. Calibration yaw exists only on that parent and is applied once to
-both core and direction. The spindle is not camera-parented, head-locked, billboard-oriented, or
-recomputed from apparent celestial-body directions. Camera motion changes only its per-eye
-projection.
+The spindle and celestial-equator groups are children of one identity-only
+`geocentric-celestial-structure-frame`, itself below `geographic-reference-frame`. Calibration yaw
+exists only on the geographic parent and is applied once to the whole assembly. The local horizon
+is a separate observer-centered sibling. The spindle is not camera-parented, head-locked,
+billboard-oriented, or recomputed from apparent celestial-body directions. Camera motion changes
+only its per-eye projection.
 
 An exact east/west view can place the infinite line on the boundary of the active perspective
 chart; the renderer suppresses that legitimate projection-at-infinity degeneracy instead of
@@ -157,8 +164,9 @@ Physical acceptance remains **NOT RUN** for this correction.
 12. Toggle the axis off and on.
 13. Recalibrate.
 14. Exit and re-enter.
-15. Confirm no duplicates or stale segments.
-16. Confirm the horizon, poles, equator, bodies, Sun path, and hour notches remain correct.
+15. Confirm the same core/equator/spindle relationship returns.
+16. Confirm no duplicates or stale geometry remain.
+17. Confirm the horizon, poles, equator, bodies, Sun path, and hour notches remain correct.
 
 Record each result as `PASS`, `FAIL`, `UNCERTAIN`, or `NOT RUN`; do not infer physical acceptance
 from automated or desktop evidence.

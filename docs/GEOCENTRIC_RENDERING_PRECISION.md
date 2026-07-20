@@ -106,3 +106,12 @@ camera-relative components above the explicit budget are rejected.
 Automated and desktop evidence cannot establish Quest GPU/compositor behavior, physical world
 locking, passthrough readability, or comfort. The independent renderer gate and later physical
 Quest acceptance must keep those results explicitly pending until observed.
+
+## Unified equator boundary
+
+The equator now preserves its finite Earth-core center while retaining bounded GPU values. For
+display radius `R = 12,756,274 m`, the shader receives `coreView / R + directionView` and
+homogeneous `w = 1 / R`. This is exactly equivalent to the finite point
+`coreView + R * directionView`. Across the supported WGS84 observer/elevation domain the spatial
+component budget is below `2`; raw Earth-scale ring coordinates are CPU-only. The equator and
+spindle use the identical shared core and axis-normal objects beneath the same calibrated parent.

@@ -1,10 +1,10 @@
 # Project State
 
-**Last updated:** 2026-07-19 America/New_York
+**Last updated:** 2026-07-20 America/New_York
 
 **Updated by:** Codex / project control
 
-**Current phase:** Rigid Earth-axis spindle correction automated- and desktop-validated locally on `fix/earth-axis-spindle`; independent revalidation and integration pending
+**Current phase:** Unified geocentric axis/core/equator correction automated- and desktop-validated locally on `fix/earth-axis-spindle`; independent revalidation and integration pending
 
 **Overall status:** **Milestone 1 COMPLETE; Milestone 2A PASS and published; hardened geocentric Milestone 2B independently validated, integrated, and published.** The independent renderer gate found no
 blocking or material defect. It reproduced per-eye cache invalidation and eye-order behavior,
@@ -113,6 +113,15 @@ tests, production build, dependency/diff checks, and development/production-prev
 toggle, reset, recalibration, asset, and console regression pass. No astronomy, calibration,
 observer, horizon, equator, Sun-path, notch, or body science changed. Integration, deployment, and
 physical Quest acceptance are not performed or inferred.
+
+The clarified local correction now also reconciles the celestial equator with the rigid spindle.
+The prior equator science already had the correct P03 plane normal/basis and WGS84 core, but its
+`w = 0` direction-only renderer discarded the finite center, making the visible ring
+translation-invariant. One `GeocentricCelestialStructurePresentation` now supplies the identical
+core/center, axis/plane normal, exact pole antipodes, orthonormal plane basis, revisions, and
+provenance to both layers. A finite two-WGS84-radius reference ring is rendered as bounded
+homogeneous points below one identity geocentric scene node; the local horizon remains an
+observer-centered sibling. Integration, deployment, and physical Quest acceptance remain NOT RUN.
 
 ## One-paragraph state summary
 
@@ -403,7 +412,7 @@ normal local integration now pass; publication must succeed before the physical 
 | `COSMIC_CALIBRATION_WEBXR_PROJECT_BRIEF.md` | Product concept and long-term context | Active reference |
 | `PROJECT_CHARTER.md` | Project definition and boundaries | Active |
 | `DECISIONS.md` | Accepted foundation, geographic-frame, astronomy, time, and precession decisions | Current |
-| `NEXT_TASK.md` | Independently revalidate and integrate the rigid Earth-axis spindle correction | Local correction awaits an independent gate and integration decision |
+| `NEXT_TASK.md` | Independently revalidate and integrate the unified geocentric axis, core, and celestial-equator structure | Local correction awaits an independent gate and integration decision |
 
 ## Environment
 
@@ -414,7 +423,7 @@ normal local integration now pass; publication must succeed before the physical 
 | Runtime dependencies | Three.js `0.185.1`; Astronomy Engine `2.1.19` | Yes; exact versions pinned |
 | Development dependencies | Vite `8.1.4`; TypeScript `7.0.2`; Vitest `4.1.10`; Three/WebXR types | Yes |
 | Build command | `npm run build` | Passed |
-| Test command | `npm run test` | 421/421 passed across 36 files on `fix/earth-axis-spindle`; integrated `master` baseline was 416/416 |
+| Test command | `npm run test` | 432/432 passed across 39 files on `fix/earth-axis-spindle`; prior branch baseline was 421/421 and integrated `master` baseline was 416/416 |
 | Deployment target | GitHub Pages at `https://thinksql1.github.io/cosmic-calibration-webxr/` | Run `29707073636` deployed `31be4cc`; hosted Milestone 2F desktop regression PASS |
 
 ## Risks
@@ -495,10 +504,13 @@ normal local integration now pass; publication must succeed before the physical 
 
 | 2026-07-19 | Local rigid Earth-axis spindle correction | PASS locally; confirmed the science was already collinear and removed the presentation seam formed by separate north/south lines and the overlaid core marker. One immutable descriptor and one bounded projective strip now preserve exact antipodes and core incidence through camera, parent, yaw, recalibration, reset, toggle, and re-entry cases. An independent implementation review found an offscreen-core side-emphasis fallback; the bounded projective-side classifier, Michigan regression, independent re-gate, and post-fix production-browser smoke pass. Type-check, 36 files / 421 tests, build, dependency/diff, development/preview camera/control/lifecycle, assets, and clean consoles pass. Integration, deployment, and physical Quest acceptance are NOT RUN | `fix/earth-axis-spindle`; `docs/EARTH_AXIS_SPINDLE.md` |
 
+| 2026-07-20 | Local unified geocentric structure reconciliation | PASS locally; confirmed the old equator renderer erased its finite Earth-core center with `w = 0`, while snapshot science and the rigid spindle were correct. One shared core/axis/poles/equatorial-plane descriptor, common identity scene parent, and bounded finite homogeneous ring now preserve center, incidence, perpendicularity, parallax, one-yaw transforms, and lifecycle. Clean install, type-check, 39 files / 432 tests, production build, unchanged dependencies, diff checks, and development/production-preview orbit, `0/90` calibration, toggle, reset/re-entry, existing-layer, asset, and clean-console smoke checks pass. Independent final review findings on hierarchy wording and unified transition coverage were corrected; the recheck passed with no remaining findings. Merge, push, deployment, and physical Quest acceptance NOT RUN | `fix/earth-axis-spindle`; DEC-029; `docs/CELESTIAL_EQUATOR.md` |
+
 ## Current decision horizon
 
-Independently revalidate and integrate the rigid Earth-axis spindle correction. Verify the
-projective collinearity, core anchoring, pole agreement, single-yaw transform path, bounded
-transparent-Earth strip, lifecycle, regression evidence, and clean feature commit before a normal
-integration decision. Do not deploy, perform or infer Quest acceptance, or begin labels, ecliptic,
-orbital paths, Moon phase, precession, or other later work.
+Independently revalidate and integrate the unified geocentric axis, core, and celestial-equator
+structure. Verify core/equator identity, axis perpendicularity, pole agreement, observer offset,
+single-yaw transform invariance, transparent-Earth presentation, lifecycle, regression evidence,
+and the clean feature commits before a normal integration decision. Do not deploy, perform or
+infer Quest acceptance, or begin labels, ecliptic, orbital paths, Moon phase, precession, or other
+later work.

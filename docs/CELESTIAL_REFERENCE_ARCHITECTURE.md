@@ -59,15 +59,14 @@ XR tracking / local-floor frame                         physical tracking
 ├── room-relative diagnostic frame                     presentation only
 └── calibrated geographic presentation frame           room -> geographic yaw
     ├── local floor/cardinal presentation
-    └── observer-centered celestial presentation frame display mapping only
-        ├── Earth-axis presentation
-        ├── NCP/SCP presentation
-        ├── celestial-equator presentation
-        ├── precession-path presentation               future
-        ├── ecliptic presentation                      future
-        ├── Sun temporal presentation                  future
-        ├── Moon temporal presentation                 future
-        └── other optional presentation layers         future
+    ├── Earth-centered geocentric assembly (core, axis, poles, equator)
+    │   ├── Earth-axis and NCP/SCP presentation
+    │   └── celestial-equator presentation
+    └── observer-centered local presentation
+        ├── local-horizon presentation
+        ├── apparent Sun/Moon/body directions
+        ├── Sun temporal presentation
+        └── other optional observer references         future
 
 Scientific model graph (not Three.js parenting)
 WGS84-like Earth-fixed terrestrial state
@@ -343,7 +342,8 @@ offsets.
 
 - `southAxis = -northAxis` exactly after normalization.
 - NCP and SCP markers are endpoints of one axis object, not separately calculated objects.
-- The mean celestial equator uses the plane through the origin with normal `northAxisMean`.
+- The mean celestial equator uses the plane through the finite Earth core with normal
+  `northAxisMean`; the observer origin must not substitute for that core.
 - A true/CIP equator, if enabled, uses `northAxisTrue` and is a distinct layer/model ID.
 - At ideal geodetic latitude `phi`, the mean NCP altitude in the geometric geodetic horizon is
   `phi`; the SCP is antipodal. Southern observers see the SCP above the horizon.
@@ -390,8 +390,9 @@ date/Earth-rotation transform.
 validated GCRS P03 basis plus its science-owned observer-horizontal sampling basis. The unlabelled
 local basis changes only sample phase, never the full equatorial locus; it avoids treating the
 axis-only Earth-rotation shortcut as a general celestial-coordinate transform. The renderer uses
-96 homogeneous projective directions and existing camera-relative core context, not a finite or
-observer-centred ring. Independent integration, publication, and Quest validation remain pending.
+96 bounded homogeneous samples of a finite Earth-core-centred reference ring in the infinite
+equatorial plane. It is not an observer-centred ring. Independent integration, publication, and
+Quest validation remain pending.
 
 ## Horizon model
 

@@ -1,10 +1,12 @@
 import type { EnuUnitDirection } from '../science/astronomy/types';
 import type { ScientificSnapshot, ScientificSnapshotBuildResult } from '../science/snapshot/scientificSnapshot';
 import {
-  mapEnuPositionToApplicationBasis,
-  mapEnuToApplicationBasis,
   type ApplicationBasisDirection,
 } from './mapEnuToApplicationBasis';
+import {
+  createGeocentricCelestialStructurePresentation,
+  type GeocentricCelestialStructurePresentation,
+} from './geocentricCelestialStructurePresentation';
 
 export const CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS = 10_000_000_000_000;
 export const EARTH_AXIS_LINEAR_SCENE_FAR_METERS = 100;
@@ -104,6 +106,7 @@ export interface EarthAxisPresentationModel {
   readonly poleRenderConvergenceUpperBoundArcseconds: number;
   readonly observerToCoreDistanceMeters: number;
   readonly observerToAxisDistanceMeters: number;
+  readonly geocentricStructure: GeocentricCelestialStructurePresentation;
   readonly spindle: EarthAxisSpindlePresentation;
   readonly north: EarthAxisEndpointPresentation;
   readonly south: EarthAxisEndpointPresentation;
@@ -156,28 +159,6 @@ function addScaled(
   });
 }
 
-function exactAntipodeApplication(
-  direction: ApplicationBasisDirection,
-): ApplicationBasisDirection {
-  return Object.freeze({
-    frame: 'APPLICATION_BASIS',
-    units: 'unitless',
-    x: -direction.x,
-    y: -direction.y,
-    z: -direction.z,
-  });
-}
-
-function exactAntipodeEnu(direction: EnuUnitDirection): EnuUnitDirection {
-  return Object.freeze({
-    frame: 'HORIZONTAL_ENU',
-    units: 'unitless',
-    east: -direction.east,
-    north: -direction.north,
-    up: -direction.up,
-  });
-}
-
 function endpoint(
   pole: EarthAxisEndpointPresentation['pole'],
   source: ScientificSnapshot['observerHorizontalEarthAxis']['north'],
@@ -216,17 +197,23 @@ function endpoint(
 export function createEarthAxisPresentationModel(
   snapshot: ScientificSnapshot,
   settings: EarthAxisDisplaySettings = DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
+  geocentricStructure: GeocentricCelestialStructurePresentation =
+    createGeocentricCelestialStructurePresentation(snapshot),
 ): EarthAxisPresentationModel {
   validateSettings(settings);
   const placement = snapshot.observerGeocentricEarthAxis;
-  const observerSurfaceOrigin = mapEnuPositionToApplicationBasis(
-    placement.observerSurfaceOrigin,
-  );
-  const earthCore = mapEnuPositionToApplicationBasis(placement.earthCore);
-  const northDirectionEnu = placement.northDirection;
-  const southDirectionEnu = exactAntipodeEnu(northDirectionEnu);
-  const northDirectionApplication = mapEnuToApplicationBasis(northDirectionEnu);
-  const southDirectionApplication = exactAntipodeApplication(northDirectionApplication);
+  if (
+    geocentricStructure.snapshotCacheKey !== snapshot.cacheKey ||
+    geocentricStructure.validity !== 'VALIDATED'
+  ) {
+    throw new Error('Earth-axis presentation requires the matching validated geocentric structure.');
+  }
+  const observerSurfaceOrigin = geocentricStructure.observerSurfaceOrigin;
+  const earthCore = geocentricStructure.earthCore;
+  const northDirectionEnu = geocentricStructure.northAxisDirectionEnu;
+  const southDirectionEnu = geocentricStructure.southAxisDirectionEnu;
+  const northDirectionApplication = geocentricStructure.northAxisDirection;
+  const southDirectionApplication = geocentricStructure.southAxisDirection;
   const convergenceBound = convergenceUpperBoundArcseconds(
     placement.observerToCoreDistanceMeters,
   );
@@ -272,6 +259,7 @@ export function createEarthAxisPresentationModel(
     poleRenderConvergenceUpperBoundArcseconds: convergenceBound,
     observerToCoreDistanceMeters: placement.observerToCoreDistanceMeters,
     observerToAxisDistanceMeters: placement.observerToAxisDistanceMeters,
+    geocentricStructure,
     spindle,
     north: endpoint(
       'NCP',

@@ -431,6 +431,12 @@ export function createEarthAxisGroup(
       group.userData.spindleCoordinateFrameIdentity = model.spindle.coordinateFrameIdentity;
       group.userData.spindleTransformParentIdentity = group.parent?.name ?? 'unparented';
       group.userData.spindleYawApplication = 'GEOGRAPHIC_PARENT_EXACTLY_ONCE';
+      group.userData.geocentricStructureContract =
+        model.geocentricStructure.geometryContract;
+      group.userData.geocentricStructureCacheKey =
+        model.geocentricStructure.snapshotCacheKey;
+      group.userData.coreIsEquatorCenter =
+        model.earthCore === model.geocentricStructure.celestialEquatorCenter;
       group.userData.spindleNorthSouthDotProduct =
         model.spindle.northDirection.x * model.spindle.southDirection.x +
         model.spindle.northDirection.y * model.spindle.southDirection.y +

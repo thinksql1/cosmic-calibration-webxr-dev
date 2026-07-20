@@ -16,10 +16,12 @@ updates through the same central simulation clock. The path is not the celestial
 annual ecliptic; labels and other body paths remain deferred.
 
 The local `fix/earth-axis-spindle` branch corrects the user-observed bowed/hinged axis presentation
-without changing P03, WGS84, calibration, the celestial poles/equator, horizon, bodies, Sun path,
-or time. One authoritative core/direction descriptor now drives one constant-width projectively
-clipped spindle and the exact antipodal pole markers. Automated and desktop validation pass with
-421 tests; independent integration and physical Quest acceptance remain pending.
+and unifies the finite Earth core, spindle, projective poles, and celestial-equatorial plane under
+one Earth-centered presentation contract. The equator is a bounded two-Earth-radius reference
+ring centered on the core and perpendicular to the same axis; bounded homogeneous rendering
+preserves that finite center without raw Earth-scale GPU vertices. The surface observer and local
+horizon remain offset and observer-centered. P03, WGS84, calibration, bodies, Sun path, and time
+science are unchanged; independent integration and physical Quest acceptance remain pending.
 
 ## Milestone 2 architecture status
 
@@ -94,8 +96,9 @@ The shared desktop/XR scene contains:
   one authoritative camera-relative geocentric P03 spindle descriptor rendered as a single
   projectively clipped constant-width strip with exact antipodal projective NCP/SCP markers and no
   raw large-world GPU positions;
-- an optional homogeneous mean celestial equator plus independent eye modes for axis/equator/local
-  horizon; and
+- an optional bounded homogeneous mean celestial-equator reference ring centered on the same
+  Earth core and perpendicular to the same rotational spindle, plus independent eye modes for
+  axis/equator/local horizon; and
 - a default-hidden 96-sample, 24 m calibrated local tangent-plane horizon distinct from the
   1.5 m room-floor diagnostic ring; and
 - a default-hidden seven-marker actual apparent topocentric Sun/Moon/Mercury/Venus/Mars/Jupiter/

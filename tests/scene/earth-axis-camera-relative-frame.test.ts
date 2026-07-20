@@ -69,6 +69,7 @@ function geocentricFixture(
     renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_SPINDLE_AND_PROJECTIVE_POLES',
     depthContract: 'LINEAR_XR_DEPTH_WITH_NON_WRITING_CELESTIAL_OVERLAY',
     gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES',
+    geocentricStructure: undefined as never,
     observerSurfaceOrigin: Object.freeze({ x: 0, y: 0, z: 0 }),
     earthCore: core,
     earthCoreVisible: true,

@@ -2,6 +2,28 @@
 
 Desktop success is not Quest success. Record each physical criterion as **PASS**, **FAIL**, **UNCERTAIN**, or **NOT RUN** with notes and evidence.
 
+## Unified geocentric core, spindle, poles, and equator — pending
+
+**Physical Quest acceptance: NOT RUN.** After independent integration and deployment:
+
+1. Enter passthrough.
+2. Calibrate true north.
+3. Enable Earth core, spindle, celestial poles, and celestial equator.
+4. Confirm the spindle is perfectly straight.
+5. Confirm the spindle passes through Earth core.
+6. Confirm Earth core appears at the center of the celestial-equator ring.
+7. Confirm the spindle crosses the equator at a right angle in the modeled 3D structure.
+8. Confirm north and south pole directions extend from the same axis.
+9. Confirm the local horizon is centered around the observer, not Earth core.
+10. Move laterally and vertically.
+11. Confirm the core/equator/spindle assembly remains rigid.
+12. Confirm observer parallax does not cause the equator to follow the head.
+13. Toggle layers.
+14. Recalibrate.
+15. Exit and re-enter.
+16. Confirm no duplicate or stale geometry.
+17. Confirm Sun path, notches, and bodies remain correct.
+
 ## Milestone 0 evidence
 
 Milestone 0 physical Quest 3 acceptance is complete for the tested environment. Immersive AR entry, passthrough, reference geometry, controlled standing-floor alignment, horizon horizontality, zenith/nadir verticality, world locking, exit/re-entry, recenter, comfort, and usability passed. See `PROJECT_STATE.md` for the durable evidence summary.
