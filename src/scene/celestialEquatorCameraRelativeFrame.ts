@@ -99,7 +99,17 @@ export function createCelestialEquatorCameraRelativeFrame(
       Math.fround(direction.z),
     ).normalize();
     maximumAngularError = Math.max(maximumAngularError, angularErrorArcseconds(direction, quantized));
-    maximumPlaneResidual = Math.max(maximumPlaneResidual, Math.abs(direction.dot(normalViewVector)));
+    // Plane membership is a property of the immutable presentation geometry,
+    // not of an XR eye matrix. Rechecking it after camera transforms made a
+    // scientific invariant depend on device-pose numerical conditioning.
+    maximumPlaneResidual = Math.max(
+      maximumPlaneResidual,
+      Math.abs(
+        sample.directionApplication.x * model.normalApplication.x
+        + sample.directionApplication.y * model.normalApplication.y
+        + sample.directionApplication.z * model.normalApplication.z
+      ),
+    );
     const point = Object.freeze({
       x: scaledCore.x + direction.x,
       y: scaledCore.y + direction.y,

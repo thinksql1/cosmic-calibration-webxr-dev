@@ -15,13 +15,15 @@ const sources = import.meta.glob(
 describe('celestial-equator rendering boundaries', () => {
   it('keeps finite-core incidence in bounded homogeneous coordinates', () => {
     const combined = Object.values(sources).join('\n');
-    expect(combined).toContain('directionView + uCoreViewScaled');
+    expect(combined).toContain('projectionMatrix * modelViewMatrix');
+    expect(combined).toContain('vec4(position, uRingProjectiveW)');
     expect(combined).toContain('coreViewVector.clone().multiplyScalar(inverseRadius)');
     expect(combined).toContain('NO_RAW_LARGE_WORLD_VERTEX_COORDINATES');
     expect(combined).not.toContain('10_000_000_000_000');
     expect(combined).not.toContain('diagnosticFiniteProxyPosition');
     expect(combined).not.toContain('computeP03BiasPrecessionMatrix');
     expect(combined).not.toContain('vec4(position, 0.0)');
+    expect(combined).not.toContain('uCoreViewScaled');
   });
 
   it('uses the established non-writing overlay contract and bounded local geometry', () => {

@@ -91,22 +91,17 @@ function invoke(object: THREE.Object3D, camera: THREE.Camera): void {
 
 function ringClipPoints(
   positions: THREE.BufferAttribute,
-  coreViewScaled: THREE.Vector3,
   projectiveW: number,
   modelView: THREE.Matrix4,
   projection: THREE.Matrix4,
 ): THREE.Vector3[] {
-  const rotation = new THREE.Matrix3().setFromMatrix4(modelView);
   return Array.from({ length: positions.count }, (_, index) => {
-    const directionView = new THREE.Vector3(
-      positions.getX(index), positions.getY(index), positions.getZ(index),
-    ).applyMatrix3(rotation);
     const clip = new THREE.Vector4(
-      directionView.x + coreViewScaled.x,
-      directionView.y + coreViewScaled.y,
-      directionView.z + coreViewScaled.z,
+      positions.getX(index),
+      positions.getY(index),
+      positions.getZ(index),
       Math.fround(projectiveW),
-    ).applyMatrix4(projection);
+    ).applyMatrix4(modelView).applyMatrix4(projection);
     return new THREE.Vector3(clip.x, clip.y, clip.w);
   });
 }
@@ -184,7 +179,6 @@ describe('unified geocentric production rendering boundary', () => {
     const positions = state.ring.geometry.getAttribute('position') as THREE.BufferAttribute;
     const material = state.ring.material as THREE.ShaderMaterial;
     const coreUniform = (state.core.material as THREE.ShaderMaterial).uniforms.uViewVector.value as THREE.Vector3;
-    const coreScaled = material.uniforms.uCoreViewScaled.value as THREE.Vector3;
     expect(positions.array).toBeInstanceOf(Float32Array);
     expect(Array.from(positions.array).every(Number.isFinite)).toBe(true);
     expect(Math.max(...Array.from(positions.array, Math.abs))).toBeLessThan(2);
@@ -193,25 +187,24 @@ describe('unified geocentric production rendering boundary', () => {
       13,
     );
     expect(coreUniform.toArray().every(Number.isFinite)).toBe(true);
-    expect(coreScaled.toArray().every(Number.isFinite)).toBe(true);
-    expect(coreScaled.length()).toBeLessThan(1);
-    expect(coreScaled.toArray()).toEqual(coreScaled.toArray().map(Math.fround));
-    expect(material.vertexShader).toContain('directionView + uCoreViewScaled');
+    expect(material.uniforms.uDrawEnabled.value).toBe(1);
+    expect(material.vertexShader).toContain('projectionMatrix * modelViewMatrix');
     const frame = state.equator.createFrameForCamera(state.camera);
     const firstSample = state.source.equator.samples[0].directionApplication;
-    expect(positions.getX(0)).toBe(Math.fround(firstSample.x));
-    expect(positions.getY(0)).toBe(Math.fround(firstSample.y));
-    expect(positions.getZ(0)).toBe(Math.fround(firstSample.z));
+    const inverseRadius = 1 / state.source.equator.displayRadiusMeters;
+    expect(positions.getX(0)).toBe(Math.fround(state.source.equator.center.x * inverseRadius + firstSample.x));
+    expect(positions.getY(0)).toBe(Math.fround(state.source.equator.center.y * inverseRadius + firstSample.y));
+    expect(positions.getZ(0)).toBe(Math.fround(state.source.equator.center.z * inverseRadius + firstSample.z));
     expect(material.uniforms.uRingProjectiveW.value).toBe(Math.fround(frame.ringProjectiveW));
-    expect(coreScaled.toArray()).toEqual([
-      Math.fround(frame.coreView.x * frame.ringProjectiveW),
-      Math.fround(frame.coreView.y * frame.ringProjectiveW),
-      Math.fround(frame.coreView.z * frame.ringProjectiveW),
-    ]);
     const rotation = new THREE.Matrix3().setFromMatrix4(state.ring.modelViewMatrix);
-    const first = new THREE.Vector3(positions.getX(0), positions.getY(0), positions.getZ(0))
+    const scaledCore = new THREE.Vector3(
+      state.source.equator.center.x * inverseRadius,
+      state.source.equator.center.y * inverseRadius,
+      state.source.equator.center.z * inverseRadius,
+    );
+    const first = new THREE.Vector3(positions.getX(0), positions.getY(0), positions.getZ(0)).sub(scaledCore)
       .applyMatrix3(rotation).normalize();
-    const quarter = new THREE.Vector3(positions.getX(24), positions.getY(24), positions.getZ(24))
+    const quarter = new THREE.Vector3(positions.getX(24), positions.getY(24), positions.getZ(24)).sub(scaledCore)
       .applyMatrix3(rotation).normalize();
     const normal = new THREE.Vector3(frame.normalView.x, frame.normalView.y, frame.normalView.z);
     expect(Math.abs(first.dot(quarter))).toBeLessThan(1e-6);
@@ -242,7 +235,6 @@ describe('unified geocentric production rendering boundary', () => {
       const material = state.ring.material as THREE.ShaderMaterial;
       const clips = ringClipPoints(
         positions,
-        material.uniforms.uCoreViewScaled.value as THREE.Vector3,
         material.uniforms.uRingProjectiveW.value as number,
         state.ring.modelViewMatrix,
         state.camera.projectionMatrix,
@@ -296,8 +288,7 @@ describe('unified geocentric production rendering boundary', () => {
     expect(state.ring.layers.test(right.layers)).toBe(false);
     if (state.ring.layers.test(left.layers)) invoke(state.ring, left);
     const leftUpload = Array.from((state.ring.geometry.getAttribute('position') as THREE.BufferAttribute).array);
-    const leftCoreScaled = (state.ring.material as THREE.ShaderMaterial)
-      .uniforms.uCoreViewScaled.value.clone() as THREE.Vector3;
+    const leftModelView = state.ring.modelViewMatrix.clone();
     state.equator.setEyePresentationMode('right');
     state.equator.applyEyePresentationViews([{ eye: 'left' }, { eye: 'right' }], true);
     expect(state.equator.getEyePresentationDiagnostics()).toMatchObject({
@@ -307,19 +298,18 @@ describe('unified geocentric production rendering boundary', () => {
     expect(state.ring.layers.test(right.layers)).toBe(true);
     if (state.ring.layers.test(right.layers)) invoke(state.ring, right);
     const rightUpload = Array.from((state.ring.geometry.getAttribute('position') as THREE.BufferAttribute).array);
-    const rightCoreScaled = (state.ring.material as THREE.ShaderMaterial)
-      .uniforms.uCoreViewScaled.value.clone() as THREE.Vector3;
+    const rightModelView = state.ring.modelViewMatrix.clone();
     expect(rightUpload).toEqual(leftUpload);
-    expect(rightCoreScaled).not.toEqual(leftCoreScaled);
+    expect(rightModelView.equals(leftModelView)).toBe(false);
+    expect(rightModelView.elements.every(Number.isFinite)).toBe(true);
     state.equator.setEyePresentationMode('both');
     state.equator.applyEyePresentationViews(undefined, false);
     expect(state.equator.getEyePresentationDiagnostics()).toMatchObject({
       mode: 'both', context: 'desktop-mono-fallback', renderedEyes: ['none'],
     });
     invoke(state.ring, state.camera);
-    const monoCoreScaled = (state.ring.material as THREE.ShaderMaterial)
-      .uniforms.uCoreViewScaled.value.clone() as THREE.Vector3;
-    expect(monoCoreScaled).not.toEqual(rightCoreScaled);
+    const monoModelView = state.ring.modelViewMatrix.clone();
+    expect(monoModelView.equals(rightModelView)).toBe(false);
     expect(JSON.stringify(state.source.equator)).toBe(modelBefore);
     state.axis.dispose();
     state.equator.dispose();
@@ -331,13 +321,13 @@ describe('unified geocentric production rendering boundary', () => {
     const material = state.ring.material as THREE.ShaderMaterial;
     const before = Array.from(positions.array);
     const beforeW = material.uniforms.uRingProjectiveW.value;
-    const beforeCore = material.uniforms.uCoreViewScaled.value.clone() as THREE.Vector3;
+    const beforeDrawEnabled = material.uniforms.uDrawEnabled.value;
     const beforeVersion = positions.version;
     state.equator.dispose();
     invoke(state.ring, state.camera);
     expect(Array.from(positions.array)).toEqual(before);
     expect(material.uniforms.uRingProjectiveW.value).toBe(beforeW);
-    expect(material.uniforms.uCoreViewScaled.value).toEqual(beforeCore);
+    expect(material.uniforms.uDrawEnabled.value).toBe(beforeDrawEnabled);
     expect(positions.version).toBe(beforeVersion);
     expect(() => state.equator.update(state.source.equator)).toThrow('disposed');
     state.axis.dispose();

@@ -166,7 +166,10 @@ const desktopBackground = new THREE.Color(0x071014);
 const scene = createReferenceScene();
 const geographicReference = createGeographicReferenceGroup();
 const celestialAxis = createEarthAxisGroup();
-const celestialEquator = createCelestialEquatorGroup(96);
+const celestialEquator = createCelestialEquatorGroup(
+  96,
+  (event, detail) => xrDiagnostics.record(event, detail),
+);
 const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
   celestialAxis.group,
   celestialEquator.group,

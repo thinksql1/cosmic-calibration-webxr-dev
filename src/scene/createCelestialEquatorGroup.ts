@@ -13,15 +13,23 @@ import {
 
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.999;
 
+function matrixIsFinite(matrix: THREE.Matrix4): boolean {
+  for (const value of matrix.elements) {
+    if (!Number.isFinite(value)) return false;
+  }
+  return true;
+}
+
 const vertexShader = /* glsl */ `
-  uniform vec3 uCoreViewScaled;
   uniform float uRingProjectiveW;
+  uniform float uDrawEnabled;
   void main() {
-    vec3 directionView = mat3(modelViewMatrix) * position;
-    vec4 clipPosition = projectionMatrix * vec4(
-      directionView + uCoreViewScaled,
-      uRingProjectiveW
-    );
+    if (uDrawEnabled < 0.5) {
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
+    vec4 clipPosition = projectionMatrix * modelViewMatrix
+      * vec4(position, uRingProjectiveW);
     if (clipPosition.w > 0.0) {
       clipPosition.z = clipPosition.w * ${CLIP_DEPTH_WITHOUT_DEPTH_WRITE.toFixed(3)};
     }
@@ -42,8 +50,8 @@ function material(): THREE.ShaderMaterial {
     uniforms: {
       uColor: { value: new THREE.Color(0xb79cff) },
       uOpacity: { value: 0.48 },
-      uCoreViewScaled: { value: new THREE.Vector3() },
       uRingProjectiveW: { value: 1.0 },
+      uDrawEnabled: { value: 1.0 },
     },
     transparent: true,
     depthTest: false,
@@ -66,6 +74,7 @@ export interface CelestialEquatorGroupHandle {
 /** Owns one bounded homogeneous Earth-core-centred equatorial reference ring. */
 export function createCelestialEquatorGroup(
   sampleCount: number,
+  reportDiagnostic: (event: string, detail: string) => void = () => undefined,
 ): CelestialEquatorGroupHandle {
   if (!Number.isSafeInteger(sampleCount) || sampleCount < 8 || sampleCount % 2 !== 0) {
     throw new Error('Celestial-equator rendering requires an even sample count of at least eight.');
@@ -82,6 +91,15 @@ export function createCelestialEquatorGroup(
   line.renderOrder = 21;
   group.add(line);
   const eyeFilter = createEyePresentationLayerFilter(group);
+  const modelViewScratch = new THREE.Matrix4();
+
+  function report(event: string, detail: string): void {
+    try {
+      reportDiagnostic(event, detail);
+    } catch (error) {
+      console.error('Celestial-equator diagnostic reporter failed.', error);
+    }
+  }
 
   let currentModel: CelestialEquatorPresentationModel | undefined;
   let disposed = false;
@@ -113,18 +131,20 @@ export function createCelestialEquatorGroup(
     return cachedFrame;
   }
 
+  let lastSafetyState = 'valid';
   line.onBeforeRender = (_renderer, _scene, camera) => {
-    const frame = frameForCamera(camera);
-    (line.material.uniforms.uCoreViewScaled.value as THREE.Vector3).set(
-      Math.fround(frame.coreView.x * frame.ringProjectiveW),
-      Math.fround(frame.coreView.y * frame.ringProjectiveW),
-      Math.fround(frame.coreView.z * frame.ringProjectiveW),
-    );
-    line.material.uniforms.uRingProjectiveW.value = Math.fround(frame.ringProjectiveW);
-    group.userData.cameraRelativeCoreMagnitudeMeters = frame.cameraRelativeCoreMagnitudeMeters;
-    group.userData.maximumUploadedComponentMagnitude = frame.maximumUploadedComponentMagnitude;
-    group.userData.float32DirectionAngularErrorArcseconds = frame.float32DirectionAngularErrorArcseconds;
-    group.userData.maximumPlaneResidual = frame.maximumPlaneResidual;
+    modelViewScratch.multiplyMatrices(camera.matrixWorldInverse, line.matrixWorld);
+    const finite = matrixIsFinite(camera.projectionMatrix)
+      && matrixIsFinite(modelViewScratch)
+      && Number.isFinite(line.material.uniforms.uRingProjectiveW.value)
+      && Number.isFinite(line.material.uniforms.uOpacity.value);
+    line.material.uniforms.uDrawEnabled.value = finite ? 1 : 0;
+    const safetyState = finite ? 'valid' : 'suppressed-non-finite-eye-state';
+    if (safetyState !== lastSafetyState) {
+      report('celestial-equator.draw-state', safetyState);
+      lastSafetyState = safetyState;
+    }
+    group.userData.lastDrawState = safetyState;
   };
 
   return Object.freeze({
@@ -137,16 +157,53 @@ export function createCelestialEquatorGroup(
       currentModel = model;
       invalidate();
       const values = position.array as Float32Array;
+      const inverseRadius = 1 / model.displayRadiusMeters;
+      let maximumUploadedComponentMagnitude = Math.abs(inverseRadius);
+      let maximumPlaneResidual = 0;
+      let finite = Number.isFinite(inverseRadius) && inverseRadius > 0;
       model.samples.forEach((sample, index) => {
         const offset = index * 3;
-        values[offset] = sample.directionApplication.x;
-        values[offset + 1] = sample.directionApplication.y;
-        values[offset + 2] = sample.directionApplication.z;
+        const x = model.center.x * inverseRadius + sample.directionApplication.x;
+        const y = model.center.y * inverseRadius + sample.directionApplication.y;
+        const z = model.center.z * inverseRadius + sample.directionApplication.z;
+        finite = finite && [x, y, z].every(Number.isFinite);
+        maximumUploadedComponentMagnitude = Math.max(
+          maximumUploadedComponentMagnitude,
+          Math.abs(x), Math.abs(y), Math.abs(z),
+        );
+        maximumPlaneResidual = Math.max(
+          maximumPlaneResidual,
+          Math.abs(
+            sample.directionApplication.x * model.normalApplication.x
+            + sample.directionApplication.y * model.normalApplication.y
+            + sample.directionApplication.z * model.normalApplication.z
+          ),
+        );
+        values[offset] = finite ? Math.fround(x) : 0;
+        values[offset + 1] = finite ? Math.fround(y) : 0;
+        values[offset + 2] = finite ? Math.fround(z) : 0;
       });
+      const renderContractValid = finite
+        && Number.isFinite(model.lineOpacity)
+        && maximumUploadedComponentMagnitude <= 2
+        && maximumPlaneResidual <= 1e-9;
       position.needsUpdate = true;
-      line.visible = model.visible;
-      line.material.uniforms.uOpacity.value = model.lineOpacity;
-      group.visible = model.visible;
+      line.material.uniforms.uRingProjectiveW.value = renderContractValid
+        ? Math.fround(inverseRadius)
+        : 0;
+      line.material.uniforms.uDrawEnabled.value = renderContractValid ? 1 : 0;
+      line.visible = model.visible && renderContractValid;
+      line.material.uniforms.uOpacity.value = renderContractValid ? model.lineOpacity : 0;
+      group.visible = model.visible && renderContractValid;
+      group.userData.renderContractValid = renderContractValid;
+      group.userData.maximumUploadedComponentMagnitude = maximumUploadedComponentMagnitude;
+      group.userData.maximumPlaneResidual = maximumPlaneResidual;
+      group.userData.renderSuppressedReason = renderContractValid
+        ? undefined
+        : `finite=${finite};maximum=${maximumUploadedComponentMagnitude};plane=${maximumPlaneResidual}`;
+      if (!renderContractValid) {
+        report('celestial-equator.update-suppressed', group.userData.renderSuppressedReason);
+      }
       group.userData.snapshotCacheKey = model.snapshotIdentity.cacheKey;
       group.userData.acceptedCalibrationRevision = model.snapshotIdentity.acceptedCalibrationRevision;
       group.userData.renderStrategy = model.renderStrategy;
