@@ -10,6 +10,7 @@ const sources = import.meta.glob(
     '../../src/main.ts',
     '../../src/scene/createEarthAxisGroup.ts',
     '../../src/scene/earthAxisCameraRelativeFrame.ts',
+    '../../src/scene/earthAxisProjectedSegments.ts',
   ],
   {
     eager: true,
@@ -21,6 +22,7 @@ const sources = import.meta.glob(
 const mainSource = sources['../../src/main.ts'];
 const rendererSource = sources['../../src/scene/createEarthAxisGroup.ts'];
 const frameSource = sources['../../src/scene/earthAxisCameraRelativeFrame.ts'];
+const segmentSource = sources['../../src/scene/earthAxisProjectedSegments.ts'];
 
 describe('WebXR-safe geocentric depth and GPU boundary', () => {
   it('keeps the shared renderer on ordinary linear depth with a tight local far plane', () => {
@@ -29,11 +31,21 @@ describe('WebXR-safe geocentric depth and GPU boundary', () => {
     expect(mainSource).toContain('EARTH_AXIS_LINEAR_SCENE_FAR_METERS');
   });
 
-  it('uses a homogeneous direction and camera-relative core without raw finite proxies', () => {
-    expect(rendererSource).toContain('uniform vec3 uSpindleCore');
-    expect(rendererSource).toContain('uniform vec3 uDirectionView');
-    expect(rendererSource).toContain('uniform float uInverseDisplayExtent');
-    expect(rendererSource).toContain('projectionMatrix * vec4(boundedView, uInverseDisplayExtent)');
+  it('uses two independently projected homogeneous half-lines without raw finite proxies', () => {
+    expect(rendererSource).toContain('uniform vec2 uStartNdc');
+    expect(rendererSource).toContain('uniform vec2 uBoundaryNdc');
+    expect(rendererSource).toContain('mix(uStartNdc, uBoundaryNdc, position.x)');
+    expect(segmentSource).toContain('directionView.z,');
+    expect(segmentSource).toContain('0,');
+    expect(segmentSource).toContain('frame.coreView.z,');
+    expect(segmentSource).toContain('1,');
+    expect(segmentSource).toContain('NON_INDEXED_GL_TRIANGLES_OPEN_QUAD');
+    for (const cyclicPrimitive of [
+      'LineLoop', 'TriangleFan', 'TriangleStrip', 'RingGeometry', 'circle', 'angular',
+      'atan(', 'sin(', 'cos(',
+    ]) {
+      expect(segmentSource).not.toContain(cyclicPrimitive);
+    }
     expect(frameSource).toContain('frame.spindleCore.w');
     expect(frameSource).toContain('frame.northDirectionView.z');
     expect(frameSource).toContain(').applyMatrix4(projectionMatrix)');
@@ -46,12 +58,13 @@ describe('WebXR-safe geocentric depth and GPU boundary', () => {
 
   it('declares every celestial material as a non-testing, non-writing overlay', () => {
     const handle = createEarthAxisGroup(() => new THREE.Texture());
-    for (const child of handle.group.children) {
-      const material = (child as THREE.Mesh | THREE.Line).material as THREE.Material;
+    handle.group.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      const material = child.material as THREE.Material;
       expect(material.depthTest).toBe(false);
       expect(material.depthWrite).toBe(false);
       expect(material.transparent).toBe(true);
-    }
+    });
     handle.dispose();
   });
 

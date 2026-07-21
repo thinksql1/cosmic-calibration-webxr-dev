@@ -491,9 +491,17 @@ export function applyBasicDiagnosticMaterials(root: THREE.Object3D, target: XrDi
     const name = namedObject(object);
     const selected = target === 'all'
       || (target === 'core' && name === 'modeled-earth-core-marker')
-      || (target === 'axis' && name === 'mean-earth-axis-rigid-spindle')
+      || (target === 'axis' && name.startsWith('mean-earth-axis-rigid-spindle'))
       || (target === 'equator' && name === 'celestial-equator-ring');
     if (!selected) return;
+    if (name.startsWith('mean-earth-axis-rigid-spindle-')) {
+      // The open spindle quads are meaningful only through their per-eye
+      // projection shader. Replacing that shader would expose the unit-quad
+      // template as unrelated screen geometry and invalidate the preset.
+      object.userData.diagnosticBasicMaterialSkipped =
+        'projective-open-segment-requires-projection-shader';
+      return;
+    }
     const original = (object as THREE.Mesh).material as THREE.Material & { uniforms?: Record<string, THREE.IUniform> };
     let replacement: THREE.Material;
     if (object instanceof THREE.Line) replacement = new THREE.LineBasicMaterial({ color: 0xff4df0, depthTest: false });

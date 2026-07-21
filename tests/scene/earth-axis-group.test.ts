@@ -78,39 +78,58 @@ function model(overrides: Partial<EarthAxisPresentationModel> = {}): EarthAxisPr
 
 const labelFactory = () => new THREE.Texture();
 
+function spindleSegment(
+  handle: ReturnType<typeof createEarthAxisGroup>,
+  half: 'north' | 'south',
+): THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial> {
+  return handle.group.getObjectByName(
+    `mean-earth-axis-rigid-spindle-${half}-segment`,
+  ) as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+}
+
+function testRenderer(width = 1440, height = 900): THREE.WebGLRenderer {
+  return {
+    getCurrentViewport(target: THREE.Vector4) {
+      return target.set(0, 0, width, height);
+    },
+  } as unknown as THREE.WebGLRenderer;
+}
+
 describe('geocentric Earth-axis Three.js group', () => {
   it('uploads only bounded homogeneous coefficients and keeps all object translations local', () => {
     const handle = createEarthAxisGroup(labelFactory);
     handle.update(model());
     expect(handle.group.name).toBe('celestial-geocentric-earth-axis-frame');
     expect(handle.group.children).toHaveLength(6);
-    for (const child of handle.group.children) {
+    handle.group.traverse((child) => {
       expect(child.position.toArray()).toEqual([0, 0, 0]);
-      const renderable = child as THREE.Mesh | THREE.Line;
+      if (!(child instanceof THREE.Mesh)) return;
+      const renderable = child;
       const positions = renderable.geometry.getAttribute('position') as THREE.BufferAttribute;
       expect(Math.max(...Array.from(positions.array, Math.abs))).toBeLessThanOrEqual(1);
       const material = renderable.material as THREE.ShaderMaterial;
       expect(material.depthTest).toBe(false);
       expect(material.depthWrite).toBe(false);
-    }
-    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Line;
+    });
+    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Group;
+    const north = spindleSegment(handle, 'north');
+    const south = spindleSegment(handle, 'south');
     const core = handle.group.getObjectByName('modeled-earth-core-marker') as THREE.Mesh;
     expect(spindle).toBeDefined();
-    expect(handle.group.getObjectByName('mean-earth-axis-north-segment')).toBeUndefined();
-    expect(handle.group.getObjectByName('mean-earth-axis-south-segment')).toBeUndefined();
-    expect(spindle.renderOrder).toBeGreaterThan(core.renderOrder);
-    const spindleMaterial = spindle.material as THREE.ShaderMaterial;
-    expect(spindleMaterial.uniforms.uSpindleCore).toBeDefined();
-    expect(spindleMaterial.uniforms.uDirectionView).toBeDefined();
-    expect(spindleMaterial.uniforms.uInverseDisplayExtent).toBeDefined();
-    expect(spindleMaterial.uniforms.uOpacity.value).toBeCloseTo(0.72, 12);
-    expect(spindleMaterial.vertexShader).toContain('projectionMatrix');
-    expect(spindleMaterial.vertexShader).toContain('position.x * uDirectionView');
-    expect((spindle.geometry.getAttribute('position') as THREE.BufferAttribute).count).toBe(3);
-    expect(spindleMaterial.fragmentShader).not.toContain('uNorthOpacity');
-    expect(spindleMaterial.fragmentShader).not.toContain('uSouthOpacity');
-    expect(spindleMaterial.uniforms).not.toHaveProperty('uNorthOpacity');
-    expect(spindleMaterial.uniforms).not.toHaveProperty('uSouthOpacity');
+    expect(spindle.children).toEqual([north, south]);
+    for (const segment of [north, south]) {
+      expect(segment.renderOrder).toBeGreaterThan(core.renderOrder);
+      expect(segment.geometry.index).toBeNull();
+      expect(segment.geometry.getAttribute('position').count).toBe(6);
+      expect(segment.userData.primitiveTopology).toBe('NON_INDEXED_GL_TRIANGLES_OPEN_QUAD');
+      expect(segment.userData.indices).toEqual([]);
+      expect(segment.material.uniforms.uStartNdc).toBeDefined();
+      expect(segment.material.uniforms.uBoundaryNdc).toBeDefined();
+      expect(segment.material.uniforms.uPerpendicularOffsetNdc).toBeDefined();
+      expect(segment.material.uniforms.uOpacity.value).toBeCloseTo(0.72, 12);
+      expect(segment.material.vertexShader).toContain('mix(uStartNdc, uBoundaryNdc, position.x)');
+      expect(segment.material.vertexShader).not.toContain('projectionMatrix');
+    }
   });
 
   it('derives camera-relative core and exact projective antipodes for the active eye', () => {
@@ -179,16 +198,18 @@ describe('geocentric Earth-axis Three.js group', () => {
     const handle = createEarthAxisGroup(labelFactory);
     const source = model();
     handle.update(source);
-    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Line;
+    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Group;
+    const northSegment = spindleSegment(handle, 'north');
+    const southSegment = spindleSegment(handle, 'south');
     const southMarker = handle.group.getObjectByName('south-celestial-pole-marker') as THREE.Mesh;
     const geometry = southMarker.geometry;
     handle.update(model({
       south: Object.freeze({ ...source.south, segmentVisible: false, markerVisible: false, labelVisible: false }),
     }));
     expect(spindle.visible).toBe(true);
-    const spindleMaterial = spindle.material as THREE.ShaderMaterial;
-    expect(spindleMaterial.uniforms.uOpacity.value).toBe(source.north.segmentOpacity);
-    expect(spindle.geometry.drawRange).toEqual({ start: 1, count: 2 });
+    expect(northSegment.visible).toBe(true);
+    expect(southSegment.visible).toBe(false);
+    expect(northSegment.material.uniforms.uOpacity.value).toBe(source.north.segmentOpacity);
     expect(southMarker.visible).toBe(false);
     expect(southMarker.position.toArray()).toEqual([0, 0, 0]);
     expect(southMarker.geometry).toBe(geometry);
@@ -214,7 +235,7 @@ describe('geocentric Earth-axis Three.js group', () => {
   it('clears readiness without disposing reusable owned resources', () => {
     const handle = createEarthAxisGroup(labelFactory);
     handle.update(model());
-    const geometry = (handle.group.children[0] as THREE.Line).geometry;
+    const geometry = spindleSegment(handle, 'north').geometry;
     const dispose = vi.fn();
     geometry.addEventListener('dispose', dispose);
     handle.clear();
@@ -230,66 +251,112 @@ describe('geocentric Earth-axis Three.js group', () => {
     const handle = createEarthAxisGroup(labelFactory);
     const source = model();
     handle.update(source);
-    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Line;
     const core = handle.group.getObjectByName('modeled-earth-core-marker') as THREE.Mesh;
     const camera = new THREE.PerspectiveCamera(54, 16 / 9, 0.01, 100);
     camera.position.set(0.4, 1.65, 0.2);
     camera.lookAt(source.earthCore.x, source.earthCore.y, source.earthCore.z);
     camera.updateProjectionMatrix();
     camera.updateWorldMatrix(true, false);
-    const renderer = {
-      getCurrentViewport(target: THREE.Vector4) {
-        return target.set(0, 0, 1440, 900);
-      },
-    } as unknown as THREE.WebGLRenderer;
+    const renderer = testRenderer();
     core.onBeforeRender(
       renderer, new THREE.Scene(), camera, core.geometry, core.material as THREE.Material, handle.group,
     );
-    spindle.onBeforeRender(
-      renderer, new THREE.Scene(), camera, spindle.geometry, spindle.material as THREE.Material, handle.group,
-    );
-    const material = spindle.material as THREE.ShaderMaterial;
-    const spindleCore = material.uniforms.uSpindleCore.value as THREE.Vector3;
-    const direction = material.uniforms.uDirectionView.value as THREE.Vector3;
-    const inverseExtent = material.uniforms.uInverseDisplayExtent.value as number;
-    expect(material.uniforms.uOpacity.value).toBe(source.north.segmentOpacity);
-    expect(spindleCore.toArray().every(Number.isFinite)).toBe(true);
-    expect(direction.toArray().every(Number.isFinite)).toBe(true);
-    expect(direction.length()).toBeCloseTo(1, 12);
-    expect(inverseExtent).toBeGreaterThan(0);
-    expect(inverseExtent).toBeLessThan(1);
-    expect(spindle.geometry.drawRange).toEqual({ start: 0, count: 3 });
-    expect(spindle.renderOrder).toBeGreaterThan(core.renderOrder);
+    const north = spindleSegment(handle, 'north');
+    const south = spindleSegment(handle, 'south');
+    for (const segment of [north, south]) {
+      segment.onBeforeRender(
+        renderer, new THREE.Scene(), camera, segment.geometry, segment.material, handle.group,
+      );
+      expect(segment.material.uniforms.uDrawEnabled.value).toBe(1);
+      expect((segment.material.uniforms.uStartNdc.value as THREE.Vector2).toArray().every(Number.isFinite)).toBe(true);
+      expect((segment.material.uniforms.uBoundaryNdc.value as THREE.Vector2).toArray().every(Number.isFinite)).toBe(true);
+      expect((segment.material.uniforms.uPerpendicularOffsetNdc.value as THREE.Vector2).toArray().every(Number.isFinite)).toBe(true);
+      expect(segment.material.uniforms.uOpacity.value).toBe(source.north.segmentOpacity);
+      expect(segment.renderOrder).toBeGreaterThan(core.renderOrder);
+    }
   });
 
-  it('updates the one spindle independently for sequential left and right XR eye cameras', () => {
+  it('updates both open segments independently for sequential left and right XR eye cameras', () => {
     const handle = createEarthAxisGroup(labelFactory);
     handle.update(model());
     handle.applyEyePresentationViews([{ eye: 'left' }, { eye: 'right' }], true);
-    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Line;
-    const material = spindle.material as THREE.ShaderMaterial;
-    const renderer = {} as THREE.WebGLRenderer;
+    const north = spindleSegment(handle, 'north');
+    const south = spindleSegment(handle, 'south');
+    const renderer = testRenderer(1024, 1024);
     const scene = new THREE.Scene();
     const left = new THREE.PerspectiveCamera(54, 1, 0.01, 100);
     const right = new THREE.PerspectiveCamera(54, 1, 0.01, 100);
     left.position.set(-0.032, 1.65, 0.2);
     right.position.set(0.032, 1.65, 0.2);
+    const source = model();
+    left.lookAt(source.earthCore.x, source.earthCore.y, source.earthCore.z);
+    right.lookAt(source.earthCore.x, source.earthCore.y, source.earthCore.z);
+    left.updateProjectionMatrix();
+    right.updateProjectionMatrix();
     left.updateWorldMatrix(true, false);
     right.updateWorldMatrix(true, false);
 
-    spindle.onBeforeRender(renderer, scene, left, spindle.geometry, material, handle.group);
-    const leftCore = (material.uniforms.uSpindleCore.value as THREE.Vector3).clone();
-    const geometryVersion = (spindle.geometry.getAttribute('position') as THREE.BufferAttribute).version;
-    spindle.onBeforeRender(renderer, scene, right, spindle.geometry, material, handle.group);
-    const rightCore = (material.uniforms.uSpindleCore.value as THREE.Vector3).clone();
+    const versions = [north, south].map(
+      (segment) => (segment.geometry.getAttribute('position') as THREE.BufferAttribute).version,
+    );
+    const boundaries: number[][] = [];
+    for (const camera of [left, right]) {
+      for (const segment of [north, south]) {
+        expect(() => segment.onBeforeRender(
+          renderer, scene, camera, segment.geometry, segment.material, handle.group,
+        )).not.toThrow();
+      }
+      boundaries.push((north.material.uniforms.uBoundaryNdc.value as THREE.Vector2).toArray());
+    }
+    expect(boundaries[0].every(Number.isFinite)).toBe(true);
+    expect(boundaries[1].every(Number.isFinite)).toBe(true);
+    expect(boundaries[1]).not.toEqual(boundaries[0]);
+    [north, south].forEach((segment, index) => {
+      expect((segment.geometry.getAttribute('position') as THREE.BufferAttribute).version).toBe(versions[index]);
+      expect(segment.material.vertexShader).not.toContain('camera.cameras[0]');
+    });
+    handle.dispose();
+  });
 
-    expect(leftCore.toArray().every(Number.isFinite)).toBe(true);
-    expect(rightCore.toArray().every(Number.isFinite)).toBe(true);
-    expect(rightCore).not.toEqual(leftCore);
-    expect((spindle.geometry.getAttribute('position') as THREE.BufferAttribute).version)
-      .toBe(geometryVersion);
-    expect(material.vertexShader).toContain('projectionMatrix');
-    expect(material.vertexShader).not.toContain('camera.cameras[0]');
+  it('localizes an invalid projection to each spindle half and permits later eye traversal', () => {
+    const diagnostics: Array<{ event: string; detail: string }> = [];
+    const handle = createEarthAxisGroup(labelFactory, (event, detail) => {
+      diagnostics.push({ event, detail });
+    });
+    const source = model();
+    handle.update(source);
+    const north = spindleSegment(handle, 'north');
+    const south = spindleSegment(handle, 'south');
+    const renderer = testRenderer(1024, 1024);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(54, 1, 0.01, 100);
+    camera.position.set(0, 1.65, 0.2);
+    camera.lookAt(source.earthCore.x, source.earthCore.y, source.earthCore.z);
+    camera.updateWorldMatrix(true, false);
+    camera.projectionMatrix.elements[0] = Number.NaN;
+
+    for (const segment of [north, south]) {
+      expect(() => segment.onBeforeRender(
+        renderer, scene, camera, segment.geometry, segment.material, handle.group,
+      )).not.toThrow();
+      expect(segment.material.uniforms.uDrawEnabled.value).toBe(0);
+    }
+    expect(diagnostics.some(({ event }) => event === 'earth-axis.open-segments')).toBe(true);
+
+    camera.updateProjectionMatrix();
+    camera.layers.mask = 0b0101;
+    for (const segment of [north, south]) {
+      expect(() => segment.onBeforeRender(
+        renderer, scene, camera, segment.geometry, segment.material, handle.group,
+      )).not.toThrow();
+      expect(segment.material.uniforms.uDrawEnabled.value).toBe(1);
+    }
+    expect(diagnostics.some(({ detail }) => detail.includes('eye=right'))).toBe(true);
+    const rightDetail = diagnostics.find(({ detail }) => detail.includes('eye=right'))?.detail ?? '';
+    expect(rightDetail).toContain('northVertices=');
+    expect(rightDetail).toContain('southVertices=');
+    expect(rightDetail).toContain('indices=none,none');
+    expect(rightDetail).toContain('crossHalfTriangle=false');
     handle.dispose();
   });
 
@@ -297,9 +364,10 @@ describe('geocentric Earth-axis Three.js group', () => {
     const handle = createEarthAxisGroup(labelFactory);
     const initial = model();
     handle.update(initial);
-    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Mesh;
-    const geometry = spindle.geometry;
-    const material = spindle.material;
+    const spindle = handle.group.getObjectByName('mean-earth-axis-rigid-spindle') as THREE.Group;
+    const north = spindleSegment(handle, 'north');
+    const south = spindleSegment(handle, 'south');
+    const resources = [north, south].map(({ geometry, material }) => ({ geometry, material }));
 
     for (let revision = 2; revision <= 4; revision += 1) {
       handle.update(model({
@@ -341,8 +409,7 @@ describe('geocentric Earth-axis Three.js group', () => {
     expect(handle.group.children.filter(
       (child) => child.name === 'mean-earth-axis-rigid-spindle',
     )).toHaveLength(1);
-    expect(spindle.geometry).toBe(geometry);
-    expect(spindle.material).toBe(material);
+    expect([north, south].map(({ geometry, material }) => ({ geometry, material }))).toEqual(resources);
     expect(handle.group.getObjectByName('axis-core-joint')).toBeUndefined();
   });
 
@@ -353,12 +420,13 @@ describe('geocentric Earth-axis Three.js group', () => {
       textures.push(texture);
       return texture;
     });
-    const geometries = new Set(handle.group.children.map(
-      (child) => (child as THREE.Mesh | THREE.Line).geometry,
-    ));
-    const materials = new Set(handle.group.children.map(
-      (child) => (child as THREE.Mesh | THREE.Line).material as THREE.Material,
-    ));
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    handle.group.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      geometries.add(child.geometry);
+      materials.add(child.material as THREE.Material);
+    });
     const geometryDisposals = [...geometries].map((geometry) => {
       const listener = vi.fn();
       geometry.addEventListener('dispose', listener);

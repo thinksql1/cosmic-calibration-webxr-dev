@@ -165,7 +165,10 @@ const domOverlayControls: EventTarget[] = [
 const desktopBackground = new THREE.Color(0x071014);
 const scene = createReferenceScene();
 const geographicReference = createGeographicReferenceGroup();
-const celestialAxis = createEarthAxisGroup();
+const celestialAxis = createEarthAxisGroup(
+  undefined,
+  (event, detail) => xrDiagnostics.record(event, detail),
+);
 const celestialEquator = createCelestialEquatorGroup(
   96,
   (event, detail) => xrDiagnostics.record(event, detail),

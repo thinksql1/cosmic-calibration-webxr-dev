@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   BoundedDiagnosticBuffer,
+  applyBasicDiagnosticMaterials,
   diagnosticEye,
   finiteNumbers,
   parseXrDiagnosticLaunch,
@@ -10,6 +11,7 @@ import {
   XR_DIAGNOSTIC_PANEL_INTERVAL_MS,
   XR_DIAGNOSTIC_PRESETS,
 } from '../../src/diagnostics/xrPerEyeDiagnostics';
+import { createEarthAxisGroup } from '../../src/scene/createEarthAxisGroup';
 
 describe('query-gated XR per-eye diagnostics', () => {
   it('is disabled by default and restores a valid persisted preset only in diagnostic mode', () => {
@@ -56,6 +58,22 @@ describe('query-gated XR per-eye diagnostics', () => {
     expect(XR_DIAGNOSTIC_PRESETS[7].disableFrustumCulling).toBe(true);
     expect(XR_DIAGNOSTIC_PRESETS[8].disableApplicationClipping).toBe(true);
     expect(XR_DIAGNOSTIC_PRESETS[9].basicTarget).toBe('all');
+  });
+
+  it('does not bypass the per-eye projection shader for open spindle segments', () => {
+    const handle = createEarthAxisGroup(() => new THREE.Texture());
+    const segment = handle.group.getObjectByName(
+      'mean-earth-axis-rigid-spindle-north-segment',
+    ) as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+    const material = segment.material;
+    const callback = segment.onBeforeRender;
+    applyBasicDiagnosticMaterials(handle.group, 'all');
+    expect(segment.material).toBe(material);
+    expect(segment.onBeforeRender).toBe(callback);
+    expect(segment.userData.diagnosticBasicMaterialSkipped).toBe(
+      'projective-open-segment-requires-projection-shader',
+    );
+    handle.dispose();
   });
 
   it('throttles panel rendering independently of callback frequency', () => {

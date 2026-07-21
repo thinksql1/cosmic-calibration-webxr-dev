@@ -6,6 +6,13 @@ import {
   type EarthAxisCameraRelativeFrame,
 } from './earthAxisCameraRelativeFrame';
 import {
+  createEarthAxisProjectedSegments,
+  EARTH_AXIS_RIBBON_CLIP_DEPTH,
+  type EarthAxisHalf,
+  type EarthAxisProjectedSegment,
+  type EarthAxisProjectedSegments,
+} from './earthAxisProjectedSegments';
+import {
   createEyePresentationLayerFilter,
   type EyePresentationDiagnostics,
   type XrViewIdentitySource,
@@ -16,18 +23,24 @@ type PoleLabelTextureFactory = (text: 'NCP' | 'SCP', color: string) => THREE.Tex
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.999;
 const viewportScratch = new THREE.Vector4();
 
-const spindleVertexShader = /* glsl */ `
-  uniform vec3 uSpindleCore;
-  uniform vec3 uDirectionView;
-  uniform float uInverseDisplayExtent;
+const spindleSegmentVertexShader = /* glsl */ `
+  uniform vec2 uStartNdc;
+  uniform vec2 uBoundaryNdc;
+  uniform vec2 uPerpendicularOffsetNdc;
+  uniform float uDrawEnabled;
 
   void main() {
-    vec3 boundedView = uSpindleCore + position.x * uDirectionView;
-    gl_Position = projectionMatrix * vec4(boundedView, uInverseDisplayExtent);
+    if (uDrawEnabled < 0.5) {
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
+    vec2 center = mix(uStartNdc, uBoundaryNdc, position.x);
+    vec2 ndc = center + position.y * uPerpendicularOffsetNdc;
+    gl_Position = vec4(ndc, ${EARTH_AXIS_RIBBON_CLIP_DEPTH.toFixed(3)}, 1.0);
   }
 `;
 
-const spindleFragmentShader = /* glsl */ `
+const spindleSegmentFragmentShader = /* glsl */ `
   uniform float uOpacity;
   uniform vec3 uColor;
 
@@ -83,6 +96,7 @@ function overlayMaterial(parameters: {
   vertexShader: string;
   fragmentShader: string;
   uniforms: Record<string, THREE.IUniform>;
+  side?: THREE.Side;
 }): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     ...parameters,
@@ -93,33 +107,43 @@ function overlayMaterial(parameters: {
   });
 }
 
-function createSpindle(): THREE.Line<THREE.BufferGeometry, THREE.ShaderMaterial> {
+function createSpindleSegment(
+  half: EarthAxisHalf,
+): THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial> {
   const geometry = new THREE.BufferGeometry();
-  // One line strip and one material render south endpoint -> core -> north endpoint.
-  // The x components are bounded homogeneous direction coefficients, not positions.
+  // One independent, non-indexed open quad: two triangles from core to one
+  // viewport boundary. No vertex or triangle belongs to the opposite half.
   geometry.setAttribute('position', new THREE.Float32BufferAttribute([
-    -1, 0, 0,
-    0, 0, 0,
-    1, 0, 0,
+    0, -1, 0,
+    1, -1, 0,
+    0, 1, 0,
+    1, -1, 0,
+    1, 1, 0,
+    0, 1, 0,
   ], 3));
-  const spindle = new THREE.Line(
+  const segment = new THREE.Mesh(
     geometry,
     overlayMaterial({
-      vertexShader: spindleVertexShader,
-      fragmentShader: spindleFragmentShader,
+      vertexShader: spindleSegmentVertexShader,
+      fragmentShader: spindleSegmentFragmentShader,
       uniforms: {
-        uSpindleCore: { value: new THREE.Vector3() },
-        uDirectionView: { value: new THREE.Vector3(0, 0, -1) },
-        uInverseDisplayExtent: { value: 1 },
+        uStartNdc: { value: new THREE.Vector2() },
+        uBoundaryNdc: { value: new THREE.Vector2() },
+        uPerpendicularOffsetNdc: { value: new THREE.Vector2() },
+        uDrawEnabled: { value: 0 },
         uOpacity: { value: 0.72 },
         uColor: { value: new THREE.Color(0xc9e3e8) },
       },
+      side: THREE.DoubleSide,
     }),
   );
-  spindle.frustumCulled = false;
-  // The spindle draws over the core marker so the marker cannot become a hinge.
-  spindle.renderOrder = 27;
-  return spindle;
+  segment.name = `mean-earth-axis-rigid-spindle-${half}-segment`;
+  segment.frustumCulled = false;
+  segment.renderOrder = 27;
+  segment.userData.axisHalf = half;
+  segment.userData.primitiveTopology = 'NON_INDEXED_GL_TRIANGLES_OPEN_QUAD';
+  segment.userData.indices = Object.freeze([]);
+  return segment;
 }
 
 function createPoleLabelTexture(text: 'NCP' | 'SCP', color: string): THREE.Texture {
@@ -189,6 +213,74 @@ function setViewportUniforms(
   );
 }
 
+function setSegmentUniforms(
+  mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>,
+  projected: EarthAxisProjectedSegment,
+): void {
+  (mesh.material.uniforms.uStartNdc.value as THREE.Vector2).set(
+    projected.startNdc.x,
+    projected.startNdc.y,
+  );
+  (mesh.material.uniforms.uBoundaryNdc.value as THREE.Vector2).set(
+    projected.boundaryNdc.x,
+    projected.boundaryNdc.y,
+  );
+  (mesh.material.uniforms.uPerpendicularOffsetNdc.value as THREE.Vector2).set(
+    projected.perpendicularOffsetNdc.x,
+    projected.perpendicularOffsetNdc.y,
+  );
+  mesh.material.uniforms.uDrawEnabled.value = projected.visible ? 1 : 0;
+}
+
+function diagnosticEye(camera: THREE.Camera): string {
+  const mask = camera.layers.mask >>> 0;
+  const left = (mask & (1 << 1)) !== 0;
+  const right = (mask & (1 << 2)) !== 0;
+  if (left && !right) return 'left';
+  if (right && !left) return 'right';
+  return 'mono-or-unknown';
+}
+
+function point(value: Readonly<{ x: number; y: number }>): string {
+  return `${value.x.toFixed(6)},${value.y.toFixed(6)}`;
+}
+
+function clipVector(value: Readonly<{ x: number; y: number; z: number; w: number }>): string {
+  return `${value.x.toFixed(6)},${value.y.toFixed(6)},${value.z.toFixed(6)},${value.w.toFixed(6)}`;
+}
+
+function vertices(value: EarthAxisProjectedSegment): string {
+  return value.ribbonVerticesClip
+    .map(({ x, y, z, w }) => `${x.toFixed(6)},${y.toFixed(6)},${z.toFixed(3)},${w}`)
+    .join(';');
+}
+
+function projectionDiagnostic(
+  eye: string,
+  projected: EarthAxisProjectedSegments,
+): string {
+  const { north, south } = projected;
+  return [
+    `eye=${eye}`,
+    `core=${point(projected.coreNdc)}`,
+    `northDirection=${point(north.directionNdc)}`,
+    `southDirection=${point(south.directionNdc)}`,
+    `northDirectionClip=${clipVector(north.projectiveDirectionClip)}`,
+    `southDirectionClip=${clipVector(south.projectiveDirectionClip)}`,
+    `northBoundary=${point(north.boundaryNdc)}`,
+    `southBoundary=${point(south.boundaryNdc)}`,
+    `lengths=${north.lengthNdc.toFixed(6)},${south.lengthNdc.toFixed(6)}`,
+    `northPerpendicular=${point(north.perpendicularOffsetNdc)}`,
+    `southPerpendicular=${point(south.perpendicularOffsetNdc)}`,
+    `northVertices=${vertices(north)}`,
+    `southVertices=${vertices(south)}`,
+    'indices=none,none',
+    `oppositeDot=${projected.oppositeDirectionDot.toFixed(9)}`,
+    `crossHalfTriangle=${projected.anyTriangleSpansBothHalves}`,
+    `reasons=${north.reason},${south.reason}`,
+  ].join('|');
+}
+
 export interface EarthAxisGroupHandle {
   readonly group: THREE.Group;
   update(model: EarthAxisPresentationModel): void;
@@ -208,13 +300,17 @@ export interface EarthAxisGroupHandle {
  */
 export function createEarthAxisGroup(
   labelTextureFactory: PoleLabelTextureFactory = createPoleLabelTexture,
+  reportDiagnostic: (event: string, detail: string) => void = () => undefined,
 ): EarthAxisGroupHandle {
   const group = new THREE.Group();
   group.name = 'celestial-geocentric-earth-axis-frame';
   group.visible = false;
 
-  const spindle = createSpindle();
+  const spindle = new THREE.Group();
   spindle.name = 'mean-earth-axis-rigid-spindle';
+  const northSpindleSegment = createSpindleSegment('north');
+  const southSpindleSegment = createSpindleSegment('south');
+  spindle.add(northSpindleSegment, southSpindleSegment);
 
   const earthCore = createProjectiveQuad({ color: 0xeafcff, projective: false, renderOrder: 25 });
   earthCore.name = 'modeled-earth-core-marker';
@@ -241,7 +337,8 @@ export function createEarthAxisGroup(
   const eyeFilter = createEyePresentationLayerFilter(group);
 
   const ownedObjects = [
-    spindle,
+    northSpindleSegment,
+    southSpindleSegment,
     earthCore,
     northMarker,
     southMarker,
@@ -254,6 +351,15 @@ export function createEarthAxisGroup(
   let cachedCamera: THREE.Camera | undefined;
   const cachedCameraWorld = new THREE.Matrix4();
   const cachedGroupWorld = new THREE.Matrix4();
+  const lastProjectionDiagnostics = new Map<string, string>();
+
+  function report(event: string, detail: string): void {
+    try {
+      reportDiagnostic(event, detail);
+    } catch {
+      // Diagnostic transport must never abort XR rendering.
+    }
+  }
 
   function requireModel(): EarthAxisPresentationModel {
     if (!currentModel) throw new Error('Earth-axis render frame is not scientifically ready.');
@@ -287,17 +393,42 @@ export function createEarthAxisGroup(
     cachedCamera = undefined;
   }
 
-  spindle.onBeforeRender = (_renderer, _scene, camera) => {
-    const frame = frameForCamera(camera);
-    setVectorUniform(spindle.material.uniforms.uSpindleCore, frame.spindleCore);
-    setVectorUniform(spindle.material.uniforms.uDirectionView, frame.northDirectionView);
-    spindle.material.uniforms.uInverseDisplayExtent.value = frame.spindleCore.w;
-    group.userData.axisDirectionView = Object.freeze({
-      x: frame.northDirectionView.x,
-      y: frame.northDirectionView.y,
-      z: frame.northDirectionView.z,
-    });
+  const bindSpindleSegment = (
+    mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>,
+    half: EarthAxisHalf,
+  ) => {
+    mesh.onBeforeRender = (renderer, _scene, camera) => {
+      const eye = diagnosticEye(camera);
+      try {
+        const viewport = renderer.getCurrentViewport(viewportScratch);
+        const frame = frameForCamera(camera);
+        const projected = createEarthAxisProjectedSegments(
+          frame,
+          camera.projectionMatrix,
+          { x: Math.max(1, viewport.z), y: Math.max(1, viewport.w) },
+        );
+        setSegmentUniforms(mesh, projected[half]);
+        group.userData.axisDirectionView = Object.freeze({
+          x: frame.northDirectionView.x,
+          y: frame.northDirectionView.y,
+          z: frame.northDirectionView.z,
+        });
+        group.userData.lastProjectedSegments = projected;
+        const detail = projectionDiagnostic(eye, projected);
+        if (lastProjectionDiagnostics.get(eye) !== detail) {
+          lastProjectionDiagnostics.set(eye, detail);
+          report('earth-axis.open-segments', detail);
+        }
+      } catch (error) {
+        mesh.material.uniforms.uDrawEnabled.value = 0;
+        const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        report('earth-axis.segment-suppressed', `eye=${eye}|half=${half}|error=${message}`);
+      }
+    };
   };
+
+  bindSpindleSegment(northSpindleSegment, 'north');
+  bindSpindleSegment(southSpindleSegment, 'south');
 
   const bindQuad = (
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>,
@@ -328,16 +459,10 @@ export function createEarthAxisGroup(
       currentModel = model;
       invalidateFrameCache();
       spindle.visible = model.north.segmentVisible || model.south.segmentVisible;
-      if (model.north.segmentVisible && model.south.segmentVisible) {
-        spindle.geometry.setDrawRange(0, 3);
-      } else if (model.south.segmentVisible) {
-        spindle.geometry.setDrawRange(0, 2);
-      } else if (model.north.segmentVisible) {
-        spindle.geometry.setDrawRange(1, 2);
-      } else {
-        spindle.geometry.setDrawRange(0, 0);
-      }
-      spindle.material.uniforms.uOpacity.value = model.north.segmentOpacity;
+      northSpindleSegment.visible = model.north.segmentVisible;
+      southSpindleSegment.visible = model.south.segmentVisible;
+      northSpindleSegment.material.uniforms.uOpacity.value = model.north.segmentOpacity;
+      southSpindleSegment.material.uniforms.uOpacity.value = model.south.segmentOpacity;
 
       earthCore.visible = model.earthCoreVisible;
       northMarker.visible = model.north.markerVisible;
@@ -402,6 +527,7 @@ export function createEarthAxisGroup(
     clear(): void {
       currentModel = undefined;
       invalidateFrameCache();
+      lastProjectionDiagnostics.clear();
       group.visible = false;
       group.userData.snapshotCacheKey = undefined;
       group.userData.acceptedCalibrationRevision = undefined;
@@ -422,6 +548,7 @@ export function createEarthAxisGroup(
       disposed = true;
       currentModel = undefined;
       invalidateFrameCache();
+      lastProjectionDiagnostics.clear();
       eyeFilter.dispose();
       group.visible = false;
       group.removeFromParent();
