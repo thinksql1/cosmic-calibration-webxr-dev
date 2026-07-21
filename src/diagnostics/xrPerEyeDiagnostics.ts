@@ -1,8 +1,14 @@
 import * as THREE from 'three';
+import {
+  parseXrObjectIsolation,
+  XR_OBJECT_ISOLATION_STATES,
+  type XrObjectIsolationState,
+} from './xrObjectIsolation';
 
 export const XR_DIAGNOSTIC_BUFFER_CAPACITY = 128;
 export const XR_DIAGNOSTIC_PANEL_INTERVAL_MS = 500;
 const PRESET_STORAGE_KEY = 'cosmic-calibration-xr-diagnostic-preset';
+const ISOLATION_STORAGE_KEY = 'cosmic-calibration-xr-object-isolation';
 
 export type XrDiagnosticPresetId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
@@ -48,11 +54,13 @@ export const XR_DIAGNOSTIC_PRESETS: readonly XrDiagnosticPreset[] = Object.freez
 export interface XrDiagnosticLaunch {
   readonly enabled: boolean;
   readonly preset: XrDiagnosticPreset;
+  readonly isolation: XrObjectIsolationState;
 }
 
 export function parseXrDiagnosticLaunch(
   search: string,
   storedPreset?: string | null,
+  storedIsolation?: string | null,
 ): XrDiagnosticLaunch {
   const params = new URLSearchParams(search);
   const enabled = params.get('diag') === '1';
@@ -60,7 +68,11 @@ export function parseXrDiagnosticLaunch(
   const numeric = Number(raw);
   const preset = XR_DIAGNOSTIC_PRESETS.find((candidate) => candidate.id === numeric)
     ?? XR_DIAGNOSTIC_PRESETS[0];
-  return Object.freeze({ enabled, preset });
+  return Object.freeze({
+    enabled,
+    preset,
+    isolation: parseXrObjectIsolation(search, storedIsolation),
+  });
 }
 
 export class BoundedDiagnosticBuffer {
@@ -122,17 +134,54 @@ export class PerEyeDiagnosticCounters {
   }
 }
 
+export class PerEyeDiagnosticDrawNames {
+  private readonly current = {
+    left: new Set<string>(),
+    right: new Set<string>(),
+    mono: new Set<string>(),
+    unknown: new Set<string>(),
+  };
+  private readonly latest = {
+    left: Object.freeze([]) as readonly string[],
+    right: Object.freeze([]) as readonly string[],
+    mono: Object.freeze([]) as readonly string[],
+    unknown: Object.freeze([]) as readonly string[],
+  };
+
+  beginFrame(): void {
+    Object.values(this.current).forEach((names) => names.clear());
+  }
+
+  record(eye: ReturnType<typeof diagnosticEye>, objectName: string): void {
+    this.current[eye].add(objectName);
+  }
+
+  completeFrame(): void {
+    (Object.keys(this.current) as Array<keyof typeof this.current>).forEach((eye) => {
+      this.latest[eye] = Object.freeze([...this.current[eye]].sort());
+    });
+  }
+
+  names(eye: keyof typeof this.latest): readonly string[] {
+    return this.latest[eye];
+  }
+}
+
 export function shouldFlushDiagnosticPanel(dirty: boolean, lastFlush: number, now: number): boolean {
   return dirty && now - lastFlush >= XR_DIAGNOSTIC_PANEL_INTERVAL_MS;
 }
 
 interface DiagnosticPanelFields {
   readonly preset: HTMLElement;
+  readonly isolation: HTMLElement;
   readonly calibration: HTMLElement;
   readonly leftCount: HTMLElement;
   readonly rightCount: HTMLElement;
   readonly leftObject: HTMLElement;
   readonly rightObject: HTMLElement;
+  readonly leftDraws: HTMLElement;
+  readonly rightDraws: HTMLElement;
+  readonly monoDraws: HTMLElement;
   readonly error: HTMLElement;
   readonly log: HTMLElement;
 }
@@ -151,6 +200,7 @@ export interface DiagnosticSnapshotTargets {
 export interface XrPerEyeDiagnostics {
   readonly enabled: boolean;
   readonly preset: XrDiagnosticPreset;
+  readonly isolation: XrObjectIsolationState;
   readonly buffer: BoundedDiagnosticBuffer;
   readonly leftCount: number;
   readonly rightCount: number;
@@ -205,7 +255,11 @@ function finiteObjectState(object: THREE.Object3D, camera: THREE.Camera): string
   ].join(',');
 }
 
-function createPanel(preset: XrDiagnosticPreset, onClear: () => void): {
+function createPanel(
+  preset: XrDiagnosticPreset,
+  isolation: XrObjectIsolationState,
+  onClear: () => void,
+): {
   readonly root: HTMLElement;
   readonly fields: DiagnosticPanelFields;
 } {
@@ -232,6 +286,22 @@ function createPanel(preset: XrDiagnosticPreset, onClear: () => void): {
     url.searchParams.set('preset', presetSelect.value);
     window.location.assign(url);
   });
+  const isolationSelect = document.createElement('select');
+  isolationSelect.setAttribute('aria-label', 'Object isolation');
+  for (const candidate of XR_OBJECT_ISOLATION_STATES) {
+    const option = document.createElement('option');
+    option.value = candidate.id;
+    option.textContent = `${candidate.id} — ${candidate.name}`;
+    option.selected = candidate.id === isolation.id;
+    isolationSelect.append(option);
+  }
+  isolationSelect.addEventListener('change', () => {
+    localStorage.setItem(ISOLATION_STORAGE_KEY, isolationSelect.value);
+    const url = new URL(window.location.href);
+    url.searchParams.set('diag', '1');
+    url.searchParams.set('isolate', isolationSelect.value);
+    window.location.assign(url);
+  });
   const controls = document.createElement('div');
   const copy = document.createElement('button');
   copy.textContent = 'Copy diagnostics';
@@ -248,16 +318,20 @@ function createPanel(preset: XrDiagnosticPreset, onClear: () => void): {
     fields[key] = value;
   };
   add('preset', 'Current preset');
+  add('isolation', 'Object isolation');
   add('calibration', 'Calibration state');
   add('leftCount', 'Left callbacks');
   add('rightCount', 'Right callbacks');
   add('leftObject', 'Last left object');
   add('rightObject', 'Last right object');
+  add('leftDraws', 'Left draw objects');
+  add('rightDraws', 'Right draw objects');
+  add('monoDraws', 'Mono draw objects');
   add('error', 'Latest error');
   const log = document.createElement('pre');
   log.style.cssText = 'white-space:pre-wrap;margin:6px 0 0';
   fields.log = log;
-  details.append(summary, presetSelect, controls, grid, log);
+  details.append(summary, presetSelect, isolationSelect, controls, grid, log);
   root.append(details);
   document.body.append(root);
   clear.addEventListener('click', onClear);
@@ -266,12 +340,16 @@ function createPanel(preset: XrDiagnosticPreset, onClear: () => void): {
 }
 
 export function createXrPerEyeDiagnostics(
-  launch = parseXrDiagnosticLaunch(window.location.search, localStorage.getItem(PRESET_STORAGE_KEY)),
+  launch = parseXrDiagnosticLaunch(
+    window.location.search,
+    localStorage.getItem(PRESET_STORAGE_KEY),
+    localStorage.getItem(ISOLATION_STORAGE_KEY),
+  ),
 ): XrPerEyeDiagnostics {
   const buffer = new BoundedDiagnosticBuffer();
   if (!launch.enabled) {
     const disabled: XrPerEyeDiagnostics = {
-      enabled: false, preset: launch.preset, buffer,
+      enabled: false, preset: launch.preset, isolation: launch.isolation, buffer,
       get leftCount() { return 0; }, get rightCount() { return 0; }, get panelFlushCount() { return 0; },
       installGlobalCapture() {}, instrument() {}, record() {}, frameEntry() {}, frameCompletion() {},
       operation() {}, setCalibrationState() {}, snapshot() {}, flushPanel() {}, dispose() {},
@@ -281,6 +359,7 @@ export function createXrPerEyeDiagnostics(
 
   let calibrationState = 'unknown';
   const counters = new PerEyeDiagnosticCounters();
+  const drawNames = new PerEyeDiagnosticDrawNames();
   let lastLeft = 'none';
   let lastRight = 'none';
   let latestError = 'none';
@@ -292,6 +371,7 @@ export function createXrPerEyeDiagnostics(
   let lastFrameCompleted = true;
   let currentOperation = 'none';
   const signatures = new Map<string, string>();
+  const instrumentedObjects = new WeakSet<THREE.Object3D>();
   const restorers: Array<() => void> = [];
   let panel: ReturnType<typeof createPanel>;
 
@@ -305,11 +385,12 @@ export function createXrPerEyeDiagnostics(
     latestError = 'none';
     dirty = true;
   };
-  panel = createPanel(launch.preset, clear);
+  panel = createPanel(launch.preset, launch.isolation, clear);
 
   const api: XrPerEyeDiagnostics = {
     enabled: true,
     preset: launch.preset,
+    isolation: launch.isolation,
     buffer,
     get leftCount() { return counters.left; },
     get rightCount() { return counters.right; },
@@ -351,14 +432,19 @@ export function createXrPerEyeDiagnostics(
       record('capture.installed', `shaderChecks=${renderer.debug.checkShaderErrors}`);
     },
     instrument(root): void {
+      let installed = 0;
       root.traverse((object) => {
         if (!(object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points || object instanceof THREE.Sprite)) return;
+        if (instrumentedObjects.has(object)) return;
+        instrumentedObjects.add(object);
+        installed += 1;
         const originalBefore = object.onBeforeRender;
         const originalAfter = object.onAfterRender;
         const name = namedObject(object);
         object.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
           const eye = diagnosticEye(camera);
           counters.increment(eye);
+          drawNames.record(eye, name);
           if (eye === 'left') lastLeft = `${name}:entry`;
           if (eye === 'right') lastRight = `${name}:entry`;
           const signature = finiteObjectState(object, camera);
@@ -395,11 +481,12 @@ export function createXrPerEyeDiagnostics(
         };
         restorers.push(() => { object.onBeforeRender = originalBefore; object.onAfterRender = originalAfter; });
       });
-      record('render.trace.installed', `objects=${signatures.size}`);
+      if (installed > 0) record('render.trace.installed', `objects=${installed}`);
     },
     record,
     frameEntry(): void {
       frameOpen = true;
+      drawNames.beginFrame();
       currentOperation = 'frame-entry';
     },
     operation(name): void {
@@ -409,6 +496,7 @@ export function createXrPerEyeDiagnostics(
       if (frameOpen && !completed && lastFrameCompleted) record('frame.incomplete', `operation=${currentOperation}`);
       if (frameOpen && completed && !lastFrameCompleted) record('frame.recovered');
       lastFrameCompleted = completed;
+      drawNames.completeFrame();
       frameOpen = false;
       dirty = true;
     },
@@ -466,11 +554,15 @@ export function createXrPerEyeDiagnostics(
     flushPanel(now = performance.now()): void {
       if (!shouldFlushDiagnosticPanel(dirty, lastFlush, now)) return;
       panel.fields.preset.textContent = `${launch.preset.id} — ${launch.preset.name}`;
+      panel.fields.isolation.textContent = `${launch.isolation.id} — ${launch.isolation.name}`;
       panel.fields.calibration.textContent = calibrationState;
       panel.fields.leftCount.textContent = String(counters.left);
       panel.fields.rightCount.textContent = String(counters.right);
       panel.fields.leftObject.textContent = lastLeft;
       panel.fields.rightObject.textContent = lastRight;
+      panel.fields.leftDraws.textContent = drawNames.names('left').join(', ') || 'none';
+      panel.fields.rightDraws.textContent = drawNames.names('right').join(', ') || 'none';
+      panel.fields.monoDraws.textContent = drawNames.names('mono').join(', ') || 'none';
       panel.fields.error.textContent = latestError;
       panel.fields.log.textContent = buffer.values().join('\n');
       lastFlush = now;

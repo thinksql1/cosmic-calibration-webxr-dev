@@ -67,6 +67,7 @@ import {
   createSimpleUnifiedRootDiagnostic,
   createXrPerEyeDiagnostics,
 } from './diagnostics/xrPerEyeDiagnostics';
+import { applyXrObjectIsolation } from './diagnostics/xrObjectIsolation';
 import { NorthCalibrationControllerManager } from './xr/controllerCalibration';
 import {
   checkingState,
@@ -226,7 +227,24 @@ if (xrDiagnostics.enabled && diagnosticPreset.disableApplicationClipping) {
   renderer.localClippingEnabled = false;
 }
 xrDiagnostics.installGlobalCapture(renderer);
-xrDiagnostics.instrument(geographicReference);
+xrDiagnostics.instrument(scene);
+
+let diagnosticIsolationSignature = '';
+function applyDiagnosticObjectIsolation(): void {
+  if (!xrDiagnostics.enabled) return;
+  // Controller feedback objects are added only after XR session activation;
+  // instrumentation is idempotent and picks up those late candidates.
+  xrDiagnostics.instrument(scene);
+  const result = applyXrObjectIsolation(scene, xrDiagnostics.isolation);
+  const signature = `${result.stateId}|${result.matchedObjectNames.join(',')}`;
+  if (signature === diagnosticIsolationSignature) return;
+  diagnosticIsolationSignature = signature;
+  xrDiagnostics.record('object-isolation.state', [
+    `id=${result.stateId}`,
+    `requested=${result.requestedObjectNames.join(',') || 'preset-behavior'}`,
+    `matched=${result.matchedObjectNames.join(',') || 'none'}`,
+  ].join('|'));
+}
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0.45, 0);
@@ -796,6 +814,8 @@ renderer.setAnimationLoop((_time, frame) => {
     applyEyePresentationForFrame(frame);
     xrDiagnostics.operation('desktop-controls');
     if (!renderer.xr.isPresenting) controls.update();
+    xrDiagnostics.operation('object-isolation');
+    applyDiagnosticObjectIsolation();
     xrDiagnostics.operation('renderer.render');
     renderer.render(scene, camera);
     xrDiagnostics.operation('frame-complete');

@@ -6,6 +6,7 @@ import {
   diagnosticEye,
   finiteNumbers,
   parseXrDiagnosticLaunch,
+  PerEyeDiagnosticDrawNames,
   PerEyeDiagnosticCounters,
   shouldFlushDiagnosticPanel,
   XR_DIAGNOSTIC_PANEL_INTERVAL_MS,
@@ -15,10 +16,28 @@ import { createEarthAxisGroup } from '../../src/scene/createEarthAxisGroup';
 
 describe('query-gated XR per-eye diagnostics', () => {
   it('is disabled by default and restores a valid persisted preset only in diagnostic mode', () => {
-    expect(parseXrDiagnosticLaunch('')).toMatchObject({ enabled: false, preset: { id: 0 } });
-    expect(parseXrDiagnosticLaunch('?diag=1', '6')).toMatchObject({ enabled: true, preset: { id: 6 } });
+    expect(parseXrDiagnosticLaunch('')).toMatchObject({ enabled: false, preset: { id: 0 }, isolation: { id: 'all' } });
+    expect(parseXrDiagnosticLaunch('?diag=1', '6', 'north-spindle')).toMatchObject({ enabled: true, preset: { id: 6 }, isolation: { id: 'north-spindle' } });
     expect(parseXrDiagnosticLaunch('?diag=1&preset=9', '2')).toMatchObject({ enabled: true, preset: { id: 9 } });
     expect(parseXrDiagnosticLaunch('?diag=1&preset=invalid')).toMatchObject({ preset: { id: 0 } });
+  });
+
+  it('reports an exact bounded set of submitted object names for each eye', () => {
+    const draws = new PerEyeDiagnosticDrawNames();
+    draws.beginFrame();
+    draws.record('left', 'north-spindle');
+    draws.record('left', 'north-spindle');
+    draws.record('right', 'south-spindle');
+    draws.record('right', 'earth-core');
+    draws.completeFrame();
+    expect(draws.names('left')).toEqual(['north-spindle']);
+    expect(draws.names('right')).toEqual(['earth-core', 'south-spindle']);
+    draws.beginFrame();
+    draws.record('mono', 'floor-horizon-ring');
+    draws.completeFrame();
+    expect(draws.names('left')).toEqual([]);
+    expect(draws.names('right')).toEqual([]);
+    expect(draws.names('mono')).toEqual(['floor-horizon-ring']);
   });
 
   it('keeps a bounded chronological ring without per-frame growth', () => {
