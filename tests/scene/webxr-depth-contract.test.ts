@@ -29,11 +29,13 @@ describe('WebXR-safe geocentric depth and GPU boundary', () => {
     expect(mainSource).toContain('EARTH_AXIS_LINEAR_SCENE_FAR_METERS');
   });
 
-  it('uses a homogeneous direction and camera-relative core without raw finite proxies', () => {
-    expect(rendererSource).toContain('uniform vec3 uSpindleCore');
-    expect(rendererSource).toContain('uniform vec3 uDirectionView');
-    expect(rendererSource).toContain('uniform float uInverseDisplayExtent');
-    expect(rendererSource).toContain('projectionMatrix * vec4(boundedView, uInverseDisplayExtent)');
+  it('uses a bounded per-eye projective ribbon without raw finite proxies', () => {
+    expect(rendererSource).toContain('new THREE.Mesh');
+    expect(rendererSource).toContain('uniform vec2 uCoreNdc');
+    expect(rendererSource).toContain('uniform vec2 uNorthLineDirectionNdc');
+    expect(rendererSource).toContain('uniform float uHalfWidthPixels');
+    expect(rendererSource).toContain('projectEarthAxisCenterline');
+    expect(rendererSource).toContain('CLIP_DEPTH_WITHOUT_DEPTH_WRITE');
     expect(frameSource).toContain('frame.spindleCore.w');
     expect(frameSource).toContain('frame.northDirectionView.z');
     expect(frameSource).toContain(').applyMatrix4(projectionMatrix)');

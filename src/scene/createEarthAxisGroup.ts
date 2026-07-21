@@ -3,6 +3,7 @@ import type { EarthAxisPresentationModel } from '../presentation/earthAxisPresen
 import type { EyePresentationMode } from '../presentation/eyePresentationMode';
 import {
   createEarthAxisCameraRelativeFrame,
+  projectEarthAxisCenterline,
   type EarthAxisCameraRelativeFrame,
 } from './earthAxisCameraRelativeFrame';
 import {
@@ -15,23 +16,44 @@ type PoleLabelTextureFactory = (text: 'NCP' | 'SCP', color: string) => THREE.Tex
 
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.999;
 const viewportScratch = new THREE.Vector4();
+const SPINDLE_HALF_WIDTH_PIXELS = 1.5;
+const SPINDLE_NDC_HALF_LENGTH = 2.5;
 
 const spindleVertexShader = /* glsl */ `
-  uniform vec3 uSpindleCore;
-  uniform vec3 uDirectionView;
-  uniform float uInverseDisplayExtent;
+  uniform vec2 uCoreNdc;
+  uniform vec2 uNorthLineDirectionNdc;
+  uniform vec2 uViewportPixels;
+  uniform float uHalfWidthPixels;
+  uniform float uDrawEnabled;
+  varying float vAxisCoordinate;
 
   void main() {
-    vec3 boundedView = uSpindleCore + position.x * uDirectionView;
-    gl_Position = projectionMatrix * vec4(boundedView, uInverseDisplayExtent);
+    if (uDrawEnabled < 0.5) {
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
+    vec2 lineNormalNdc = vec2(-uNorthLineDirectionNdc.y, uNorthLineDirectionNdc.x);
+    vec2 ndc = uCoreNdc
+      + position.x * ${SPINDLE_NDC_HALF_LENGTH.toFixed(1)} * uNorthLineDirectionNdc
+      + position.y * lineNormalNdc * (2.0 * uHalfWidthPixels / uViewportPixels);
+    // This is a non-writing overlay: use the same far-plane depth contract as
+    // markers and the equator, rather than clipping the geocentric axis at the
+    // XR camera's finite 100 m far plane.
+    gl_Position = vec4(ndc, ${CLIP_DEPTH_WITHOUT_DEPTH_WRITE.toFixed(3)}, 1.0);
+    vAxisCoordinate = position.x;
   }
 `;
 
 const spindleFragmentShader = /* glsl */ `
   uniform float uOpacity;
   uniform vec3 uColor;
+  uniform float uShowNorth;
+  uniform float uShowSouth;
+  varying float vAxisCoordinate;
 
   void main() {
+    if ((vAxisCoordinate < 0.0 && uShowSouth < 0.5) ||
+        (vAxisCoordinate > 0.0 && uShowNorth < 0.5)) discard;
     gl_FragColor = vec4(uColor, uOpacity);
   }
 `;
@@ -83,6 +105,7 @@ function overlayMaterial(parameters: {
   vertexShader: string;
   fragmentShader: string;
   uniforms: Record<string, THREE.IUniform>;
+  side?: THREE.Side;
 }): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     ...parameters,
@@ -93,27 +116,41 @@ function overlayMaterial(parameters: {
   });
 }
 
-function createSpindle(): THREE.Line<THREE.BufferGeometry, THREE.ShaderMaterial> {
+function createSpindle(): THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial> {
   const geometry = new THREE.BufferGeometry();
-  // One line strip and one material render south endpoint -> core -> north endpoint.
-  // The x components are bounded homogeneous direction coefficients, not positions.
+  // Two adjacent triangles form one continuous south -> core -> north ribbon.
+  // x is signed NDC distance from the projected core and y is ribbon side.
   geometry.setAttribute('position', new THREE.Float32BufferAttribute([
-    -1, 0, 0,
-    0, 0, 0,
-    1, 0, 0,
+    -1, -1, 0,
+    0, -1, 0,
+    -1, 1, 0,
+    0, -1, 0,
+    0, 1, 0,
+    -1, 1, 0,
+    0, -1, 0,
+    1, -1, 0,
+    0, 1, 0,
+    1, -1, 0,
+    1, 1, 0,
+    0, 1, 0,
   ], 3));
-  const spindle = new THREE.Line(
+  const spindle = new THREE.Mesh(
     geometry,
     overlayMaterial({
       vertexShader: spindleVertexShader,
       fragmentShader: spindleFragmentShader,
       uniforms: {
-        uSpindleCore: { value: new THREE.Vector3() },
-        uDirectionView: { value: new THREE.Vector3(0, 0, -1) },
-        uInverseDisplayExtent: { value: 1 },
+        uCoreNdc: { value: new THREE.Vector2() },
+        uNorthLineDirectionNdc: { value: new THREE.Vector2(0, 1) },
+        uViewportPixels: { value: new THREE.Vector2(1, 1) },
+        uHalfWidthPixels: { value: SPINDLE_HALF_WIDTH_PIXELS },
+        uDrawEnabled: { value: 0 },
+        uShowNorth: { value: 1 },
+        uShowSouth: { value: 1 },
         uOpacity: { value: 0.72 },
         uColor: { value: new THREE.Color(0xc9e3e8) },
       },
+      side: THREE.DoubleSide,
     }),
   );
   spindle.frustumCulled = false;
@@ -187,6 +224,40 @@ function setViewportUniforms(
     Math.max(1, viewport.z),
     Math.max(1, viewport.w),
   );
+}
+
+function setSpindleRibbonFrame(
+  spindle: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>,
+  frame: EarthAxisCameraRelativeFrame,
+  camera: THREE.Camera,
+  renderer: THREE.WebGLRenderer,
+): void {
+  const projected = projectEarthAxisCenterline(frame, camera.projectionMatrix);
+  const core = projected.coreImage;
+  const north = projected.northDirectionImage;
+  const coreNdc = new THREE.Vector2(core.x / core.z, core.y / core.z);
+  const northNdc = Math.abs(north.z) > 1e-12
+    ? new THREE.Vector2(north.x / north.z, north.y / north.z)
+    : new THREE.Vector2(north.x, north.y);
+  const northDirection = northNdc.sub(coreNdc);
+  const finite = [
+    coreNdc.x,
+    coreNdc.y,
+    northDirection.x,
+    northDirection.y,
+  ].every(Number.isFinite);
+  const directionLength = northDirection.length();
+  const drawEnabled = projected.visibleInViewport
+    && !projected.endOnDegenerate
+    && finite
+    && directionLength > 1e-9;
+  if (drawEnabled) northDirection.multiplyScalar(1 / directionLength);
+  (spindle.material.uniforms.uCoreNdc.value as THREE.Vector2).copy(coreNdc);
+  (spindle.material.uniforms.uNorthLineDirectionNdc.value as THREE.Vector2).copy(
+    drawEnabled ? northDirection : new THREE.Vector2(0, 1),
+  );
+  spindle.material.uniforms.uDrawEnabled.value = drawEnabled ? 1 : 0;
+  setViewportUniforms(renderer, spindle.material);
 }
 
 export interface EarthAxisGroupHandle {
@@ -287,11 +358,9 @@ export function createEarthAxisGroup(
     cachedCamera = undefined;
   }
 
-  spindle.onBeforeRender = (_renderer, _scene, camera) => {
+  spindle.onBeforeRender = (renderer, _scene, camera) => {
     const frame = frameForCamera(camera);
-    setVectorUniform(spindle.material.uniforms.uSpindleCore, frame.spindleCore);
-    setVectorUniform(spindle.material.uniforms.uDirectionView, frame.northDirectionView);
-    spindle.material.uniforms.uInverseDisplayExtent.value = frame.spindleCore.w;
+    setSpindleRibbonFrame(spindle, frame, camera, renderer);
     group.userData.axisDirectionView = Object.freeze({
       x: frame.northDirectionView.x,
       y: frame.northDirectionView.y,
@@ -328,15 +397,8 @@ export function createEarthAxisGroup(
       currentModel = model;
       invalidateFrameCache();
       spindle.visible = model.north.segmentVisible || model.south.segmentVisible;
-      if (model.north.segmentVisible && model.south.segmentVisible) {
-        spindle.geometry.setDrawRange(0, 3);
-      } else if (model.south.segmentVisible) {
-        spindle.geometry.setDrawRange(0, 2);
-      } else if (model.north.segmentVisible) {
-        spindle.geometry.setDrawRange(1, 2);
-      } else {
-        spindle.geometry.setDrawRange(0, 0);
-      }
+      spindle.material.uniforms.uShowNorth.value = model.north.segmentVisible ? 1 : 0;
+      spindle.material.uniforms.uShowSouth.value = model.south.segmentVisible ? 1 : 0;
       spindle.material.uniforms.uOpacity.value = model.north.segmentOpacity;
 
       earthCore.visible = model.earthCoreVisible;
