@@ -17,8 +17,10 @@ The study branch now adds query-gated, default-off explanatory aids: baseline, o
 radius, reference-surface marker, sparse reference-Earth wireframe, local tangent patch, and a
 combined comparison mode. They consume the immutable observer-offset contract and bounded finite
 homogeneous anchors without changing the celestial grid, equator, poles, calibration, horizon,
-solar layers, or parked spindle. Development-only Pages deployment and physical Quest comparison
-are pending; no production design has been selected.
+solar layers, or parked spindle. Merge `a63a24a568fbe23271fbb17aa898eb71a94e5e97` was pushed
+normally to development `master`; Actions run `29917770378` passed and development Pages serves
+the study controls. Physical Quest comparison remains pending; no production design has been
+selected.
 
 ## Development pole-marker/grid convergence repair (local)
 

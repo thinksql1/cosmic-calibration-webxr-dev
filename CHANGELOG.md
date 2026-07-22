@@ -10,6 +10,9 @@
   the validated finite homogeneous contract, add diagnostic isolation, and leave the validated
   celestial grid/equator and parked spindle unchanged. No production variant is selected pending
   physical Quest comparison.
+- Normally merged the study work as `a63a24a` into development `master` and published it through
+  successful Actions/Pages run `29917770378`. This remains development-only; physical Quest
+  comparison is the next evidence gate.
 
 - Added the architecture-only `ObserverOffsetGeocentricPresentation` contract for later
   development study aids. It reuses the existing shared Earth core, WGS84 semi-major reference
