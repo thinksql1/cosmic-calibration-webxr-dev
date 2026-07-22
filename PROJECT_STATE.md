@@ -1,6 +1,6 @@
 # Project State
 
-## Development-only celestial coordinate grid (in progress)
+## Development-only celestial coordinate grid
 
 `feature/celestial-coordinate-grid` adds a default-hidden geocentric reference grid without
 changing the protected stable repository. It reuses the published P03/WGS84 core, axis, and
@@ -8,8 +8,13 @@ equatorial-basis contract: closed declination circles at `+60`, `+30`, `-30`, an
 plus twelve intentionally open pole-to-pole meridian semicircles every two hours. Its deterministic
 0h reference is explicitly non-sidereal because no validated sidereal/vernal-equinox presentation
 reference exists in the current model. The unresolved spindle issue is deliberately unchanged.
-Focused utility, topology, and non-finite eye-suppression tests pass locally; full validation,
-development-only deployment, hosted verification, and new physical Quest evidence remain pending.
+Feature commit `90251054ec2ad8c957054879496e72e864e4416a` was normally merged as
+`d4cd9ce68376d321a711d3dfa4526c5c5e2ee0f7` into the development repository only and pushed to
+`dev/master`. Clean merged validation passes `npm ci`, type-check, 468/468 tests across 46 files,
+production build, audit, dependency tree, and diff check. Development Actions run `29910750550`
+passed build and Pages deployment. The hosted development app loads repository-relative assets;
+observer/calibration readiness and master/family grid controls pass with no blocking console error.
+Physical Quest stereo acceptance remains NOT RUN.
 
 **Last updated:** 2026-07-20 America/New_York
 

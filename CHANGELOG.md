@@ -10,6 +10,10 @@
   deterministic non-sidereal 0h reference, and adds reusable coordinate conversion, controls,
   diagnostics, isolation, and focused geometry/XR-safety tests. No spindle behavior, stable
   repository, stable workflow, or stable Pages deployment changed.
+- Normal development-only integration merged `9025105` as `d4cd9ce` and published it through
+  Actions run `29910750550`. Clean merged validation passes 468/468 tests across 46 files,
+  type-check, build, audit, dependency tree, and diff check; hosted desktop controls and assets
+  load without blocking console errors. Physical Quest stereo acceptance remains pending.
 
 - Independently revalidated and normally integrated the unified geocentric celestial structure
   with merge `1acedcdac660214a7cbc9cf0ace469f1c2e3c20d`. Feature and merged `master` pass
