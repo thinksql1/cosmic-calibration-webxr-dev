@@ -8,8 +8,11 @@ Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. Uranus and Neptune are
 Pluto is explicitly a dwarf planet. Earth remains intentionally omitted from the observer sky.
 All bodies use the same validated WGS84 observer, central simulation clock, `EQD_TRUE` to
 `HORIZONTAL_ENU` provider path, application-basis mapping, calibrated geographic parent, and
-projective XR presentation contract. The outer markers are locally validated but not yet physically
-Quest-tested. Planet Labels defaults OFF, affects only enabled planet/Pluto labels, reuses each
+projective XR presentation contract. The feature was normally merged as
+`8a66c4b3cc448663ef31efe8a02be5343da115b2` and deployed to development Pages only through
+successful Actions run `29951224433`; the hosted bundle exposes that exact build SHA, Uranus, and
+Planet Labels. The outer markers are not yet physically Quest-tested. Planet Labels defaults OFF,
+affects only enabled planet/Pluto labels, reuses each
 marker direction with a bounded offset, and has no collision-layout claim. The core proxy, grid,
 equator, poles, horizon, Sun path, body positions, Swartz Creek defaults, and parked spindle are
 unchanged. No stable change is implied.

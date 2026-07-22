@@ -11,6 +11,9 @@
   marker direction, have bounded deterministic offsets, and do not change Sun/Moon/pole labels.
   No stable, core, grid, equator, calibration, or spindle behavior changed. Physical Quest
   validation remains pending.
+- Normally merged the extension as `8a66c4b` into development master and deployed it through
+  successful Actions/Pages run `29951224433`. This is development-only hosted evidence, not
+  physical Quest validation or a stable change.
 
 - Integrated the physically preferred far finite holographic Earth-core proxy into normal
   development behavior. The Earth Core toggle now selects exactly one direct marker when ON and
