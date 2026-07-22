@@ -75,6 +75,9 @@ function providerBody(body: ObserverRelativeBody): Body {
     case 'Mars': return Body.Mars;
     case 'Jupiter': return Body.Jupiter;
     case 'Saturn': return Body.Saturn;
+    case 'Uranus': return Body.Uranus;
+    case 'Neptune': return Body.Neptune;
+    case 'Pluto': return Body.Pluto;
   }
 }
 

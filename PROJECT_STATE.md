@@ -1,5 +1,19 @@
 # Project State
 
+## Outer planets and independent Planet Labels (development local)
+
+The local `feature/outer-planets-and-labels` extension expands the existing Astronomy Engine
+apparent-topocentric body catalog from Sun/Moon plus Mercury through Saturn to Sun, Moon, Mercury,
+Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. Uranus and Neptune are major planets;
+Pluto is explicitly a dwarf planet. Earth remains intentionally omitted from the observer sky.
+All bodies use the same validated WGS84 observer, central simulation clock, `EQD_TRUE` to
+`HORIZONTAL_ENU` provider path, application-basis mapping, calibrated geographic parent, and
+projective XR presentation contract. The outer markers are locally validated but not yet physically
+Quest-tested. Planet Labels defaults OFF, affects only enabled planet/Pluto labels, reuses each
+marker direction with a bounded offset, and has no collision-layout claim. The core proxy, grid,
+equator, poles, horizon, Sun path, body positions, Swartz Creek defaults, and parked spindle are
+unchanged. No stable change is implied.
+
 ## Integrated finite holographic Earth-core proxy (development only)
 
 Feature `f61b6f1b22871915cc756f6f4f206051d74f3d1a`, normally merged into development as
@@ -144,7 +158,7 @@ to the seven validated directions without duplication, loads repository-subpath 
 blocking console errors. The user has since reported positive bounded Quest use of the body layer:
 markers were visible and Sun, Mercury, and Venus were plausibly identifiable, while missing labels
 limited identification of other bodies. The user also noticed that the celestial equator does not
-match the Sun's path. This is feedback, not a complete seven-body, angular-accuracy, lifecycle,
+match the Sun's path. This is historical feedback about the then-published seven-body layer, not a complete angular-accuracy, lifecycle,
 or comfort acceptance record.
 
 Milestone 2F adds an observer-relative apparent Sun trace over the explicit IANA
@@ -172,7 +186,7 @@ repository-relative assets, clean console, and a 60.45-second live-clock advance
 Quest acceptance remains pending and is not inferred from desktop evidence.
 
 The user described the already deployed body and Sun-clock experience as beautiful and compelling.
-That report concerns the published seven-body layer, observer-relative daily Sun path, civil-hour
+That report concerns the historical published seven-body layer, observer-relative daily Sun path, civil-hour
 notches, and live updates; it does not physically accept the now-published rigid spindle, unified
 geocentric presentation, or renderer-boundary remediation. The reported plausible identification
 of Sun, Mercury, and Venus, along with absent labels limiting other identification, remains

@@ -138,9 +138,23 @@ export const SUPPORTED_SOLAR_SYSTEM_BODIES = Object.freeze([
   'Mars',
   'Jupiter',
   'Saturn',
+  'Uranus',
+  'Neptune',
+  'Pluto',
 ] as const);
 
 export type ObserverRelativeBody = (typeof SUPPORTED_SOLAR_SYSTEM_BODIES)[number];
+
+/** Major planets are separate from the Sun, Moon, and the dwarf planet Pluto. */
+export const SUPPORTED_PLANET_BODIES = Object.freeze([
+  'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune',
+] as const);
+
+export const SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES = Object.freeze([
+  ...SUPPORTED_PLANET_BODIES, 'Pluto',
+] as const);
+
+export type SupportedPlanetBody = (typeof SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES)[number];
 
 export interface EquatorialPositionResult {
   readonly body: ObserverRelativeBody;

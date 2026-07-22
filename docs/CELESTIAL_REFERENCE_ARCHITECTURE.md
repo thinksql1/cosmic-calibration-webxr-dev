@@ -9,7 +9,7 @@ implementation sequence is superseded where later milestones are explicitly reco
 
 Milestones 2A through 2F and the published geocentric baseline now implement much of this design:
 the WGS84 Earth core, axis/poles, celestial equator, observer-centered local horizon, apparent
-Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn directions, civil-day Sun path, civil-hour notches,
+Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto directions, civil-day Sun path, civil-hour notches,
 central clock, live refresh, provenance, warnings, and errors. The published unified-geocentric
 correction changes only the spindle/core/equator presentation contract; physical Quest acceptance
 remains pending.
@@ -631,7 +631,7 @@ published/local status declared at the top of this document.
   observer provides a valid geodetic location. Implementation must validate inputs.
 - **Implemented since this document was written:** WGS84 Earth core; geocentric axis/poles;
   celestial equator; projective/camera-relative celestial rendering; observer-centered local
-  horizon; apparent Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn; central clock;
+  horizon; apparent Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto; central clock;
   IANA/DST-aware civil-day handling; daily Sun path; civil-hour notches; provenance; structured
   warnings/errors; and live refresh.
 - **Genuinely deferred:** geolocation; ecliptic and annual paths; labels/object identification;

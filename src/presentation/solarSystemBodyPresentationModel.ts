@@ -1,4 +1,9 @@
-import type { ObserverRelativeBody, EnuUnitDirection } from '../science/astronomy/types';
+import {
+  SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES,
+  type ObserverRelativeBody,
+  type EnuUnitDirection,
+  type SupportedPlanetBody,
+} from '../science/astronomy/types';
 import type { SolarSystemBodyState } from '../science/bodies/solarSystemBodyState';
 import type { ScientificSnapshot } from '../science/snapshot/scientificSnapshot';
 import {
@@ -8,6 +13,8 @@ import {
 
 export interface SolarSystemBodyDisplaySettings {
   readonly showBodies: boolean;
+  readonly enabledPlanetBodies?: readonly SupportedPlanetBody[];
+  readonly showPlanetLabels?: boolean;
   /** A presentation-only cue used when the daily Sun path is visible. */
   readonly emphasizeSun?: boolean;
   /** Lets the daily Sun path retain its authoritative live Sun marker without enabling the other bodies. */
@@ -15,7 +22,12 @@ export interface SolarSystemBodyDisplaySettings {
 }
 
 export const DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS: SolarSystemBodyDisplaySettings =
-  Object.freeze({ showBodies: false, emphasizeSun: false });
+  Object.freeze({
+    showBodies: false,
+    enabledPlanetBodies: SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES,
+    showPlanetLabels: false,
+    emphasizeSun: false,
+  });
 
 export interface SolarSystemBodyStyle {
   readonly colorHex: number;
@@ -32,6 +44,15 @@ export interface SolarSystemBodyMarkerModel {
   readonly aboveHorizon: boolean;
   readonly celestialEquatorRelation: 'NORTH' | 'ON' | 'SOUTH';
   readonly style: SolarSystemBodyStyle;
+  readonly visible: boolean;
+}
+
+export interface SolarSystemBodyLabelModel {
+  readonly body: SupportedPlanetBody;
+  readonly text: string;
+  readonly directionApplication: ApplicationBasisDirection;
+  readonly visible: boolean;
+  readonly offsetNdc: readonly [number, number];
 }
 
 export interface SolarSystemBodyPresentationModel {
@@ -42,6 +63,7 @@ export interface SolarSystemBodyPresentationModel {
   readonly gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES';
   readonly presentationRadiusPolicy: 'DIRECTION_AT_INFINITY_NO_FINITE_CELESTIAL_DISTANCE';
   readonly markers: readonly SolarSystemBodyMarkerModel[];
+  readonly labels: readonly SolarSystemBodyLabelModel[];
   readonly visible: boolean;
   readonly snapshotIdentity: {
     readonly snapshotCacheKey: string;
@@ -69,6 +91,9 @@ const BODY_STYLES: Readonly<Record<ObserverRelativeBody, SolarSystemBodyStyle>> 
   Mars: Object.freeze({ colorHex: 0xe47d68, pixelDiameter: 12, opacity: 0.82 }),
   Jupiter: Object.freeze({ colorHex: 0xd7a56c, pixelDiameter: 15, opacity: 0.84 }),
   Saturn: Object.freeze({ colorHex: 0xcbbb91, pixelDiameter: 14, opacity: 0.82 }),
+  Uranus: Object.freeze({ colorHex: 0x9de4e8, pixelDiameter: 11, opacity: 0.78 }),
+  Neptune: Object.freeze({ colorHex: 0x6f9ee8, pixelDiameter: 11, opacity: 0.8 }),
+  Pluto: Object.freeze({ colorHex: 0xb9aec8, pixelDiameter: 9, opacity: 0.72 }),
 });
 
 function unitLength(direction: EnuUnitDirection): number {
@@ -86,7 +111,7 @@ function validateInputs(snapshot: ScientificSnapshot, state: SolarSystemBodyStat
     state.provenance.identity.providerVersion !== snapshot.providers.astronomy.providerVersion ||
     state.provenance.identity.provider !== snapshot.providers.astronomy.provider ||
     state.correctionProfile !== snapshot.configuration.bodyCorrectionProfile ||
-    state.bodies.length !== 7
+    state.bodies.length !== 10
   ) {
     throw new Error('Solar-system presentation requires body state from the active immutable scientific snapshot.');
   }
@@ -102,6 +127,7 @@ export function createSolarSystemBodyPresentationModel(
   settings: SolarSystemBodyDisplaySettings = DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
 ): SolarSystemBodyPresentationModel {
   validateInputs(snapshot, state);
+  const enabledPlanets = new Set(settings.enabledPlanetBodies ?? SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES);
   const markers = Object.freeze(state.bodies.map((result) => {
     const direction = result.horizontal.direction;
     if (
@@ -112,6 +138,9 @@ export function createSolarSystemBodyPresentationModel(
     ) {
       throw new Error('Solar-system presentation requires finite unit ENU directions.');
     }
+    const isPlanet = (SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES as readonly string[]).includes(result.body);
+    const visible = !isPlanet || enabledPlanets.has(result.body as SupportedPlanetBody);
+    const baseStyle = BODY_STYLES[result.body];
     return Object.freeze({
       body: result.body,
       directionEnu: direction,
@@ -120,13 +149,25 @@ export function createSolarSystemBodyPresentationModel(
       azimuthDeg: result.horizontal.azimuthDeg,
       aboveHorizon: result.aboveHorizon,
       celestialEquatorRelation: result.celestialEquatorRelation,
+      visible,
       style: result.body === 'Sun' && settings.emphasizeSun === true
         ? Object.freeze({ ...BODY_STYLES.Sun, pixelDiameter: 22, opacity: 0.98 })
         : settings.showSunOnly === true && settings.showBodies !== true
-          ? Object.freeze({ ...BODY_STYLES[result.body], opacity: 0 })
-          : BODY_STYLES[result.body],
+          ? Object.freeze({ ...baseStyle, opacity: 0 })
+          : visible ? baseStyle : Object.freeze({ ...baseStyle, opacity: 0 }),
     });
   }));
+  const labels = Object.freeze(markers
+    .filter((marker): marker is SolarSystemBodyMarkerModel & { readonly body: SupportedPlanetBody } =>
+      (SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES as readonly string[]).includes(marker.body))
+    .map((marker, index) => Object.freeze({
+      body: marker.body,
+      text: marker.body === 'Pluto' ? 'Pluto (dwarf planet)' : marker.body,
+      directionApplication: marker.directionApplication,
+      visible: settings.showBodies && settings.showPlanetLabels === true && marker.visible,
+      // Small stable NDC offsets avoid each label's own marker without a layout engine.
+      offsetNdc: Object.freeze([0.014 + (index % 2) * 0.004, 0.018 + (index % 3) * 0.003]) as readonly [number, number],
+    })));
   return Object.freeze({
     kind: 'ready',
     presentationKind: 'PROJECTIVE_APPARENT_TOPOCENTRIC_DIRECTIONS_AT_INFINITY',
@@ -135,6 +176,7 @@ export function createSolarSystemBodyPresentationModel(
     gpuCoordinatePolicy: 'NO_RAW_LARGE_WORLD_VERTEX_COORDINATES',
     presentationRadiusPolicy: 'DIRECTION_AT_INFINITY_NO_FINITE_CELESTIAL_DISTANCE',
     markers,
+    labels,
     visible: settings.showBodies || settings.showSunOnly === true,
     snapshotIdentity: Object.freeze({
       snapshotCacheKey: snapshot.cacheKey,

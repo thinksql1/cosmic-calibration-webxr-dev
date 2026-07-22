@@ -263,18 +263,21 @@ alignment, world locking, reset/re-entry, performance, or comfort details. The p
 the regression checklist for any later Quest evidence. See
 [Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
 
-## Milestone 2E actual solar-system body placement (pending)
+## Development outer planets and Planet Labels (pending)
 
-Test the published default-hidden seven-body layer using the
+Test the development default-hidden ten-body layer using the
 selected observer and UTC instant. Confirm that Sun/Moon directions are broadly plausible, planets
 remain separated rather than sharing a decorative path, below-horizon bodies remain represented
 according to the documented overlay convention, and all markers remain world-locked with the
 horizon, celestial equator, and axis. Check Sun-marker comfort/brightness, show/hide, reset,
 recalibration, exit/re-entry, reload, and absence of duplicated or stale markers. Verify each
-required marker is present when enabled: Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn;
-not every body is expected to be above the horizon. This procedure does not measure
-angular accuracy, identify Moon phase, or authorize projection/labels/temporal paths. **Physical
-Quest acceptance: NOT RUN.**
+required marker is present when enabled: Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn,
+Uranus, Neptune, and Pluto (dwarf planet); not every body is expected to be above the horizon.
+Enable **Planet Labels** and verify labels are anchored to enabled planet/Pluto markers in both
+eyes, do not hide their own marker, and disappear without hiding markers when the master is OFF.
+Disable one planet and verify its marker and label both disappear. This procedure does not measure
+angular accuracy, identify Moon phase, or authorize a constellation/label-layout system.
+**Physical Quest acceptance: NOT RUN.**
 
 ## Milestone 2F 24-hour Sun path and live celestial updates (pending)
 

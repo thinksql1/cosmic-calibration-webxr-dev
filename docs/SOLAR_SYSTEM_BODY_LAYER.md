@@ -1,100 +1,59 @@
 # Actual Solar-System Body Layer
 
-## Scope
+## Scope and catalog
 
-This bounded layer renders seven actual apparent topocentric directions: Sun, Moon, Mercury,
-Venus, Mars, Jupiter, and Saturn. It is the intentionally promoted next visible layer after the
-accepted spatial-reference baseline; the planned long-term precession prerequisite review remains
-in the roadmap and is not performed or replaced here.
+This default-hidden layer renders ten actual apparent topocentric directions: the Sun, Moon,
+Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto. Sun and Moon remain separate
+object categories. Mercury through Neptune are major planets; Pluto is explicitly a dwarf planet.
+Earth is intentionally not an external observer-sky marker.
 
-## Scientific contract
-
-The application-owned Astronomy Engine adapter produces one immutable typed result per body from:
-
-- the validated WGS84 observer state (east-positive longitude and mean-sea-level elevation);
-- the central immutable simulation-clock instant;
-- the selected Tier 1 body correction profile;
-- Astronomy Engine `2.1.19` provenance.
-
-Each result retains apparent topocentric `EQD_TRUE` equatorial coordinates, `HORIZONTAL_ENU`
-azimuth/altitude/unit direction, a horizon state, declination relation to the celestial equator,
-units, correction profile, provider/version, observer, instant, and validity/warnings. The default
-profile is `AE_APPARENT_TOPOCENTRIC_AIRLESS`: light-time, topocentric parallax, aberration,
-provider-managed precession/nutation are included; atmospheric refraction is disabled. A later
-configuration may explicitly select normal refraction for every body together, never selectively.
-
-Below-horizon bodies remain valid output directions. They are not clamped to the horizon, hidden
-as if absent, or projected to the celestial equator. Declination remains metadata for future
-pedagogy; no equator-projection or connecting-line mode is in this layer.
+The catalog is supplied by Astronomy Engine `2.1.19`. The adapter uses its `Equator` result with
+topocentric/apparent options and converts it through `Horizon` into `HORIZONTAL_ENU`. The retained
+`EQD_TRUE` equatorial coordinates and `HORIZONTAL_ENU` unit direction preserve the provider's
+apparent topocentric contract: light-time, topocentric parallax, aberration, and provider-managed
+precession/nutation are included. The default profile is airless; normal atmospheric refraction is
+an explicit whole-catalog configuration. Validated WGS84 latitude, east-positive longitude, MSL
+elevation, and the central simulation-clock instant are passed to every provider query.
 
 ## Presentation contract
 
-The presentation model maps the immutable ENU direction once into the established application
-basis: east -> `+X`, up -> `+Y`, north -> `-Z`. It does not calculate an ephemeris, consume
-ambient time, or apply geographic yaw. The calibrated geographic parent supplies accepted north
-yaw exactly once, together with the Earth axis, celestial equator, and local horizon.
+ENU maps once to the application basis: east -> `+X`, up -> `+Y`, north -> `-Z`. The calibrated
+geographic parent then owns yaw exactly once. Markers and labels are true projective directions
+(`w = 0`), so their centers preserve apparent direction without raw astronomical-distance vertices.
+Native Three.js model-view/projection matrices resolve each XR eye; the renderer has no per-eye
+geometry mutation, camera parenting, or throwing render callback. Invalid marker or label input
+suppresses only that object and records a bounded diagnostic.
 
-Markers are homogeneous projective directions (`w = 0`) rendered at infinity. There is no finite
-celestial presentation radius and no literal distance claim: marker centers preserve apparent
-direction while diameter and color are restrained visibility aids. The Sun is warm but intentionally
-not solar-bright; the Moon is pale neutral; planets share a quiet differentiated family. None is a
-nearby miniature physical solar system, a label, a pointer, a star field, or an astrological symbol.
+Marker size and color are symbolic visibility aids, not physical disk or angular-diameter claims.
+Existing Sun/Moon and inner-planet styling is retained. Uranus is restrained light cyan, Neptune
+deeper blue, and Pluto subdued lavender-gray. All marker and label materials are non-writing,
+non-testing celestial overlays with bounded unit-direction GPU attributes.
 
-The GPU receives only bounded unit-direction attributes. Marker materials use the accepted linear
-XR-depth non-writing/non-testing celestial overlay policy (`depthTest = false`,
-`depthWrite = false`); no logarithmic depth or raw astronomical-distance coordinate enters the
-renderer. The group is world-locked below the calibrated geographic parent, not camera/controller
-parented, and owns/disposes only its Points geometry and shader material.
+## Controls and labels
 
-## State and cache
+- **Solar-system bodies** controls marker-layer availability.
+- Individual controls select each planet and Pluto; Sun and Moon remain independently categorized.
+- **Planet Labels** controls only planet/Pluto labels and defaults OFF.
 
-`SolarSystemBodyStateService` is deliberately separate from the structural P03 snapshot. Before a
-provider call or cache lookup, it requires the active registry's immutable
-`ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_V1` descriptor to equal the descriptor retained by the
-snapshot and enabled Tier 1 configuration. The descriptor contains provider name/version, adapter
-version, supported body-set identifier, supported correction profiles, and the EQD_TRUE to
-HORIZONTAL_ENU frame contract. A mismatch is a fatal structured scientific error, never a warning
-or a cache hit. Its immutable expected/actual diagnostic snapshots preserve every descriptor
-dimension and a deterministic `mismatchedFields` list, so a frame-, profile-, body-, or
-capability-only difference cannot appear identical in error context.
+An enabled body with Planet Labels ON shows one label; turning labels OFF leaves markers visible.
+Turning off an individual body hides its marker and label. Labels reuse the exact marker direction,
+have a small deterministic NDC offset so they do not cover their own marker center, and are not a
+new coordinate convention. A full collision/decluttering engine is deliberately deferred; rare
+inter-body label overlap is a known limitation.
 
-Its bounded frozen/paused cache key includes that active descriptor, the validated observer and
-observer revision, complete explicit simulation clock/instant/source/revision state, configuration
-correction profile and revision, the fixed body list/body-set identifier, and frame policy. Active
-unpaused time bypasses cache. Both equatorial and horizontal results must independently match the
-requested body, observer, instant, provider identity, correction profile, frame, units, and finite
-unit-direction contract before a recursively frozen body state is returned. Calibration is
-presentation-only for body directions, so yaw is not baked into this scientific cache; the
-containing immutable scientific snapshot still gates readiness.
+Diagnostics expose provider/catalog/frame/profile, observer/time inputs, ENU and application
+directions, label state, active and suppressed draw objects, and the visible build identifier.
+Diagnostic isolation includes all planet markers, labels, outer planets, each new outer body with
+its label, planets plus grid, planets without Sun/Moon, and Sun/Moon comparison. Explicit feature
+controls remain authoritative during isolation.
 
-## Controls and current exclusions
+## Exclusions and follow-up
 
-One default-hidden **Solar-system bodies** control reveals or hides the complete seven-marker
-layer. There are no per-body controls, labels, pointing aids, search, persistent storage, network
-lookup, a second clock, Moon phase/limb/diameter rendering, planet disks/rings/paths, ecliptic,
-celestial-equator projection, combined actual-plus-projected display, declination connectors,
-Moon/planet temporal paths, stars, or precession geometry. The separate Sun civil-day path and
-central-clock refresh are documented in [Solar 24-Hour Clock](SOLAR_24_HOUR_CLOCK.md); they do not
-add labels, alter the body-science contract, or project any body to the celestial equator.
+This layer does not add planet disks, rings, phases, pointing, ecliptic, trails, stars,
+constellations, sidereal-basis changes, or a second clock. Future constellations must use the same
+validated apparent/equatorial direction pathway rather than inventing another basis. The parked
+Earth-axis spindle is unrelated and unchanged.
 
-## Verification and Quest follow-up
-
-Automated tests cover supported identifiers, deterministic frozen observer/time computation,
-provider/frame/correction provenance, below-horizon retention, ENU/application signs,
-direction-only rendering, bounded GPU attributes, depth policy, group ownership, and disposal.
-Provider identity and complete equatorial/horizontal provenance are adversarially validated before a
-body state can become ready. The adapter's independent JPL fixture depth remains strongest for the
-established Sun/Moon cases; independent major-planet fixture expansion is a non-blocking future
-scientific-validation improvement.
-Final independent validation, normal integration, GitHub Actions/Pages publication, and hosted
-desktop regression pass with 383 tests. Hosted verification confirms readiness, the default-hidden
-global control, seven-body diagnostic, repeated visibility toggling, subpath assets, clean console,
-and coexistence with the axis/equator/horizon. Physical Quest acceptance remains pending and must
-check general Sun/Moon direction, planet separation, below-horizon continuity, brightness,
-world-locking, calibration, session lifecycle, and absence of duplicate markers.
-
-The user subsequently reported positive bounded Quest use: the layer operated, markers were
-visible, and Sun, Mercury, and Venus were plausibly identifiable. Missing labels limited
-identification of other bodies, and the user observed that the celestial equator is not the Sun's
-path. This feedback does not establish exact angular accuracy, all-seven identification,
-long-duration updates, lifecycle coverage, or comfort telemetry.
+Quest validation is pending for Uranus, Neptune, Pluto, Planet Labels, label-to-marker anchoring,
+and stereo stability. Record only observed results; do not infer exact angular accuracy or body
+identification from a short session.

@@ -125,7 +125,7 @@ function alteredHorizontal(
 describe('actual solar-system body state', () => {
   it('supports exactly the bounded Sun, Moon, and major-planet list with typed immutable provenance', () => {
     expect(SUPPORTED_SOLAR_SYSTEM_BODIES).toEqual([
-      'Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn',
+      'Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto',
     ]);
     const service = new SolarSystemBodyStateService(createScientificProviderRegistry());
     const result = service.capture(readySnapshot());
@@ -268,9 +268,9 @@ describe('actual solar-system body state', () => {
     expect(expected).toMatchObject({
       provider: 'Astronomy Engine',
       providerVersion: '2.1.19',
-      adapterVersion: '1.0.0',
-      bodySetId: 'SUN_MOON_MERCURY_VENUS_MARS_JUPITER_SATURN_V1',
-      supportedBodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'],
+      adapterVersion: '1.1.0',
+      bodySetId: 'SUN_MOON_MERCURY_VENUS_MARS_JUPITER_SATURN_URANUS_NEPTUNE_PLUTO_V2',
+      supportedBodies: ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'],
       supportedCorrectionProfiles: [
         'AE_APPARENT_TOPOCENTRIC_AIRLESS',
         'AE_APPARENT_TOPOCENTRIC_NORMAL_REFRACTION',

@@ -22,6 +22,10 @@ import { createSolarSystemBodiesGroup } from './scene/createSolarSystemBodiesGro
 import { createSolarDailyPathGroup } from './scene/createSolarDailyPathGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
+import {
+  SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES,
+  type SupportedPlanetBody,
+} from './science/astronomy/types';
 import { createScientificProviderRegistry } from './science/providers/scientificProviderRegistry';
 import { SolarSystemBodyStateService } from './science/bodies/solarSystemBodyState';
 import { SolarDailyPathService } from './science/temporal/solarDailyPath';
@@ -158,6 +162,17 @@ const showDeclinationGridInput = requireElement<HTMLInputElement>('#show-declina
 const showRightAscensionGridInput = requireElement<HTMLInputElement>('#show-right-ascension-lines');
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
+const showPlanetLabelsInput = requireElement<HTMLInputElement>('#show-planet-labels');
+const planetBodyVisibilityInputs: Readonly<Record<SupportedPlanetBody, HTMLInputElement>> = Object.freeze({
+  Mercury: requireElement<HTMLInputElement>('#show-planet-mercury'),
+  Venus: requireElement<HTMLInputElement>('#show-planet-venus'),
+  Mars: requireElement<HTMLInputElement>('#show-planet-mars'),
+  Jupiter: requireElement<HTMLInputElement>('#show-planet-jupiter'),
+  Saturn: requireElement<HTMLInputElement>('#show-planet-saturn'),
+  Uranus: requireElement<HTMLInputElement>('#show-planet-uranus'),
+  Neptune: requireElement<HTMLInputElement>('#show-planet-neptune'),
+  Pluto: requireElement<HTMLInputElement>('#show-planet-pluto'),
+});
 const showSolarDailyPathInput = requireElement<HTMLInputElement>('#show-solar-daily-path');
 const showSolarHourNotchesInput = requireElement<HTMLInputElement>('#show-solar-hour-notches');
 const showSolarPathBelowHorizonInput = requireElement<HTMLInputElement>('#show-solar-path-below-horizon');
@@ -321,6 +336,7 @@ function enforceEarthCoreToggle(): void {
 function applyDiagnosticObjectIsolation(): void {
   if (!xrDiagnostics.enabled) {
     enforceEarthCoreToggle();
+    solarSystemBodies.enforceVisibilityControls();
     return;
   }
   // Controller feedback objects are added only after XR session activation;
@@ -329,6 +345,8 @@ function applyDiagnosticObjectIsolation(): void {
   const result = applyXrObjectIsolation(scene, xrDiagnostics.isolation);
   const signature = `${result.stateId}|${result.matchedObjectNames.join(',')}`;
   enforceEarthCoreToggle();
+  // Diagnostics may isolate descendants, but explicit body/label controls remain authoritative.
+  solarSystemBodies.enforceVisibilityControls();
   if (signature === diagnosticIsolationSignature) return;
   diagnosticIsolationSignature = signature;
   xrDiagnostics.record('object-isolation.state', [
@@ -449,6 +467,10 @@ function currentSolarSystemBodyDisplaySettings(): SolarSystemBodyDisplaySettings
   return Object.freeze({
     ...DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
     showBodies: showSolarSystemBodiesInput.checked,
+    enabledPlanetBodies: SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES.filter(
+      (body) => planetBodyVisibilityInputs[body].checked,
+    ),
+    showPlanetLabels: showPlanetLabelsInput.checked,
     emphasizeSun: showSolarDailyPathInput.checked || showSolarHourNotchesInput.checked,
     showSunOnly: !showSolarSystemBodiesInput.checked &&
       (showSolarDailyPathInput.checked || showSolarHourNotchesInput.checked),
@@ -623,6 +645,14 @@ function renderCelestialAxis(): void {
     currentSolarSystemBodyDisplaySettings(),
   );
   solarSystemBodies.update(bodyModel);
+  const bodyDiagnostics = solarSystemBodies.getDiagnostics();
+  celestialDiagnostics.append(...[
+    `Apparent-body provider ${bodyModel.provenance.provider} ${bodyModel.provenance.providerVersion}; ${bodyModel.provenance.sourceFrame} → ${bodyModel.provenance.outputFrame}; profile ${bodyModel.provenance.correctionProfile}`,
+    `Planet Labels ${showPlanetLabelsInput.checked ? 'ON' : 'OFF'}; active marker draws ${bodyDiagnostics.activeMarkerObjectNames.length}; active planet-label draws ${bodyDiagnostics.activeLabelObjectNames.length}`,
+    `Enabled planets ${currentSolarSystemBodyDisplaySettings().enabledPlanetBodies?.join(', ') || 'none'}; provider catalog ${bodyState.provenance.identity.supportedBodies.join(', ')}; selected UTC ${result.snapshot.clock.instant.utcIso}; observer ${result.snapshot.observer.observer.latitudeDeg.toFixed(4)}, ${result.snapshot.observer.observer.longitudeDegEast.toFixed(4)}, ${result.snapshot.observer.observer.elevationMeters.toFixed(0)} m MSL`,
+    `Body markers ${bodyDiagnostics.activeMarkerObjectNames.join(', ') || 'none'}; labels ${bodyDiagnostics.activeLabelObjectNames.join(', ') || 'none'}; suppressed markers ${bodyDiagnostics.suppressedMarkerObjectNames.join(', ') || 'none'}; suppressed labels ${bodyDiagnostics.suppressedLabelObjectNames.join(', ') || 'none'}; label-anchor directional error 0`,
+    ...bodyModel.markers.map((marker) => `${marker.body}: ENU (${marker.directionEnu.east.toFixed(4)}, ${marker.directionEnu.north.toFixed(4)}, ${marker.directionEnu.up.toFixed(4)}) → application (${marker.directionApplication.x.toFixed(4)}, ${marker.directionApplication.y.toFixed(4)}, ${marker.directionApplication.z.toFixed(4)}); marker ${marker.visible ? 'enabled' : 'disabled'}; finite ${Number.isFinite(marker.directionApplication.x) && Number.isFinite(marker.directionApplication.y) && Number.isFinite(marker.directionApplication.z)}`),
+  ].map((detail) => Object.assign(document.createElement('li'), { textContent: detail })));
   if (civilTimeZoneState.current.kind !== 'ready') {
     solarDailyPath.clear();
     celestialDiagnostics.append(
@@ -1005,6 +1035,8 @@ useCurrentTimeButton.addEventListener('click', () => {
   showRightAscensionGridInput,
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
+  showPlanetLabelsInput,
+  ...Object.values(planetBodyVisibilityInputs),
   showSolarDailyPathInput,
   showSolarHourNotchesInput,
   showSolarPathBelowHorizonInput,

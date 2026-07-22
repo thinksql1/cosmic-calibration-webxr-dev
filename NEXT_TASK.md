@@ -4,18 +4,20 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically confirm the integrated 4.0-meter core toggle behavior and Swartz Creek default location values on Quest before considering any stable promotion.
+**Title:** Physically validate Uranus, Neptune, Pluto, and planet-label behavior on Quest before beginning the real-sky orientation and constellation phase.
 
 Use a fresh private Quest Browser session and the exact cache-busted development URL. Confirm the
-build identifier and initial Swartz Creek values (`42.9572`, `-83.8308`, `240 m`), calibrate north,
-then confirm the normal Earth Core representation is the accepted `4.0 m` finite world-locked
-proxy. Toggle Earth Core OFF and ON in both eyes; OFF must leave no direct core marker and ON must
-restore exactly one proxy without changing calibration or the celestial grid.
+build identifier and Swartz Creek defaults, calibrate north, enable the apparent body layer, then
+check Uranus, Neptune, Pluto (dwarf planet), and Planet Labels independently in both eyes. Labels
+must remain attached to their enabled marker, remain distinct from its center, disappear when the
+master label control is off, and disappear with an individually disabled body. Confirm the core
+proxy, grid, equator, poles, horizon, Sun path, and existing bodies remain unchanged.
 
 ## Exclusions
 
-Do not resume the parked spindle, alter the scientific Earth-core source, move the grid, add
-location persistence, or promote development work to the protected stable repository.
+Do not begin constellations, resume the parked spindle, alter the scientific Earth-core source,
+move the grid, add location persistence, or promote development work to the protected stable
+repository.
 
 ## Recommended execution
 
