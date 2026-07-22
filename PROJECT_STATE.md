@@ -11,7 +11,8 @@ All bodies use the same validated WGS84 observer, central simulation clock, `EQD
 projective XR presentation contract. The feature was normally merged as
 `8a66c4b3cc448663ef31efe8a02be5343da115b2` and deployed to development Pages only through
 successful Actions run `29951224433`; the hosted bundle exposes that exact build SHA, Uranus, and
-Planet Labels. The outer markers are not yet physically Quest-tested. Planet Labels defaults OFF,
+Planet Labels. Physical Quest testing confirms Mercury-through-Pluto markers and the repaired
+native Sprite labels render and remain associated with their markers. Planet Labels defaults OFF,
 affects only enabled planet/Pluto labels, reuses each
 marker direction with a bounded offset, and has no collision-layout claim. The core proxy, grid,
 equator, poles, horizon, Sun path, body positions, Swartz Creek defaults, and parked spindle are
@@ -24,7 +25,9 @@ the plane's vertex position, collapsing every textured quad to one clip-space po
 rasterized area. The local repair replaces only label presentation with reusable finite `24 m`,
 tangent-offset, world-anchored Three.js sprites. Textures must contain visible alpha; normal and
 forced Uranus-proof state are distinguished; invalid labels suppress locally. The repaired
-contract has automated and development-deployment evidence only until physical Quest revalidation.
+contract has now passed its basic physical Quest rendering/attachment gate. Its original Small,
+Medium, and Large sizes were nevertheless too small for comfortable reading; a development-only
+five-preset readability revision is in progress. No constellation-label approval is implied.
 
 Repair feature `3a31b92619ee4b0e61224173b4b67a48bcb4664d` was normally merged into
 development as `c18e28a9536facb4ac39487fe6071646744ca860`. Clean merged validation passed

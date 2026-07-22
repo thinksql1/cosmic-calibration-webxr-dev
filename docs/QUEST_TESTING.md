@@ -263,7 +263,7 @@ alignment, world locking, reset/re-entry, performance, or comfort details. The p
 the regression checklist for any later Quest evidence. See
 [Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
 
-## Development outer planets and Planet Labels (pending)
+## Development outer planets and Planet Labels (readability selection pending)
 
 Test the development default-hidden ten-body layer using the
 selected observer and UTC instant. Confirm that Sun/Moon directions are broadly plausible, planets
@@ -277,20 +277,23 @@ Enable **Planet Labels** and verify labels are anchored to enabled planet/Pluto 
 eyes, do not hide their own marker, and disappear without hiding markers when the master is OFF.
 Disable one planet and verify its marker and label both disappear. This procedure does not measure
 angular accuracy, identify Moon phase, or authorize a constellation/label-layout system.
-**Physical Quest acceptance: NOT RUN.**
+**Physical Quest marker and Sprite-rendering evidence: PASS for the reported scope.** The tested
+labels rendered and stayed associated with their markers, but the original dimensions were too
+small for comfortable reading. The scale-selection procedure below remains pending.
 
 ### Repaired finite planet-label contract
 
-Build `51b6fff376bdddf8db59b8611914cd607bed0789` physically passed all planet markers
-through Pluto but failed Planet Labels with the master explicitly ON. For the repair, use a fresh
-private session and the exact cache-busted development URL. First open
-`labelStudy=uranus-xr-proof`: one Uranus marker and one `Uranus` sprite must appear immediately,
-without pointing or selection. Check adjacency, readability, slow head motion, viewport edges, and
-each eye independently. Then use normal mode: Planet Labels OFF must leave markers visible; ON must
-show exactly one label for each enabled planet/Pluto; disabling one body must hide its marker and
-label. Confirm pole labels and all non-label celestial features are unchanged. Record callback or
-incomplete-frame errors explicitly. The finite `24 m` label anchor is presentation geometry, not
-astronomical distance. **Physical acceptance of the repaired contract: NOT RUN.**
+Build `51b6fff376bdddf8db59b8611914cd607bed0789` physically passed all planet markers through
+Pluto but failed Planet Labels with the master explicitly ON. The later Sprite repair rendered and
+remained marker-attached on Quest, but its original Small/Medium/Large scales were too small for
+comfortable reading. For the five-preset comparison, use a fresh private session and exact
+cache-busted development URL. Confirm the visible build SHA, calibrate north, enable bodies and
+Planet Labels, then compare `labelScale=small|medium|large|xl|xxl`: Small equals the prior Large,
+and each successive preset doubles width and height. Record the smallest comfortably readable
+preset while checking adjacency, head motion, viewport edges, each eye, Planet Labels OFF behavior,
+and no duplicate/callback errors. The finite `24 m` label anchor is presentation geometry, not
+astronomical distance; XL/XXL overlap is intentional test evidence, not a collision-layout claim.
+Do not infer constellation-label readiness from this procedure.
 
 ## Milestone 2F 24-hour Sun path and live celestial updates (pending)
 

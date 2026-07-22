@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { getPlanetLabelScaleDefinition } from '../../src/presentation/planetLabelPresentation';
 import { createPlanetLabelSprite } from '../../src/scene/createPlanetLabelSprite';
 
 function canvasWithVisibleText() {
@@ -46,6 +47,7 @@ describe('Uranus finite XR label sprite proof', () => {
       depthTest: false,
       depthWrite: false,
       frustumCulled: false,
+      worldScale: [2.24, 0.56, 1],
     });
   });
 
@@ -93,5 +95,23 @@ describe('Uranus finite XR label sprite proof', () => {
     result.handle.dispose(); result.handle.dispose();
     expect(materialDispose).toHaveBeenCalledTimes(1);
     expect(textureDispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves every scale from immutable canonical dimensions without changing its finite anchor or resources', () => {
+    const result = createPlanetLabelSprite('uranus-xr-label-proof', 'Uranus', canvasWithVisibleText);
+    if (result.kind !== 'VALID_PLANET_LABEL_SPRITE') throw new Error(result.reason);
+    const material = result.handle.sprite.material;
+    const texture = (material as THREE.SpriteMaterial).map;
+    const direction = { frame: 'APPLICATION_BASIS' as const, units: 'unitless' as const, x: 0.3, y: 0.4, z: -0.8660254037844386 };
+    const initial = result.handle.update(direction, 'small');
+    if (!initial) throw new Error('Expected finite Small placement.');
+    const anchor = initial.anchor.clone();
+    for (const scale of ['medium', 'large', 'xl', 'xxl', 'small', 'xxl'] as const) {
+      const placement = result.handle.update(direction, scale);
+      expect(placement?.anchor.toArray()).toEqual(anchor.toArray());
+      expect(result.handle.sprite.scale.toArray()).toEqual([...getPlanetLabelScaleDefinition(scale).dimensionsMeters, 1]);
+      expect(result.handle.sprite.material).toBe(material);
+      expect((result.handle.sprite.material as THREE.SpriteMaterial).map).toBe(texture);
+    }
   });
 });

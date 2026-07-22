@@ -40,8 +40,11 @@ Turning off an individual body hides its marker and label. Build `51b6fff` prove
 Quest but exposed a zero-area projective-plane label defect. The repaired labels reuse the exact
 marker direction at a disclosed finite `24 m` presentation anchor plus a deterministic tangent
 offset and render as native XR sprites. They are not a new coordinate convention or astronomical
-distance claim. A full collision/decluttering engine is deliberately deferred; rare inter-body
-label overlap is a known limitation. See [XR Planet Label Rendering](XR_PLANET_LABEL_RENDERING.md).
+distance claim. Quest testing confirmed rendering and attachment but found the original size table
+too small for comfortable reading. Old Large is new Small; Medium is the default and larger
+canonical XL/XXL experiments are available for physical readability comparison. A full
+collision/decluttering engine is deliberately deferred; inter-body overlap is an accepted
+readability-test limitation. See [XR Planet Label Rendering](XR_PLANET_LABEL_RENDERING.md).
 
 Diagnostics expose provider/catalog/frame/profile, observer/time inputs, ENU and application
 directions, label state, active and suppressed draw objects, and the visible build identifier.
@@ -56,7 +59,7 @@ constellations, sidereal-basis changes, or a second clock. Future constellations
 validated apparent/equatorial direction pathway rather than inventing another basis. The parked
 Earth-axis spindle is unrelated and unchanged.
 
-Quest validation passed Uranus, Neptune, and Pluto markers but failed the prior labels. Physical
-revalidation is pending for the repaired Uranus proof, all labels, label-to-marker anchoring, and
-stereo stability. Record only observed results; do not infer exact angular accuracy or body
-identification from a short session.
+Quest validation passed Uranus, Neptune, and Pluto markers and the repaired finite Sprite labels'
+basic rendering/attachment behavior. Physical comparison is now pending for Small, Medium, Large,
+XL, and XXL readability, label-to-marker anchoring, and stereo stability. Record only observed
+results; do not infer exact angular accuracy or body identification from a short session.

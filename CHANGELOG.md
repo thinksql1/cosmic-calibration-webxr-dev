@@ -4,6 +4,12 @@
 
 ### Added
 
+- Recorded physical Quest confirmation that the repaired native Sprite planet labels render and
+  remain attached to their markers. The prior largest size was still too small to read comfortably,
+  so the scale table now promotes old Large to new Small and supplies Medium/Large/XL/XXL at
+  `2×/4×/8×/16×` that base. Medium is the new default; XL and XXL are explicit readability
+  experiments, and overlap handling plus constellation-label approval remain deferred.
+
 - Diagnosed the Quest-invisible Planet Labels in development build `51b6fff` as zero-area
   projective plane geometry: the label vertex shader ignored every plane vertex. Added a
   query-gated Uranus XR proof and replaced all planet/Pluto labels with finite `24 m`,

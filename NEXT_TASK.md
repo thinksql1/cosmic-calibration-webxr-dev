@@ -4,14 +4,14 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate the repaired Uranus proof and all planet labels on Quest before beginning any constellation-label implementation.
+**Title:** Physically select the smallest comfortably readable planet-label preset on Quest before deciding what scale strategy should be used for future constellation labels.
 
 Use a fresh private Quest Browser session and the exact cache-busted development URL. Confirm the
 build identifier and Swartz Creek defaults, calibrate north, then open the query-gated Uranus proof.
-Confirm the finite `Uranus` sprite appears immediately without pointing, remains beside the marker
-through head motion in both eyes, and disappears under normal Planet Labels OFF state. Then enable
-all planet labels and verify correct body association, individual-body gating, stereo stability,
-readability, and unchanged core/grid/equator/poles/horizon/Sun/Moon behavior.
+Confirm the finite `Uranus` sprite and all enabled planet/Pluto labels remain marker-attached in
+both eyes, then compare Small, Medium, Large, XL, and XXL. Record the smallest comfortably readable
+preset while checking that changing size neither moves anchors nor duplicates resources. Preserve
+Planet Labels OFF behavior and all core/grid/equator/poles/horizon/Sun/Moon behavior.
 
 ## Exclusions
 

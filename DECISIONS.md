@@ -479,6 +479,20 @@
   calibrated direction, and scientific honesty without camera parenting or per-eye geometry
   mutation. It is not approved for constellation labels until this repair passes Quest.
 
+### DEC-037: Use five canonical planet-label readability presets for development Quest comparison
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only physical size selection
+- **Owner:** Darrell Wright / project control
+- **Decision:** Physical Quest testing confirmed the finite Sprite contract renders and remains
+  marker-attached, but its former Small/Medium/Large dimensions were too small for comfortable
+  reading. Preserve the old `1.12 × 0.28 m` Large dimensions as new Small, then define canonical
+  non-compounding dimensions: Medium `2.24 × 0.56 m`, Large `4.48 × 1.12 m`, XL `8.96 × 2.24 m`,
+  and XXL `17.92 × 4.48 m`. Default to Medium. XL and XXL are intentionally large Quest
+  readability experiments; overlap handling is deferred.
+- **Rationale:** The world anchor, texture, material, marker direction, and XR eye contract have
+  physical evidence. Adjusting only immutable Sprite dimensions isolates the remaining readability
+  question without compromising the validated rendering contract or introducing a collision system.
+
 ## Proposed decisions awaiting review
 
 None yet.

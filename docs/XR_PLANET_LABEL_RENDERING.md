@@ -35,8 +35,12 @@ normalized apparent body direction * 24 m
 The tangent basis is derived deterministically from the exact marker direction with a fallback
 axis chosen away from parallel. The offset is perpendicular to the body direction, so the label
 does not cover its own marker. `24 m` is a bounded visual distance, not astronomical distance.
-Small, medium, and large diagnostic scales are `0.72 × 0.18 m`, `0.90 × 0.225 m`, and
-`1.12 × 0.28 m`; normal labels use medium.
+Physical Quest testing confirmed that the Sprite contract renders and stays marker-attached, but
+the original Small/Medium/Large sizes were too small for comfortable reading. The old Large
+(`1.12 × 0.28 m`) is now new Small. Canonical non-compounding readability presets are Small
+`1.12 × 0.28 m` (`1×` old Large), Medium `2.24 × 0.56 m` (`2×`), Large `4.48 × 1.12 m` (`4×`),
+XL `8.96 × 2.24 m` (`8×`), and XXL `17.92 × 4.48 m` (`16×`). Normal labels default to Medium.
+XL and XXL are intentional physical-test extremes; collision/overlap resolution remains deferred.
 
 Textures are deterministic `512 × 128` canvas textures using a system font, pale foreground,
 dark translucent backing, padding, and shadow. Creation verifies nonzero alpha pixels before a
@@ -53,8 +57,9 @@ label. Objects, textures, and materials are created once, reused through toggles
 once. Invalid texture or transform state suppresses only that label.
 
 `labelStudy=uranus-xr-proof` forces exactly one Uranus marker and one repaired label so the
-contract can be checked independently of normal feature gates. `labelScale=small|medium|large`
-selects a bounded proof size. Diagnostics distinguish configured, submitted, visible, and
+contract can be checked independently of normal feature gates.
+`labelScale=small|medium|large|xl|xxl` selects a canonical bounded proof size; invalid values fall
+back to Medium. Diagnostics distinguish configured, submitted, visible, and
 render-callback-observed labels and report texture alpha, material/depth state, finite anchor,
 tangent offset, per-eye NDC centers, disparity, camera distance, callback errors, and suppression.
 

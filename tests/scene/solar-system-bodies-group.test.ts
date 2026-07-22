@@ -3,7 +3,11 @@ import { describe, expect, it, vi } from 'vitest';
 import type { SolarSystemBodyPresentationModel } from '../../src/presentation/solarSystemBodyPresentationModel';
 import { createSolarSystemBodiesGroup } from '../../src/scene/createSolarSystemBodiesGroup';
 
-function model(visible = true, labelsVisible = visible): SolarSystemBodyPresentationModel {
+function model(
+  visible = true,
+  labelsVisible = visible,
+  labelScale: 'small' | 'medium' | 'large' | 'xl' | 'xxl' = 'medium',
+): SolarSystemBodyPresentationModel {
   const bodies = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'] as const;
   const labelBodies = ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'] as const;
   return Object.freeze({
@@ -30,7 +34,7 @@ function model(visible = true, labelsVisible = visible): SolarSystemBodyPresenta
       text: body === 'Pluto' ? 'Pluto (dwarf planet)' : body,
       directionApplication: Object.freeze({ frame: 'APPLICATION_BASIS' as const, units: 'unitless' as const, x: index === 5 ? 0.25 : 0, y: index === 5 ? 0.25 : 0, z: index === 5 ? -Math.sqrt(0.875) : -1 }),
       visible: labelsVisible,
-      scale: 'medium' as const,
+      scale: labelScale,
     }))),
     visible,
     snapshotIdentity: Object.freeze({ snapshotCacheKey: 'snapshot', bodyCacheKey: 'body', observerRevision: 1, timeRevision: 1, calibrationRevision: 1, acceptedCalibrationRevision: 1, configurationRevision: 1 }),
@@ -140,6 +144,25 @@ describe('actual solar-system body Three.js group', () => {
     handle.update(model());
     expect(handle.group.children.filter((object) => object instanceof THREE.Sprite)).toEqual(labels);
     expect(labels.every((label) => label.visible)).toBe(true);
+  });
+
+  it('updates all selected Sprite scales without recreating sprites, textures, materials, or anchors', () => {
+    const handle = createHandle();
+    handle.update(model(true, true, 'small'));
+    const labels = handle.group.children.filter((object): object is THREE.Sprite => object instanceof THREE.Sprite);
+    const before = labels.map((sprite) => ({ sprite, material: sprite.material, texture: (sprite.material as THREE.SpriteMaterial).map, anchor: sprite.position.clone() }));
+    handle.update(model(true, true, 'xxl'));
+    for (const entry of before) {
+      expect(entry.sprite.position.toArray()).toEqual(entry.anchor.toArray());
+      expect(entry.sprite.scale.toArray()).toEqual([17.92, 4.48, 1]);
+      expect(entry.sprite.material).toBe(entry.material);
+      expect((entry.sprite.material as THREE.SpriteMaterial).map).toBe(entry.texture);
+    }
+    handle.update(model(true, false, 'xl'));
+    expect(labels.every((label) => !label.visible)).toBe(true);
+    handle.update(model(true, true, 'xl'));
+    expect(labels.every((label) => label.visible && label.scale.x === 8.96 && label.scale.y === 2.24)).toBe(true);
+    expect(handle.group.children.filter((object) => object instanceof THREE.Sprite)).toEqual(labels);
   });
 
   it('suppresses one invalid texture without hiding its marker or other labels', () => {

@@ -3,6 +3,7 @@ import type { ApplicationBasisDirection } from '../presentation/mapEnuToApplicat
 import {
   createPlanetLabelPlacement,
   createPlanetLabelTexture,
+  DEFAULT_PLANET_LABEL_SCALE,
   type PlanetLabelCanvasFactory,
   type PlanetLabelPlacement,
   type PlanetLabelScale,
@@ -21,6 +22,7 @@ export interface PlanetLabelSpriteDiagnostics {
   readonly depthWrite: boolean;
   readonly renderOrder: number;
   readonly frustumCulled: boolean;
+  readonly worldScale: readonly [number, number, number];
   readonly placement?: PlanetLabelPlacement;
   readonly projectedCentersNdc: Readonly<Record<string, readonly [number, number, number]>>;
   readonly stereoDisparityNdc?: number;
@@ -110,6 +112,7 @@ export function createPlanetLabelSprite(
   const diagnostics = (): PlanetLabelSpriteDiagnostics => {
     const left = projectedCenters.get('left');
     const right = projectedCenters.get('right');
+    const worldScale = sprite.getWorldScale(new THREE.Vector3());
     return Object.freeze({
     objectCreated: true,
     textureWidth: texture.width,
@@ -122,6 +125,7 @@ export function createPlanetLabelSprite(
     depthWrite: material.depthWrite,
     renderOrder: sprite.renderOrder,
     frustumCulled: sprite.frustumCulled,
+    worldScale: Object.freeze([worldScale.x, worldScale.y, worldScale.z] as [number, number, number]),
     placement,
     projectedCentersNdc: Object.freeze(Object.fromEntries(projectedCenters)),
     stereoDisparityNdc: left && right ? Math.hypot(left[0] - right[0], left[1] - right[1]) : undefined,
@@ -134,7 +138,7 @@ export function createPlanetLabelSprite(
 
   const handle: PlanetLabelSpriteHandle = Object.freeze({
     sprite,
-    update(direction: ApplicationBasisDirection, scale: PlanetLabelScale = 'medium') {
+    update(direction: ApplicationBasisDirection, scale: PlanetLabelScale = DEFAULT_PLANET_LABEL_SCALE) {
       if (disposed) return undefined;
       const result = createPlanetLabelPlacement(direction, scale);
       if (result.kind !== 'VALID_PLANET_LABEL_PLACEMENT') {
