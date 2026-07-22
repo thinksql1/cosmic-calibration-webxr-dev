@@ -3,6 +3,8 @@ import type { ObserverOffsetGeocentricPresentation } from './observerOffsetGeoce
 
 export const FINITE_CORE_PARALLAX_MODE = 'finite-parallax' as const;
 export const FINITE_CORE_PARALLAX_DEFAULT_DISTANCE_METERS = 2.5;
+/** The Quest-selected normal development presentation distance. */
+export const FINITE_CORE_PARALLAX_NORMAL_DISTANCE_METERS = 4.0;
 export const FINITE_CORE_PARALLAX_PROXY_RADIUS_METERS = 0.06;
 export const FINITE_CORE_PARALLAX_DISTANCE_PRESETS = Object.freeze({
   near: 1.5,
@@ -11,9 +13,23 @@ export const FINITE_CORE_PARALLAX_DISTANCE_PRESETS = Object.freeze({
 } as const);
 
 export type FiniteCoreParallaxDistancePreset = keyof typeof FINITE_CORE_PARALLAX_DISTANCE_PRESETS;
+export type EarthCorePresentation = 'none' | 'scientific-marker' | 'finite-proxy';
+
+/**
+ * The Earth Core setting is the final visibility authority. A study may select
+ * the retained scientific comparison marker, but it cannot bypass Core OFF.
+ */
+export function selectEarthCorePresentation(
+  earthCoreEnabled: boolean,
+  requestedMode: string,
+): EarthCorePresentation {
+  if (!earthCoreEnabled) return 'none';
+  return requestedMode === 'baseline' ? 'scientific-marker' : 'finite-proxy';
+}
 
 export interface FiniteCoreParallaxLaunch {
   readonly enabled: boolean;
+  readonly explicitlyRequested: boolean;
   readonly mode: 'baseline' | typeof FINITE_CORE_PARALLAX_MODE;
   readonly distancePreset: FiniteCoreParallaxDistancePreset;
   readonly distanceMeters: number;
@@ -63,10 +79,12 @@ function presetFrom(raw: string | null): FiniteCoreParallaxDistancePreset {
 
 export function parseFiniteCoreParallaxLaunch(search: string): FiniteCoreParallaxLaunch {
   const params = new URLSearchParams(search);
-  const enabled = params.get('coreStudy') === FINITE_CORE_PARALLAX_MODE;
+  const requestedMode = params.get('coreStudy');
+  const enabled = requestedMode === FINITE_CORE_PARALLAX_MODE;
   const distancePreset = presetFrom(params.get('coreDistance'));
   return Object.freeze({
     enabled,
+    explicitlyRequested: requestedMode === 'baseline' || enabled,
     mode: enabled ? FINITE_CORE_PARALLAX_MODE : 'baseline',
     distancePreset,
     distanceMeters: FINITE_CORE_PARALLAX_DISTANCE_PRESETS[distancePreset],

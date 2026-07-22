@@ -56,11 +56,11 @@
           <summary>Observer &amp; time</summary>
           <div class="observer-grid">
             <label for="observer-latitude">Latitude (°)</label>
-            <input id="observer-latitude" type="number" min="-90" max="90" step="0.0001" value="42" inputmode="decimal" />
+            <input id="observer-latitude" type="number" min="-90" max="90" step="0.0001" inputmode="decimal" />
             <label for="observer-longitude">Longitude (° east-positive)</label>
-            <input id="observer-longitude" type="number" step="0.0001" value="0" inputmode="decimal" />
+            <input id="observer-longitude" type="number" step="0.0001" inputmode="decimal" />
             <label for="observer-elevation">Elevation (m MSL)</label>
-            <input id="observer-elevation" type="number" min="-12000" max="100000" step="1" value="0" inputmode="decimal" />
+            <input id="observer-elevation" type="number" min="-12000" max="100000" step="1" inputmode="decimal" />
           </div>
           <p id="observer-error" class="input-error" role="alert"></p>
           <div class="button-row compact-buttons">
@@ -73,7 +73,7 @@
             <button type="button" data-observer-latitude="-34" data-observer-label="Mid-south">Mid-south</button>
             <button type="button" data-observer-latitude="70" data-observer-label="High-north">High-north</button>
           </div>
-          <p class="simulation-note">Presets are generic validation latitudes at 0° longitude and 0 m MSL, not a detected location.</p>
+            <p class="simulation-note">Development defaults are Swartz Creek, Michigan (42.9572°, -83.8308°, 240 m MSL); they are editable initial values, not detected location or persisted preference. Presets are generic validation latitudes at 0° longitude and 0 m MSL.</p>
 
           <div class="time-controls">
             <span class="field-label">Selected UTC</span>
@@ -156,7 +156,7 @@
           </details>
           <details id="finite-core-study-controls" hidden>
             <summary>Finite core parallax experiment</summary>
-            <p class="simulation-note">Development-only go/no-go study. The proxy follows the scientific observer-to-core direction at a deliberately compressed local distance; it is not the literal Earth core.</p>
+            <p class="simulation-note">The normal Earth Core visual is the accepted 4.0 m finite holographic proxy. This comparison control can still select the scientific baseline or the 1.5/2.5/4.0 m proxy studies; no finite distance is the literal Earth-core distance.</p>
             <label for="finite-core-study-mode">Core presentation</label>
             <select id="finite-core-study-mode">
               <option value="baseline">Scientific core baseline</option>
@@ -165,10 +165,10 @@
             <label for="finite-core-distance">Proxy distance</label>
             <select id="finite-core-distance">
               <option value="near">Near — 1.5 m</option>
-              <option value="medium" selected>Medium — 2.5 m</option>
-              <option value="far">Far — 4.0 m</option>
+              <option value="medium">Medium — 2.5 m</option>
+              <option value="far" selected>Far — 4.0 m</option>
             </select>
-            <p class="simulation-note">The finite mode hides the scientific core marker and leaves the coordinate grid as the distant reference. Normal development URLs remain unchanged.</p>
+            <p class="simulation-note">The finite mode hides the scientific core marker and leaves the coordinate grid as the distant reference. The Earth Core toggle remains authoritative in every mode.</p>
             <ul id="finite-core-study-diagnostics" class="diagnostics-list"></ul>
           </details>
         </details>

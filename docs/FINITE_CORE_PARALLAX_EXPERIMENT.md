@@ -1,9 +1,9 @@
 # Finite Core Parallax Experiment
 
-**Status:** Development-only, query-gated go/no-go experiment, deployed from development merge
-`f496f78` through successful Actions/Pages run `29924654192`. Automated and desktop evidence
-validates the projection mechanics, but only physical Quest testing can decide whether the proxy
-is perceptually convincing.
+**Status:** Development-only finite-core presentation, selected by physical Quest comparison.
+The normal Earth Core visual is the far `4.0 m` proxy; the near and medium query-gated modes remain
+available for comparison. This is not a literal Earth-core distance, and integrated toggle/default
+verification remains pending.
 
 ## Question
 
@@ -28,14 +28,16 @@ The **finite holographic core proxy** is a presentation compression. It uses onl
 scientific observer-to-core direction, but stops at one of three local distances:
 
 - near: `1.5 m`
-- medium/default: `2.5 m`
-- far: `4.0 m`
+- medium: `2.5 m`
+- far/default normal development: `4.0 m`
 
 It is not the literal Earth-core location and must never replace the scientific source of truth.
 
 ## Rendering contract
 
-`?coreStudy=finite-parallax` hides the existing scientific core marker, enables the celestial grid
+Normal development uses the far proxy whenever **Earth Core** is enabled. `?coreStudy=finite-parallax` keeps
+the near/medium/far comparison path; an explicit scientific baseline remains diagnostic-only. Earth Core OFF
+always hides both representations. Finite mode hides the existing scientific core marker, enables the celestial grid
 as the distant reference, and shows one `12 cm` diameter low-poly translucent 3D proxy. The proxy
 is an ordinary finite local-metre mesh under:
 

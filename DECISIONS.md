@@ -436,6 +436,18 @@
   depth can make the core read as a hologram against the distant grid without corrupting the
   scientific geocentric model.
 
+### DEC-034: Use the Quest-selected finite proxy as normal development Earth Core presentation
+- **Date:** 2026-07-22
+- **Status:** Accepted for development only; integrated Quest confirmation pending
+- **Decision:** The normal development Earth Core visual is one `4.0 m`, `12 cm` finite
+  holographic proxy along the immutable scientific observer-to-core direction. The Earth Core
+  toggle is authoritative: ON selects exactly one direct core representation and OFF selects none.
+  The scientific homogeneous core anchor remains scientific truth and an explicit diagnostic
+  comparison option; it is not displayed beside the normal proxy. Swartz Creek, Michigan is the
+  editable non-persistent development default (`42.9572`, `-83.8308`, `240 m` MSL).
+- **Rationale:** Quest comparison preferred the far proxy. The finite depth is a disclosed
+  practical holographic presentation aid, not a literal 6.37-million-metre core distance.
+
 ## Proposed decisions awaiting review
 
 None yet.
