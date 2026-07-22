@@ -154,6 +154,23 @@
               <label>Opacity <input id="geo-study-opacity" type="range" min="0.15" max="0.75" step="0.05" value="0.42" /></label>
             </div>
           </details>
+          <details id="finite-core-study-controls" hidden>
+            <summary>Finite core parallax experiment</summary>
+            <p class="simulation-note">Development-only go/no-go study. The proxy follows the scientific observer-to-core direction at a deliberately compressed local distance; it is not the literal Earth core.</p>
+            <label for="finite-core-study-mode">Core presentation</label>
+            <select id="finite-core-study-mode">
+              <option value="baseline">Scientific core baseline</option>
+              <option value="finite-parallax">Finite holographic proxy</option>
+            </select>
+            <label for="finite-core-distance">Proxy distance</label>
+            <select id="finite-core-distance">
+              <option value="near">Near — 1.5 m</option>
+              <option value="medium" selected>Medium — 2.5 m</option>
+              <option value="far">Far — 4.0 m</option>
+            </select>
+            <p class="simulation-note">The finite mode hides the scientific core marker and leaves the coordinate grid as the distant reference. Normal development URLs remain unchanged.</p>
+            <ul id="finite-core-study-diagnostics" class="diagnostics-list"></ul>
+          </details>
         </details>
 
         <details>

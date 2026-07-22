@@ -2,6 +2,30 @@
 
 Desktop success is not Quest success. Record each physical criterion as **PASS**, **FAIL**, **UNCERTAIN**, or **NOT RUN** with notes and evidence.
 
+## Development finite-core parallax experiment — pending
+
+**Physical Quest go/no-go test: NOT RUN.** This tests one compressed near-field presentation aid;
+it does not move or physically accept the scientific Earth core and does not resume the parked
+spindle.
+
+1. Start a fresh private Quest Browser session, open the exact cache-busted development URL, and
+   confirm the visible build identifier.
+2. Enter passthrough WebXR, calibrate north, and open the proxy-plus-grid isolation.
+3. Fix gaze on a grid intersection near the proxy. Move the head slowly right and confirm the
+   fixed proxy shifts left relative to the distant grid.
+4. Move slowly left and confirm the proxy shifts right.
+5. Close each eye independently and confirm coherent, nonzero stereo depth without double images
+   or eye-specific jumps.
+6. Compare `1.5`, `2.5`, and `4.0 m`; record clarity, comfort, and whether parallax decreases with
+   distance.
+7. Confirm the proxy remains world-locked, never head-locked, while all celestial grid and other
+   validated geometry remains unchanged.
+8. Use `diag=1` to record per-eye NDC centers, disparity, camera translation, projected motion,
+   build SHA, and any local suppression.
+9. Confirm no callback or incomplete-frame errors.
+10. Record PASS only if natural finite-object parallax is convincing. Otherwise park or remove the
+    core presentation; do not resume the pole-to-pole line.
+
 ## Development celestial coordinate grid — pending
 
 **Physical Quest acceptance: NOT RUN.** This checklist applies only to the development deployment

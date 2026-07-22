@@ -4,6 +4,15 @@
 
 ### Added
 
+- Added one default-off development finite-core parallax experiment. The
+  `coreStudy=finite-parallax` query replaces only the visible scientific core marker with a fixed
+  `12 cm` local-metre 3D proxy along the scientific observer-to-core direction at `1.5`, `2.5`, or
+  `4.0 m`. Native cameras produce stereo/head-motion parallax; the scientific core, celestial
+  grid, calibration, prior studies, and parked spindle remain unchanged. Focused automated tests
+  prove opposite projected motion for right/left camera translation, nonzero stereo disparity,
+  and the expected inverse distance/parallax relationship. Physical Quest go/no-go validation is
+  still pending.
+
 - Added default-off development observer-offset geocentric presentation studies: a bounded
   observer-to-core ribbon, reference-surface marker, sparse reference-Earth wireframe, local
   geodetic tangent patch, and combined comparison mode. They are selected by `geoStudy`, use only

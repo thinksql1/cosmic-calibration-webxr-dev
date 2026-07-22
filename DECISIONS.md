@@ -421,6 +421,21 @@
   the observer, modifying the celestial structure, or treating a dense explanatory cage as the
   final visual language.
 
+### DEC-033: Test finite natural parallax without changing the scientific core
+- **Date:** 2026-07-22
+- **Status:** Accepted for one development-only go/no-go experiment; physical Quest result pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Keep the shared scientific Earth core and all homogeneous celestial geometry
+  unchanged. When `coreStudy=finite-parallax` is explicit, hide the scientific core marker and
+  show one fixed local-metre 3D proxy along the contract's normalized observer-to-core direction
+  at `1.5`, `2.5`, or `4.0 m`. Parent it only to the calibrated geographic frame and let native XR
+  eye cameras create stereo disparity and head-motion parallax. No shader-simulated parallax,
+  camera parenting, eye-specific mutation, line, sphere, or other study aid is allowed.
+- **Rationale:** Literal Earth-core distance makes human head-motion parallax imperceptible. A
+  deliberately disclosed near-field proxy is the smallest test of whether ordinary finite-object
+  depth can make the core read as a hologram against the distant grid without corrupting the
+  scientific geocentric model.
+
 ## Proposed decisions awaiting review
 
 None yet.
