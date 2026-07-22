@@ -4,11 +4,12 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the physical Quest pole-marker/grid convergence confirmation on the development deployment
+**Title:** Implement the five query-gated observer-offset geocentric presentation-study variants using only the validated `ObserverOffsetGeocentricPresentation` contract, without introducing additional centers, scales, or coordinate conventions.
 
-Use a fresh private Quest Browser session and the cache-busted development URL to confirm north and
-south markers and labels are centered on their respective grid convergence points in both eyes.
-Record only observed results. Do not touch stable or the parked spindle investigation.
+Implement the bounded radius, surface-point, wireframe-reference-Earth, tangent-plane, and combined
+development study modes only after preserving the existing grid/equator/pole contracts. Compare them
+physically in a fresh private Quest Browser session before choosing a production direction. Do not
+touch stable or the parked spindle investigation.
 
 ## Exclusions
 
