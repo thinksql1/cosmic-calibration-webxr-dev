@@ -12,6 +12,10 @@
   prove opposite projected motion for right/left camera translation, nonzero stereo disparity,
   and the expected inverse distance/parallax relationship. Physical Quest go/no-go validation is
   still pending.
+- Normally merged the experiment as `f496f78` into development `master` and published it through
+  successful Actions/Pages run `29924654192`. The hosted page and relative bundle return HTTP 200
+  and embed the merge build identifier. This is development-only deployment evidence, not physical
+  Quest acceptance or stable promotion.
 
 - Added default-off development observer-offset geocentric presentation studies: a bounded
   observer-to-core ribbon, reference-surface marker, sparse reference-Earth wireframe, local

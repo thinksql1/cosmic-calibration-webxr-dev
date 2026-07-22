@@ -2,7 +2,8 @@
 
 ## Finite core parallax experiment (development only)
 
-Branch `experiment/finite-core-parallax` adds one default-off, query-gated near-field holographic
+Feature `f61b6f1b22871915cc756f6f4f206051d74f3d1a`, normally merged into development as
+`f496f78a11711acafcaee0e8dbe5ba9cb762ab16`, adds one default-off, query-gated near-field holographic
 proxy at `1.5`, `2.5`, or `4.0 m`. Its direction is derived exclusively from the validated
 scientific observer-to-core vector, while its local distance is explicitly presentation
 compression rather than the literal WGS84 Earth-core distance. The proxy is a fixed `12 cm` 3D
@@ -10,8 +11,10 @@ mesh below the existing calibrated geographic parent; native left/right XR camer
 creates parallax without camera parenting, screen-space animation, render callbacks, or per-eye
 geometry mutation. `coreStudy=finite-parallax` hides only the scientific core marker and enables
 the unchanged celestial grid as a distant reference. Automated and desktop projection evidence
-passes; physical Quest go/no-go acceptance remains pending. The protected stable repository and
-the parked spindle are unchanged.
+passes. Development Actions run `29924654192` passed install, type-check, 492/492 tests across 51
+files, build, artifact upload, and Pages deployment; hosted HTML and its repository-relative bundle
+return HTTP 200 and identify the merge SHA. Physical Quest go/no-go acceptance remains pending.
+The protected stable repository and the parked spindle are unchanged.
 
 ## Observer-offset geocentric presentation contract (local architecture)
 

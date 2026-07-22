@@ -1,8 +1,9 @@
 # Finite Core Parallax Experiment
 
-**Status:** Development-only, query-gated go/no-go experiment. Automated and desktop evidence
-can validate the projection mechanics, but only physical Quest testing can decide whether the
-proxy is perceptually convincing.
+**Status:** Development-only, query-gated go/no-go experiment, deployed from development merge
+`f496f78` through successful Actions/Pages run `29924654192`. Automated and desktop evidence
+validates the projection mechanics, but only physical Quest testing can decide whether the proxy
+is perceptually convincing.
 
 ## Question
 
