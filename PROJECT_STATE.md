@@ -1,5 +1,18 @@
 # Project State
 
+## Finite core parallax experiment (development only)
+
+Branch `experiment/finite-core-parallax` adds one default-off, query-gated near-field holographic
+proxy at `1.5`, `2.5`, or `4.0 m`. Its direction is derived exclusively from the validated
+scientific observer-to-core vector, while its local distance is explicitly presentation
+compression rather than the literal WGS84 Earth-core distance. The proxy is a fixed `12 cm` 3D
+mesh below the existing calibrated geographic parent; native left/right XR camera projection
+creates parallax without camera parenting, screen-space animation, render callbacks, or per-eye
+geometry mutation. `coreStudy=finite-parallax` hides only the scientific core marker and enables
+the unchanged celestial grid as a distant reference. Automated and desktop projection evidence
+passes; physical Quest go/no-go acceptance remains pending. The protected stable repository and
+the parked spindle are unchanged.
+
 ## Observer-offset geocentric presentation contract (local architecture)
 
 The development study branch now contains a non-rendering, immutable
@@ -8,8 +21,8 @@ core, actual ellipsoidal observer origin, two-semi-major-radius celestial-grid s
 tangent basis, geographic-parent-only yaw, and finite homogeneous `(P / R, 1 / R)` anchor
 encoding. It records the slight WGS84 ellipsoid/reference-sphere difference rather than moving
 either the observer or core. No study geometry, grid/equator change, deployment, stable change, or
-physical acceptance is implied. The exact next task is to implement the five query-gated study
-variants using this contract only.
+physical acceptance is implied. The five query-gated explanatory variants were subsequently
+implemented and deployed to development; no production variant has been selected.
 
 ## Observer-offset geocentric presentation study (development only)
 

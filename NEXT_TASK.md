@@ -4,18 +4,19 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically compare the five observer-offset geocentric presentation-study variants on Quest and select the smallest calm set of cues that makes the Earth-centered structure perceptually clear.
+**Title:** Physically run the finite-core parallax go/no-go experiment on Quest.
 
-Use a fresh private Quest Browser session and exact cache-busted development URL. Confirm the build
-identifier, calibrate once, assess each eye independently, and record only observed clarity,
-comfort, clutter, and scale evidence. Do not choose a production design from desktop evidence,
-touch stable, or change the parked spindle investigation.
+Use a fresh private Quest Browser session and the exact cache-busted development URLs. Confirm the
+build identifier, calibrate north, compare the `1.5`, `2.5`, and `4.0 m` finite proxy distances
+against the unchanged celestial grid, and record natural head-motion parallax, stereo depth,
+world locking, comfort, and errors. Decide only whether the simple finite proxy mechanism passes
+or fails; do not select a broader presentation design from desktop evidence.
 
 ## Exclusions
 
-Do not infer unobserved results, change the parked spindle investigation, add labels,
-constellations, sidereal alignment, or other celestial features, or promote development work to
-the protected stable repository.
+Do not infer unobserved results, resume the parked spindle, alter the scientific Earth-core source,
+move the grid, add other study geometry, or promote development work to the protected stable
+repository.
 
 ## Recommended execution
 

@@ -19,6 +19,17 @@ const state = (
   colorByObjectName: colorByObjectName ? Object.freeze({ ...colorByObjectName }) : undefined,
 });
 
+const CELESTIAL_GRID_LINE_NAMES = Object.freeze([
+  'declination-circle-plus-60', 'declination-circle-plus-30',
+  'declination-circle-minus-30', 'declination-circle-minus-60',
+  'right-ascension-meridian-00h', 'right-ascension-meridian-02h',
+  'right-ascension-meridian-04h', 'right-ascension-meridian-06h',
+  'right-ascension-meridian-08h', 'right-ascension-meridian-10h',
+  'right-ascension-meridian-12h', 'right-ascension-meridian-14h',
+  'right-ascension-meridian-16h', 'right-ascension-meridian-18h',
+  'right-ascension-meridian-20h', 'right-ascension-meridian-22h',
+]);
+
 export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Object.freeze([
   state('all', 'Preset behavior — no object isolation', []),
   state('core-marker', 'Earth core marker only', ['modeled-earth-core-marker'], { 'modeled-earth-core-marker': 0xffffff }),
@@ -57,6 +68,10 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('calibration-ray', 'North-calibration target ray only', ['north-calibration-target-ray'], { 'north-calibration-target-ray': 0xffee00 }),
   state('controller-feedback', 'Controller calibration feedback only', ['north-calibration-controller-feedback']),
   state('world-feedback', 'World calibration feedback only', ['north-calibration-world-feedback']),
+  state('finite-core-proxy', 'Finite holographic core proxy only', ['finite-core-holographic-proxy'], { 'finite-core-holographic-proxy': 0x9cecff }),
+  state('finite-core-proxy-grid', 'Finite core proxy plus celestial grid', ['finite-core-holographic-proxy', ...CELESTIAL_GRID_LINE_NAMES]),
+  state('scientific-core-marker', 'Existing scientific core marker only', ['modeled-earth-core-marker'], { 'modeled-earth-core-marker': 0xffffff }),
+  state('scientific-core-grid', 'Scientific core marker plus celestial grid', ['modeled-earth-core-marker', ...CELESTIAL_GRID_LINE_NAMES]),
   state('geo-study-core-radius', 'Observer-to-core radius only', ['observer-to-earth-core-radius']),
   state('geo-study-surface', 'Observer reference surface marker only', ['observer-reference-surface-marker']),
   state('geo-study-earth', 'Reference Earth wireframe only', ['reference-earth-terrestrial-equator', 'reference-earth-latitude-plus-30', 'reference-earth-latitude-minus-30', 'reference-earth-latitude-plus-60', 'reference-earth-latitude-minus-60', 'reference-earth-meridian-000', 'reference-earth-meridian-030', 'reference-earth-meridian-060', 'reference-earth-meridian-090', 'reference-earth-meridian-120', 'reference-earth-meridian-150']),
