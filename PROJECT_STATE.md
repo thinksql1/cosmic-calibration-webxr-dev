@@ -3,7 +3,7 @@
 ## Integrated finite holographic Earth-core proxy (development only)
 
 Feature `f61b6f1b22871915cc756f6f4f206051d74f3d1a`, normally merged into development as
-`f496f78a11711acafcaee0e8dbe5ba9cb762ab16`, adds one default-off, query-gated near-field holographic
+`f496f78a11711acafcaee0e8dbe5ba9cb762ab16`, adds one near-field holographic
 proxy at `1.5`, `2.5`, or `4.0 m`. Physical Quest testing selected the `4.0 m` far proxy as the
 normal development Earth Core visual. Its direction is derived exclusively from the validated
 scientific observer-to-core vector, while its local distance is explicitly presentation
@@ -16,7 +16,10 @@ anchor remains available for diagnostics and explicit comparison only. Swartz Cr
 (`42.9572`, `-83.8308` east-positive degrees, `240 m` MSL) is the editable, non-persistent
 development default. This presentation proxy is not the literal Earth-core distance. The protected
 stable repository and parked spindle remain unchanged. Physical confirmation of the integrated
-toggle/defaults remains pending.
+toggle/defaults remains pending. Development merge `1d7d5fbd4ec46d1466261a8421bdbe4d0ac2f0ce`
+passed type-check, `494/494` tests across `52` files, build, audit, dependency tree, diff check,
+and desktop input verification; Actions run `29943133628` completed successfully and deployed
+development Pages only.
 
 ## Observer-offset geocentric presentation contract (local architecture)
 

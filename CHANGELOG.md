@@ -10,6 +10,9 @@
   Added editable, non-persistent Swartz Creek development defaults: `42.9572`, `-83.8308`, and
   `240 m` MSL. No stable repository, calibration math, celestial grid, or parked spindle behavior
   changed.
+- Normally merged the integration as `1d7d5fb` into development master and deployed it through
+  successful Actions/Pages run `29943133628`. This is development-only deployment evidence; the
+  integrated Quest toggle/default confirmation remains pending.
 
 - Added one default-off development finite-core parallax experiment. The
   `coreStudy=finite-parallax` query replaces only the visible scientific core marker with a fixed
