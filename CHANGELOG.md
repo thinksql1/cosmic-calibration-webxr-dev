@@ -4,6 +4,14 @@
 
 ### Added
 
+- Extended the development-only apparent topocentric body catalog through Uranus and Neptune and
+  added Pluto as a clearly classified dwarf planet. Each uses the existing Astronomy Engine,
+  observer/time, ENU-to-application, calibrated-parent, and projective XR path. Added independent
+  default-off Planet Labels and individual planet/Pluto visibility controls; labels share their
+  marker direction, have bounded deterministic offsets, and do not change Sun/Moon/pole labels.
+  No stable, core, grid, equator, calibration, or spindle behavior changed. Physical Quest
+  validation remains pending.
+
 - Integrated the physically preferred far finite holographic Earth-core proxy into normal
   development behavior. The Earth Core toggle now selects exactly one direct marker when ON and
   none when OFF, including diagnostic isolation; the retained scientific marker is comparison-only.

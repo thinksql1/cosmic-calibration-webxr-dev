@@ -105,10 +105,25 @@
             <label><input id="show-right-ascension-lines" type="checkbox" checked />Right ascension lines</label>
             <label><input id="show-local-horizon" type="checkbox" />Local horizon</label>
             <label><input id="show-solar-system-bodies" type="checkbox" />Solar-system bodies</label>
+            <label><input id="show-planet-labels" type="checkbox" />Planet labels</label>
             <label><input id="show-solar-daily-path" type="checkbox" />Sun daily path</label>
             <label><input id="show-solar-hour-notches" type="checkbox" />Sun civil-hour notches</label>
             <label><input id="show-solar-path-below-horizon" type="checkbox" checked />Sun path below horizon</label>
           </div>
+          <details id="planet-body-controls">
+            <summary>Individual planet visibility</summary>
+            <div class="toggle-grid" aria-label="Individual planet visibility">
+              <label><input id="show-planet-mercury" type="checkbox" checked />Mercury</label>
+              <label><input id="show-planet-venus" type="checkbox" checked />Venus</label>
+              <label><input id="show-planet-mars" type="checkbox" checked />Mars</label>
+              <label><input id="show-planet-jupiter" type="checkbox" checked />Jupiter</label>
+              <label><input id="show-planet-saturn" type="checkbox" checked />Saturn</label>
+              <label><input id="show-planet-uranus" type="checkbox" checked />Uranus</label>
+              <label><input id="show-planet-neptune" type="checkbox" checked />Neptune</label>
+              <label><input id="show-planet-pluto" type="checkbox" checked />Pluto (dwarf planet)</label>
+            </div>
+            <p class="simulation-note">Individual planet choices affect only their markers and Planet Labels. Sun and Moon remain separate categories.</p>
+          </details>
           <div class="eye-mode-grid" aria-label="XR eye presentation modes">
             <label for="axis-eye-mode">Axis &amp; poles eye mode</label>
             <select id="axis-eye-mode">
@@ -132,7 +147,7 @@
           <p class="simulation-note">Eye modes are reversible XR presentation controls for investigating binocular doubling. Assigning different layers to different eyes may cause binocular rivalry. Desktop remains a visible mono fallback for every mode.</p>
           <p id="eye-presentation-status" class="simulation-note" aria-live="polite"></p>
           <p class="simulation-note">World-scale WGS84 model: one Earth-centered structure contains the core, rotational spindle, projective NCP/SCP directions, and a finite reference ring in the celestial-equatorial plane. The optional 24 m local horizon is intentionally observer-centered and tangent-plane based; its radius is a visual reference, not distance to the natural horizon. The room floor is not an opaque Earth surface.</p>
-          <p class="simulation-note">Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn are actual apparent topocentric directions at the selected observer and UTC instant. Their marker centers are projective directions, not literal distances or diameters; Moon phase, labels, and projection modes are deferred.</p>
+          <p class="simulation-note">Sun and Moon remain separate categories. Mercury through Neptune are major planets; Pluto is a dwarf planet. Their markers are actual apparent topocentric directions at the selected observer and UTC instant. Planet Labels affects only planet/Pluto labels and defaults off; marker sizes are symbolic visibility aids, not planetary disks.</p>
           <p class="simulation-note">The optional Sun path is an observer-relative apparent trace across the selected local civil day. Its notches are independently calculated at valid civil-hour boundaries on the path itself, including below-horizon positions; it is neither the celestial equator nor an annual ecliptic.</p>
           <p class="simulation-note">The coordinate grid is a restrained geocentric reference: four closed declination circles and twelve intentionally open pole-to-pole longitude arcs. Its current 0h reference is deterministic and non-sidereal; future constellations must reuse this coordinate utility rather than introduce another convention.</p>
           <details id="geo-study-controls" hidden>

@@ -32,7 +32,8 @@ describe('actual solar-system body presentation model', () => {
     const { snapshot, bodies } = fixture();
     const model = createSolarSystemBodyPresentationModel(snapshot, bodies, { showBodies: true });
     expect(model.visible).toBe(true);
-    expect(model.markers).toHaveLength(7);
+    expect(model.markers).toHaveLength(10);
+    expect(model.labels).toHaveLength(8);
     expect(model.presentationRadiusPolicy).toBe('DIRECTION_AT_INFINITY_NO_FINITE_CELESTIAL_DISTANCE');
     for (const marker of model.markers) {
       expect(marker.directionApplication.x).toBeCloseTo(marker.directionEnu.east, 14);
@@ -43,6 +44,30 @@ describe('actual solar-system body presentation model', () => {
     }
     expect(Object.isFrozen(model)).toBe(true);
     expect(() => createSolarSystemBodyPresentationModel(snapshot, Object.freeze({ ...bodies, snapshotIdentity: { ...bodies.snapshotIdentity, timeRevision: 99 } }))).toThrow('active immutable scientific snapshot');
+  });
+
+  it('keeps planet labels independent from markers and classifies Pluto as a dwarf planet', () => {
+    const { snapshot, bodies } = fixture();
+    const labelsOff = createSolarSystemBodyPresentationModel(snapshot, bodies, { showBodies: true, showPlanetLabels: false });
+    expect(labelsOff.markers.filter((marker) => marker.body === 'Uranus' || marker.body === 'Neptune' || marker.body === 'Pluto').every((marker) => marker.visible)).toBe(true);
+    expect(labelsOff.labels.every((label) => !label.visible)).toBe(true);
+    const labelsOn = createSolarSystemBodyPresentationModel(snapshot, bodies, { showBodies: true, showPlanetLabels: true, enabledPlanetBodies: ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'] });
+    expect(labelsOn.labels.filter((label) => label.visible)).toHaveLength(8);
+    expect(labelsOn.labels.find((label) => label.body === 'Pluto')!.text).toBe('Pluto (dwarf planet)');
+    expect(labelsOn.labels.every((label) => label.directionApplication === labelsOn.markers.find((marker) => marker.body === label.body)!.directionApplication)).toBe(true);
+  });
+
+  it('hides an individually disabled planet and its label without changing other body categories', () => {
+    const { snapshot, bodies } = fixture();
+    const model = createSolarSystemBodyPresentationModel(snapshot, bodies, {
+      showBodies: true,
+      showPlanetLabels: true,
+      enabledPlanetBodies: ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Pluto'],
+    });
+    expect(model.markers.find((marker) => marker.body === 'Neptune')!.visible).toBe(false);
+    expect(model.labels.find((label) => label.body === 'Neptune')!.visible).toBe(false);
+    expect(model.markers.find((marker) => marker.body === 'Sun')!.visible).toBe(true);
+    expect(model.markers.find((marker) => marker.body === 'Moon')!.visible).toBe(true);
   });
 
   it('keeps the current Sun marker authoritative for a path-only presentation without enabling other bodies', () => {

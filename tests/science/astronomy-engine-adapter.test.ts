@@ -161,7 +161,7 @@ describe('Astronomy Engine adapter against JPL Horizons', () => {
   it('returns one typed actual-position result for every bounded body without exposing provider objects', () => {
     const instant = createSimulationInstant('2025-06-21T16:00:00.000Z', 'frozen-test');
     const observer = createObserver({ latitudeDeg: 42, longitudeDegEast: -83, elevationMeters: 250 });
-    for (const body of ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'] as const) {
+    for (const body of ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'] as const) {
       const result = getApparentTopocentricBody(body, instant, observer, 'AE_APPARENT_TOPOCENTRIC_AIRLESS');
       expect(result).toMatchObject({
         kind: 'VALID_APPARENT_TOPOCENTRIC_BODY',

@@ -4,7 +4,7 @@ import type { SolarSystemBodyPresentationModel } from '../../src/presentation/so
 import { createSolarSystemBodiesGroup } from '../../src/scene/createSolarSystemBodiesGroup';
 
 function model(visible = true): SolarSystemBodyPresentationModel {
-  const bodies = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'] as const;
+  const bodies = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'] as const;
   return Object.freeze({
     kind: 'ready' as const,
     presentationKind: 'PROJECTIVE_APPARENT_TOPOCENTRIC_DIRECTIONS_AT_INFINITY' as const,
@@ -21,7 +21,9 @@ function model(visible = true): SolarSystemBodyPresentationModel {
       aboveHorizon: true,
       celestialEquatorRelation: 'ON' as const,
       style: Object.freeze({ colorHex: 0xffffff, pixelDiameter: 10 + index, opacity: 0.8 }),
+      visible: true,
     }))),
+    labels: Object.freeze([]),
     visible,
     snapshotIdentity: Object.freeze({ snapshotCacheKey: 'snapshot', bodyCacheKey: 'body', observerRevision: 1, timeRevision: 1, calibrationRevision: 1, acceptedCalibrationRevision: 1, configurationRevision: 1 }),
     provenance: Object.freeze({ provider: 'Astronomy Engine', providerVersion: '2.1.19', sourceFrame: 'EQD_TRUE' as const, outputFrame: 'HORIZONTAL_ENU' as const, correctionProfile: 'AE_APPARENT_TOPOCENTRIC_AIRLESS' as const }),
@@ -35,15 +37,17 @@ describe('actual solar-system body Three.js group', () => {
     const points = handle.group.children[0] as THREE.Points;
     const material = points.material as THREE.ShaderMaterial;
     const positions = points.geometry.getAttribute('position') as THREE.BufferAttribute;
-    expect(points.geometry.getAttribute('aColor').count).toBe(7);
-    expect(points.geometry.getAttribute('aPointSize').count).toBe(7);
-    expect(points.geometry.getAttribute('aOpacity').count).toBe(7);
+    expect(points.geometry.getAttribute('aColor').count).toBe(1);
+    expect(points.geometry.getAttribute('aPointSize').count).toBe(1);
+    expect(points.geometry.getAttribute('aOpacity').count).toBe(1);
     expect(Math.max(...Array.from(positions.array, Math.abs))).toBeLessThanOrEqual(1);
     expect(material.depthTest).toBe(false);
     expect(material.depthWrite).toBe(false);
     expect(points.frustumCulled).toBe(false);
     expect(points.renderOrder).toBe(24);
     expect(material.vertexShader).toContain('vec4(position, 0.0)');
+    expect(handle.group.children.filter((object) => object.name.endsWith('-marker'))).toHaveLength(10);
+    expect(new Set(handle.group.children.map((object) => object.name)).size).toBe(handle.group.children.length);
   });
 
   it('is translation invariant for projective directions and disposes only owned resources', () => {
@@ -66,5 +70,16 @@ describe('actual solar-system body Three.js group', () => {
     handle.dispose();
     expect(disposeGeometry).toHaveBeenCalledTimes(1);
     expect(disposeMaterial).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not alter shared marker geometry while sequential XR-eye frames are inspected', () => {
+    const handle = createSolarSystemBodiesGroup();
+    handle.update(model());
+    const points = handle.group.children[0] as THREE.Points;
+    const before = [...(points.geometry.getAttribute('position') as THREE.BufferAttribute).array];
+    const left = new THREE.PerspectiveCamera(); left.position.set(-0.032, 0, 0);
+    const right = new THREE.PerspectiveCamera(); right.position.set(0.032, 0, 0);
+    handle.createFrameForCamera(left); handle.createFrameForCamera(right);
+    expect([...(points.geometry.getAttribute('position') as THREE.BufferAttribute).array]).toEqual(before);
   });
 });

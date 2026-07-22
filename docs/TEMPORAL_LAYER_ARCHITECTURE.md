@@ -8,7 +8,7 @@ implemented or remain deferred. Current temporal implementation status is govern
 `PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, and [Solar 24-Hour Clock](SOLAR_24_HOUR_CLOCK.md).
 
 The published baseline implements one central simulation clock; deterministic frozen and paused
-modes; bounded live refresh; apparent Sun, Moon, and seven-body state; explicit IANA-zone
+modes; bounded live refresh; apparent Sun, Moon, and ten-body state; explicit IANA-zone
 civil-day resolution with DST fold/gap metadata; a daily observer-relative apparent Sun path; and
 exact civil-hour notches. Labels, event-jump controls, broad time manipulation, richer lunar
 temporal visualization, and planetary trajectories remain deferred. All celestial layers consume

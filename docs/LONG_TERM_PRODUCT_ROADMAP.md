@@ -8,7 +8,8 @@ started opportunistically.
 
 The current published baseline includes true-north calibration, observer-centered local horizon,
 WGS84 Earth core, geocentric P03 axis/poles, celestial equator, reversible eye presentation, and
-default-hidden actual apparent markers for Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn.
+default-hidden actual apparent markers for Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn,
+Uranus, Neptune, and Pluto (dwarf planet).
 It also includes the central simulation clock, IANA/DST-aware civil-day handling, the bounded
 observer-relative daily Sun path, civil-hour notches, live celestial updates, scientific
 provenance, and structured warnings/errors. It also includes the published rigid continuous
@@ -145,7 +146,7 @@ the body direction.
 | Apparent Moon | Published baseline; full physical acceptance pending | Preserves material topocentric parallax in the apparent direction and provenance. Phase/illumination, literal distance, and projection/both modes remain deferred. |
 | Moon study scale | Exploratory | Separate true angular size, enhanced study size, and focused-Moon mode. All enhancement is declared presentation, not a physical claim. |
 | Lunar temporal paths | Planned after Moon direction | Support next-24-hour and local-midnight approaches only when the sampling/phase contracts are independently validated; never show a circular observer-centered lunar orbit. |
-| Mercury, Venus, Mars, Jupiter, Saturn | Published baseline; full physical acceptance pending | One Tier 1 correction profile and immutable provenance; no labels, disks, rings, paths, zodiac, or all-at-once planetarium default. |
+| Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto (dwarf planet) | Development body extension; physical Quest acceptance pending | One Tier 1 correction profile and immutable provenance; Planet Labels are default-off and independent; disks, rings, paths, zodiac, collision layout, and all-at-once planetarium default remain deferred. |
 | Object pointing and labels | Planned shared utility | Use angular/screen-space rules, object-specific constraints, collision handling, and source/model diagnostics. A pointer remains an aid, not an astronomical measurement. |
 
 ### 3. Interpretation and contemplative options

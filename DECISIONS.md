@@ -448,6 +448,21 @@
 - **Rationale:** Quest comparison preferred the far proxy. The finite depth is a disclosed
   practical holographic presentation aid, not a literal 6.37-million-metre core distance.
 
+### DEC-035: Extend the apparent body catalog through Pluto with independent planet labels
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only physical Quest validation
+- **Owner:** Darrell Wright / project control
+- **Decision:** Retain the existing Astronomy Engine apparent-topocentric body pipeline and extend
+  its bounded catalog with Uranus, Neptune, and Pluto. Mercury through Neptune are major planets;
+  Pluto is a dwarf planet and Earth remains excluded from the observer sky. Add a default-off
+  Planet Labels master plus individual planet/Pluto visibility controls. Labels reuse the exact
+  projective marker direction with a small bounded offset; Sun, Moon, pole, grid, and horizon
+  labels remain independent. Marker colors/sizes are symbolic, not physical-disk claims.
+- **Rationale:** The provider directly supports the three bodies, so the smallest scientificly
+  consistent extension reuses the validated observer/time/frame/rendering path. Labels address the
+  reported identification limit without beginning a constellation system or a large collision
+  layout engine.
+
 ## Proposed decisions awaiting review
 
 None yet.

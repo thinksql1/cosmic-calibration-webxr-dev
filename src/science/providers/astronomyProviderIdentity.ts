@@ -6,11 +6,11 @@ import {
 
 export const ASTRONOMY_ENGINE_PROVIDER = 'Astronomy Engine' as const;
 export const ASTRONOMY_ENGINE_VERSION = '2.1.19' as const;
-export const APPARENT_TOPOCENTRIC_ADAPTER_VERSION = '1.0.0' as const;
+export const APPARENT_TOPOCENTRIC_ADAPTER_VERSION = '1.1.0' as const;
 export const APPARENT_TOPOCENTRIC_PROVIDER_ID =
-  'ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_V1' as const;
+  'ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_V2' as const;
 export const APPARENT_TOPOCENTRIC_BODY_SET_ID =
-  'SUN_MOON_MERCURY_VENUS_MARS_JUPITER_SATURN_V1' as const;
+  'SUN_MOON_MERCURY_VENUS_MARS_JUPITER_SATURN_URANUS_NEPTUNE_PLUTO_V2' as const;
 
 export type ApparentTopocentricCorrectionProfile = Extract<
   CorrectionProfileId,

@@ -127,7 +127,10 @@ Calibration is deliberately in memory only. Session exit, reload, room change, b
 - `src/presentation/`: immutable scientific-state-to-renderer models, application-basis mapping, geocentric structure presentation, and eye presentation modes.
 - `src/science/state/`, `src/science/snapshot/`, and `src/science/frames/`: explicit WGS84 observer state, UTC simulation clock, revisioned immutable snapshots, P03/WGS84 frame transforms, scientific provenance, structured warnings, and errors.
 - `src/science/astronomy/` and `src/science/providers/`: validated Astronomy Engine adapter, P03 mean-pole provider, correction/frame contracts, and provider identity.
-- `src/science/bodies/`: actual apparent Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn state service.
+- `src/science/bodies/`: actual apparent Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn,
+  Uranus, Neptune, and Pluto state service. Sun/Moon remain separate categories; Pluto is a dwarf
+  planet. Planet/Pluto labels reuse each marker's projective apparent direction and remain
+  independently controlled.
 - `src/science/temporal/` and `src/temporal/`: IANA civil-day/DST resolution, Sun daily-path service, civil-hour metadata, and central-clock live refresh scheduling.
 - `src/calibration/math.ts` and `src/calibration/state.ts`: pure projection/signed-yaw logic and calibration records.
 - `src/xr/state.ts` and `src/xr/controllerCalibration.ts`: capability detection, owned immersive-session lifecycle, target-ray visualization, and native select capture.

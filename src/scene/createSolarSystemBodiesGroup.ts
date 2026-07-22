@@ -1,4 +1,9 @@
 import * as THREE from 'three';
+import {
+  SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES,
+  SUPPORTED_SOLAR_SYSTEM_BODIES,
+  type ObserverRelativeBody,
+} from '../science/astronomy/types';
 import type { SolarSystemBodyPresentationModel } from '../presentation/solarSystemBodyPresentationModel';
 import {
   createSolarSystemBodiesCameraRelativeFrame,
@@ -7,180 +12,154 @@ import {
 
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.997;
 
-const vertexShader = /* glsl */ `
-  attribute vec3 aColor;
-  attribute float aPointSize;
-  attribute float aOpacity;
-  varying vec3 vColor;
-  varying float vOpacity;
+const markerVertexShader = /* glsl */ `
+  attribute vec3 aColor; attribute float aPointSize; attribute float aOpacity;
+  varying vec3 vColor; varying float vOpacity;
   void main() {
-    vec4 clipPosition = projectionMatrix * vec4(position, 0.0);
-    if (clipPosition.w > 0.0) {
-      clipPosition.z = clipPosition.w * ${CLIP_DEPTH_WITHOUT_DEPTH_WRITE.toFixed(3)};
-    }
-    gl_Position = clipPosition;
-    gl_PointSize = aPointSize;
-    vColor = aColor;
-    vOpacity = aOpacity;
+    vec4 clipPosition = projectionMatrix * modelViewMatrix * vec4(position, 0.0);
+    if (clipPosition.w > 0.0) clipPosition.z = clipPosition.w * ${CLIP_DEPTH_WITHOUT_DEPTH_WRITE.toFixed(3)};
+    gl_Position = clipPosition; gl_PointSize = aPointSize; vColor = aColor; vOpacity = aOpacity;
   }
 `;
-
-const fragmentShader = /* glsl */ `
-  uniform float uOpacity;
-  varying vec3 vColor;
-  varying float vOpacity;
+const markerFragmentShader = /* glsl */ `
+  uniform float uOpacity; varying vec3 vColor; varying float vOpacity;
+  void main() { vec2 c = gl_PointCoord - vec2(0.5); if (dot(c, c) > 0.25) discard; gl_FragColor = vec4(vColor, uOpacity * vOpacity); }
+`;
+const labelVertexShader = /* glsl */ `
+  uniform vec3 uDirection; uniform vec2 uOffsetNdc; varying vec2 vUv;
   void main() {
-    vec2 centered = gl_PointCoord - vec2(0.5);
-    if (dot(centered, centered) > 0.25) discard;
-    gl_FragColor = vec4(vColor, uOpacity * vOpacity);
+    vec4 clipPosition = projectionMatrix * modelViewMatrix * vec4(uDirection, 0.0);
+    clipPosition.xy += uOffsetNdc * clipPosition.w;
+    if (clipPosition.w > 0.0) clipPosition.z = clipPosition.w * ${CLIP_DEPTH_WITHOUT_DEPTH_WRITE.toFixed(3)};
+    gl_Position = clipPosition; vUv = uv;
   }
 `;
+const labelFragmentShader = /* glsl */ `
+  uniform sampler2D uMap; uniform float uOpacity; varying vec2 vUv;
+  void main() { vec4 sampled = texture2D(uMap, vUv); gl_FragColor = vec4(sampled.rgb, sampled.a * uOpacity); }
+`;
 
-function material(): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
-    vertexShader,
-    fragmentShader,
-    uniforms: { uOpacity: { value: 1 } },
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
-    toneMapped: false,
-  });
+function markerMaterial(): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({ vertexShader: markerVertexShader, fragmentShader: markerFragmentShader,
+    uniforms: { uOpacity: { value: 1 } }, transparent: true, depthTest: false, depthWrite: false, toneMapped: false });
 }
+function labelTexture(text: string): THREE.Texture | undefined {
+  try {
+    const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 64;
+    const context = canvas.getContext('2d'); if (!context) return undefined;
+    context.font = '600 28px system-ui, sans-serif'; context.textAlign = 'center'; context.textBaseline = 'middle';
+    context.fillStyle = '#d9edf4'; context.shadowColor = 'rgba(0,0,0,0.72)'; context.shadowBlur = 6;
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+    const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; return texture;
+  } catch { return undefined; }
+}
+function bodyName(body: ObserverRelativeBody): string { return `apparent-${body.toLowerCase()}-marker`; }
+function labelName(body: string): string { return `apparent-${body.toLowerCase()}-label`; }
 
+export interface SolarSystemBodiesDiagnostics {
+  readonly activeMarkerObjectNames: readonly string[];
+  readonly activeLabelObjectNames: readonly string[];
+  readonly suppressedMarkerObjectNames: readonly string[];
+  readonly suppressedLabelObjectNames: readonly string[];
+}
 export interface SolarSystemBodiesGroupHandle {
   readonly group: THREE.Group;
   update(model: SolarSystemBodyPresentationModel): void;
   clear(): void;
+  /** Reapplies user feature gates after diagnostics isolate a descendant. */
+  enforceVisibilityControls(): void;
   dispose(): void;
   createFrameForCamera(camera: THREE.Camera): SolarSystemBodiesCameraRelativeFrame;
+  getDiagnostics(): SolarSystemBodiesDiagnostics;
 }
 
-/** Owns seven bounded homogeneous body-marker attributes and their material. */
+/**
+ * Owns immutable projective marker and label objects. Native Three.js model-view
+ * and projection matrices resolve each XR eye; no shared geometry or uniforms
+ * are changed during rendering.
+ */
 export function createSolarSystemBodiesGroup(): SolarSystemBodiesGroupHandle {
-  const group = new THREE.Group();
-  group.name = 'actual-apparent-solar-system-body-directions';
-  group.visible = false;
-  const geometry = new THREE.BufferGeometry();
-  const positions = new THREE.Float32BufferAttribute(7 * 3, 3);
-  const colors = new THREE.Float32BufferAttribute(7 * 3, 3);
-  const pointSizes = new THREE.Float32BufferAttribute(7, 1);
-  const opacities = new THREE.Float32BufferAttribute(7, 1);
-  geometry.setAttribute('position', positions);
-  geometry.setAttribute('aColor', colors);
-  geometry.setAttribute('aPointSize', pointSizes);
-  geometry.setAttribute('aOpacity', opacities);
-  const pointsMaterial = material();
-  const points = new THREE.Points(geometry, pointsMaterial);
-  points.name = 'actual-apparent-solar-system-body-markers';
-  points.frustumCulled = false;
-  points.renderOrder = 24;
-  group.add(points);
+  const group = new THREE.Group(); group.name = 'actual-apparent-solar-system-body-directions'; group.visible = false;
+  const markers = new Map<ObserverRelativeBody, THREE.Points>();
+  const labels = new Map<string, THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>();
+  const ownedTextures: THREE.Texture[] = []; let currentModel: SolarSystemBodyPresentationModel | undefined; let disposed = false;
+  let diagnostics: SolarSystemBodiesDiagnostics = Object.freeze({ activeMarkerObjectNames: Object.freeze([]), activeLabelObjectNames: Object.freeze([]), suppressedMarkerObjectNames: Object.freeze([]), suppressedLabelObjectNames: Object.freeze([]) });
+  const suppressedMarkers = new Set<string>(); const suppressedLabels = new Set<string>();
 
-  let currentModel: SolarSystemBodyPresentationModel | undefined;
-  let disposed = false;
-  let cachedFrame: SolarSystemBodiesCameraRelativeFrame | undefined;
-  let cachedCamera: THREE.Camera | undefined;
-  const cachedCameraWorld = new THREE.Matrix4();
-  const cachedGroupWorld = new THREE.Matrix4();
-
-  function invalidate(): void {
-    cachedFrame = undefined;
-    cachedCamera = undefined;
+  for (const body of SUPPORTED_SOLAR_SYSTEM_BODIES) {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -1], 3));
+    geometry.setAttribute('aColor', new THREE.Float32BufferAttribute([1, 1, 1], 3));
+    geometry.setAttribute('aPointSize', new THREE.Float32BufferAttribute([1], 1));
+    geometry.setAttribute('aOpacity', new THREE.Float32BufferAttribute([0], 1));
+    const points = new THREE.Points(geometry, markerMaterial()); points.name = bodyName(body); points.visible = false; points.frustumCulled = false; points.renderOrder = 24;
+    points.userData.body = body; points.userData.projectiveW = 0; group.add(points); markers.set(body, points);
+  }
+  for (const body of SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES) {
+    const texture = labelTexture(body === 'Pluto' ? 'Pluto (dwarf planet)' : body);
+    if (!texture) continue;
+    ownedTextures.push(texture);
+    const material = new THREE.ShaderMaterial({ vertexShader: labelVertexShader, fragmentShader: labelFragmentShader,
+      uniforms: { uDirection: { value: new THREE.Vector3(0, 0, -1) }, uOffsetNdc: { value: new THREE.Vector2() }, uMap: { value: texture }, uOpacity: { value: 0.88 } },
+      transparent: true, depthTest: false, depthWrite: false, toneMapped: false });
+    const label = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material); label.name = labelName(body); label.visible = false; label.frustumCulled = false; label.renderOrder = 25;
+    label.userData.body = body; label.userData.projectiveW = 0; group.add(label); labels.set(body, label);
   }
 
-  function frameForCamera(camera: THREE.Camera): SolarSystemBodiesCameraRelativeFrame {
-    if (disposed) throw new Error('Solar-system body renderer has been disposed.');
-    if (
-      cachedFrame && cachedCamera === camera && cachedCameraWorld.equals(camera.matrixWorld) &&
-      cachedGroupWorld.equals(group.matrixWorld)
-    ) return cachedFrame;
-    if (!currentModel) throw new Error('Solar-system body render frame is not scientifically ready.');
-    cachedFrame = createSolarSystemBodiesCameraRelativeFrame(
-      currentModel,
-      group.matrixWorld,
-      camera.matrixWorld,
-    );
-    cachedCamera = camera;
-    cachedCameraWorld.copy(camera.matrixWorld);
-    cachedGroupWorld.copy(group.matrixWorld);
-    return cachedFrame;
-  }
-
-  points.onBeforeRender = (_renderer, _scene, camera) => {
-    const frame = frameForCamera(camera);
-    const values = positions.array as Float32Array;
-    frame.directionsView.forEach((direction, index) => {
-      const offset = index * 3;
-      values[offset] = direction.x;
-      values[offset + 1] = direction.y;
-      values[offset + 2] = direction.z;
+  const refreshDiagnostics = (): void => {
+    diagnostics = Object.freeze({
+      activeMarkerObjectNames: Object.freeze([...markers.values()].filter((object) => object.visible).map((object) => object.name)),
+      activeLabelObjectNames: Object.freeze([...labels.values()].filter((object) => object.visible).map((object) => object.name)),
+      suppressedMarkerObjectNames: Object.freeze([...suppressedMarkers]),
+      suppressedLabelObjectNames: Object.freeze([...new Set([...SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES.filter((body) => !labels.has(body)).map(labelName), ...suppressedLabels])]),
     });
-    positions.needsUpdate = true;
-    group.userData.maximumUploadedComponentMagnitude = frame.maximumUploadedComponentMagnitude;
-    group.userData.float32DirectionAngularErrorArcseconds = frame.float32DirectionAngularErrorArcseconds;
   };
-
   return Object.freeze({
     group,
-    update(model: SolarSystemBodyPresentationModel): void {
+    update(model: SolarSystemBodyPresentationModel) {
       if (disposed) throw new Error('Cannot update a disposed solar-system body renderer.');
-      if (model.markers.length !== 7) {
-        throw new Error('Solar-system body renderer requires exactly seven supported markers.');
-      }
+      if (model.markers.length !== SUPPORTED_SOLAR_SYSTEM_BODIES.length) throw new Error('Solar-system body renderer requires the complete supported catalog.');
       currentModel = model;
-      invalidate();
-      const colorValues = colors.array as Float32Array;
-      const sizeValues = pointSizes.array as Float32Array;
-      const opacityValues = opacities.array as Float32Array;
-      model.markers.forEach((marker, index) => {
-        const color = new THREE.Color(marker.style.colorHex);
-        const offset = index * 3;
-        colorValues[offset] = color.r;
-        colorValues[offset + 1] = color.g;
-        colorValues[offset + 2] = color.b;
-        sizeValues[index] = marker.style.pixelDiameter;
-        opacityValues[index] = marker.style.opacity;
+      suppressedMarkers.clear(); suppressedLabels.clear();
+      for (const marker of model.markers) {
+        const object = markers.get(marker.body)!; const geometry = object.geometry;
+        const valid = [marker.directionApplication.x, marker.directionApplication.y, marker.directionApplication.z, marker.style.pixelDiameter, marker.style.opacity]
+          .every(Number.isFinite);
+        if (!valid) {
+          object.visible = false; object.userData.controlVisible = false; suppressedMarkers.add(object.name); continue;
+        }
+        (geometry.getAttribute('position') as THREE.BufferAttribute).setXYZ(0, marker.directionApplication.x, marker.directionApplication.y, marker.directionApplication.z);
+        const color = new THREE.Color(marker.style.colorHex); (geometry.getAttribute('aColor') as THREE.BufferAttribute).setXYZ(0, color.r, color.g, color.b);
+        (geometry.getAttribute('aPointSize') as THREE.BufferAttribute).setX(0, marker.style.pixelDiameter);
+        (geometry.getAttribute('aOpacity') as THREE.BufferAttribute).setX(0, marker.style.opacity);
+        for (const attribute of Object.values(geometry.attributes)) attribute.needsUpdate = true;
+        object.userData.controlVisible = model.visible && marker.visible && marker.style.opacity > 0;
+        object.visible = object.userData.controlVisible;
+      }
+      for (const labelModel of model.labels) {
+        const object = labels.get(labelModel.body); if (!object) continue;
+        const valid = [labelModel.directionApplication.x, labelModel.directionApplication.y, labelModel.directionApplication.z, labelModel.offsetNdc[0], labelModel.offsetNdc[1]]
+          .every(Number.isFinite);
+        if (!valid) {
+          object.visible = false; object.userData.controlVisible = false; suppressedLabels.add(object.name); continue;
+        }
+        (object.material.uniforms.uDirection.value as THREE.Vector3).set(labelModel.directionApplication.x, labelModel.directionApplication.y, labelModel.directionApplication.z);
+        (object.material.uniforms.uOffsetNdc.value as THREE.Vector2).set(labelModel.offsetNdc[0], labelModel.offsetNdc[1]);
+        object.userData.controlVisible = model.visible && labelModel.visible;
+        object.visible = object.userData.controlVisible;
+      }
+      group.visible = model.visible; group.userData.provenance = model.provenance; group.userData.bodyCacheKey = model.snapshotIdentity.bodyCacheKey; refreshDiagnostics();
+    },
+    clear() { currentModel = undefined; group.visible = false; suppressedMarkers.clear(); suppressedLabels.clear(); [...markers.values(), ...labels.values()].forEach((object) => { object.visible = false; object.userData.controlVisible = false; }); refreshDiagnostics(); },
+    enforceVisibilityControls() {
+      if (!currentModel?.visible) group.visible = false;
+      [...markers.values(), ...labels.values()].forEach((object) => {
+        if (object.userData.controlVisible !== true) object.visible = false;
       });
-      colors.needsUpdate = true;
-      pointSizes.needsUpdate = true;
-      opacities.needsUpdate = true;
-      points.visible = model.visible;
-      group.visible = model.visible;
-      group.userData.snapshotCacheKey = model.snapshotIdentity.snapshotCacheKey;
-      group.userData.bodyCacheKey = model.snapshotIdentity.bodyCacheKey;
-      group.userData.acceptedCalibrationRevision = model.snapshotIdentity.acceptedCalibrationRevision;
-      group.userData.renderStrategy = model.renderStrategy;
-      group.userData.depthContract = model.depthContract;
-      group.userData.presentationRadiusPolicy = model.presentationRadiusPolicy;
-      group.userData.provenance = model.provenance;
+      refreshDiagnostics();
     },
-    clear(): void {
-      currentModel = undefined;
-      invalidate();
-      points.visible = false;
-      group.visible = false;
-      group.userData.snapshotCacheKey = undefined;
-      group.userData.bodyCacheKey = undefined;
-      group.userData.acceptedCalibrationRevision = undefined;
-    },
-    dispose(): void {
-      if (disposed) return;
-      disposed = true;
-      currentModel = undefined;
-      invalidate();
-      points.onBeforeRender = () => undefined;
-      group.visible = false;
-      group.removeFromParent();
-      geometry.dispose();
-      pointsMaterial.dispose();
-      group.clear();
-      group.userData.disposed = true;
-    },
-    createFrameForCamera(camera: THREE.Camera): SolarSystemBodiesCameraRelativeFrame {
-      group.updateWorldMatrix(true, false);
-      camera.updateWorldMatrix(true, false);
-      return frameForCamera(camera);
-    },
+    dispose() { if (disposed) return; disposed = true; currentModel = undefined; group.removeFromParent(); for (const object of markers.values()) { object.geometry.dispose(); (object.material as THREE.Material).dispose(); } for (const object of labels.values()) { object.geometry.dispose(); object.material.dispose(); } ownedTextures.forEach((texture) => texture.dispose()); group.clear(); },
+    createFrameForCamera(camera: THREE.Camera) { if (disposed) throw new Error('Solar-system body renderer has been disposed.'); if (!currentModel) throw new Error('Solar-system body render frame is not scientifically ready.'); group.updateWorldMatrix(true, false); camera.updateWorldMatrix(true, false); return createSolarSystemBodiesCameraRelativeFrame(currentModel, group.matrixWorld, camera.matrixWorld); },
+    getDiagnostics() { return diagnostics; },
   });
 }

@@ -129,7 +129,7 @@ not applicable. See [Mean Pole Model Validation](MEAN_POLE_MODEL_VALIDATION.md).
 ### Apparent topocentric equatorial
 
 The adapter calls Astronomy Engine `Equator(body, time, observer, true, true)` for the bounded
-Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn list. The provider documentation defines this as topocentric, light-time corrected, parallax
+Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto list. The provider documentation defines this as topocentric, light-time corrected, parallax
 corrected, aberration enabled, and true-equator-of-date. The application result records:
 
 - `EQD_TRUE` rather than a generic equatorial tag;
@@ -229,7 +229,7 @@ while adding any missing safe scientific context.
 
 The body layer uses one frozen application-owned descriptor:
 `ASTRONOMY_ENGINE_APPARENT_TOPOCENTRIC_V1`. It binds the Astronomy Engine name/version, body-adapter
-version, supported Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn set, supported airless/normal
+version, supported Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto set, supported airless/normal
 correction profiles, and the `EQD_TRUE -> HORIZONTAL_ENU` frame contract. The structural snapshot
 retains a recursively frozen copy; `SolarSystemBodyStateService` verifies the active registry
 descriptor against it before invoking the adapter or consulting its cache.
@@ -290,7 +290,7 @@ Tier 2 same-profile/same-observer frame comparison remains deferred.
 `ScientificSnapshotService` supplies the structural P03 orchestration boundary. It accepts an
 explicit immutable observer/clock/calibration/configuration state set and a typed registry. The
 separate `SolarSystemBodyStateService` uses the same validated snapshot inputs and registry for the
-bounded seven-body actual-direction state; it has its own exact frozen-time cache identity so body
+bounded ten-body actual-direction state; it has its own exact frozen-time cache identity so body
 cadence does not bloat the structural P03 snapshot. Neither service permits provider calls from
 presentation. See [Scientific Snapshot Contract](SCIENTIFIC_SNAPSHOT_CONTRACT.md),
 [Scientific Cache Policy](SCIENTIFIC_CACHE_POLICY.md), and

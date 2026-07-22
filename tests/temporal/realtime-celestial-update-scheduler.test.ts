@@ -48,7 +48,7 @@ describe('real-time celestial update scheduler', () => {
     expect(clock.current.instant.utcIso).toBe('2025-06-21T16:01:00.000Z');
   });
 
-  it('advances all seven production body directions through one shared deterministic one-hour refresh', () => {
+  it('advances all supported production body directions through one shared deterministic one-hour refresh', () => {
     const clock = new SimulationClock(createSimulationInstant('2025-06-21T16:00:00.000Z', 'frozen-test'));
     clock.startRealtime();
     const observer = new ObserverStateStore();
