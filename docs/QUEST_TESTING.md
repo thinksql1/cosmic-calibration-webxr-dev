@@ -24,6 +24,24 @@ spindle/equator evidence.
 14. Recalibrate, reset, exit, and re-enter; confirm the grid rebuilds without stale geometry.
 15. Confirm existing celestial body, Sun path, civil-hour-notch, horizon, axis, and equator layers remain operational; record that the unresolved spindle behavior is unchanged.
 
+## Development observer-offset geocentric presentation study — pending
+
+**Physical Quest comparison: NOT RUN.** This is a development-only design comparison, not a
+production acceptance or a repair of the parked spindle.
+
+1. Start a fresh private Quest Browser session and open one exact cache-busted development URL per
+   `geoStudy` mode; confirm the visible build identifier before entering AR.
+2. Complete north calibration once, enable the celestial grid where helpful, and compare baseline,
+   core-radius, surface-point, wireframe-earth, tangent-plane, and combined in each eye separately.
+3. Move slowly, look toward both poles, and place the structure near the viewport edge. Record
+   whether the Earth core reads as the celestial-sphere center and the observer reads as offset.
+4. Assess whether the Earth reference sphere and tangent patch clarify the local-horizon relation
+   without becoming a dense cage, causing discomfort, or obscuring passthrough.
+5. Use `?diag=1` and the `geo-study-*` isolation modes to distinguish study geometry from floor,
+   horizon, grid, and parked spindle objects. Record frame/callback errors if any.
+6. Preserve all existing grid/equator/pole/horizon/Sun/body behavior and record only observed
+   evidence. Select no production aid until the comparison is reviewed.
+
 ## Unified geocentric core, spindle, poles, and equator — pending
 
 **Physical Quest acceptance: NOT RUN.** Integration and deployment are complete; on physical Quest:

@@ -4,12 +4,12 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Implement the five query-gated observer-offset geocentric presentation-study variants using only the validated `ObserverOffsetGeocentricPresentation` contract, without introducing additional centers, scales, or coordinate conventions.
+**Title:** Physically compare the five observer-offset geocentric presentation-study variants on Quest and select the smallest calm set of cues that makes the Earth-centered structure perceptually clear.
 
-Implement the bounded radius, surface-point, wireframe-reference-Earth, tangent-plane, and combined
-development study modes only after preserving the existing grid/equator/pole contracts. Compare them
-physically in a fresh private Quest Browser session before choosing a production direction. Do not
-touch stable or the parked spindle investigation.
+Use a fresh private Quest Browser session and exact cache-busted development URL. Confirm the build
+identifier, calibrate once, assess each eye independently, and record only observed clarity,
+comfort, clutter, and scale evidence. Do not choose a production design from desktop evidence,
+touch stable, or change the parked spindle investigation.
 
 ## Exclusions
 

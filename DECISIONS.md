@@ -409,6 +409,18 @@
   studies without falsely re-centering the model, uploading raw Earth-scale vertices, or quietly
   treating the WGS84 ellipsoid as a perfect sphere.
 
+### DEC-032: Compare observer-offset explanation aids before selecting a production visual
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only Quest study; production choice pending
+- **Decision:** Expose baseline, core-radius, reference-surface, wireframe-Earth, tangent-plane,
+  and combined modes only through the development `geoStudy` query/control path. Keep them static,
+  default-off, bounded-homogeneous, and sourced solely from DEC-031's contract. Use physical Quest
+  comparison to select the smallest calm cue set; do not promote an aid based on desktop review.
+- **Rationale:** The issue is perceptual communication rather than a failed grid/core coordinate
+  relationship. Reversible, isolated study modes gather the needed evidence without re-centering
+  the observer, modifying the celestial structure, or treating a dense explanatory cage as the
+  final visual language.
+
 ## Proposed decisions awaiting review
 
 None yet.
