@@ -55,9 +55,14 @@ const projectiveQuadVertexShader = /* glsl */ `
   uniform vec2 uViewportPixels;
   uniform vec2 uSizePixels;
   uniform vec2 uOffsetPixels;
+  uniform float uDrawEnabled;
   varying vec2 vUv;
 
   void main() {
+    if (uDrawEnabled < 0.5) {
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
     vec4 clipPosition = projectionMatrix * vec4(uViewVector, uProjectiveW);
     vec2 pixelOffset = position.xy * uSizePixels + uOffsetPixels;
     clipPosition.xy += pixelOffset * (2.0 / uViewportPixels) * clipPosition.w;
@@ -178,6 +183,7 @@ function createProjectiveQuad(parameters: {
     uSizePixels: { value: new THREE.Vector2(18, 18) },
     uOffsetPixels: { value: new THREE.Vector2() },
     uOpacity: { value: 0.9 },
+    uDrawEnabled: { value: 1 },
   };
   if (parameters.color !== undefined) {
     uniforms.uColor = { value: new THREE.Color(parameters.color) };
@@ -432,11 +438,26 @@ export function createEarthAxisGroup(
 
   const bindQuad = (
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>,
-    vector: (frame: EarthAxisCameraRelativeFrame) => EarthAxisCameraRelativeFrame['coreView'],
+    point: (frame: EarthAxisCameraRelativeFrame) => Readonly<{ x: number; y: number; z: number; w: number }>,
   ) => {
     mesh.onBeforeRender = (renderer, _scene, camera) => {
-      const frame = frameForCamera(camera);
-      setVectorUniform(mesh.material.uniforms.uViewVector, vector(frame));
+      let frame: EarthAxisCameraRelativeFrame;
+      try {
+        frame = frameForCamera(camera);
+        const anchor = point(frame);
+        if (![anchor.x, anchor.y, anchor.z, anchor.w].every(Number.isFinite)) {
+          mesh.material.uniforms.uDrawEnabled.value = 0;
+          report('earth-axis.pole-anchor-suppressed', `${mesh.name}|non-finite-anchor`);
+          return;
+        }
+        setVectorUniform(mesh.material.uniforms.uViewVector, anchor);
+        mesh.material.uniforms.uProjectiveW.value = anchor.w;
+        mesh.material.uniforms.uDrawEnabled.value = 1;
+      } catch (error) {
+        mesh.material.uniforms.uDrawEnabled.value = 0;
+        report('earth-axis.pole-anchor-suppressed', `${mesh.name}|${error instanceof Error ? error.message : String(error)}`);
+        return;
+      }
       setViewportUniforms(renderer, mesh.material);
       group.userData.cameraRelativeCoreMagnitudeMeters = frame.cameraRelativeCoreMagnitudeMeters;
       group.userData.maximumUploadedComponentMagnitude = frame.maximumUploadedComponentMagnitude;
@@ -446,11 +467,11 @@ export function createEarthAxisGroup(
     };
   };
 
-  bindQuad(earthCore, (frame) => frame.coreView);
-  bindQuad(northMarker, (frame) => frame.northDirectionView);
-  bindQuad(southMarker, (frame) => frame.southDirectionView);
-  bindQuad(northLabel, (frame) => frame.northDirectionView);
-  bindQuad(southLabel, (frame) => frame.southDirectionView);
+  bindQuad(earthCore, (frame) => ({ ...frame.coreView, w: 1 }));
+  bindQuad(northMarker, (frame) => frame.northGridConvergenceView ?? frame.spindleNorthEndpoint);
+  bindQuad(southMarker, (frame) => frame.southGridConvergenceView ?? frame.spindleSouthEndpoint);
+  bindQuad(northLabel, (frame) => frame.northGridConvergenceView ?? frame.spindleNorthEndpoint);
+  bindQuad(southLabel, (frame) => frame.southGridConvergenceView ?? frame.spindleSouthEndpoint);
 
   return Object.freeze({
     group,

@@ -4,6 +4,10 @@
 
 ### Added
 
+- Repaired development pole-marker/grid convergence: marker and label anchors now use the grid's
+  canonical exact antipodal directions and finite homogeneous convergence points. The grid,
+  spindle, calibration, and styling remain unchanged.
+
 - Added a development-only celestial coordinate grid: four restrained closed declination circles
   (`+60`, `+30`, `-30`, `-60`) and twelve explicitly open pole-to-pole longitude arcs at two-hour
   intervals. It shares the immutable geocentric core/axis/equatorial basis, uses a documented

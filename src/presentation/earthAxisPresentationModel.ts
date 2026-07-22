@@ -7,6 +7,7 @@ import {
   createGeocentricCelestialStructurePresentation,
   type GeocentricCelestialStructurePresentation,
 } from './geocentricCelestialStructurePresentation';
+import { createEquatorialCoordinateBasis, getCanonicalCelestialPoleDirections } from './equatorialCoordinates';
 
 export const CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS = 10_000_000_000_000;
 export const EARTH_AXIS_LINEAR_SCENE_FAR_METERS = 100;
@@ -100,6 +101,7 @@ export interface EarthAxisPresentationModel {
   readonly poleLabelWidthPixels: number;
   readonly poleLabelHeightPixels: number;
   readonly poleRenderConvergenceUpperBoundArcseconds: number;
+  readonly gridConvergenceRadiusMeters?: number;
   readonly observerToCoreDistanceMeters: number;
   readonly observerToAxisDistanceMeters: number;
   readonly geocentricStructure: GeocentricCelestialStructurePresentation;
@@ -191,8 +193,13 @@ export function createEarthAxisPresentationModel(
   const earthCore = geocentricStructure.earthCore;
   const northDirectionEnu = geocentricStructure.northAxisDirectionEnu;
   const southDirectionEnu = geocentricStructure.southAxisDirectionEnu;
-  const northDirectionApplication = geocentricStructure.northAxisDirection;
-  const southDirectionApplication = geocentricStructure.southAxisDirection;
+  const canonicalPoles = getCanonicalCelestialPoleDirections(createEquatorialCoordinateBasis(
+    geocentricStructure.equatorialBasisFirst,
+    geocentricStructure.equatorialBasisSecond,
+    geocentricStructure.northAxisDirection,
+  ));
+  const northCanonicalDirectionApplication = canonicalPoles.north;
+  const southCanonicalDirectionApplication = canonicalPoles.south;
   const convergenceBound = convergenceUpperBoundArcseconds(
     placement.observerToCoreDistanceMeters,
   );
@@ -203,8 +210,8 @@ export function createEarthAxisPresentationModel(
     renderTopology: 'ONE_PROJECTIVELY_CLIPPED_SCREEN_SPACE_SPINDLE',
     coordinateFrameIdentity: 'APPLICATION_BASIS_UNCALIBRATED_BELOW_GEOGRAPHIC_PARENT',
     earthCore,
-    northDirection: northDirectionApplication,
-    southDirection: southDirectionApplication,
+    northDirection: northCanonicalDirectionApplication,
+    southDirection: southCanonicalDirectionApplication,
     displayExtentMeters: CELESTIAL_POLE_RENDER_DISTANCE_FROM_CORE_METERS,
     calibrationRevision: snapshot.revisions.geographicCalibration,
     acceptedCalibrationRevision:
@@ -236,6 +243,7 @@ export function createEarthAxisPresentationModel(
     poleLabelWidthPixels: CELESTIAL_POLE_LABEL_WIDTH_PIXELS,
     poleLabelHeightPixels: CELESTIAL_POLE_LABEL_HEIGHT_PIXELS,
     poleRenderConvergenceUpperBoundArcseconds: convergenceBound,
+    gridConvergenceRadiusMeters: geocentricStructure.celestialEquatorDisplayRadiusMeters,
     observerToCoreDistanceMeters: placement.observerToCoreDistanceMeters,
     observerToAxisDistanceMeters: placement.observerToAxisDistanceMeters,
     geocentricStructure,
@@ -244,7 +252,7 @@ export function createEarthAxisPresentationModel(
       'NCP',
       snapshot.observerHorizontalEarthAxis.north,
       northDirectionEnu,
-      northDirectionApplication,
+      northCanonicalDirectionApplication,
       earthCore,
       settings,
     ),
@@ -252,7 +260,7 @@ export function createEarthAxisPresentationModel(
       'SCP',
       snapshot.observerHorizontalEarthAxis.south,
       southDirectionEnu,
-      southDirectionApplication,
+      southCanonicalDirectionApplication,
       earthCore,
       settings,
     ),

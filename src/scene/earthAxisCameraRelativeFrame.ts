@@ -33,6 +33,8 @@ export interface EarthAxisCameraRelativeFrame {
   readonly coreView: CameraRelativeVector;
   readonly northDirectionView: CameraRelativeVector;
   readonly southDirectionView: CameraRelativeVector;
+  readonly northGridConvergenceView?: BoundedHomogeneousSpindlePoint;
+  readonly southGridConvergenceView?: BoundedHomogeneousSpindlePoint;
   readonly spindleCore: BoundedHomogeneousSpindlePoint;
   readonly spindleNorthEndpoint: BoundedHomogeneousSpindlePoint;
   readonly spindleSouthEndpoint: BoundedHomogeneousSpindlePoint;
@@ -319,6 +321,10 @@ export function createEarthAxisCameraRelativeFrame(
   if (!Number.isFinite(spindle.displayExtentMeters) || spindle.displayExtentMeters <= 0) {
     throw new Error('Earth-axis spindle display extent must be finite and positive.');
   }
+  const gridConvergenceRadius = model.gridConvergenceRadiusMeters ?? spindle.displayExtentMeters;
+  if (!Number.isFinite(gridConvergenceRadius) || gridConvergenceRadius <= 0) {
+    throw new Error('Pole marker convergence requires a finite positive grid radius.');
+  }
 
   const cameraPositionWorld = new THREE.Vector3().setFromMatrixPosition(cameraWorldMatrix);
   const cameraWorldRotation = new THREE.Quaternion().setFromRotationMatrix(cameraWorldMatrix);
@@ -346,6 +352,7 @@ export function createEarthAxisCameraRelativeFrame(
   const northDirectionView = finiteVector(northViewValue, 'unitless');
   const southDirectionView = exactAntipode(northDirectionView);
   const inverseDisplayExtent = 1 / spindle.displayExtentMeters;
+  const inverseGridRadius = 1 / gridConvergenceRadius;
   const spindleCore = spindlePoint(coreView, northDirectionView, 0, inverseDisplayExtent);
   const spindleNorthEndpoint = spindlePoint(
     coreView,
@@ -358,6 +365,18 @@ export function createEarthAxisCameraRelativeFrame(
     northDirectionView,
     -1,
     inverseDisplayExtent,
+  );
+  const northGridConvergenceView = spindlePoint(
+    coreView,
+    northDirectionView,
+    1,
+    inverseGridRadius,
+  );
+  const southGridConvergenceView = spindlePoint(
+    coreView,
+    northDirectionView,
+    -1,
+    inverseGridRadius,
   );
   const floatCore = float32Vector(coreView);
   const floatNorth = float32Vector(northDirectionView);
@@ -381,6 +400,8 @@ export function createEarthAxisCameraRelativeFrame(
     coreView,
     northDirectionView,
     southDirectionView,
+    northGridConvergenceView,
+    southGridConvergenceView,
     spindleCore,
     spindleNorthEndpoint,
     spindleSouthEndpoint,

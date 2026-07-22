@@ -4,12 +4,11 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the physical Quest acceptance test for the development celestial coordinate grid
+**Title:** Independently revalidate and deploy the development pole-marker/grid convergence repair
 
-Execute the pending celestial-coordinate-grid checklist in `docs/QUEST_TESTING.md` on physical
-Quest hardware against the development deployment. Record only observed PASS, FAIL, UNCERTAIN, or
-NOT RUN results, including left/right-eye visibility and open-meridian behavior. Preserve exact
-device/browser evidence where available.
+Review the focused canonical-pole, finite-homogeneous-anchor repair; validate, merge, and deploy
+only to the development repository if it passes. Do not touch stable. Physical confirmation remains
+pending after deployment.
 
 ## Exclusions
 

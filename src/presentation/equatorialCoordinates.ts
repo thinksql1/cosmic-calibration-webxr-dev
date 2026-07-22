@@ -17,6 +17,11 @@ export interface EquatorialCoordinateBasis {
   readonly northPole: ApplicationBasisDirection;
 }
 
+export interface CanonicalCelestialPoleDirections {
+  readonly north: ApplicationBasisDirection;
+  readonly south: ApplicationBasisDirection;
+}
+
 function dot(a: ApplicationBasisDirection, b: ApplicationBasisDirection): number {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -56,6 +61,22 @@ export function rightAscensionToRadians(value: number, units: RightAscensionUnit
   return value * Math.PI / 180;
 }
 
+/** The single source for the grid, pole markers, labels, and future stars. */
+export function getCanonicalCelestialPoleDirections(
+  basis: EquatorialCoordinateBasis,
+): CanonicalCelestialPoleDirections {
+  return Object.freeze({
+    north: basis.northPole,
+    south: Object.freeze({
+      frame: 'APPLICATION_BASIS',
+      units: 'unitless',
+      x: -basis.northPole.x,
+      y: -basis.northPole.y,
+      z: -basis.northPole.z,
+    }),
+  });
+}
+
 /** Converts RA/declination to a finite normalized application-basis direction. */
 export function equatorialCoordinatesToDirection(
   rightAscension: number,
@@ -66,6 +87,9 @@ export function equatorialCoordinatesToDirection(
   if (!Number.isFinite(declinationDegrees) || declinationDegrees < -90 || declinationDegrees > 90) {
     throw new Error('Declination must be finite and within -90 through +90 degrees.');
   }
+  const poles = getCanonicalCelestialPoleDirections(basis);
+  if (declinationDegrees === 90) return poles.north;
+  if (declinationDegrees === -90) return poles.south;
   const ra = rightAscensionToRadians(rightAscension, rightAscensionUnits);
   const dec = declinationDegrees * Math.PI / 180;
   const equatorialRadius = Math.cos(dec);

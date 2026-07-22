@@ -1,5 +1,14 @@
 # Project State
 
+## Development pole-marker/grid convergence repair (local)
+
+The successful development celestial grid is authoritative. Audit found a finite-vs-infinite
+presentation mismatch: meridian endpoints use the finite Earth-core-centered grid radius while
+pole markers/labels previously used projective infinity. The local repair gives markers and labels
+the exact canonical grid pole directions and the same finite homogeneous endpoint. The parked
+spindle is unchanged; integration, development deployment, and physical confirmation of this
+focused repair remain pending.
+
 ## Development-only celestial coordinate grid
 
 `feature/celestial-coordinate-grid` adds a default-hidden geocentric reference grid without
