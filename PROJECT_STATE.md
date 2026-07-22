@@ -1,5 +1,25 @@
 # Project State
 
+## Observer-offset geocentric presentation contract (local architecture)
+
+The development study branch now contains a non-rendering, immutable
+`ObserverOffsetGeocentricPresentation` contract. It preserves the existing shared WGS84 Earth
+core, actual ellipsoidal observer origin, two-semi-major-radius celestial-grid scale, local ENU
+tangent basis, geographic-parent-only yaw, and finite homogeneous `(P / R, 1 / R)` anchor
+encoding. It records the slight WGS84 ellipsoid/reference-sphere difference rather than moving
+either the observer or core. No study geometry, grid/equator change, deployment, stable change, or
+physical acceptance is implied. The exact next task is to implement the five query-gated study
+variants using this contract only.
+
+## Observer-offset geocentric presentation study (development only)
+
+The study branch now adds query-gated, default-off explanatory aids: baseline, observer-to-core
+radius, reference-surface marker, sparse reference-Earth wireframe, local tangent patch, and a
+combined comparison mode. They consume the immutable observer-offset contract and bounded finite
+homogeneous anchors without changing the celestial grid, equator, poles, calibration, horizon,
+solar layers, or parked spindle. Development-only Pages deployment and physical Quest comparison
+are pending; no production design has been selected.
+
 ## Development pole-marker/grid convergence repair (local)
 
 The successful development celestial grid is authoritative. Audit found a finite-vs-infinite

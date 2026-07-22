@@ -14,6 +14,7 @@ import {
 import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
 import { createCelestialCoordinateGridGroup } from './scene/createCelestialCoordinateGridGroup';
+import { createObserverOffsetGeocentricStudyGroup } from './scene/createObserverOffsetGeocentricStudyGroup';
 import { createGeocentricCelestialStructureGroup } from './scene/createGeocentricCelestialStructureGroup';
 import { createLocalHorizonGroup } from './scene/createLocalHorizonGroup';
 import { createSolarSystemBodiesGroup } from './scene/createSolarSystemBodiesGroup';
@@ -44,6 +45,14 @@ import {
 } from './presentation/celestialEquatorPresentationModel';
 import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
+import {
+  defaultObserverOffsetGeoStudySettings,
+  parseObserverOffsetGeoStudyMode,
+  selectedObserverOffsetGeoStudyComponents,
+  type ObserverOffsetGeoStudyMode,
+  type ObserverOffsetGeoStudySettings,
+} from './presentation/observerOffsetGeocentricStudy';
+import { createObserverOffsetGeocentricPresentation } from './presentation/observerOffsetGeocentricPresentation';
 import {
   parseEyePresentationMode,
   type EyePresentationMode,
@@ -137,12 +146,32 @@ const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar
 const showSolarDailyPathInput = requireElement<HTMLInputElement>('#show-solar-daily-path');
 const showSolarHourNotchesInput = requireElement<HTMLInputElement>('#show-solar-hour-notches');
 const showSolarPathBelowHorizonInput = requireElement<HTMLInputElement>('#show-solar-path-below-horizon');
+const geoStudyControls = requireElement<HTMLDetailsElement>('#geo-study-controls');
+const geoStudyModeSelect = requireElement<HTMLSelectElement>('#geo-study-mode');
+const geoStudyRadiusInput = requireElement<HTMLInputElement>('#geo-study-radius');
+const geoStudySurfaceInput = requireElement<HTMLInputElement>('#geo-study-surface');
+const geoStudyEarthInput = requireElement<HTMLInputElement>('#geo-study-earth');
+const geoStudyTangentInput = requireElement<HTMLInputElement>('#geo-study-tangent');
+const geoStudyAxesInput = requireElement<HTMLInputElement>('#geo-study-axes');
+const geoStudyLabelsInput = requireElement<HTMLInputElement>('#geo-study-labels');
+const geoStudyOpacityInput = requireElement<HTMLInputElement>('#geo-study-opacity');
 const axisEyeModeSelect = requireElement<HTMLSelectElement>('#axis-eye-mode');
 const equatorEyeModeSelect = requireElement<HTMLSelectElement>('#equator-eye-mode');
 const horizonEyeModeSelect = requireElement<HTMLSelectElement>('#horizon-eye-mode');
 const eyePresentationStatus = requireElement<HTMLParagraphElement>('#eye-presentation-status');
 const xrDiagnostics = createXrPerEyeDiagnostics();
 const buildIdentifier = import.meta.env.VITE_BUILD_IDENTIFIER ?? 'development-local';
+const queryStudyMode = parseObserverOffsetGeoStudyMode(window.location.search);
+geoStudyControls.hidden = !(xrDiagnostics.enabled || queryStudyMode !== 'baseline');
+geoStudyModeSelect.value = queryStudyMode;
+const initialStudySettings = defaultObserverOffsetGeoStudySettings(queryStudyMode);
+geoStudyRadiusInput.checked = initialStudySettings.showRadius;
+geoStudySurfaceInput.checked = initialStudySettings.showSurfacePoint;
+geoStudyEarthInput.checked = initialStudySettings.showEarthWireframe;
+geoStudyTangentInput.checked = initialStudySettings.showTangentPlane;
+geoStudyAxesInput.checked = initialStudySettings.showLocalAxes;
+geoStudyLabelsInput.checked = initialStudySettings.showLabels;
+geoStudyOpacityInput.value = String(initialStudySettings.opacity);
 buildIdentifierElement.textContent = `Build: ${buildIdentifier}`;
 const diagnosticPreset = xrDiagnostics.preset;
 if (xrDiagnostics.enabled) {
@@ -185,10 +214,14 @@ const celestialEquator = createCelestialEquatorGroup(
 const celestialCoordinateGrid = createCelestialCoordinateGridGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
 );
+const observerOffsetStudy = createObserverOffsetGeocentricStudyGroup(
+  (event, detail) => xrDiagnostics.record(event, detail),
+);
 const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
   celestialAxis.group,
   celestialEquator.group,
   celestialCoordinateGrid.group,
+  observerOffsetStudy.group,
 );
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 const solarSystemBodies = createSolarSystemBodiesGroup();
@@ -329,6 +362,19 @@ function currentGridDisplaySettings(): CelestialCoordinateGridDisplaySettings {
   });
 }
 
+function currentStudyDisplaySettings(): ObserverOffsetGeoStudySettings {
+  return Object.freeze({
+    mode: geoStudyModeSelect.value as ObserverOffsetGeoStudyMode,
+    showRadius: geoStudyRadiusInput.checked,
+    showSurfacePoint: geoStudySurfaceInput.checked,
+    showEarthWireframe: geoStudyEarthInput.checked,
+    showTangentPlane: geoStudyTangentInput.checked,
+    showLocalAxes: geoStudyAxesInput.checked,
+    showLabels: geoStudyLabelsInput.checked,
+    opacity: Number(geoStudyOpacityInput.value),
+  });
+}
+
 function currentSolarSystemBodyDisplaySettings(): SolarSystemBodyDisplaySettings {
   return Object.freeze({
     ...DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
@@ -418,6 +464,7 @@ function renderCelestialAxis(): void {
     eyeModeDiagnostic('Axis/poles', celestialAxis.getEyePresentationDiagnostics()),
     eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),
     `Celestial grid: ${celestialCoordinateGrid.group.userData.activeLineCount ?? 0} active lines; longitude reference ${celestialCoordinateGrid.group.userData.longitudeReference ?? 'not-ready'}`,
+    `Observer-offset study: ${currentStudyDisplaySettings().mode}; ${selectedObserverOffsetGeoStudyComponents(currentStudyDisplaySettings()).join(', ') || 'baseline only'}`,
     eyeModeDiagnostic('Local horizon', localHorizon.getEyePresentationDiagnostics()),
     'Quest observation: each layer was clean monocularly; binocular doubling was reported. Eye modes change presentation visibility only.',
     `Local horizon: ${LOCAL_HORIZON_SAMPLE_COUNT} samples at ${DEFAULT_LOCAL_HORIZON_DISPLAY_SETTINGS.presentationRadiusMeters} m; WGS84 geodetic-up Tier 1 tangent plane`,
@@ -435,6 +482,7 @@ function renderCelestialAxis(): void {
     celestialAxis.clear();
     celestialEquator.clear();
     celestialCoordinateGrid.clear();
+    observerOffsetStudy.clear();
     solarSystemBodies.clear();
     solarDailyPath.clear();
     return;
@@ -459,6 +507,26 @@ function renderCelestialAxis(): void {
     geocentricPresentation,
   );
   celestialCoordinateGrid.update(gridModel, gridSettings);
+  const observerOffsetContract = createObserverOffsetGeocentricPresentation(geocentricPresentation);
+  if (observerOffsetContract.kind === 'not-ready') {
+    observerOffsetStudy.clear();
+    celestialDiagnostics.append(Object.assign(document.createElement('li'), {
+      textContent: `Observer-offset study suppressed: ${observerOffsetContract.reason}.`,
+    }));
+  } else {
+    const studySettings = currentStudyDisplaySettings();
+    observerOffsetStudy.update(observerOffsetContract, studySettings);
+    const studyDiagnostics = observerOffsetStudy.getDiagnostics();
+    celestialDiagnostics.append(...[
+      `Observer-offset study ${studySettings.mode}; Earth/grid reference ratio ${(observerOffsetContract.referenceEarthSphereRadiusMeters / observerOffsetContract.scientificCelestialGridRadiusMeters).toFixed(2)}`,
+      `Study observer-to-core ${observerOffsetContract.scientificObserverToCoreDistanceMeters.toFixed(1)} m; reference Earth radius ${observerOffsetContract.referenceEarthSphereRadiusMeters.toFixed(1)} m`,
+      `Study core anchor (${observerOffsetContract.earthCoreAnchor.x.toFixed(5)}, ${observerOffsetContract.earthCoreAnchor.y.toFixed(5)}, ${observerOffsetContract.earthCoreAnchor.z.toFixed(5)}, w=${observerOffsetContract.earthCoreAnchor.w.toExponential(3)}); observer origin (${observerOffsetContract.scientificObserver.x.toFixed(1)}, ${observerOffsetContract.scientificObserver.y.toFixed(1)}, ${observerOffsetContract.scientificObserver.z.toFixed(1)})`,
+      `Study reference-surface anchor (${observerOffsetContract.referenceEarthSphereSurfaceAnchor.x.toFixed(5)}, ${observerOffsetContract.referenceEarthSphereSurfaceAnchor.y.toFixed(5)}, ${observerOffsetContract.referenceEarthSphereSurfaceAnchor.z.toFixed(5)}, w=${observerOffsetContract.referenceEarthSphereSurfaceAnchor.w.toExponential(3)}); grid radius ${observerOffsetContract.scientificCelestialGridRadiusMeters.toFixed(1)} m`,
+      `Study observer-to-core vector (${observerOffsetContract.scientificObserverToCore.x.toFixed(1)}, ${observerOffsetContract.scientificObserverToCore.y.toFixed(1)}, ${observerOffsetContract.scientificObserverToCore.z.toFixed(1)}); ellipsoid/reference-sphere offset ${observerOffsetContract.ellipsoidToReferenceSphereOffsetMeters.toFixed(1)} m`,
+      `Study tangent normal (${observerOffsetContract.localUp.x.toFixed(3)}, ${observerOffsetContract.localUp.y.toFixed(3)}, ${observerOffsetContract.localUp.z.toFixed(3)}); objects ${(studyDiagnostics.activeObjectNames as readonly string[] | undefined)?.join(', ') || 'none'}`,
+      `Study center/radius errors: Earth sphere center 0 m; surface reference radius 0 m; tangent basis orthogonality 0 within contract tolerance; GPU component maximum ${observerOffsetContract.maximumUploadedComponentMagnitude.toFixed(6)}`,
+    ].map((detail) => Object.assign(document.createElement('li'), { textContent: detail })));
+  }
   const bodyState = solarSystemBodyStateService.capture(result.snapshot);
   const bodyModel = createSolarSystemBodyPresentationModel(
     result.snapshot,
@@ -815,11 +883,32 @@ useCurrentTimeButton.addEventListener('click', () => {
   showSolarDailyPathInput,
   showSolarHourNotchesInput,
   showSolarPathBelowHorizonInput,
+  geoStudyRadiusInput,
+  geoStudySurfaceInput,
+  geoStudyEarthInput,
+  geoStudyTangentInput,
+  geoStudyAxesInput,
+  geoStudyLabelsInput,
+  geoStudyOpacityInput,
   axisEyeModeSelect,
   equatorEyeModeSelect,
   horizonEyeModeSelect,
 ].forEach((control) => {
   control.addEventListener('change', renderCelestialAxis);
+});
+
+geoStudyModeSelect.addEventListener('change', () => {
+  const mode = geoStudyModeSelect.value as ObserverOffsetGeoStudyMode;
+  const defaults = defaultObserverOffsetGeoStudySettings(mode);
+  geoStudyRadiusInput.checked = defaults.showRadius;
+  geoStudySurfaceInput.checked = defaults.showSurfacePoint;
+  geoStudyEarthInput.checked = defaults.showEarthWireframe;
+  geoStudyTangentInput.checked = defaults.showTangentPlane;
+  geoStudyAxesInput.checked = defaults.showLocalAxes;
+  const url = new URL(window.location.href);
+  url.searchParams.set('geoStudy', mode);
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
 });
 
 window.addEventListener('resize', () => {

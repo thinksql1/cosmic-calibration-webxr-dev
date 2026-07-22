@@ -135,6 +135,25 @@
           <p class="simulation-note">Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn are actual apparent topocentric directions at the selected observer and UTC instant. Their marker centers are projective directions, not literal distances or diameters; Moon phase, labels, and projection modes are deferred.</p>
           <p class="simulation-note">The optional Sun path is an observer-relative apparent trace across the selected local civil day. Its notches are independently calculated at valid civil-hour boundaries on the path itself, including below-horizon positions; it is neither the celestial equator nor an annual ecliptic.</p>
           <p class="simulation-note">The coordinate grid is a restrained geocentric reference: four closed declination circles and twelve intentionally open pole-to-pole longitude arcs. Its current 0h reference is deterministic and non-sidereal; future constellations must reuse this coordinate utility rather than introduce another convention.</p>
+          <details id="geo-study-controls" hidden>
+            <summary>Observer-offset geocentric study</summary>
+            <p class="simulation-note">Development-only explanatory aids. They do not change the validated celestial grid, equator, or calibration.</p>
+            <label for="geo-study-mode">Study mode</label>
+            <select id="geo-study-mode">
+              <option value="baseline">Baseline</option><option value="core-radius">Observer-to-core radius</option>
+              <option value="surface-point">Reference surface point</option><option value="wireframe-earth">Wireframe Earth</option>
+              <option value="tangent-plane">Tangent plane</option><option value="combined">Combined study</option>
+            </select>
+            <div class="toggle-grid">
+              <label><input id="geo-study-radius" type="checkbox" />Core radius</label>
+              <label><input id="geo-study-surface" type="checkbox" />Surface marker</label>
+              <label><input id="geo-study-earth" type="checkbox" />Earth wireframe</label>
+              <label><input id="geo-study-tangent" type="checkbox" />Tangent patch</label>
+              <label><input id="geo-study-axes" type="checkbox" />Local axes</label>
+              <label><input id="geo-study-labels" type="checkbox" />Study labels</label>
+              <label>Opacity <input id="geo-study-opacity" type="range" min="0.15" max="0.75" step="0.05" value="0.42" /></label>
+            </div>
+          </details>
         </details>
 
         <details>

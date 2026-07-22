@@ -4,11 +4,12 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Run the physical Quest pole-marker/grid convergence confirmation on the development deployment
+**Title:** Physically compare the five observer-offset geocentric presentation-study variants on Quest and select the smallest calm set of cues that makes the Earth-centered structure perceptually clear.
 
-Use a fresh private Quest Browser session and the cache-busted development URL to confirm north and
-south markers and labels are centered on their respective grid convergence points in both eyes.
-Record only observed results. Do not touch stable or the parked spindle investigation.
+Use a fresh private Quest Browser session and exact cache-busted development URL. Confirm the build
+identifier, calibrate once, assess each eye independently, and record only observed clarity,
+comfort, clutter, and scale evidence. Do not choose a production design from desktop evidence,
+touch stable, or change the parked spindle investigation.
 
 ## Exclusions
 

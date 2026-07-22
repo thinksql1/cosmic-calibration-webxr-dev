@@ -4,6 +4,20 @@
 
 ### Added
 
+- Added default-off development observer-offset geocentric presentation studies: a bounded
+  observer-to-core ribbon, reference-surface marker, sparse reference-Earth wireframe, local
+  geodetic tangent patch, and combined comparison mode. They are selected by `geoStudy`, use only
+  the validated finite homogeneous contract, add diagnostic isolation, and leave the validated
+  celestial grid/equator and parked spindle unchanged. No production variant is selected pending
+  physical Quest comparison.
+
+- Added the architecture-only `ObserverOffsetGeocentricPresentation` contract for later
+  development study aids. It reuses the existing shared Earth core, WGS84 semi-major reference
+  radius, two-radius celestial-grid scale, local ENU tangent basis, and finite homogeneous anchor
+  convention without adding scene objects or changing the validated grid/equator. The explicit
+  WGS84 ellipsoid-versus-reference-sphere distinction prevents a future visual aid from silently
+  moving the observer or inventing a second center. No deployment or physical test occurred.
+
 - Repaired development pole-marker/grid convergence: marker and label anchors now use the grid's
   canonical exact antipodal directions and finite homogeneous convergence points. The grid,
   spindle, calibration, and styling remain unchanged.

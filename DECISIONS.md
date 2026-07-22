@@ -393,6 +393,34 @@
   reference is honest, testable, and reusable for later constellation work without falsely
   claiming real-sky RA alignment or reviving the former camera-relative equator approach.
 
+### DEC-031: Keep observer-offset explanatory aids on the existing finite geocentric contract
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only architecture; no visible study variant selected
+- **Owner:** Darrell Wright / project control
+- **Decision:** Use one immutable `ObserverOffsetGeocentricPresentation` derived from the existing
+  `GeocentricCelestialStructurePresentation`. Its finite points use the existing bounded
+  homogeneous encoding `(P / R, 1 / R)`, with `R` equal to the two-WGS84-semi-major-radius
+  celestial grid. The core remains the one shared center; the actual observer remains a separate
+  WGS84 ellipsoidal local origin. Preserve WGS84 local ENU geodetic up for tangent cues, while
+  exposing a separately labeled one-semi-major-radius reference-sphere point for explanatory
+  geometry. Apply geographic yaw only on the existing parent and never mutate anchors per eye.
+- **Rationale:** The finite grid is mathematically centered on the core, but an observer near the
+  surface sees it from an off-center perspective. A named contract permits bounded explanatory
+  studies without falsely re-centering the model, uploading raw Earth-scale vertices, or quietly
+  treating the WGS84 ellipsoid as a perfect sphere.
+
+### DEC-032: Compare observer-offset explanation aids before selecting a production visual
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only Quest study; production choice pending
+- **Decision:** Expose baseline, core-radius, reference-surface, wireframe-Earth, tangent-plane,
+  and combined modes only through the development `geoStudy` query/control path. Keep them static,
+  default-off, bounded-homogeneous, and sourced solely from DEC-031's contract. Use physical Quest
+  comparison to select the smallest calm cue set; do not promote an aid based on desktop review.
+- **Rationale:** The issue is perceptual communication rather than a failed grid/core coordinate
+  relationship. Reversible, isolated study modes gather the needed evidence without re-centering
+  the observer, modifying the celestial structure, or treating a dense explanatory cage as the
+  final visual language.
+
 ## Proposed decisions awaiting review
 
 None yet.
