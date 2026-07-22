@@ -4,6 +4,13 @@
 
 ### Added
 
+- Added a development-only celestial coordinate grid: four restrained closed declination circles
+  (`+60`, `+30`, `-30`, `-60`) and twelve explicitly open pole-to-pole longitude arcs at two-hour
+  intervals. It shares the immutable geocentric core/axis/equatorial basis, uses a documented
+  deterministic non-sidereal 0h reference, and adds reusable coordinate conversion, controls,
+  diagnostics, isolation, and focused geometry/XR-safety tests. No spindle behavior, stable
+  repository, stable workflow, or stable Pages deployment changed.
+
 - Independently revalidated and normally integrated the unified geocentric celestial structure
   with merge `1acedcdac660214a7cbc9cf0ace469f1c2e3c20d`. Feature and merged `master` pass
   438/438 tests across 40 files, type-check, production build, diff, and dependency checks with no

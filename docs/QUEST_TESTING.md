@@ -2,6 +2,28 @@
 
 Desktop success is not Quest success. Record each physical criterion as **PASS**, **FAIL**, **UNCERTAIN**, or **NOT RUN** with notes and evidence.
 
+## Development celestial coordinate grid — pending
+
+**Physical Quest acceptance: NOT RUN.** This checklist applies only to the development deployment
+after the local coordinate-grid feature is published there; it does not alter the accepted stable
+spindle/equator evidence.
+
+1. Open the exact development deployment in Quest passthrough and record commit/browser versions.
+2. Apply observer and true-north calibration, then enable the celestial coordinate grid.
+3. Confirm the grid appears in the left eye.
+4. Confirm the grid appears in the right eye.
+5. Confirm the existing celestial equator remains correct and independent.
+6. Confirm declination circles remain parallel to the equator and shrink toward the poles.
+7. Confirm right-ascension meridians run continuously from SCP to NCP.
+8. Confirm meridians remain open rather than becoming closed vertical loops.
+9. Confirm meridian spacing appears uniform and the 0h arc is only modestly emphasized.
+10. Toggle the master, declination, and right-ascension controls repeatedly; record duplicates or leaks.
+11. Look toward either pole and view lines edge-on; record any exception, instability, or incomplete XR frame.
+12. Use diagnostic isolation to distinguish the celestial grid from floor/local horizons, cardinal geometry, and the parked spindle.
+13. Move laterally and vertically; confirm coherent geocentric parallax and no camera-following grid.
+14. Recalibrate, reset, exit, and re-enter; confirm the grid rebuilds without stale geometry.
+15. Confirm existing celestial body, Sun path, civil-hour-notch, horizon, axis, and equator layers remain operational; record that the unresolved spindle behavior is unchanged.
+
 ## Unified geocentric core, spindle, poles, and equator — pending
 
 **Physical Quest acceptance: NOT RUN.** Integration and deployment are complete; on physical Quest:

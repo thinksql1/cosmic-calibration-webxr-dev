@@ -13,6 +13,7 @@ import {
 } from './scene/createGeographicReference';
 import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
+import { createCelestialCoordinateGridGroup } from './scene/createCelestialCoordinateGridGroup';
 import { createGeocentricCelestialStructureGroup } from './scene/createGeocentricCelestialStructureGroup';
 import { createLocalHorizonGroup } from './scene/createLocalHorizonGroup';
 import { createSolarSystemBodiesGroup } from './scene/createSolarSystemBodiesGroup';
@@ -41,6 +42,7 @@ import {
   DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
   type CelestialEquatorDisplaySettings,
 } from './presentation/celestialEquatorPresentationModel';
+import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
 import {
   parseEyePresentationMode,
@@ -126,6 +128,9 @@ const showMarkersInput = requireElement<HTMLInputElement>('#show-pole-markers');
 const showLabelsInput = requireElement<HTMLInputElement>('#show-pole-labels');
 const showBelowHorizonInput = requireElement<HTMLInputElement>('#show-below-horizon');
 const showCelestialEquatorInput = requireElement<HTMLInputElement>('#show-celestial-equator');
+const showCelestialGridInput = requireElement<HTMLInputElement>('#show-celestial-coordinate-grid');
+const showDeclinationGridInput = requireElement<HTMLInputElement>('#show-declination-lines');
+const showRightAscensionGridInput = requireElement<HTMLInputElement>('#show-right-ascension-lines');
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const showSolarDailyPathInput = requireElement<HTMLInputElement>('#show-solar-daily-path');
@@ -174,9 +179,13 @@ const celestialEquator = createCelestialEquatorGroup(
   96,
   (event, detail) => xrDiagnostics.record(event, detail),
 );
+const celestialCoordinateGrid = createCelestialCoordinateGridGroup(
+  (event, detail) => xrDiagnostics.record(event, detail),
+);
 const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
   celestialAxis.group,
   celestialEquator.group,
+  celestialCoordinateGrid.group,
 );
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 const solarSystemBodies = createSolarSystemBodiesGroup();
@@ -285,6 +294,7 @@ function diagnosticSnapshot(label: string, state: NorthCalibrationState): void {
       horizon: localHorizon.group,
       earthAxis: celestialAxis.group,
       equator: celestialEquator.group,
+      grid: celestialCoordinateGrid.group,
     },
   );
 }
@@ -304,6 +314,15 @@ function currentEquatorDisplaySettings(): CelestialEquatorDisplaySettings {
   return Object.freeze({
     ...DEFAULT_CELESTIAL_EQUATOR_DISPLAY_SETTINGS,
     showEquator: showCelestialEquatorInput.checked,
+  });
+}
+
+function currentGridDisplaySettings(): CelestialCoordinateGridDisplaySettings {
+  return Object.freeze({
+    ...DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS,
+    showGrid: showCelestialGridInput.checked,
+    showDeclinationLines: showDeclinationGridInput.checked,
+    showRightAscensionLines: showRightAscensionGridInput.checked,
   });
 }
 
@@ -394,6 +413,7 @@ function renderCelestialAxis(): void {
     ...view.diagnostics,
     eyeModeDiagnostic('Axis/poles', celestialAxis.getEyePresentationDiagnostics()),
     eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),
+    `Celestial grid: ${celestialCoordinateGrid.group.userData.activeLineCount ?? 0} active lines; longitude reference ${celestialCoordinateGrid.group.userData.longitudeReference ?? 'not-ready'}`,
     eyeModeDiagnostic('Local horizon', localHorizon.getEyePresentationDiagnostics()),
     'Quest observation: each layer was clean monocularly; binocular doubling was reported. Eye modes change presentation visibility only.',
     `Local horizon: ${LOCAL_HORIZON_SAMPLE_COUNT} samples at ${DEFAULT_LOCAL_HORIZON_DISPLAY_SETTINGS.presentationRadiusMeters} m; WGS84 geodetic-up Tier 1 tangent plane`,
@@ -410,6 +430,7 @@ function renderCelestialAxis(): void {
   if (result.kind !== 'ready') {
     celestialAxis.clear();
     celestialEquator.clear();
+    celestialCoordinateGrid.clear();
     solarSystemBodies.clear();
     solarDailyPath.clear();
     return;
@@ -427,6 +448,13 @@ function renderCelestialAxis(): void {
     geocentricPresentation,
   );
   celestialEquator.update(equatorModel);
+  const gridSettings = currentGridDisplaySettings();
+  const gridModel = createCelestialCoordinateGridPresentationModel(
+    result.snapshot,
+    gridSettings,
+    geocentricPresentation,
+  );
+  celestialCoordinateGrid.update(gridModel, gridSettings);
   const bodyState = solarSystemBodyStateService.capture(result.snapshot);
   const bodyModel = createSolarSystemBodyPresentationModel(
     result.snapshot,
@@ -478,6 +506,8 @@ function renderCelestialAxis(): void {
       `Equator basis ${equatorModel.provenance.frame} from ${equatorModel.provenance.sourceBasisFrame}; ${equatorModel.provenance.samplingPhase}`,
       `Equator render strategy ${equatorModel.renderStrategy}`,
       `Equator depth contract ${equatorModel.depthContract}`,
+      `Celestial coordinate grid: ${gridModel.lines.filter((line) => line.family === 'declination').length} closed declination circles; ${gridModel.lines.filter((line) => line.family === 'right-ascension').length} open pole-to-pole right-ascension meridians`,
+      'Grid longitude is a deterministic local canonical reference, not a claimed sidereal or vernal-equinox alignment.',
       `Bodies: ${bodyModel.markers.length} actual apparent topocentric directions; ${bodyModel.provenance.correctionProfile}; below-horizon positions retained`,
       `Bodies render strategy ${bodyModel.renderStrategy}; ${bodyModel.presentationRadiusPolicy}`,
     ].map((diagnostic) => {
@@ -495,6 +525,7 @@ function setImmersivePresentation(active: boolean): void {
   if (!active) {
     celestialAxis.applyEyePresentationViews();
     celestialEquator.applyEyePresentationViews();
+    celestialCoordinateGrid.applyEyePresentationViews();
     localHorizon.applyEyePresentationViews();
   }
 }
@@ -772,6 +803,9 @@ useCurrentTimeButton.addEventListener('click', () => {
   showLabelsInput,
   showBelowHorizonInput,
   showCelestialEquatorInput,
+  showCelestialGridInput,
+  showDeclinationGridInput,
+  showRightAscensionGridInput,
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
   showSolarDailyPathInput,
@@ -799,6 +833,7 @@ function applyEyePresentationForFrame(frame?: XRFrame): void {
   }
   celestialAxis.applyEyePresentationViews(views, renderer.xr.isPresenting);
   celestialEquator.applyEyePresentationViews(views, renderer.xr.isPresenting);
+  celestialCoordinateGrid.applyEyePresentationViews(views, renderer.xr.isPresenting);
   localHorizon.applyEyePresentationViews(views, renderer.xr.isPresenting);
   updateEyePresentationStatus();
 }
@@ -829,6 +864,7 @@ renderer.setAnimationLoop((_time, frame) => {
 window.addEventListener('pagehide', () => {
   celestialAxis.dispose();
   celestialEquator.dispose();
+  celestialCoordinateGrid.dispose();
   localHorizon.dispose();
   solarSystemBodies.dispose();
   solarDailyPath.dispose();

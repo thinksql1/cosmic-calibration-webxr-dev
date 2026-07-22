@@ -195,6 +195,7 @@ export interface DiagnosticSnapshotTargets {
   readonly horizon: THREE.Object3D;
   readonly earthAxis: THREE.Object3D;
   readonly equator: THREE.Object3D;
+  readonly grid: THREE.Object3D;
 }
 
 export interface XrPerEyeDiagnostics {
@@ -548,6 +549,7 @@ export function createXrPerEyeDiagnostics(
         objectState('horizon', targets.horizon),
         objectState('axis', targets.earthAxis),
         objectState('equator', targets.equator),
+        objectState('grid', targets.grid),
         `horizonPoints=${horizonSamples}`,
       ].join(' | '));
     },

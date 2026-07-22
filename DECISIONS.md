@@ -379,6 +379,20 @@
   unchanged. This supersedes only DEC-023's rendering-at-infinity choice; its P03 mean-equator
   science and historical evidence remain valid.
 
+### DEC-030: Use a deterministic non-sidereal basis for the first celestial coordinate grid
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only implementation
+- **Owner:** Darrell Wright / project control
+- **Decision:** The first coordinate grid reuses the validated geocentric structure's P03 north
+  axis and right-handed equatorial basis. Its 0h direction is the existing local canonical first
+  basis vector; positive RA rotates toward the second vector by the right-hand rule. It contains
+  four closed declination circles and twelve intentionally open pole-to-pole two-hour meridian
+  arcs, with static bounded homogeneous geometry and no per-eye geometry mutation.
+- **Rationale:** The repository provides provider RA/declination values and Julian TT but has no
+  validated sidereal/vernal-equinox direction in the scene presentation. A deterministic local
+  reference is honest, testable, and reusable for later constellation work without falsely
+  claiming real-sky RA alignment or reviving the former camera-relative equator approach.
+
 ## Proposed decisions awaiting review
 
 None yet.
