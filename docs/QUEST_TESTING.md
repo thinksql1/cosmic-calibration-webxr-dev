@@ -300,6 +300,19 @@ actual transition day, or long-duration comfort.
 Record only observed results. Do not infer all seven identities, a daylight-saving transition,
 recenter/tracking-loss coverage, exact drift, or comfort duration from this short procedure.
 
+## Integrated finite Earth Core and Swartz Creek defaults (development)
+
+Use a fresh private Quest Browser session and the exact cache-busted development URL. Confirm the
+visible build SHA and initial observer inputs: latitude `42.9572`, longitude `-83.8308`
+(east-positive, therefore west), and `240 m` MSL. Enter XR, calibrate north once, and confirm the
+normal Earth Core visual is the `4.0 m` finite holographic proxy along the true scientific
+observer-to-core direction. Check both eyes and slow lateral head movement for natural world-locked
+parallax. Toggle **Earth Core** OFF: no direct finite or scientific core marker may remain. Toggle
+it ON: exactly one proxy must return at the same world position without recalibration or a grid,
+equator, pole, horizon, Sun, or body-layer change. Edit one location field and confirm calibration
+does not overwrite it. This is a presentation proxy, not literal Earth-core distance; no location
+persistence is implied. Record only observed results and keep the spindle parked.
+
 ## Rigid Earth-axis spindle correction
 
 The canonical 23-step unified-geocentric procedure above supersedes the historical spindle-only

@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   createFiniteCoreParallaxModel,
   FINITE_CORE_PARALLAX_DISTANCE_PRESETS,
+  FINITE_CORE_PARALLAX_NORMAL_DISTANCE_METERS,
   FINITE_CORE_PARALLAX_PROXY_RADIUS_METERS,
   parseFiniteCoreParallaxLaunch,
+  selectEarthCorePresentation,
 } from '../../src/presentation/finiteCoreParallaxExperiment';
 import { createGeocentricCelestialStructurePresentation } from '../../src/presentation/geocentricCelestialStructurePresentation';
 import { createObserverOffsetGeocentricPresentation } from '../../src/presentation/observerOffsetGeocentricPresentation';
@@ -29,11 +31,19 @@ function contract() {
 
 describe('finite core parallax presentation model', () => {
   it('is query gated and accepts only the three bounded deterministic presets', () => {
-    expect(parseFiniteCoreParallaxLaunch('')).toMatchObject({ enabled: false, mode: 'baseline', distanceMeters: 2.5 });
+    expect(parseFiniteCoreParallaxLaunch('')).toMatchObject({ enabled: false, explicitlyRequested: false, mode: 'baseline', distanceMeters: 2.5 });
     expect(parseFiniteCoreParallaxLaunch('?coreStudy=finite-parallax')).toMatchObject({ enabled: true, distancePreset: 'medium', distanceMeters: 2.5 });
     expect(parseFiniteCoreParallaxLaunch('?coreStudy=finite-parallax&coreDistance=near')).toMatchObject({ distancePreset: 'near', distanceMeters: 1.5 });
     expect(parseFiniteCoreParallaxLaunch('?coreStudy=finite-parallax&coreDistance=4')).toMatchObject({ distancePreset: 'far', distanceMeters: 4 });
     expect(parseFiniteCoreParallaxLaunch('?coreStudy=other&coreDistance=-1')).toMatchObject({ enabled: false, distancePreset: 'medium' });
+  });
+
+  it('makes the Quest-selected far proxy normal while retaining explicit study comparison choices', () => {
+    expect(FINITE_CORE_PARALLAX_NORMAL_DISTANCE_METERS).toBe(FINITE_CORE_PARALLAX_DISTANCE_PRESETS.far);
+    expect(selectEarthCorePresentation(true, 'finite-parallax')).toBe('finite-proxy');
+    expect(selectEarthCorePresentation(true, 'baseline')).toBe('scientific-marker');
+    expect(selectEarthCorePresentation(false, 'finite-parallax')).toBe('none');
+    expect(selectEarthCorePresentation(false, 'baseline')).toBe('none');
   });
 
   it('derives its normalized direction exclusively from the scientific observer-to-core vector', () => {

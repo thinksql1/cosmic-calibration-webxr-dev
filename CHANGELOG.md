@@ -4,6 +4,13 @@
 
 ### Added
 
+- Integrated the physically preferred far finite holographic Earth-core proxy into normal
+  development behavior. The Earth Core toggle now selects exactly one direct marker when ON and
+  none when OFF, including diagnostic isolation; the retained scientific marker is comparison-only.
+  Added editable, non-persistent Swartz Creek development defaults: `42.9572`, `-83.8308`, and
+  `240 m` MSL. No stable repository, calibration math, celestial grid, or parked spindle behavior
+  changed.
+
 - Added one default-off development finite-core parallax experiment. The
   `coreStudy=finite-parallax` query replaces only the visible scientific core marker with a fixed
   `12 cm` local-metre 3D proxy along the scientific observer-to-core direction at `1.5`, `2.5`, or

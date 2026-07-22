@@ -28,6 +28,10 @@ import { SolarDailyPathService } from './science/temporal/solarDailyPath';
 import { ScientificSnapshotService } from './science/snapshot/scientificSnapshotService';
 import { GeographicCalibrationStateAdapter } from './science/state/geographicCalibrationState';
 import { ObserverStateStore } from './science/state/observerState';
+import {
+  DEVELOPMENT_DEFAULT_OBSERVER_LOCATION,
+  developmentObserverLocationInput,
+} from './science/astronomy/developmentObserverLocation';
 import { ScientificConfigurationStore } from './science/state/scientificConfiguration';
 import { SimulationClock } from './science/state/simulationClock';
 import { CivilTimeZoneStateStore } from './science/state/civilTimeZoneState';
@@ -59,7 +63,9 @@ import {
   finiteCoreParallaxDistancePreset,
   FINITE_CORE_PARALLAX_DISTANCE_PRESETS,
   FINITE_CORE_PARALLAX_MODE,
+  FINITE_CORE_PARALLAX_NORMAL_DISTANCE_METERS,
   parseFiniteCoreParallaxLaunch,
+  selectEarthCorePresentation,
   type FiniteCoreParallaxModel,
 } from './presentation/finiteCoreParallaxExperiment';
 import {
@@ -186,9 +192,15 @@ geoStudyTangentInput.checked = initialStudySettings.showTangentPlane;
 geoStudyAxesInput.checked = initialStudySettings.showLocalAxes;
 geoStudyLabelsInput.checked = initialStudySettings.showLabels;
 geoStudyOpacityInput.value = String(initialStudySettings.opacity);
-finiteCoreStudyControls.hidden = !(xrDiagnostics.enabled || finiteCoreLaunch.enabled);
-finiteCoreStudyModeSelect.value = finiteCoreLaunch.mode;
-finiteCoreDistanceSelect.value = finiteCoreLaunch.distancePreset;
+finiteCoreStudyControls.hidden = !(xrDiagnostics.enabled || finiteCoreLaunch.explicitlyRequested);
+// The normal development scene deliberately uses the Quest-selected far proxy;
+// explicit baseline remains available only for diagnostics/comparison.
+finiteCoreStudyModeSelect.value = finiteCoreLaunch.mode === 'baseline' && finiteCoreLaunch.explicitlyRequested
+  ? 'baseline'
+  : FINITE_CORE_PARALLAX_MODE;
+finiteCoreDistanceSelect.value = finiteCoreLaunch.enabled
+  ? finiteCoreLaunch.distancePreset
+  : 'far';
 buildIdentifierElement.textContent = `Build: ${buildIdentifier}`;
 const diagnosticPreset = xrDiagnostics.preset;
 if (xrDiagnostics.enabled) {
@@ -297,13 +309,26 @@ xrDiagnostics.installGlobalCapture(renderer);
 xrDiagnostics.instrument(scene);
 
 let diagnosticIsolationSignature = '';
+function enforceEarthCoreToggle(): void {
+  if (showEarthCoreInput.checked) return;
+  const scientificMarker = celestialAxis.group.getObjectByName('modeled-earth-core-marker');
+  const finiteProxy = finiteCoreParallaxExperiment.group.getObjectByName('finite-core-holographic-proxy');
+  if (scientificMarker) scientificMarker.visible = false;
+  if (finiteProxy) finiteProxy.visible = false;
+  finiteCoreParallaxExperiment.group.visible = false;
+}
+
 function applyDiagnosticObjectIsolation(): void {
-  if (!xrDiagnostics.enabled) return;
+  if (!xrDiagnostics.enabled) {
+    enforceEarthCoreToggle();
+    return;
+  }
   // Controller feedback objects are added only after XR session activation;
   // instrumentation is idempotent and picks up those late candidates.
   xrDiagnostics.instrument(scene);
   const result = applyXrObjectIsolation(scene, xrDiagnostics.isolation);
   const signature = `${result.stateId}|${result.matchedObjectNames.join(',')}`;
+  enforceEarthCoreToggle();
   if (signature === diagnosticIsolationSignature) return;
   diagnosticIsolationSignature = signature;
   xrDiagnostics.record('object-isolation.state', [
@@ -340,6 +365,7 @@ let xrOriginSequence = 0;
 let previousCalibrationKind: NorthCalibrationState['kind'] | undefined;
 let currentFiniteCoreModel: FiniteCoreParallaxModel | undefined;
 let lastFiniteCoreDiagnosticUpdateMs = Number.NEGATIVE_INFINITY;
+let observerLocationEntry: 'development-default' | 'user-edited' = 'development-default';
 
 function diagnosticSnapshot(label: string, state: NorthCalibrationState): void {
   xrDiagnostics.snapshot(
@@ -363,7 +389,9 @@ function currentAxisDisplaySettings(): EarthAxisDisplaySettings {
   return Object.freeze({
     ...DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS,
     showAxis: showAxisInput.checked,
-    showEarthCore: showEarthCoreInput.checked && finiteCoreStudyModeSelect.value !== FINITE_CORE_PARALLAX_MODE,
+    // The scientific homogeneous marker is retained only for the explicit
+    // comparison baseline. Ordinary development uses the finite proxy below.
+    showEarthCore: selectedEarthCorePresentation() === 'scientific-marker',
     showMarkers: showMarkersInput.checked,
     showLabels: showLabelsInput.checked,
     showBelowHorizonSegment: showBelowHorizonInput.checked,
@@ -371,10 +399,18 @@ function currentAxisDisplaySettings(): EarthAxisDisplaySettings {
 }
 
 function finiteCoreExperimentEnabled(): boolean {
-  return finiteCoreStudyModeSelect.value === FINITE_CORE_PARALLAX_MODE;
+  return selectedEarthCorePresentation() === 'finite-proxy';
+}
+
+function selectedEarthCorePresentation(): ReturnType<typeof selectEarthCorePresentation> {
+  return selectEarthCorePresentation(showEarthCoreInput.checked, finiteCoreStudyModeSelect.value);
 }
 
 function finiteCoreExperimentDistanceMeters(): number {
+  if (finiteCoreStudyModeSelect.value === FINITE_CORE_PARALLAX_MODE &&
+      finiteCoreDistanceSelect.value === 'far') {
+    return FINITE_CORE_PARALLAX_NORMAL_DISTANCE_METERS;
+  }
   return FINITE_CORE_PARALLAX_DISTANCE_PRESETS[
     finiteCoreParallaxDistancePreset(finiteCoreDistanceSelect.value)
   ];
@@ -499,7 +535,8 @@ function renderCelestialAxis(): void {
     eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),
     `Celestial grid: ${celestialCoordinateGrid.group.userData.activeLineCount ?? 0} active lines; longitude reference ${celestialCoordinateGrid.group.userData.longitudeReference ?? 'not-ready'}`,
     `Observer-offset study: ${currentStudyDisplaySettings().mode}; ${selectedObserverOffsetGeoStudyComponents(currentStudyDisplaySettings()).join(', ') || 'baseline only'}`,
-    `Finite core parallax: ${finiteCoreExperimentEnabled() ? `${finiteCoreExperimentDistanceMeters().toFixed(1)} m compressed proxy` : 'disabled; scientific core unchanged'}`,
+    `Earth Core toggle ${showEarthCoreInput.checked ? 'ON' : 'OFF'}; selected representation ${selectedEarthCorePresentation()}; configured proxy distance ${finiteCoreExperimentDistanceMeters().toFixed(1)} m`,
+    `Configured observer ${observerLatitudeInput.value}°, ${observerLongitudeInput.value}° east-positive, ${observerElevationInput.value} m MSL (${observerLocationEntry === 'development-default' ? 'development defaults' : 'user-edited this session'}; no persistence)`,
     eyeModeDiagnostic('Local horizon', localHorizon.getEyePresentationDiagnostics()),
     'Quest observation: each layer was clean monocularly; binocular doubling was reported. Eye modes change presentation visibility only.',
     `Local horizon: ${LOCAL_HORIZON_SAMPLE_COUNT} samples at ${DEFAULT_LOCAL_HORIZON_DISPLAY_SETTINGS.presentationRadiusMeters} m; WGS84 geodetic-up Tier 1 tangent plane`,
@@ -563,8 +600,10 @@ function renderCelestialAxis(): void {
     currentFiniteCoreModel = finiteCoreModel.kind === 'FINITE_CORE_PARALLAX_MODEL'
       ? finiteCoreModel
       : undefined;
+    const coreVisualNames = directCoreVisualObjectNames();
     const studyDiagnostics = observerOffsetStudy.getDiagnostics();
     celestialDiagnostics.append(...[
+      `Direct Earth-core visuals ${coreVisualNames.length}: ${coreVisualNames.join(', ') || 'none'}; finite proxy ${isVisibleInScene(finiteCoreParallaxExperiment.group.getObjectByName('finite-core-holographic-proxy')) ? 'visible' : 'hidden'}; scientific marker ${isVisibleInScene(celestialAxis.group.getObjectByName('modeled-earth-core-marker')) ? 'visible' : 'hidden'}`,
       `Observer-offset study ${studySettings.mode}; Earth/grid reference ratio ${(observerOffsetContract.referenceEarthSphereRadiusMeters / observerOffsetContract.scientificCelestialGridRadiusMeters).toFixed(2)}`,
       `Study observer-to-core ${observerOffsetContract.scientificObserverToCoreDistanceMeters.toFixed(1)} m; reference Earth radius ${observerOffsetContract.referenceEarthSphereRadiusMeters.toFixed(1)} m`,
       `Study core anchor (${observerOffsetContract.earthCoreAnchor.x.toFixed(5)}, ${observerOffsetContract.earthCoreAnchor.y.toFixed(5)}, ${observerOffsetContract.earthCoreAnchor.z.toFixed(5)}, w=${observerOffsetContract.earthCoreAnchor.w.toExponential(3)}); observer origin (${observerOffsetContract.scientificObserver.x.toFixed(1)}, ${observerOffsetContract.scientificObserver.y.toFixed(1)}, ${observerOffsetContract.scientificObserver.z.toFixed(1)})`,
@@ -572,8 +611,8 @@ function renderCelestialAxis(): void {
       `Study observer-to-core vector (${observerOffsetContract.scientificObserverToCore.x.toFixed(1)}, ${observerOffsetContract.scientificObserverToCore.y.toFixed(1)}, ${observerOffsetContract.scientificObserverToCore.z.toFixed(1)}); ellipsoid/reference-sphere offset ${observerOffsetContract.ellipsoidToReferenceSphereOffsetMeters.toFixed(1)} m`,
       `Study tangent normal (${observerOffsetContract.localUp.x.toFixed(3)}, ${observerOffsetContract.localUp.y.toFixed(3)}, ${observerOffsetContract.localUp.z.toFixed(3)}); objects ${(studyDiagnostics.activeObjectNames as readonly string[] | undefined)?.join(', ') || 'none'}`,
       `Study center/radius errors: Earth sphere center 0 m; surface reference radius 0 m; tangent basis orthogonality 0 within contract tolerance; GPU component maximum ${observerOffsetContract.maximumUploadedComponentMagnitude.toFixed(6)}`,
-      finiteCoreModel.kind === 'FINITE_CORE_PARALLAX_MODEL'
-        ? `Finite core proxy direction (${finiteCoreModel.scientificObserverToCoreDirection.x.toFixed(5)}, ${finiteCoreModel.scientificObserverToCoreDirection.y.toFixed(5)}, ${finiteCoreModel.scientificObserverToCoreDirection.z.toFixed(5)}); local distance ${finiteCoreModel.proxyDistanceMeters.toFixed(1)} m; scientific distance ${finiteCoreModel.scientificObserverToCoreDistanceMeters.toFixed(1)} m`
+    finiteCoreModel.kind === 'FINITE_CORE_PARALLAX_MODEL'
+        ? `Finite core proxy direction (${finiteCoreModel.scientificObserverToCoreDirection.x.toFixed(5)}, ${finiteCoreModel.scientificObserverToCoreDirection.y.toFixed(5)}, ${finiteCoreModel.scientificObserverToCoreDirection.z.toFixed(5)}); local distance ${finiteCoreModel.proxyDistanceMeters.toFixed(1)} m; scientific distance ${finiteCoreModel.scientificObserverToCoreDistanceMeters.toFixed(1)} m; proxy ${finiteCoreExperimentEnabled() ? 'world-locked and selected' : 'not submitted'}`
         : `Finite core proxy suppressed: ${finiteCoreModel.reason}`,
     ].map((detail) => Object.assign(document.createElement('li'), { textContent: detail })));
   }
@@ -862,14 +901,17 @@ civilTimeZoneInput.addEventListener('change', () => applyCivilTimeZone('user-sel
 
 function applyObserver(source = 'manual observer entry'): void {
   try {
-    observerState.set({
-      latitudeDeg: observerLatitudeInput.valueAsNumber,
-      longitudeDegEast: observerLongitudeInput.valueAsNumber,
-      elevationMeters: observerElevationInput.valueAsNumber,
-      horizontalDatum: 'WGS84',
-      verticalDatum: 'MEAN_SEA_LEVEL',
-      source,
-    });
+    const input = source === 'development default location'
+      ? developmentObserverLocationInput(source)
+      : {
+        latitudeDeg: observerLatitudeInput.valueAsNumber,
+        longitudeDegEast: observerLongitudeInput.valueAsNumber,
+        elevationMeters: observerElevationInput.valueAsNumber,
+        horizontalDatum: 'WGS84' as const,
+        verticalDatum: 'MEAN_SEA_LEVEL' as const,
+        source,
+      };
+    observerState.set(input);
     observerError.textContent = '';
   } catch (error) {
     observerState.clear();
@@ -877,6 +919,35 @@ function applyObserver(source = 'manual observer entry'): void {
   }
   renderCelestialAxis();
 }
+
+function isVisibleInScene(object: THREE.Object3D | undefined): boolean {
+  let current = object;
+  while (current) {
+    if (!current.visible) return false;
+    current = current.parent ?? undefined;
+  }
+  return Boolean(object);
+}
+
+function directCoreVisualObjectNames(): readonly string[] {
+  const candidates = [
+    celestialAxis.group.getObjectByName('modeled-earth-core-marker'),
+    finiteCoreParallaxExperiment.group.getObjectByName('finite-core-holographic-proxy'),
+  ];
+  return Object.freeze(candidates
+    .filter((candidate): candidate is THREE.Object3D => isVisibleInScene(candidate))
+    .map((candidate) => candidate.name));
+}
+
+function setDevelopmentObserverLocationInputs(): void {
+  observerLatitudeInput.value = String(DEVELOPMENT_DEFAULT_OBSERVER_LOCATION.latitudeDeg);
+  observerLongitudeInput.value = String(DEVELOPMENT_DEFAULT_OBSERVER_LOCATION.longitudeDegEast);
+  observerElevationInput.value = String(DEVELOPMENT_DEFAULT_OBSERVER_LOCATION.elevationMeters);
+  observerLocationEntry = 'development-default';
+}
+
+setDevelopmentObserverLocationInputs();
+applyObserver('development default location');
 
 applyObserverButton.addEventListener('click', () => applyObserver());
 clearObserverButton.addEventListener('click', () => {
@@ -886,11 +957,15 @@ clearObserverButton.addEventListener('click', () => {
 });
 observerPresetButtons.forEach((button) => {
   button.addEventListener('click', () => {
+    observerLocationEntry = 'user-edited';
     observerLatitudeInput.value = button.dataset.observerLatitude ?? '';
     observerLongitudeInput.value = '0';
     observerElevationInput.value = '0';
     applyObserver(`generic ${button.dataset.observerLabel ?? 'observer'} validation preset`);
   });
+});
+[observerLatitudeInput, observerLongitudeInput, observerElevationInput].forEach((input) => {
+  input.addEventListener('input', () => { observerLocationEntry = 'user-edited'; });
 });
 
 function selectTime(utcIso: string, source: 'user-selected' | 'system-selected'): void {
@@ -963,15 +1038,15 @@ geoStudyModeSelect.addEventListener('change', () => {
 });
 
 finiteCoreStudyModeSelect.addEventListener('change', () => {
-  const enabled = finiteCoreExperimentEnabled();
-  if (enabled) showCelestialGridInput.checked = true;
-  if (!enabled) finiteCoreDiagnostics.replaceChildren();
+  const finiteSelected = finiteCoreStudyModeSelect.value === FINITE_CORE_PARALLAX_MODE;
+  if (finiteSelected) showCelestialGridInput.checked = true;
+  if (!finiteSelected) finiteCoreDiagnostics.replaceChildren();
   const url = new URL(window.location.href);
-  if (enabled) {
+  if (finiteSelected) {
     url.searchParams.set('coreStudy', FINITE_CORE_PARALLAX_MODE);
     url.searchParams.set('coreDistance', finiteCoreParallaxDistancePreset(finiteCoreDistanceSelect.value));
   } else {
-    url.searchParams.delete('coreStudy');
+    url.searchParams.set('coreStudy', 'baseline');
     url.searchParams.delete('coreDistance');
   }
   window.history.replaceState({}, '', url);
@@ -981,7 +1056,7 @@ finiteCoreStudyModeSelect.addEventListener('change', () => {
 finiteCoreDistanceSelect.addEventListener('change', () => {
   const preset = finiteCoreParallaxDistancePreset(finiteCoreDistanceSelect.value);
   finiteCoreDistanceSelect.value = preset;
-  if (finiteCoreExperimentEnabled()) {
+  if (finiteCoreStudyModeSelect.value === FINITE_CORE_PARALLAX_MODE) {
     const url = new URL(window.location.href);
     url.searchParams.set('coreDistance', preset);
     window.history.replaceState({}, '', url);

@@ -4,19 +4,18 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically run the finite-core parallax go/no-go experiment on Quest.
+**Title:** Physically confirm the integrated 4.0-meter core toggle behavior and Swartz Creek default location values on Quest before considering any stable promotion.
 
-Use a fresh private Quest Browser session and the exact cache-busted development URLs. Confirm the
-build identifier, calibrate north, compare the `1.5`, `2.5`, and `4.0 m` finite proxy distances
-against the unchanged celestial grid, and record natural head-motion parallax, stereo depth,
-world locking, comfort, and errors. Decide only whether the simple finite proxy mechanism passes
-or fails; do not select a broader presentation design from desktop evidence.
+Use a fresh private Quest Browser session and the exact cache-busted development URL. Confirm the
+build identifier and initial Swartz Creek values (`42.9572`, `-83.8308`, `240 m`), calibrate north,
+then confirm the normal Earth Core representation is the accepted `4.0 m` finite world-locked
+proxy. Toggle Earth Core OFF and ON in both eyes; OFF must leave no direct core marker and ON must
+restore exactly one proxy without changing calibration or the celestial grid.
 
 ## Exclusions
 
-Do not infer unobserved results, resume the parked spindle, alter the scientific Earth-core source,
-move the grid, add other study geometry, or promote development work to the protected stable
-repository.
+Do not resume the parked spindle, alter the scientific Earth-core source, move the grid, add
+location persistence, or promote development work to the protected stable repository.
 
 ## Recommended execution
 
