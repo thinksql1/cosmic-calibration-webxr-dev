@@ -11,6 +11,10 @@
   configured/submitted/render-observed diagnostics, per-eye projected centers, isolation modes,
   local failure containment, and lifecycle coverage. Marker science and all validated celestial
   geometry remain unchanged; physical Quest acceptance is pending.
+- Normally merged the label repair as `c18e28a` into development master and deployed it through
+  successful Actions/Pages run `29960227474`. Clean merged validation passed `508/508` tests across
+  `54` files, and the hosted bundle exposes the merge build identifier and repaired-label proof.
+  This is development-only deployment evidence; physical Quest validation remains pending.
 
 - Extended the development-only apparent topocentric body catalog through Uranus and Neptune and
   added Pluto as a clearly classified dwarf planet. Each uses the existing Astronomy Engine,

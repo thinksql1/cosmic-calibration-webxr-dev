@@ -1,6 +1,6 @@
 # Project State
 
-## Outer planets and independent Planet Labels (development local)
+## Outer planets and independent Planet Labels (development deployed)
 
 The local `feature/outer-planets-and-labels` extension expands the existing Astronomy Engine
 apparent-topocentric body catalog from Sun/Moon plus Mercury through Saturn to Sun, Moon, Mercury,
@@ -24,7 +24,14 @@ the plane's vertex position, collapsing every textured quad to one clip-space po
 rasterized area. The local repair replaces only label presentation with reusable finite `24 m`,
 tangent-offset, world-anchored Three.js sprites. Textures must contain visible alpha; normal and
 forced Uranus-proof state are distinguished; invalid labels suppress locally. The repaired
-contract is locally automated-test evidence only until physical Quest revalidation.
+contract has automated and development-deployment evidence only until physical Quest revalidation.
+
+Repair feature `3a31b92619ee4b0e61224173b4b67a48bcb4664d` was normally merged into
+development as `c18e28a9536facb4ac39487fe6071646744ca860`. Clean merged validation passed
+`508/508` tests across `54` files, type-check, build, dependency audit/tree, and diff checks.
+Development Actions/Pages run `29960227474` completed successfully, and the hosted bundle reports
+the merge SHA and includes the finite-label proof and diagnostics. This is deployment evidence only;
+physical Quest validation of the repaired labels remains pending, and stable remains unchanged.
 
 ## Integrated finite holographic Earth-core proxy (development only)
 
