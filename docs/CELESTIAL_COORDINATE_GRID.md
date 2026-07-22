@@ -19,6 +19,16 @@ The current `0h` direction is the existing deterministic `LOCAL_CANONICAL_UNLABE
 
 Static Float32 attributes encode bounded homogeneous points `(EarthCore / R + direction, 1 / R)`. Geometry changes only for a new scientific snapshot, never for an individual XR eye. Each line’s small non-throwing `onBeforeRender` callback only suppresses that draw when its native Three.js matrix state is non-finite, allowing remaining grid lines and the XR frame to proceed.
 
+## Pole convergence contract
+
+The canonical `+90°` and `-90°` results from `getCanonicalCelestialPoleDirections` are the exact
+endpoints of every right-ascension meridian. Pole markers and labels use those same directions and
+the same finite bounded homogeneous anchor as the meridian endpoint: `(EarthCore / R ± direction,
+1 / R)`. The shared chain is canonical direction → identity geocentric assembly → one geographic
+calibration transform → per-eye native model-view/projection. Markers retain their screen-space
+quad primitive, size, styling, and label offset, but their center now projects identically to the
+grid convergence point rather than the superseded direction-at-infinity anchor.
+
 ## Controls and diagnostics
 
 The default-hidden master **Celestial coordinate grid** switch controls the feature. **Declination lines** and **Right ascension lines** independently filter the two line families; the celestial equator remains independent. `?diag=1` reports active line count, family state, render callbacks, invalid-line suppression, and the standard duplicate-name/draw diagnostics. Object isolation includes all grid lines, each family, `0h`, `2h`, `+30`, `-60`, and equator-plus-grid; the existing floor/local-horizon/axis isolation choices remain separate.

@@ -35,6 +35,8 @@ jobs:
         run: npm run test
 
       - name: Build
+        env:
+          VITE_BUILD_IDENTIFIER: ${{ github.sha }}
         run: npm run build
 
       - name: Upload GitHub Pages artifact

@@ -88,6 +88,7 @@ function requireElement<ElementType extends Element>(selector: string): ElementT
 const sceneHost = requireElement<HTMLDivElement>('#scene');
 const statusElement = requireElement<HTMLParagraphElement>('#status');
 const detailElement = requireElement<HTMLParagraphElement>('#status-detail');
+const buildIdentifierElement = requireElement<HTMLParagraphElement>('#build-identifier');
 const enterArButton = requireElement<HTMLButtonElement>('#enter-ar');
 const calibrationStatus = requireElement<HTMLParagraphElement>('#north-status');
 const calibrationDetail = requireElement<HTMLParagraphElement>('#north-detail');
@@ -141,6 +142,8 @@ const equatorEyeModeSelect = requireElement<HTMLSelectElement>('#equator-eye-mod
 const horizonEyeModeSelect = requireElement<HTMLSelectElement>('#horizon-eye-mode');
 const eyePresentationStatus = requireElement<HTMLParagraphElement>('#eye-presentation-status');
 const xrDiagnostics = createXrPerEyeDiagnostics();
+const buildIdentifier = import.meta.env.VITE_BUILD_IDENTIFIER ?? 'development-local';
+buildIdentifierElement.textContent = `Build: ${buildIdentifier}`;
 const diagnosticPreset = xrDiagnostics.preset;
 if (xrDiagnostics.enabled) {
   showAxisInput.checked = diagnosticPreset.axis;
@@ -410,6 +413,7 @@ function renderCelestialAxis(): void {
   celestialDetail.textContent = view.detail;
   celestialLimitations.textContent = view.limitations;
   const diagnostics = [
+    `Build ${buildIdentifier}`,
     ...view.diagnostics,
     eyeModeDiagnostic('Axis/poles', celestialAxis.getEyePresentationDiagnostics()),
     eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),

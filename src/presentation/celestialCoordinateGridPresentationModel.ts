@@ -1,7 +1,7 @@
 import type { ScientificSnapshot } from '../science/snapshot/scientificSnapshot';
 import type { ApplicationBasisDirection, ApplicationBasisPosition } from './mapEnuToApplicationBasis';
 import { createGeocentricCelestialStructurePresentation, type GeocentricCelestialStructurePresentation } from './geocentricCelestialStructurePresentation';
-import { createEquatorialCoordinateBasis, equatorialCoordinatesToDirection, type EquatorialCoordinateBasis } from './equatorialCoordinates';
+import { createEquatorialCoordinateBasis, equatorialCoordinatesToDirection, getCanonicalCelestialPoleDirections, type EquatorialCoordinateBasis } from './equatorialCoordinates';
 
 export const CELESTIAL_GRID_DECLINATION_DEGREES = Object.freeze([60, 30, -30, -60] as const);
 export const CELESTIAL_GRID_RIGHT_ASCENSION_HOURS = Object.freeze([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22] as const);
@@ -28,6 +28,7 @@ export interface CelestialCoordinateGridPresentationModel {
   readonly kind: 'ready';
   readonly renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_GEOCENTRIC_GRID';
   readonly coordinateBasis: EquatorialCoordinateBasis;
+  readonly canonicalPoles: ReturnType<typeof getCanonicalCelestialPoleDirections>;
   readonly earthCore: ApplicationBasisPosition;
   readonly displayRadiusMeters: number;
   readonly geocentricStructure: GeocentricCelestialStructurePresentation;
@@ -56,9 +57,10 @@ function meridianLine(hours: number, basis: EquatorialCoordinateBasis): Celestia
 export function createCelestialCoordinateGridPresentationModel(snapshot: ScientificSnapshot, settings: CelestialCoordinateGridDisplaySettings = DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, structure: GeocentricCelestialStructurePresentation = createGeocentricCelestialStructurePresentation(snapshot)): CelestialCoordinateGridPresentationModel {
   if (snapshot.kind !== 'ready' || structure.validity !== 'VALIDATED' || structure.snapshotCacheKey !== snapshot.cacheKey) throw new Error('Celestial grid requires the matching validated geocentric structure.');
   const basis = gridBasis(structure);
+  const canonicalPoles = getCanonicalCelestialPoleDirections(basis);
   const lines = Object.freeze([
     ...CELESTIAL_GRID_DECLINATION_DEGREES.map((value) => declinationLine(value, basis)),
     ...CELESTIAL_GRID_RIGHT_ASCENSION_HOURS.map((value) => meridianLine(value, basis)),
   ]);
-  return Object.freeze({ kind: 'ready', renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_GEOCENTRIC_GRID', coordinateBasis: basis, earthCore: structure.earthCore, displayRadiusMeters: structure.celestialEquatorDisplayRadiusMeters, geocentricStructure: structure, lines, visible: settings.showGrid });
+  return Object.freeze({ kind: 'ready', renderStrategy: 'CAMERA_RELATIVE_BOUNDED_HOMOGENEOUS_GEOCENTRIC_GRID', coordinateBasis: basis, canonicalPoles, earthCore: structure.earthCore, displayRadiusMeters: structure.celestialEquatorDisplayRadiusMeters, geocentricStructure: structure, lines, visible: settings.showGrid });
 }
