@@ -36,10 +36,12 @@ non-testing celestial overlays with bounded unit-direction GPU attributes.
 - **Planet Labels** controls only planet/Pluto labels and defaults OFF.
 
 An enabled body with Planet Labels ON shows one label; turning labels OFF leaves markers visible.
-Turning off an individual body hides its marker and label. Labels reuse the exact marker direction,
-have a small deterministic NDC offset so they do not cover their own marker center, and are not a
-new coordinate convention. A full collision/decluttering engine is deliberately deferred; rare
-inter-body label overlap is a known limitation.
+Turning off an individual body hides its marker and label. Build `51b6fff` proved the markers on
+Quest but exposed a zero-area projective-plane label defect. The repaired labels reuse the exact
+marker direction at a disclosed finite `24 m` presentation anchor plus a deterministic tangent
+offset and render as native XR sprites. They are not a new coordinate convention or astronomical
+distance claim. A full collision/decluttering engine is deliberately deferred; rare inter-body
+label overlap is a known limitation. See [XR Planet Label Rendering](XR_PLANET_LABEL_RENDERING.md).
 
 Diagnostics expose provider/catalog/frame/profile, observer/time inputs, ENU and application
 directions, label state, active and suppressed draw objects, and the visible build identifier.
@@ -54,6 +56,7 @@ constellations, sidereal-basis changes, or a second clock. Future constellations
 validated apparent/equatorial direction pathway rather than inventing another basis. The parked
 Earth-axis spindle is unrelated and unchanged.
 
-Quest validation is pending for Uranus, Neptune, Pluto, Planet Labels, label-to-marker anchoring,
-and stereo stability. Record only observed results; do not infer exact angular accuracy or body
+Quest validation passed Uranus, Neptune, and Pluto markers but failed the prior labels. Physical
+revalidation is pending for the repaired Uranus proof, all labels, label-to-marker anchoring, and
+stereo stability. Record only observed results; do not infer exact angular accuracy or body
 identification from a short session.

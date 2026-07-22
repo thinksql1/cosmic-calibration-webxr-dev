@@ -124,6 +124,23 @@
             </div>
             <p class="simulation-note">Individual planet choices affect only their markers and Planet Labels. Sun and Moon remain separate categories.</p>
           </details>
+          <details id="planet-label-study-controls" hidden>
+            <summary>Planet label XR proof</summary>
+            <div class="observer-grid">
+              <label for="planet-label-study-mode">Study mode</label>
+              <select id="planet-label-study-mode">
+                <option value="baseline" selected>Normal label behavior</option>
+                <option value="uranus-xr-proof">Uranus XR proof</option>
+              </select>
+              <label for="planet-label-scale">Label size</label>
+              <select id="planet-label-scale">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+            <p class="simulation-note">The proof forces one Uranus marker and one finite world-anchored label. It is diagnostic presentation geometry, not astronomical distance.</p>
+          </details>
           <div class="eye-mode-grid" aria-label="XR eye presentation modes">
             <label for="axis-eye-mode">Axis &amp; poles eye mode</label>
             <select id="axis-eye-mode">

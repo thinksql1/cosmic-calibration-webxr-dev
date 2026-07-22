@@ -4,18 +4,18 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate Uranus, Neptune, Pluto, and planet-label behavior on Quest before beginning the real-sky orientation and constellation phase.
+**Title:** Physically validate the repaired Uranus proof and all planet labels on Quest before beginning any constellation-label implementation.
 
 Use a fresh private Quest Browser session and the exact cache-busted development URL. Confirm the
-build identifier and Swartz Creek defaults, calibrate north, enable the apparent body layer, then
-check Uranus, Neptune, Pluto (dwarf planet), and Planet Labels independently in both eyes. Labels
-must remain attached to their enabled marker, remain distinct from its center, disappear when the
-master label control is off, and disappear with an individually disabled body. Confirm the core
-proxy, grid, equator, poles, horizon, Sun path, and existing bodies remain unchanged.
+build identifier and Swartz Creek defaults, calibrate north, then open the query-gated Uranus proof.
+Confirm the finite `Uranus` sprite appears immediately without pointing, remains beside the marker
+through head motion in both eyes, and disappears under normal Planet Labels OFF state. Then enable
+all planet labels and verify correct body association, individual-body gating, stereo stability,
+readability, and unchanged core/grid/equator/poles/horizon/Sun/Moon behavior.
 
 ## Exclusions
 
-Do not begin constellations, resume the parked spindle, alter the scientific Earth-core source,
+Do not begin constellation labels, resume the parked spindle, alter the scientific Earth-core source,
 move the grid, add location persistence, or promote development work to the protected stable
 repository.
 

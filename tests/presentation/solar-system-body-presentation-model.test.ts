@@ -53,6 +53,7 @@ describe('actual solar-system body presentation model', () => {
     expect(labelsOff.labels.every((label) => !label.visible)).toBe(true);
     const labelsOn = createSolarSystemBodyPresentationModel(snapshot, bodies, { showBodies: true, showPlanetLabels: true, enabledPlanetBodies: ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'] });
     expect(labelsOn.labels.filter((label) => label.visible)).toHaveLength(8);
+    expect(labelsOn.labels.map(({ body }) => body)).toEqual(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']);
     expect(labelsOn.labels.find((label) => label.body === 'Pluto')!.text).toBe('Pluto (dwarf planet)');
     expect(labelsOn.labels.every((label) => label.directionApplication === labelsOn.markers.find((marker) => marker.body === label.body)!.directionApplication)).toBe(true);
   });
@@ -68,6 +69,20 @@ describe('actual solar-system body presentation model', () => {
     expect(model.labels.find((label) => label.body === 'Neptune')!.visible).toBe(false);
     expect(model.markers.find((marker) => marker.body === 'Sun')!.visible).toBe(true);
     expect(model.markers.find((marker) => marker.body === 'Moon')!.visible).toBe(true);
+  });
+
+  it('forces exactly one Uranus marker and label only for the explicit XR proof mode', () => {
+    const { snapshot, bodies } = fixture();
+    const proof = createSolarSystemBodyPresentationModel(snapshot, bodies, {
+      showBodies: false,
+      showPlanetLabels: false,
+      planetLabelStudyMode: 'uranus-xr-proof',
+      planetLabelScale: 'large',
+    });
+    expect(proof.planetLabelStudyMode).toBe('uranus-xr-proof');
+    expect(proof.markers.filter(({ visible }) => visible).map(({ body }) => body)).toEqual(['Uranus']);
+    expect(proof.labels.filter(({ visible }) => visible).map(({ body }) => body)).toEqual(['Uranus']);
+    expect(proof.labels.find(({ body }) => body === 'Uranus')!.scale).toBe('large');
   });
 
   it('keeps the current Sun marker authoritative for a path-only presentation without enabling other bodies', () => {
