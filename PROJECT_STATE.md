@@ -6,8 +6,8 @@ The successful development celestial grid is authoritative. Audit found a finite
 presentation mismatch: meridian endpoints use the finite Earth-core-centered grid radius while
 pole markers/labels previously used projective infinity. The local repair gives markers and labels
 the exact canonical grid pole directions and the same finite homogeneous endpoint. The parked
-spindle is unchanged; integration, development deployment, and physical confirmation of this
-focused repair remain pending.
+spindle is unchanged. Feature `f9a74e4` was normally merged as `a74e2eb` and deployed only to
+development through successful Actions run `29913823513`; physical confirmation remains pending.
 
 ## Development-only celestial coordinate grid
 

@@ -4,11 +4,11 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Independently revalidate and deploy the development pole-marker/grid convergence repair
+**Title:** Run the physical Quest pole-marker/grid convergence confirmation on the development deployment
 
-Review the focused canonical-pole, finite-homogeneous-anchor repair; validate, merge, and deploy
-only to the development repository if it passes. Do not touch stable. Physical confirmation remains
-pending after deployment.
+Use a fresh private Quest Browser session and the cache-busted development URL to confirm north and
+south markers and labels are centered on their respective grid convergence points in both eyes.
+Record only observed results. Do not touch stable or the parked spindle investigation.
 
 ## Exclusions
 
