@@ -279,6 +279,19 @@ Disable one planet and verify its marker and label both disappear. This procedur
 angular accuracy, identify Moon phase, or authorize a constellation/label-layout system.
 **Physical Quest acceptance: NOT RUN.**
 
+### Repaired finite planet-label contract
+
+Build `51b6fff376bdddf8db59b8611914cd607bed0789` physically passed all planet markers
+through Pluto but failed Planet Labels with the master explicitly ON. For the repair, use a fresh
+private session and the exact cache-busted development URL. First open
+`labelStudy=uranus-xr-proof`: one Uranus marker and one `Uranus` sprite must appear immediately,
+without pointing or selection. Check adjacency, readability, slow head motion, viewport edges, and
+each eye independently. Then use normal mode: Planet Labels OFF must leave markers visible; ON must
+show exactly one label for each enabled planet/Pluto; disabling one body must hide its marker and
+label. Confirm pole labels and all non-label celestial features are unchanged. Record callback or
+incomplete-frame errors explicitly. The finite `24 m` label anchor is presentation geometry, not
+astronomical distance. **Physical acceptance of the repaired contract: NOT RUN.**
+
 ## Milestone 2F 24-hour Sun path and live celestial updates (pending)
 
 **Physical Quest acceptance: NOT RUN.** This checklist is for the published temporal layer; it

@@ -10,11 +10,14 @@ import {
   mapEnuToApplicationBasis,
   type ApplicationBasisDirection,
 } from './mapEnuToApplicationBasis';
+import type { PlanetLabelScale, PlanetLabelStudyMode } from './planetLabelPresentation';
 
 export interface SolarSystemBodyDisplaySettings {
   readonly showBodies: boolean;
   readonly enabledPlanetBodies?: readonly SupportedPlanetBody[];
   readonly showPlanetLabels?: boolean;
+  readonly planetLabelStudyMode?: PlanetLabelStudyMode;
+  readonly planetLabelScale?: PlanetLabelScale;
   /** A presentation-only cue used when the daily Sun path is visible. */
   readonly emphasizeSun?: boolean;
   /** Lets the daily Sun path retain its authoritative live Sun marker without enabling the other bodies. */
@@ -52,7 +55,7 @@ export interface SolarSystemBodyLabelModel {
   readonly text: string;
   readonly directionApplication: ApplicationBasisDirection;
   readonly visible: boolean;
-  readonly offsetNdc: readonly [number, number];
+  readonly scale: PlanetLabelScale;
 }
 
 export interface SolarSystemBodyPresentationModel {
@@ -64,6 +67,7 @@ export interface SolarSystemBodyPresentationModel {
   readonly presentationRadiusPolicy: 'DIRECTION_AT_INFINITY_NO_FINITE_CELESTIAL_DISTANCE';
   readonly markers: readonly SolarSystemBodyMarkerModel[];
   readonly labels: readonly SolarSystemBodyLabelModel[];
+  readonly planetLabelStudyMode: PlanetLabelStudyMode;
   readonly visible: boolean;
   readonly snapshotIdentity: {
     readonly snapshotCacheKey: string;
@@ -127,6 +131,8 @@ export function createSolarSystemBodyPresentationModel(
   settings: SolarSystemBodyDisplaySettings = DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
 ): SolarSystemBodyPresentationModel {
   validateInputs(snapshot, state);
+  const labelStudyMode = settings.planetLabelStudyMode ?? 'baseline';
+  const uranusProof = labelStudyMode === 'uranus-xr-proof';
   const enabledPlanets = new Set(settings.enabledPlanetBodies ?? SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES);
   const markers = Object.freeze(state.bodies.map((result) => {
     const direction = result.horizontal.direction;
@@ -139,7 +145,9 @@ export function createSolarSystemBodyPresentationModel(
       throw new Error('Solar-system presentation requires finite unit ENU directions.');
     }
     const isPlanet = (SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES as readonly string[]).includes(result.body);
-    const visible = !isPlanet || enabledPlanets.has(result.body as SupportedPlanetBody);
+    const visible = uranusProof
+      ? result.body === 'Uranus'
+      : !isPlanet || enabledPlanets.has(result.body as SupportedPlanetBody);
     const baseStyle = BODY_STYLES[result.body];
     return Object.freeze({
       body: result.body,
@@ -160,13 +168,14 @@ export function createSolarSystemBodyPresentationModel(
   const labels = Object.freeze(markers
     .filter((marker): marker is SolarSystemBodyMarkerModel & { readonly body: SupportedPlanetBody } =>
       (SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES as readonly string[]).includes(marker.body))
-    .map((marker, index) => Object.freeze({
+    .map((marker) => Object.freeze({
       body: marker.body,
       text: marker.body === 'Pluto' ? 'Pluto (dwarf planet)' : marker.body,
       directionApplication: marker.directionApplication,
-      visible: settings.showBodies && settings.showPlanetLabels === true && marker.visible,
-      // Small stable NDC offsets avoid each label's own marker without a layout engine.
-      offsetNdc: Object.freeze([0.014 + (index % 2) * 0.004, 0.018 + (index % 3) * 0.003]) as readonly [number, number],
+      visible: uranusProof
+        ? marker.body === 'Uranus'
+        : settings.showBodies && settings.showPlanetLabels === true && marker.visible,
+      scale: settings.planetLabelScale ?? 'medium',
     })));
   return Object.freeze({
     kind: 'ready',
@@ -177,7 +186,8 @@ export function createSolarSystemBodyPresentationModel(
     presentationRadiusPolicy: 'DIRECTION_AT_INFINITY_NO_FINITE_CELESTIAL_DISTANCE',
     markers,
     labels,
-    visible: settings.showBodies || settings.showSunOnly === true,
+    planetLabelStudyMode: labelStudyMode,
+    visible: uranusProof || settings.showBodies || settings.showSunOnly === true,
     snapshotIdentity: Object.freeze({
       snapshotCacheKey: snapshot.cacheKey,
       bodyCacheKey: state.cacheKey,

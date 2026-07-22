@@ -87,6 +87,10 @@ import {
   type SolarSystemBodyDisplaySettings,
 } from './presentation/solarSystemBodyPresentationModel';
 import {
+  parsePlanetLabelScale,
+  parsePlanetLabelStudyMode,
+} from './presentation/planetLabelPresentation';
+import {
   createSolarDailyPathPresentationModel,
   DEFAULT_SOLAR_DAILY_PATH_DISPLAY_SETTINGS,
   type SolarDailyPathDisplaySettings,
@@ -163,6 +167,9 @@ const showRightAscensionGridInput = requireElement<HTMLInputElement>('#show-righ
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const showPlanetLabelsInput = requireElement<HTMLInputElement>('#show-planet-labels');
+const planetLabelStudyControls = requireElement<HTMLDetailsElement>('#planet-label-study-controls');
+const planetLabelStudyModeSelect = requireElement<HTMLSelectElement>('#planet-label-study-mode');
+const planetLabelScaleSelect = requireElement<HTMLSelectElement>('#planet-label-scale');
 const planetBodyVisibilityInputs: Readonly<Record<SupportedPlanetBody, HTMLInputElement>> = Object.freeze({
   Mercury: requireElement<HTMLInputElement>('#show-planet-mercury'),
   Venus: requireElement<HTMLInputElement>('#show-planet-venus'),
@@ -197,6 +204,10 @@ const xrDiagnostics = createXrPerEyeDiagnostics();
 const buildIdentifier = import.meta.env.VITE_BUILD_IDENTIFIER ?? 'development-local';
 const queryStudyMode = parseObserverOffsetGeoStudyMode(window.location.search);
 const finiteCoreLaunch = parseFiniteCoreParallaxLaunch(window.location.search);
+const queryPlanetLabelStudyMode = parsePlanetLabelStudyMode(window.location.search);
+planetLabelStudyControls.hidden = !(xrDiagnostics.enabled || queryPlanetLabelStudyMode !== 'baseline');
+planetLabelStudyModeSelect.value = queryPlanetLabelStudyMode;
+planetLabelScaleSelect.value = parsePlanetLabelScale(new URLSearchParams(window.location.search).get('labelScale'));
 geoStudyControls.hidden = !(xrDiagnostics.enabled || queryStudyMode !== 'baseline');
 geoStudyModeSelect.value = queryStudyMode;
 const initialStudySettings = defaultObserverOffsetGeoStudySettings(queryStudyMode);
@@ -272,7 +283,9 @@ const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
   observerOffsetStudy.group,
 );
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
-const solarSystemBodies = createSolarSystemBodiesGroup();
+const solarSystemBodies = createSolarSystemBodiesGroup(
+  (event, detail) => xrDiagnostics.record(event, detail),
+);
 const solarDailyPath = createSolarDailyPathGroup();
 if (xrDiagnostics.enabled && diagnosticPreset.legacyAxisRoot) {
   geocentricCelestialStructure.remove(celestialAxis.group);
@@ -464,6 +477,7 @@ function currentStudyDisplaySettings(): ObserverOffsetGeoStudySettings {
 }
 
 function currentSolarSystemBodyDisplaySettings(): SolarSystemBodyDisplaySettings {
+  const planetLabelStudyMode = parsePlanetLabelStudyMode(`?labelStudy=${planetLabelStudyModeSelect.value}`);
   return Object.freeze({
     ...DEFAULT_SOLAR_SYSTEM_BODY_DISPLAY_SETTINGS,
     showBodies: showSolarSystemBodiesInput.checked,
@@ -471,6 +485,8 @@ function currentSolarSystemBodyDisplaySettings(): SolarSystemBodyDisplaySettings
       (body) => planetBodyVisibilityInputs[body].checked,
     ),
     showPlanetLabels: showPlanetLabelsInput.checked,
+    planetLabelStudyMode,
+    planetLabelScale: parsePlanetLabelScale(planetLabelScaleSelect.value),
     emphasizeSun: showSolarDailyPathInput.checked || showSolarHourNotchesInput.checked,
     showSunOnly: !showSolarSystemBodiesInput.checked &&
       (showSolarDailyPathInput.checked || showSolarHourNotchesInput.checked),
@@ -648,9 +664,13 @@ function renderCelestialAxis(): void {
   const bodyDiagnostics = solarSystemBodies.getDiagnostics();
   celestialDiagnostics.append(...[
     `Apparent-body provider ${bodyModel.provenance.provider} ${bodyModel.provenance.providerVersion}; ${bodyModel.provenance.sourceFrame} → ${bodyModel.provenance.outputFrame}; profile ${bodyModel.provenance.correctionProfile}`,
-    `Planet Labels ${showPlanetLabelsInput.checked ? 'ON' : 'OFF'}; active marker draws ${bodyDiagnostics.activeMarkerObjectNames.length}; active planet-label draws ${bodyDiagnostics.activeLabelObjectNames.length}`,
+    `Planet Labels ${showPlanetLabelsInput.checked ? 'ON' : 'OFF'}; study ${bodyModel.planetLabelStudyMode}; configured ${bodyDiagnostics.configuredLabelObjectNames.length}; submitted ${bodyDiagnostics.submittedLabelObjectNames.length}; visible ${bodyDiagnostics.activeLabelObjectNames.length}; render-callback observed ${bodyDiagnostics.renderedLabelObjectNames.length}`,
     `Enabled planets ${currentSolarSystemBodyDisplaySettings().enabledPlanetBodies?.join(', ') || 'none'}; provider catalog ${bodyState.provenance.identity.supportedBodies.join(', ')}; selected UTC ${result.snapshot.clock.instant.utcIso}; observer ${result.snapshot.observer.observer.latitudeDeg.toFixed(4)}, ${result.snapshot.observer.observer.longitudeDegEast.toFixed(4)}, ${result.snapshot.observer.observer.elevationMeters.toFixed(0)} m MSL`,
     `Body markers ${bodyDiagnostics.activeMarkerObjectNames.join(', ') || 'none'}; labels ${bodyDiagnostics.activeLabelObjectNames.join(', ') || 'none'}; suppressed markers ${bodyDiagnostics.suppressedMarkerObjectNames.join(', ') || 'none'}; suppressed labels ${bodyDiagnostics.suppressedLabelObjectNames.join(', ') || 'none'}; label-anchor directional error 0`,
+    ...Object.entries(bodyDiagnostics.labelDetails).map(([body, detail]) => {
+      const placement = detail.placement;
+      return `${body} label: created=${detail.objectCreated}; texture=${detail.textureWidth}x${detail.textureHeight}; alphaPixels=${detail.visibleAlphaPixelCount}; material=${detail.materialType}; opacity=${detail.opacity}; transparent=${detail.transparent}; depthTest=${detail.depthTest}; depthWrite=${detail.depthWrite}; renderOrder=${detail.renderOrder}; frustumCulled=${detail.frustumCulled}; anchor=${placement ? placement.anchor.toArray().map((value) => value.toFixed(4)).join(',') : 'suppressed'}; offset=${placement ? placement.tangentOffset.toArray().map((value) => value.toFixed(4)).join(',') : 'suppressed'}; projected=${Object.entries(detail.projectedCentersNdc).map(([eye, value]) => `${eye}:${value.map((component) => component.toFixed(4)).join(',')}`).join(';') || 'not-rendered'}; disparity=${detail.stereoDisparityNdc?.toExponential(3) ?? 'pending'}; cameraDistance=${detail.cameraDistanceMeters?.toFixed(3) ?? 'pending'}; callbackErrors=${detail.callbackErrorCount}; reason=${detail.suppressionReason ?? 'none'}`;
+    }),
     ...bodyModel.markers.map((marker) => `${marker.body}: ENU (${marker.directionEnu.east.toFixed(4)}, ${marker.directionEnu.north.toFixed(4)}, ${marker.directionEnu.up.toFixed(4)}) → application (${marker.directionApplication.x.toFixed(4)}, ${marker.directionApplication.y.toFixed(4)}, ${marker.directionApplication.z.toFixed(4)}); marker ${marker.visible ? 'enabled' : 'disabled'}; finite ${Number.isFinite(marker.directionApplication.x) && Number.isFinite(marker.directionApplication.y) && Number.isFinite(marker.directionApplication.z)}`),
   ].map((detail) => Object.assign(document.createElement('li'), { textContent: detail })));
   if (civilTimeZoneState.current.kind !== 'ready') {
@@ -1036,6 +1056,8 @@ useCurrentTimeButton.addEventListener('click', () => {
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
   showPlanetLabelsInput,
+  planetLabelStudyModeSelect,
+  planetLabelScaleSelect,
   ...Object.values(planetBodyVisibilityInputs),
   showSolarDailyPathInput,
   showSolarHourNotchesInput,

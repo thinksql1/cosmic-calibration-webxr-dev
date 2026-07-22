@@ -17,6 +17,15 @@ marker direction with a bounded offset, and has no collision-layout claim. The c
 equator, poles, horizon, Sun path, body positions, Swartz Creek defaults, and parked spindle are
 unchanged. No stable change is implied.
 
+Physical Quest testing of build `51b6fff376bdddf8db59b8611914cd607bed0789` passed the
+Mercury-through-Pluto markers but failed Planet Labels: the control was explicitly ON and no label
+was visible. Audit classified this as a Class C rendering defect. The custom label shader ignored
+the plane's vertex position, collapsing every textured quad to one clip-space point and zero
+rasterized area. The local repair replaces only label presentation with reusable finite `24 m`,
+tangent-offset, world-anchored Three.js sprites. Textures must contain visible alpha; normal and
+forced Uranus-proof state are distinguished; invalid labels suppress locally. The repaired
+contract is locally automated-test evidence only until physical Quest revalidation.
+
 ## Integrated finite holographic Earth-core proxy (development only)
 
 Feature `f61b6f1b22871915cc756f6f4f206051d74f3d1a`, normally merged into development as

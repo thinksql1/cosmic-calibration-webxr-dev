@@ -463,6 +463,22 @@
   reported identification limit without beginning a constellation system or a large collision
   layout engine.
 
+### DEC-036: Render planet labels as finite world-anchored XR sprites
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only Quest revalidation
+- **Owner:** Darrell Wright / project control
+- **Decision:** Retain each apparent planet marker as its validated projective direction, but render
+  its label as one finite native Three.js sprite at `24 m` along that exact direction plus a bounded
+  tangent offset. Create a verified nonblank `512 × 128` canvas texture once, reuse the sprite and
+  resources through toggles, and let native XR cameras project the fixed anchor per eye. Keep
+  labels default-off, subordinate, non-writing, non-testing, and locally suppressible. The
+  query-gated Uranus proof may force one marker/label while explicitly reporting forced state.
+- **Rationale:** Physical Quest testing proved markers and controls but no labels. Audit showed the
+  previous shader ignored plane vertices, making both textured triangles degenerate. A finite
+  sprite is the smallest established WebXR scene primitive that preserves world locking, stereo,
+  calibrated direction, and scientific honesty without camera parenting or per-eye geometry
+  mutation. It is not approved for constellation labels until this repair passes Quest.
+
 ## Proposed decisions awaiting review
 
 None yet.

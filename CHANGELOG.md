@@ -4,6 +4,14 @@
 
 ### Added
 
+- Diagnosed the Quest-invisible Planet Labels in development build `51b6fff` as zero-area
+  projective plane geometry: the label vertex shader ignored every plane vertex. Added a
+  query-gated Uranus XR proof and replaced all planet/Pluto labels with finite `24 m`,
+  tangent-offset, world-anchored native sprites using validated nonblank canvas textures. Added
+  configured/submitted/render-observed diagnostics, per-eye projected centers, isolation modes,
+  local failure containment, and lifecycle coverage. Marker science and all validated celestial
+  geometry remain unchanged; physical Quest acceptance is pending.
+
 - Extended the development-only apparent topocentric body catalog through Uranus and Neptune and
   added Pluto as a clearly classified dwarf planet. Each uses the existing Astronomy Engine,
   observer/time, ENU-to-application, calibrated-parent, and projective XR path. Added independent
