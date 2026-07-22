@@ -36,6 +36,13 @@ Development Actions/Pages run `29960227474` completed successfully, and the host
 the merge SHA and includes the finite-label proof and diagnostics. This is deployment evidence only;
 physical Quest validation of the repaired labels remains pending, and stable remains unchanged.
 
+Scale revision `cd37479b65c4c9366fde914ec15b7be761383231` updates only the immutable Sprite
+dimensions: old Large is new Small, with Medium/Large/XL/XXL at `2×/4×/8×/16×` that base and
+Medium as default. All `511/511` tests across `54` files, type-check, build, audit, dependency
+tree, diff checks, and desktop selector/query verification passed. Development Actions/Pages run
+`29962714264` passed and the hosted bundle reports that exact SHA. Physical Quest selection of the
+smallest comfortable preset remains pending; stable is unchanged.
+
 ## Integrated finite holographic Earth-core proxy (development only)
 
 Feature `f61b6f1b22871915cc756f6f4f206051d74f3d1a`, normally merged into development as

@@ -9,6 +9,9 @@
   so the scale table now promotes old Large to new Small and supplies Medium/Large/XL/XXL at
   `2×/4×/8×/16×` that base. Medium is the new default; XL and XXL are explicit readability
   experiments, and overlap handling plus constellation-label approval remain deferred.
+- Deployed the scale revision `cd37479` to development through successful Actions/Pages run
+  `29962714264`. The hosted development response is HTTP 200 and exposes the exact build SHA;
+  physical Quest readability selection remains pending.
 
 - Diagnosed the Quest-invisible Planet Labels in development build `51b6fff` as zero-area
   projective plane geometry: the label vertex shader ignored every plane vertex. Added a
