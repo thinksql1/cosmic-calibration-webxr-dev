@@ -8,6 +8,7 @@ import * as THREE from 'three';
 export function createGeocentricCelestialStructureGroup(
   earthAxisGroup: THREE.Group,
   celestialEquatorGroup: THREE.Group,
+  celestialCoordinateGridGroup?: THREE.Group,
 ): THREE.Group {
   if (earthAxisGroup === celestialEquatorGroup) {
     throw new Error('Geocentric celestial structure requires distinct axis and equator groups.');
@@ -20,5 +21,6 @@ export function createGeocentricCelestialStructureGroup(
     'APPLICATION_BASIS_UNCALIBRATED_BELOW_ONE_GEOGRAPHIC_PARENT';
   group.userData.yawApplication = 'GEOGRAPHIC_PARENT_EXACTLY_ONCE';
   group.add(earthAxisGroup, celestialEquatorGroup);
+  if (celestialCoordinateGridGroup) group.add(celestialCoordinateGridGroup);
   return group;
 }

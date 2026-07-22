@@ -1,5 +1,16 @@
 # Project State
 
+## Development-only celestial coordinate grid (in progress)
+
+`feature/celestial-coordinate-grid` adds a default-hidden geocentric reference grid without
+changing the protected stable repository. It reuses the published P03/WGS84 core, axis, and
+equatorial-basis contract: closed declination circles at `+60`, `+30`, `-30`, and `-60` degrees,
+plus twelve intentionally open pole-to-pole meridian semicircles every two hours. Its deterministic
+0h reference is explicitly non-sidereal because no validated sidereal/vernal-equinox presentation
+reference exists in the current model. The unresolved spindle issue is deliberately unchanged.
+Focused utility, topology, and non-finite eye-suppression tests pass locally; full validation,
+development-only deployment, hosted verification, and new physical Quest evidence remain pending.
+
 **Last updated:** 2026-07-20 America/New_York
 
 **Updated by:** Codex / project control

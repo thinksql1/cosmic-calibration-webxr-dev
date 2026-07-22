@@ -10,11 +10,15 @@ room, calibrated display, and scientific coordinates distinct:
 3. **Scientific state and presentation frames:** immutable observer/WGS84, UTC simulation-clock, Astronomy Engine, P03, and provenance state remain independent of scene transforms. Presentation maps tagged ENU results into the application basis below the geographic parent.
 
 Within the geographic frame, the local horizon remains observer-centered. The Earth core, axis,
-projective poles, and celestial equator form the distinct Earth-centered geocentric assembly.
+projective poles, celestial equator, and development-only celestial coordinate grid form the distinct Earth-centered geocentric assembly.
 Apparent Sun, Moon, and planet directions plus the civil-day Sun path are observer-relative
 references. North calibration rotates only the geographic display group around local Y; it never
 rotates the XR camera, renderer, room/floor frame, controller target-ray objects, or scientific
 source data.
+
+The coordinate grid reuses the assembly's P03 axis and deterministic equatorial basis. Its current
+longitude zero is explicitly non-sidereal rather than a claimed vernal-equinox reference; see
+`docs/CELESTIAL_COORDINATE_GRID.md` for the reusable conversion and topology contract.
 
 ## Coordinate convention
 
