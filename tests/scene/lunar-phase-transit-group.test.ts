@@ -83,7 +83,7 @@ describe('Lunar Phase Transit Three.js group', () => {
       callbackErrorCount: 0,
     });
     expect(diagnostics.geometryHash).toBe(beforeColorGeometryHash);
-    expect(diagnostics.colorTokens.visible).toBe('lunar-transit-visible');
+    expect(diagnostics.colorTokens.visible).toBe('moonlit-water-transit-visible');
     expect(diagnostics.spriteShapeEvidence
       .filter((entry) => entry.name.includes('phase-image'))
       .every((entry) => Math.abs(entry.localScale[0] - entry.localScale[1]) < 1e-12

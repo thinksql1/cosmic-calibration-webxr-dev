@@ -94,10 +94,10 @@
         <details open>
           <summary>Celestial &amp; horizon display</summary>
           <div class="toggle-grid">
-            <label><input id="show-celestial-axis" type="checkbox" checked />Axis</label>
-            <label><input id="show-earth-core" type="checkbox" checked />Earth core</label>
-            <label><input id="show-pole-markers" type="checkbox" checked />Pole markers</label>
-            <label><input id="show-pole-labels" type="checkbox" checked />NCP/SCP labels</label>
+            <label><input id="show-celestial-axis" type="checkbox" />Axis</label>
+            <label><input id="show-earth-core" type="checkbox" />Earth core</label>
+            <label><input id="show-pole-markers" type="checkbox" />Pole markers</label>
+            <label><input id="show-pole-labels" type="checkbox" />NCP/SCP labels</label>
             <label><input id="show-below-horizon" type="checkbox" checked />Below-horizon segment</label>
             <label><input id="show-celestial-equator" type="checkbox" />Celestial equator</label>
             <label><input id="show-celestial-coordinate-grid" type="checkbox" />Celestial coordinate grid</label>
@@ -199,11 +199,18 @@
               <option value="highlight">Highlight Selected Group</option>
               <option value="group-palette">Group Palette — Experimental</option>
             </select>
+            <label for="constellation-base-color">Constellation Base Color <span id="constellation-base-swatch" class="color-swatch" aria-hidden="true"></span></label>
+            <select id="constellation-base-color" aria-label="Constellation Base Color"></select>
+            <label for="constellation-highlight-color">Selected Group Highlight <span id="constellation-highlight-swatch" class="color-swatch" aria-hidden="true"></span></label>
+            <select id="constellation-highlight-color" aria-label="Selected Group Highlight"></select>
             <label for="constellation-color-strength">Constellation Color Strength</label>
             <select id="constellation-color-strength">
               <option value="subtle" selected>Subtle</option><option value="standard">Standard</option>
               <option value="vivid">Vivid — diagnostic</option>
             </select>
+            <div class="preset-grid" aria-label="Constellation color resets">
+              <button id="reset-constellation-colors" type="button">Reset Constellation Colors</button>
+            </div>
             <details><summary>Individual constellation visibility</summary>
               <div class="toggle-grid" aria-label="Individual constellation visibility">
                 <label><input data-constellation-identifier="ORI" type="checkbox" />Orion</label><label><input data-constellation-identifier="UMA" type="checkbox" />Ursa Major</label><label><input data-constellation-identifier="CAS" type="checkbox" />Cassiopeia</label><label><input data-constellation-identifier="CYG" type="checkbox" />Cygnus</label><label><input data-constellation-identifier="TAU" type="checkbox" />Taurus</label><label><input data-constellation-identifier="LEO" type="checkbox" />Leo</label><label><input data-constellation-identifier="SCO" type="checkbox" />Scorpius</label>
@@ -217,10 +224,11 @@
             <summary>Solar/lunar presentation study</summary>
             <p class="simulation-note"><strong>Daily motion</strong></p>
             <label for="lunar-path-palette">Lunar Path Palette</label>
-            <select id="lunar-path-palette">
-              <option value="moonlit-water" selected>Moonlit Water</option>
-              <option value="legacy-purple">Legacy Purple</option>
-            </select>
+            <select id="lunar-path-palette"></select>
+            <div class="preset-grid" aria-label="Appearance resets">
+              <button id="reset-lunar-palette" type="button">Reset Lunar Palette</button>
+              <button id="reset-all-appearance" type="button">Reset All Appearance</button>
+            </div>
             <div class="toggle-grid" aria-label="Moon presentation study visibility">
               <label><input id="show-moon-path" type="checkbox" />Moon Daily Path</label>
             </div>

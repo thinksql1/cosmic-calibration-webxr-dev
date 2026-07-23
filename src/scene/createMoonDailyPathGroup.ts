@@ -88,7 +88,7 @@ export function createMoonDailyPathGroup(
   let callbackCount = 0;
   let callbackExceptionCount = 0;
   let orientationUpdateCount = 0;
-  let activePalette: LunarPalette = 'legacy-purple';
+  let activePalette: LunarPalette = 'lunar-purple';
   const completedEyes = new Set<string>();
   const modelViewScratch = new THREE.Matrix4();
 

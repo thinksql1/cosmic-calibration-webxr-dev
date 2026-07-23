@@ -51,7 +51,7 @@ describe('Moon daily path XR renderer', () => {
     expect(Array.from((line.geometry.getAttribute('position') as THREE.BufferAttribute).array)).toEqual(before);
     expect(handle.getDiagnostics().perEyeMutation).toBe(false);
     expect(handle.getDiagnostics().geometryHash).toBe(beforeHash);
-    expect((line.material as THREE.ShaderMaterial).uniforms.uColor.value.getHex()).toBe(0x7898d8);
+    expect((line.material as THREE.ShaderMaterial).uniforms.uColor.value.getHex()).toBe(0x9eaef0);
     handle.dispose();
   });
 

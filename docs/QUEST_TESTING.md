@@ -427,6 +427,16 @@ persistence is implied. Record only observed results and keep the spindle parked
 
 ## Rigid Earth-axis spindle correction
 
+## Clean defaults and appearance personalization
+
+In a fresh private Quest Browser session, verify Axis, pole markers, pole labels, and Earth Core
+are OFF before calibration; enable each manually and confirm Earth Core OFF leaves neither direct
+core visual. In the query-gated constellation/moon studies, confirm Celestial Lavender, Observation
+Orange, Unified, Subtle, and Lunar Purple defaults. Test every curated swatch and lunar family,
+then choose nondefaults, reload, test a valid query override, and use each reset. Confirm observer,
+calibration, time, visibility, geometry, Moon Sprite shape, labels, both-eye consistency, and
+callback/frame health remain unchanged.
+
 The canonical 23-step unified-geocentric procedure above supersedes the historical spindle-only
 checklist. The correction is independently integrated and deployed; physical acceptance remains
 **NOT RUN** until this checklist is executed on Quest.

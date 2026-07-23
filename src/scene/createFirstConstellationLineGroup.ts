@@ -213,6 +213,8 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
             update.settings.colorMode ?? DEFAULT_CELESTIAL_COLOR_SETTINGS.constellationMode,
             update.settings.colorStrength ?? DEFAULT_CELESTIAL_COLOR_SETTINGS.constellationStrength,
             update.settings.selectedLearningGroup,
+            update.settings.baseColor ?? DEFAULT_CELESTIAL_COLOR_SETTINGS.constellationBaseColor,
+            update.settings.highlightColor ?? DEFAULT_CELESTIAL_COLOR_SETTINGS.constellationHighlightColor,
           );
           const styleKey = `${style.token.id}|${style.opacity.toFixed(3)}|${style.role}|${style.colorSource}`;
           if (entry.object.userData.colorStyleKey !== styleKey) {
@@ -234,6 +236,18 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
         );
         entry.material.uniforms.uEqjToApplication.value.copy(rotation);
         entry.material.uniforms.uDrawEnabled.value = 1;
+      }
+      // Curated appearance choices are lazy-cached, but historical selections
+      // never grow the line-material cache without bound. Active materials are
+      // retained; oldest inactive entries are safely disposed on control updates.
+      if (lineMaterials.size > 24) {
+        const activeLineMaterials = new Set(entries.filter((entry) => !entry.endpointMarker).map((entry) => entry.material));
+        for (const [key, candidate] of lineMaterials) {
+          if (lineMaterials.size <= 24) break;
+          if (activeLineMaterials.has(candidate)) continue;
+          candidate.dispose();
+          lineMaterials.delete(key);
+        }
       }
       enforce();
       group.userData.catalogFrame = 'EQJ_J2000';

@@ -593,6 +593,17 @@
 
 ## Proposed decisions awaiting review
 
+### DEC-043: Clean defaults and curated, persisted celestial appearance preferences
+- **Date:** 2026-07-23
+- **Status:** Implemented development study; physical Quest validation pending
+- **Decision:** Resolve fresh display defaults centrally with Axis, NCP/SCP markers, pole labels,
+  and Earth Core OFF. Restore the accepted bright Lunar Purple family as default; retain brighter
+  curated alternatives. Persist only versioned appearance identifiers under a dedicated local key.
+  Keep Unified lavender and Observation Orange defaults, use deterministic context derivation, and
+  bound shared material caching without geometry or transform changes.
+- **Rationale:** Quest feedback prioritized reduced initial clutter, legible purple lunar motion,
+  restrained instructional orange, and personalization isolated from calibration and science.
+
 None yet.
 
 ## Superseded decisions

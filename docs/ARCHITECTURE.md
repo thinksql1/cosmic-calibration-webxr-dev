@@ -156,6 +156,11 @@ Calibration is deliberately in memory only. Session exit, reload, room change, b
 
 ## Module boundaries
 
+- `src/presentation/defaultCelestialVisibility.ts`: one fresh-session visibility contract; main
+  resolves it before scene presentation, while diagnostics/query paths remain explicit.
+- `src/presentation/color/`: semantic token catalog, curated appearance preferences, safe local
+  persistence, deterministic context derivation, and material-only policies.
+
 - `src/main.ts`: renderer, DOM UI, calibration, scientific-state refresh, layer controls, and integration wiring.
 - `src/scene/`: room/floor geometry; calibrated geographic group; Earth-centered axis/core/poles/equator assembly; observer-centered local horizon; body and Sun-path groups; eye filtering; owned rendering resources and disposal.
 - `src/presentation/`: immutable scientific-state-to-renderer models, application-basis mapping, geocentric structure presentation, and eye presentation modes.

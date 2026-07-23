@@ -17,7 +17,7 @@ export type CelestialColorTokenId =
   | 'moon-phase-label';
 
 export interface CelestialColorToken {
-  readonly id: CelestialColorTokenId;
+  readonly id: string;
   readonly hex: number;
   readonly cssHex: `#${string}`;
   readonly opacity: number;

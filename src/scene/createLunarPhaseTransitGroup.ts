@@ -263,7 +263,7 @@ export function createLunarPhaseTransitGroup(
   let callbackErrorCount = 0;
   const projectedCenters = new Map<string, readonly [number, number, number]>();
   let disposed = false;
-  let activePalette: LunarPalette = 'legacy-purple';
+  let activePalette: LunarPalette = 'lunar-purple';
 
   const allMaterials = [
     visibleMaterial,

@@ -16,16 +16,16 @@ contract. Quest passthrough contrast remains a physical-test decision, not a cla
 
 ## Lunar palettes
 
-`Moonlit Water` is the default: Daily Path `#7898D8`, visible transit `#7667C7`, Earth-hidden
-transit `#354B83`, notches `#D5DDF2`, and current transit `#72D3D8`. This retains purple in the
-lunation layer while making it blue-violet/water-related rather than constellation lavender.
-`Legacy Purple` preserves the pre-change material values for direct comparison. The daily and
-transit paths remain distinct scientific layers.
+`Lunar Purple` is now the default, restoring the accepted bright Daily Path `#B9D6E8`, visible
+transit `#CDB8FF`, and Earth-hidden transit `#9383BA`. `legacy-purple` remains a compatible query
+alias. Moonlit Water is brighter than its earlier dark Quest-tested version; Silver Moon, Deep
+Ocean, Arctic Moon, and Mystic Rose are coordinated optional families. Daily and transit paths
+remain distinct scientific layers.
 
 ## Constellation modes
 
 - **Unified** (default): accepted lavender, including first-set mode.
-- **Highlight Selected Group**: one group accent plus dim lavender-gray visible context.
+- **Highlight Selected Group**: Observation Orange by default plus a derived neutral context.
 - **Group Palette — Experimental**: one stable primary learning-group color per constellation.
 
 Strength controls only material color/opacity: Subtle and Standard are normal choices; Vivid is
@@ -45,6 +45,9 @@ and lunar/Sun distinctions inspectable; they are descriptive XR evidence, not WC
 Moon image textures, Sprite anchors, label texture sizing, label scale, and compact-dial geometry
 remain untouched. A reserved next-phase token is reported for a future already-authorized marker
 only; this milestone does not add a new object.
+
+See [Celestial Appearance Personalization](CELESTIAL_APPEARANCE_PERSONALIZATION.md) for curated
+swatches, persistence, reset behavior, and query precedence.
 
 ## Physical gate
 

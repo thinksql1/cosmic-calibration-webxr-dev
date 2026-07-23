@@ -4,6 +4,11 @@
 
 ### Added
 
+- Added development-only clean celestial defaults and curated appearance personalization:
+  Axis/poles/pole labels/Earth Core OFF on fresh load; persisted versioned constellation base and
+  selected-group swatches; Lunar Purple default plus five coordinated lunar families; reset
+  controls; query precedence; and bounded material-only lifecycle protection.
+
 - Created immutable development checkpoint `quest-approved-expanded-constellations-v1` at
   Quest-approved build `d54a830ab04fb920838e78a350c0a7e540740997`, pushed only to `dev`.
 - Added the query-gated semantic celestial color system: Moonlit Water/Legacy Purple lunar
