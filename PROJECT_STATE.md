@@ -10,8 +10,14 @@ extended groups, and diagnostic isolation states. Focused tests, the full 590-te
 type-check, build, and diff check pass locally. Feature `e6f3da3` merged as
 `1e8584589b38fc476ef924e95a76a3d69e174e67`; development Actions/Pages run `30041239809` passed.
 Hosted Course-40 verification confirmed the visible exact build SHA, all 40 controls, all 11 new
-identifiers, and the master-OFF Introduction Anchors default. Physical Quest review remains
-pending. Stable is untouched.
+identifiers, and the master-OFF Introduction Anchors default. The user then physically tested the
+deployed V3A Course 40 build on Quest 3 and reported, "From what I can tell it looks good." This
+is recorded as an overall physical PASS with no blocking stereo, stability, connectivity,
+highlighting, duplicate-line, or unrelated-system regression reported. Detailed checklist
+observations were not individually captured and are not inferred. Immutable development-only tag
+`quest-approved-constellations-v3a-v1` marks the exact tested deployment-record commit
+`36346b2b5a80567ac4344db6595bbd0cd7dea427`. Stable is untouched; V3B difficult-constellation
+work is authorized in development.
 
 ## Current control record — 2026-07-23
 
