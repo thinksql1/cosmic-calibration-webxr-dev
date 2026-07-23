@@ -1,5 +1,12 @@
 # Cosmic Calibration WebXR Architecture
 
+## Semantic presentation colors
+
+`src/presentation/color/` owns semantic color tokens, query parsing, constellation policy, lunar
+palette selection, and luminance/distance validation. Scene groups consume resolved material
+values only. The science layer owns no colors; no color mode can mutate positions, buffers,
+transforms, observer state, clock state, calibration, or per-eye state.
+
 ## Expanded constellation catalog ownership
 
 `constellationCatalogV2` owns unique BSC5P J2000 star records and figure metadata; first-set and

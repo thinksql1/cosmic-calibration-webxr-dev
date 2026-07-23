@@ -2,9 +2,10 @@
 
 ## Current bounded gate
 
-Physically validate the query-gated expanded 29-constellation catalog and learning-group controls.
-The approved lunar transit systems are protected development baseline, not a stable promotion.
-Constellation labels remain blocked until the expanded line layer passes Quest review.
+Physically validate the query-gated semantic celestial color system: Moonlit Water lunar styling,
+selected-group constellation highlighting, experimental group-palette noise, and preservation of
+the now Quest-approved 29-constellation/lunar-transit baseline. This is not stable promotion.
+Constellation labels and guided-course presets remain separate gates.
 
 ## Educational objective and staged direction
 

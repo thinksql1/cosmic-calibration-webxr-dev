@@ -53,6 +53,14 @@ one displays directions above the current geometric horizon and one displays bel
 directions at reduced opacity. `Show Earth-Hidden Lunar Path` controls only the latter. No Earth
 mesh, terrain, camera frustum, or physical depth occlusion deletes the hidden portion.
 
+## Semantic lunar palette
+
+The default query-gated Moonlit Water palette gives the visible transit a blue-violet identity,
+the Earth-hidden continuation deep indigo, phase notches silver, and the current marker restrained
+aqua. It changes material color/opacity only; the shared canonical buffer, event positions, and
+Earth-hidden policy remain exactly the same. `lunarPalette=legacy-purple` provides the prior
+accepted comparison. See `SEMANTIC_CELESTIAL_COLOR_SYSTEM.md`.
+
 ## Events and current progress
 
 Each canonical event has:

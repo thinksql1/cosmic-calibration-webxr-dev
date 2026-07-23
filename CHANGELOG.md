@@ -4,6 +4,12 @@
 
 ### Added
 
+- Created immutable development checkpoint `quest-approved-expanded-constellations-v1` at
+  Quest-approved build `d54a830ab04fb920838e78a350c0a7e540740997`, pushed only to `dev`.
+- Added the query-gated semantic celestial color system: Moonlit Water/Legacy Purple lunar
+  palettes, Unified/Highlight Selected Group/Experimental Group Palette constellation modes,
+  bounded strength controls, material reuse, luminance diagnostics, and no geometry mutation.
+
 - Created immutable development tag `quest-approved-lunar-transit-v1` at accepted build
   `0d3f7219774bac51c0b3f5061205a307e67546d3`, pushed only to the development remote, and recorded
   recovery/verification instructions. No stable release or stable tag was created.

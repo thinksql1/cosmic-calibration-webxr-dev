@@ -13,6 +13,8 @@ import {
   type UnitVector3,
 } from '../science/constellations/greatCircleArc';
 import type { Matrix3Rows } from '../science/astronomy/realSkyEquatorialOrientation';
+import type { ConstellationColorMode, ConstellationColorStrength } from './color/celestialColorModes';
+import type { ConstellationLearningGroupId } from '../science/constellations/constellationLearningGroups';
 
 export interface FirstConstellationCanonicalSegment {
   readonly name: string;
@@ -45,6 +47,9 @@ export interface FirstConstellationDisplaySettings {
   readonly masterVisible: boolean;
   readonly enabledConstellations: ReadonlySet<ExpandedConstellationIdentifier>;
   readonly showEndpointMarkers: boolean;
+  readonly colorMode?: ConstellationColorMode;
+  readonly colorStrength?: ConstellationColorStrength;
+  readonly selectedLearningGroup?: ConstellationLearningGroupId | undefined;
 }
 export interface FirstConstellationPresentationUpdate {
   readonly structure: GeocentricCelestialStructurePresentation;

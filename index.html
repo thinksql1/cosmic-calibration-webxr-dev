@@ -193,6 +193,17 @@
               <option value="autumn">Autumn Sky</option><option value="zodiac">Zodiac</option><option value="all-expanded">All Expanded Constellations</option>
               <option value="added-only">Added Constellations Only</option><option value="clear">Clear Constellations</option>
             </select>
+            <label for="constellation-color-mode">Constellation Color Mode</label>
+            <select id="constellation-color-mode">
+              <option value="unified" selected>Unified</option>
+              <option value="highlight">Highlight Selected Group</option>
+              <option value="group-palette">Group Palette — Experimental</option>
+            </select>
+            <label for="constellation-color-strength">Constellation Color Strength</label>
+            <select id="constellation-color-strength">
+              <option value="subtle" selected>Subtle</option><option value="standard">Standard</option>
+              <option value="vivid">Vivid — diagnostic</option>
+            </select>
             <details><summary>Individual constellation visibility</summary>
               <div class="toggle-grid" aria-label="Individual constellation visibility">
                 <label><input data-constellation-identifier="ORI" type="checkbox" />Orion</label><label><input data-constellation-identifier="UMA" type="checkbox" />Ursa Major</label><label><input data-constellation-identifier="CAS" type="checkbox" />Cassiopeia</label><label><input data-constellation-identifier="CYG" type="checkbox" />Cygnus</label><label><input data-constellation-identifier="TAU" type="checkbox" />Taurus</label><label><input data-constellation-identifier="LEO" type="checkbox" />Leo</label><label><input data-constellation-identifier="SCO" type="checkbox" />Scorpius</label>
@@ -205,6 +216,11 @@
           <details id="moon-study-controls" hidden>
             <summary>Solar/lunar presentation study</summary>
             <p class="simulation-note"><strong>Daily motion</strong></p>
+            <label for="lunar-path-palette">Lunar Path Palette</label>
+            <select id="lunar-path-palette">
+              <option value="moonlit-water" selected>Moonlit Water</option>
+              <option value="legacy-purple">Legacy Purple</option>
+            </select>
             <div class="toggle-grid" aria-label="Moon presentation study visibility">
               <label><input id="show-moon-path" type="checkbox" />Moon Daily Path</label>
             </div>

@@ -55,6 +55,10 @@ non-writing translucent material.
 The Moon path rebuilds only when its civil-day cache identity changes. Head movement and
 left/right eye rendering never rebuild it. The Moon marker remains independently controlled.
 
+The default Moonlit Water palette distinguishes this periwinkle daily trace from the deeper
+blue-violet Lunar Phase Transit while retaining their shared lunar identity. Sun materials remain
+their accepted warm solar gold; no Sun scientific or rendering behavior changed.
+
 ## Query and controls
 
 The ordinary URL adds no Moon study geometry. Supported study modes are `off`, `daily-path`,

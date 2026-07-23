@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import type { MoonDailyPathPresentationModel } from '../presentation/moonDailyPathPresentationModel';
+import { lunarSemanticPalette } from '../presentation/color/lunarColorPolicy';
+import type { LunarPalette } from '../presentation/color/celestialColorModes';
 
 export const MAX_MOON_DAILY_PATH_RENDER_SAMPLES = 1024;
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.995;
@@ -36,6 +38,8 @@ export interface MoonDailyPathRendererDiagnostics {
   readonly geometryBuildCount: 1;
   readonly orientationUpdateCount: number;
   readonly perEyeMutation: false;
+  readonly colorToken: string;
+  readonly geometryHash: string;
 }
 
 export interface MoonDailyPathGroupHandle {
@@ -43,6 +47,7 @@ export interface MoonDailyPathGroupHandle {
   update(model: MoonDailyPathPresentationModel): void;
   clear(reason?: string): void;
   enforceVisibilityControls(): void;
+  setLunarPalette(palette: LunarPalette): void;
   getDiagnostics(): MoonDailyPathRendererDiagnostics;
   dispose(): void;
 }
@@ -83,6 +88,7 @@ export function createMoonDailyPathGroup(
   let callbackCount = 0;
   let callbackExceptionCount = 0;
   let orientationUpdateCount = 0;
+  let activePalette: LunarPalette = 'legacy-purple';
   const completedEyes = new Set<string>();
   const modelViewScratch = new THREE.Matrix4();
 
@@ -168,6 +174,12 @@ export function createMoonDailyPathGroup(
     enforceVisibilityControls(): void {
       enforce();
     },
+    setLunarPalette(palette: LunarPalette): void {
+      if (activePalette === palette) return;
+      activePalette = palette;
+      material.uniforms.uColor.value.setHex(lunarSemanticPalette(palette).dailyPath.hex);
+      group.userData.colorToken = lunarSemanticPalette(palette).dailyPath.id;
+    },
     getDiagnostics(): MoonDailyPathRendererDiagnostics {
       return Object.freeze({
         readiness: disposed ? 'disposed' : model ? 'ready' : 'not-ready',
@@ -179,6 +191,8 @@ export function createMoonDailyPathGroup(
         geometryBuildCount: 1,
         orientationUpdateCount,
         perEyeMutation: false,
+        colorToken: lunarSemanticPalette(activePalette).dailyPath.id,
+        geometryHash: `${geometry.getAttribute('position').count}:${geometry.drawRange.count}`,
       });
     },
     dispose(): void {
