@@ -5,6 +5,8 @@ import {
   type FirstConstellationPresentationUpdate,
 } from '../presentation/firstConstellationLinePresentation';
 import { createEyePresentationLayerFilter, type EyePresentationDiagnostics, type XrViewIdentitySource } from './eyePresentationLayerFilter';
+import { resolveConstellationColor } from '../presentation/color/constellationColorPolicy';
+import { DEFAULT_CELESTIAL_COLOR_SETTINGS } from '../presentation/color/celestialColorModes';
 
 const CLIP_DEPTH_WITHOUT_DEPTH_WRITE = 0.997;
 const vertexShader = /* glsl */ `
@@ -29,13 +31,13 @@ const pointFragmentShader = /* glsl */ `
 `;
 
 function finiteMatrix(matrix: THREE.Matrix4): boolean { return matrix.elements.every(Number.isFinite); }
-function material(points = false): THREE.ShaderMaterial {
+function material(points = false, color = points ? 0xffe6a0 : 0xd9b7ff, opacity = points ? 0.72 : 0.42): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader: points ? pointFragmentShader : lineFragmentShader,
     uniforms: {
-      uColor: { value: new THREE.Color(points ? 0xffe6a0 : 0xd9b7ff) },
-      uOpacity: { value: points ? 0.72 : 0.42 },
+      uColor: { value: new THREE.Color(color) },
+      uOpacity: { value: opacity },
       uProjectiveW: { value: 0 },
       uDrawEnabled: { value: 0 },
       uEncodedCore: { value: new THREE.Vector3() },
@@ -51,7 +53,7 @@ function material(points = false): THREE.ShaderMaterial {
 
 interface RenderEntry {
   readonly object: THREE.Line | THREE.Points;
-  readonly material: THREE.ShaderMaterial;
+  material: THREE.ShaderMaterial;
   readonly geometry: THREE.BufferGeometry;
   readonly constellationIdentifier: string;
   readonly endpointMarker: boolean;
@@ -71,6 +73,9 @@ export interface FirstConstellationLineDiagnostics {
   readonly submittedObjectNames: readonly string[];
   readonly materialCount: number;
   readonly bufferCount: number;
+  readonly colorMaterialUpdateCount: number;
+  readonly materialCreationCount: number;
+  readonly geometryHash: string;
 }
 export interface FirstConstellationLineGroupHandle {
   readonly group: THREE.Group;
@@ -88,6 +93,8 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
   group.name = 'constellation-line-layer';
   group.visible = false;
   const entries: RenderEntry[] = [];
+  const lineMaterials = new Map<string, THREE.ShaderMaterial>();
+  const endpointMaterial = material(true);
   const groups = new Map<string, THREE.Group>();
   const modelViewScratch = new THREE.Matrix4();
   const eyeFilter = createEyePresentationLayerFilter(group);
@@ -95,10 +102,19 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
   let lastUpdate: FirstConstellationPresentationUpdate | undefined;
   let stateReady = false;
   let orientationUpdateCount = 0;
+  let colorMaterialUpdateCount = 0;
   const geometryBuildCount = 1;
   const submitted = new Set<string>();
   const suppressed = new Set<string>();
   const report = (event: string, detail: string) => { try { reportDiagnostic(event, detail); } catch { /* bounded diagnostics only */ } };
+  const lineMaterialFor = (color: number, opacity: number): THREE.ShaderMaterial => {
+    const key = `${color.toString(16)}|${opacity.toFixed(3)}`;
+    const existing = lineMaterials.get(key);
+    if (existing) return existing;
+    const created = material(false, color, opacity);
+    lineMaterials.set(key, created);
+    return created;
+  };
 
   function configureDrawGuard(entry: RenderEntry): void {
     entry.object.onBeforeRender = (_renderer, _scene, camera) => {
@@ -132,7 +148,7 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
     for (const segment of figure.segments) {
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.Float32BufferAttribute(segment.directions.flatMap((direction) => [Math.fround(direction.x), Math.fround(direction.y), Math.fround(direction.z)]), 3));
-      const lineMaterial = material(false);
+      const lineMaterial = lineMaterialFor(0xd9b7ff, 0.42);
       const line = new THREE.Line(geometry, lineMaterial);
       line.name = segment.name;
       line.frustumCulled = false;
@@ -145,7 +161,6 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
     }
     const endpointGeometry = new THREE.BufferGeometry();
     endpointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(figure.starDirections.flatMap(({ direction }) => [Math.fround(direction.x), Math.fround(direction.y), Math.fround(direction.z)]), 3));
-    const endpointMaterial = material(true);
     const endpoints = new THREE.Points(endpointGeometry, endpointMaterial);
     endpoints.name = `constellation-${figure.identifier.toLowerCase()}-endpoint-markers`;
     endpoints.frustumCulled = false;
@@ -189,6 +204,28 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
         update.orientationRows[2][0], update.orientationRows[2][1], update.orientationRows[2][2],
       );
       for (const entry of entries) {
+        if (entry.endpointMarker) {
+          entry.material = endpointMaterial;
+          entry.object.material = endpointMaterial;
+        } else {
+          const style = resolveConstellationColor(
+            entry.constellationIdentifier as Parameters<typeof resolveConstellationColor>[0],
+            update.settings.colorMode ?? DEFAULT_CELESTIAL_COLOR_SETTINGS.constellationMode,
+            update.settings.colorStrength ?? DEFAULT_CELESTIAL_COLOR_SETTINGS.constellationStrength,
+            update.settings.selectedLearningGroup,
+          );
+          const styleKey = `${style.token.id}|${style.opacity.toFixed(3)}|${style.role}|${style.colorSource}`;
+          if (entry.object.userData.colorStyleKey !== styleKey) {
+            const styledMaterial = lineMaterialFor(style.token.hex, style.opacity);
+            entry.material = styledMaterial;
+            entry.object.material = styledMaterial;
+            entry.object.userData.colorToken = style.token.id;
+            entry.object.userData.colorRole = style.role;
+            entry.object.userData.colorSource = style.colorSource;
+            entry.object.userData.colorStyleKey = styleKey;
+            colorMaterialUpdateCount += 1;
+          }
+        }
         entry.material.uniforms.uProjectiveW.value = Math.fround(inverseRadius);
         entry.material.uniforms.uEncodedCore.value.set(
           Math.fround(update.structure.earthCore.x * inverseRadius),
@@ -230,15 +267,22 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
         geometryBuildCount,
         perEyeMutation: false,
         submittedObjectNames: Object.freeze([...submitted]),
-        materialCount: entries.length,
+        materialCount: lineMaterials.size + 1,
         bufferCount: entries.length,
+        colorMaterialUpdateCount,
+        materialCreationCount: lineMaterials.size + 1,
+        geometryHash: FIRST_CONSTELLATION_CANONICAL_GEOMETRY.figures
+          .flatMap((figure) => figure.segments.map((segment) => `${segment.name}:${segment.directions.length}`))
+          .join('|'),
       });
     },
     dispose(): void {
       if (disposed) return;
       disposed = true;
       eyeFilter.dispose();
-      entries.forEach((entry) => { entry.object.onBeforeRender = () => undefined; entry.geometry.dispose(); entry.material.dispose(); });
+      entries.forEach((entry) => { entry.object.onBeforeRender = () => undefined; entry.geometry.dispose(); });
+      endpointMaterial.dispose();
+      lineMaterials.forEach((value) => value.dispose());
       group.removeFromParent();
       group.clear();
     },

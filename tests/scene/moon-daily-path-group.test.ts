@@ -43,10 +43,15 @@ describe('Moon daily path XR renderer', () => {
     expect(line.geometry.drawRange.count).toBe(2);
     expect((line.material as THREE.ShaderMaterial).vertexShader).toContain('modelViewMatrix');
     const before = Array.from((line.geometry.getAttribute('position') as THREE.BufferAttribute).array);
+    const beforeHash = handle.getDiagnostics().geometryHash;
+    handle.setLunarPalette('legacy-purple');
+    handle.setLunarPalette('moonlit-water');
     line.onBeforeRender({} as THREE.WebGLRenderer, new THREE.Scene(), new THREE.PerspectiveCamera(), line.geometry, line.material as THREE.Material, new THREE.Group());
     line.onBeforeRender({} as THREE.WebGLRenderer, new THREE.Scene(), new THREE.PerspectiveCamera(), line.geometry, line.material as THREE.Material, new THREE.Group());
     expect(Array.from((line.geometry.getAttribute('position') as THREE.BufferAttribute).array)).toEqual(before);
     expect(handle.getDiagnostics().perEyeMutation).toBe(false);
+    expect(handle.getDiagnostics().geometryHash).toBe(beforeHash);
+    expect((line.material as THREE.ShaderMaterial).uniforms.uColor.value.getHex()).toBe(0x7898d8);
     handle.dispose();
   });
 

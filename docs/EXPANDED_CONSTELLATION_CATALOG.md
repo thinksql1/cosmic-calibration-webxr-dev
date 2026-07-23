@@ -48,6 +48,14 @@ The normal URL remains unchanged.
 Learning groups are Introduction Anchors, Circumpolar, Winter, Spring, Summer, Autumn, Zodiac,
 All Expanded, Added Only, and Clear. They are visibility metadata, not a guided course framework.
 
+## Semantic color presentation
+
+The expanded catalog remains Unified lavender by default. Query-gated instructional styling may
+highlight the selected learning group against dim context, or show a restrained deterministic
+experimental group palette. This presentation metadata does not alter BSC5P coordinates,
+project-authored connectivity, samples, buffers, or shared orientation. See
+`SEMANTIC_CELESTIAL_COLOR_SYSTEM.md`.
+
 ## Physical validation
 
 Validate first-set preservation, each seasonal group, Zodiac including Libra, all-expanded

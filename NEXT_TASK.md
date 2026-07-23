@@ -4,21 +4,13 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate the expanded 29-constellation catalog and learning-group visibility controls on Quest.
+**Title:** Physically validate the semantic celestial color system on Quest
 
-Use a fresh private Quest Browser session and exact cache-busted development URLs. Confirm the
-accepted seven figures remain unchanged, then compare Introduction Anchors, Circumpolar, Winter,
-Spring, Summer, Autumn, Zodiac, and All Expanded selections. Verify recognizable forms, smooth
-great-circle lines, world locking, coherent left/right-eye rendering, responsive all-expanded
-performance, deterministic group replacement, and no duplicate lines. Confirm every approved
-Sun, Moon, phase-transit, planet-label, grid, core, horizon, and calibration feature remains
-unchanged.
-
-## Exclusions
-
-Do not add constellation labels, expand to all 88 figures, implement guided lessons, resume the
-parked spindle, redesign accepted real-sky/body layers, add location persistence, or promote
-protected stable.
+Use the cache-busted development build to compare Unified, Highlight Selected Group, and
+Experimental Group Palette constellation modes; Moonlit Water and Legacy Purple lunar palettes;
+daily versus transit distinction; lunar versus constellation/Sun separation; stereo stability;
+and preservation of all Quest-approved geometry. Record only observed PASS, FAIL, UNCERTAIN, or
+NOT RUN evidence. Do not begin the guided introductory course framework.
 
 ## Recommended execution
 

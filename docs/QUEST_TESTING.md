@@ -1,5 +1,22 @@
 # Quest 3 Manual Acceptance Checklists
 
+## Semantic celestial color-system validation
+
+Open a fresh private Quest Browser session with the exact cache-busted build. Confirm Unified
+matches the accepted lavender constellation appearance. Select Introduction Anchors, then test
+Highlight Selected Group across Circumpolar, Winter, Spring, Summer, Autumn, and Zodiac: selected
+members should receive restrained emphasis while manually enabled context remains visible but dim.
+Test the Experimental Group Palette only as an optional comparison and record whether it is useful
+or too busy.
+
+Enable Moon Daily Path and Lunar Phase Transit with `lunarPalette=moonlit-water`. Confirm daily
+periwinkle, blue-violet visible transit, deep-indigo Earth-hidden continuation, silver notches,
+and restrained aqua current marker remain related but distinct from constellation lavender and Sun
+gold. Compare `lunarPalette=legacy-purple`. Check left/right eyes, head motion, Moon images/labels,
+and geometry preservation. Record callback/incomplete-frame errors and use the diagnostics for
+luminance, material reuse, and geometry hashes. This style layer is not physically accepted until
+those observations are recorded.
+
 ## Expanded constellation catalog validation
 
 Use `constellationStudy=first-set` to recheck the accepted seven, then use

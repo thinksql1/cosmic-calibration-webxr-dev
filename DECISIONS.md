@@ -577,6 +577,20 @@
   88 constellations. Labels, guided lessons, eclipse visualization, and stable promotion remain
   separately gated.
 
+### DEC-042: Use semantic material-only Moonlit Water and constellation instructional color modes
+- **Date:** 2026-07-23
+- **Status:** Implemented development study; physical Quest validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Preserve accepted constellation/lunar geometry, transforms, image billboards,
+  labels, and scientific state. Use centralized presentation tokens for a Moonlit Water lunar
+  palette with Legacy Purple comparison; keep Unified lavender as the default constellation
+  treatment; add selected-group highlighting and a restrained deterministic experimental primary
+  group palette. Cache/reuse materials by semantic role and color style; change no vertices during
+  palette or group changes.
+- **Rationale:** Quest feedback wanted lunar motion to remain purple in character but distinguish
+  itself from constellation structure, while optional group emphasis can aid instruction without
+  making the normal sky noisy. Material-only styling preserves the accepted XR/science contracts.
+
 ## Proposed decisions awaiting review
 
 None yet.

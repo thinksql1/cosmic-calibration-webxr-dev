@@ -10,6 +10,8 @@ import {
 } from '../presentation/moonPhaseLabels';
 import type { PlanetLabelCanvasFactory } from '../presentation/planetLabelPresentation';
 import type { MoonPhaseTextureCache } from './moonPhaseTextureCache';
+import { lunarSemanticPalette } from '../presentation/color/lunarColorPolicy';
+import type { LunarPalette } from '../presentation/color/celestialColorModes';
 
 const CLIP_DEPTH = 0.996;
 const vertexShader = /* glsl */ `
@@ -120,6 +122,8 @@ export interface LunarPhaseTransitDiagnostics {
   }[];
   readonly currentProjectedCentersNdc: Readonly<Record<string, readonly [number, number, number]>>;
   readonly currentStereoDisparityNdc?: number;
+  readonly colorTokens: Readonly<Record<string, string>>;
+  readonly geometryHash: string;
 }
 
 export interface LunarPhaseTransitGroupHandle {
@@ -130,6 +134,7 @@ export interface LunarPhaseTransitGroupHandle {
   ): void;
   clear(reason?: string): void;
   enforceVisibilityControls(): void;
+  setLunarPalette(palette: LunarPalette): void;
   getDiagnostics(): LunarPhaseTransitDiagnostics;
   dispose(): void;
 }
@@ -154,18 +159,20 @@ export function createLunarPhaseTransitGroup(
   hiddenPath.frustumCulled = false;
   const notchGroup = new THREE.Group();
   notchGroup.name = 'lunar-phase-transit-notches';
+  // All event notches share one semantic material. Their immutable geometry and
+  // per-object draw guards remain independent; no per-notch material is needed.
+  const notchMaterial = shaderMaterial(0xf0e6ff, 0.82, 0);
   const notchEntries = [
     'new-moon', 'waxing-crescent', 'first-quarter', 'waxing-gibbous',
     'full-moon', 'waning-gibbous', 'last-quarter', 'waning-crescent',
   ].map((id) => {
     const geometry = new THREE.BufferGeometry();
-    const material = shaderMaterial(0xf0e6ff, 0.82, 0);
-    const line = new THREE.Line(geometry, material);
+    const line = new THREE.Line(geometry, notchMaterial);
     line.name = `lunar-transit-notch-${id}`;
     line.renderOrder = 25;
     line.frustumCulled = false;
     notchGroup.add(line);
-    return { geometry, material, line };
+    return { geometry, material: notchMaterial, line };
   });
   group.add(visiblePath, hiddenPath, notchGroup);
 
@@ -256,11 +263,12 @@ export function createLunarPhaseTransitGroup(
   let callbackErrorCount = 0;
   const projectedCenters = new Map<string, readonly [number, number, number]>();
   let disposed = false;
+  let activePalette: LunarPalette = 'legacy-purple';
 
   const allMaterials = [
     visibleMaterial,
     hiddenMaterial,
-    ...notchEntries.map((entry) => entry.material),
+    notchMaterial,
   ];
   const configureMaterial = (
     material: THREE.ShaderMaterial,
@@ -425,6 +433,20 @@ export function createLunarPhaseTransitGroup(
     enforceVisibilityControls(): void {
       enforce();
     },
+    setLunarPalette(palette: LunarPalette): void {
+      if (activePalette === palette) return;
+      activePalette = palette;
+      const colors = lunarSemanticPalette(palette);
+      visibleMaterial.uniforms.uColor.value.setHex(colors.transitVisible.hex);
+      visibleMaterial.uniforms.uOpacity.value = colors.transitVisible.opacity;
+      hiddenMaterial.uniforms.uColor.value.setHex(colors.transitHidden.hex);
+      hiddenMaterial.uniforms.uOpacity.value = colors.transitHidden.opacity;
+      notchMaterial.uniforms.uColor.value.setHex(colors.transitNotch.hex);
+      notchMaterial.uniforms.uOpacity.value = colors.transitNotch.opacity;
+      (currentMarker.material as THREE.MeshBasicMaterial).color.setHex(colors.currentTransit.hex);
+      (currentMarker.material as THREE.MeshBasicMaterial).opacity = colors.currentTransit.opacity;
+      group.userData.lunarPalette = palette;
+    },
     getDiagnostics(): LunarPhaseTransitDiagnostics {
       group.updateWorldMatrix(true, true);
       const evidence = [...imageSprites, ...labelSprites]
@@ -476,6 +498,14 @@ export function createLunarPhaseTransitGroup(
         currentStereoDisparityNdc: left && right
           ? Math.hypot(left[0] - right[0], left[1] - right[1])
           : undefined,
+        colorTokens: Object.freeze({
+          visible: lunarSemanticPalette(activePalette).transitVisible.id,
+          hidden: lunarSemanticPalette(activePalette).transitHidden.id,
+          notch: lunarSemanticPalette(activePalette).transitNotch.id,
+          current: lunarSemanticPalette(activePalette).currentTransit.id,
+          nextPhase: lunarSemanticPalette(activePalette).nextPhase.id,
+        }),
+        geometryHash: `${pathGeometry.getAttribute('position').count}:${pathGeometry.drawRange.count}|${notchEntries.map((entry) => entry.geometry.getAttribute('position').count).join(',')}`,
       });
     },
     dispose(): void {
@@ -488,10 +518,8 @@ export function createLunarPhaseTransitGroup(
       pathGeometry.dispose();
       visibleMaterial.dispose();
       hiddenMaterial.dispose();
-      notchEntries.forEach((entry) => {
-        entry.geometry.dispose();
-        entry.material.dispose();
-      });
+      notchEntries.forEach((entry) => entry.geometry.dispose());
+      notchMaterial.dispose();
       currentMarker.geometry.dispose();
       (currentMarker.material as THREE.Material).dispose();
       imageMaterials.forEach((material) => material.dispose());

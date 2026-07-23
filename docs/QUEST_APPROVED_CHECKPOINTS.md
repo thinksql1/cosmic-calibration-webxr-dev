@@ -1,5 +1,29 @@
 # Quest-approved development checkpoints
 
+## `quest-approved-expanded-constellations-v1`
+
+- **Annotated tag:** `quest-approved-expanded-constellations-v1`
+- **Exact development commit:** `d54a830ab04fb920838e78a350c0a7e540740997`
+- **Visible build:** `d54a830`
+- **Remote:** development remote only (`dev`)
+- **Annotation:** Quest-approved milestone: 29-constellation catalog, seasonal learning groups, combined lunar phase-transit presentation, stable stereo rendering, and accepted celestial geometry.
+
+Quest review accepted the 29-figure catalog, original-seven preservation, learning groups including
+Libra/Zodiac, all-expanded performance, and the combined lunar phase-transit presentation. This
+checkpoint protects those development results; it is not stable promotion.
+
+Known limitations remain constellation labels, guided observation/course presets, eclipse
+visualization, IAU boundaries, full-88 coverage, and stable promotion. Verify with:
+
+```powershell
+git show --no-patch --format=fuller quest-approved-expanded-constellations-v1
+git rev-parse quest-approved-expanded-constellations-v1^{commit}
+git ls-remote --tags dev quest-approved-expanded-constellations-v1
+git switch -c recovery/expanded-constellations-v1 quest-approved-expanded-constellations-v1
+```
+
+Never move, recreate, or force-update this tag. Stable is neither tagged nor changed.
+
 ## `quest-approved-lunar-transit-v1`
 
 - **Annotated tag:** `quest-approved-lunar-transit-v1`

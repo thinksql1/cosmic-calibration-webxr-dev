@@ -103,6 +103,22 @@ describe('first constellation XR-safe line group', () => {
     expect(handle.getDiagnostics()).toMatchObject({ geometryBuildCount: 1, orientationUpdateCount: 2 });
   });
 
+  it('changes semantic material uniforms without rebuilding immutable constellation geometry', () => {
+    const handle = createFirstConstellationLineGroup();
+    const { structure, orientation } = source();
+    handle.update({ structure, orientationRows: orientation.eqjToApplicationRows, settings: { ...settings(true, ['ORI', 'UMA']), colorMode: 'unified', colorStrength: 'subtle', selectedLearningGroup: 'winter' } });
+    const orion = handle.group.getObjectByName('constellation-ori-segment-01') as THREE.Line;
+    const uma = handle.group.getObjectByName('constellation-uma-segment-01') as THREE.Line;
+    const geometryHash = handle.getDiagnostics().geometryHash;
+    const orionGeometry = orion.geometry;
+    handle.update({ structure, orientationRows: orientation.eqjToApplicationRows, settings: { ...settings(true, ['ORI', 'UMA']), colorMode: 'highlight', colorStrength: 'standard', selectedLearningGroup: 'winter' } });
+    expect(orion.geometry).toBe(orionGeometry);
+    expect(handle.getDiagnostics().geometryHash).toBe(geometryHash);
+    expect((orion.material as THREE.ShaderMaterial).uniforms.uOpacity.value).toBeGreaterThan((uma.material as THREE.ShaderMaterial).uniforms.uOpacity.value);
+    expect(orion.userData.colorRole).toBe('selected-group');
+    expect(uma.userData.colorRole).toBe('context');
+  });
+
   it('suppresses an invalid eye locally and contains callback/diagnostic failures', () => {
     const reports: string[] = [];
     const handle = createFirstConstellationLineGroup((event, detail) => reports.push(`${event}|${detail}`));

@@ -51,6 +51,10 @@ The continuous indicator uses the authoritative phase longitude and does not sna
 positions. Astronomy Engine supplies Moon phase and illumination; no arbitrary 29.5-day epoch is
 used.
 
+The accepted dial ring, images, labels, anchors, and current appearance are preserved by the
+semantic color milestone. A pale silver-blue label token is reserved for a future cache-keyed text
+rebuild only; this feature deliberately leaves accepted canvas text textures unchanged.
+
 ## Acceptance limits
 
 Physical Quest review must confirm that the dial reads as a symbolic instrument, not an orbit;

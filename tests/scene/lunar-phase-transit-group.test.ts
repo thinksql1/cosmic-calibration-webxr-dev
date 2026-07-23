@@ -45,6 +45,9 @@ describe('Lunar Phase Transit Three.js group', () => {
     const handle = createLunarPhaseTransitGroup(cache, canvasFactory);
     const model = createLunarPhaseTransitPresentation(transit, orientation, structure, settings);
     handle.update(model, structure);
+    const beforeColorGeometryHash = handle.getDiagnostics().geometryHash;
+    handle.setLunarPalette('legacy-purple');
+    handle.setLunarPalette('moonlit-water');
     expect(handle.group.getObjectByName('lunar-phase-transit-visible-sky-path')).toBeInstanceOf(THREE.Line);
     expect(handle.group.getObjectByName('lunar-phase-transit-earth-hidden-path')).toBeInstanceOf(THREE.Line);
     expect(model.events).toHaveLength(8);
@@ -79,6 +82,8 @@ describe('Lunar Phase Transit Three.js group', () => {
       perEyeMutation: false,
       callbackErrorCount: 0,
     });
+    expect(diagnostics.geometryHash).toBe(beforeColorGeometryHash);
+    expect(diagnostics.colorTokens.visible).toBe('lunar-transit-visible');
     expect(diagnostics.spriteShapeEvidence
       .filter((entry) => entry.name.includes('phase-image'))
       .every((entry) => Math.abs(entry.localScale[0] - entry.localScale[1]) < 1e-12
