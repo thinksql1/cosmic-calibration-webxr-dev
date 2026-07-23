@@ -1,14 +1,15 @@
 import { EXPANDED_CONSTELLATION_IDENTIFIERS } from './constellationCatalogV2';
-import { COURSE_40_CONSTELLATION_IDENTIFIERS, type Course40ConstellationIdentifier } from './constellationCatalogV3A';
+import { COURSE_40_CONSTELLATION_IDENTIFIERS } from './constellationCatalogV3A';
+import { COURSE_50_CONSTELLATION_IDENTIFIERS, type Course50ConstellationIdentifier } from './constellationCatalogV3B';
 
 export const CONSTELLATION_LEARNING_GROUP_IDS = Object.freeze([
   'introduction-anchors', 'circumpolar', 'winter', 'spring', 'summer', 'autumn', 'zodiac', 'all-expanded', 'added-only', 'clear',
-  'north-star-and-circumpolar', 'winter-extended', 'spring-extended', 'summer-compact-figures', 'autumn-extended', 'complete-zodiac', 'orion-neighborhood', 'v3a-additions-only', 'all-course-40',
+  'north-star-and-circumpolar', 'winter-extended', 'spring-extended', 'summer-compact-figures', 'autumn-extended', 'complete-zodiac', 'orion-neighborhood', 'v3a-additions-only', 'all-course-40', 'v3b-difficult-figures', 'all-course-50',
 ] as const);
 export type ConstellationLearningGroupId = (typeof CONSTELLATION_LEARNING_GROUP_IDS)[number];
-export interface ConstellationLearningGroup { readonly id: ConstellationLearningGroupId; readonly displayName: string; readonly constellationIdentifiers: readonly Course40ConstellationIdentifier[]; }
+export interface ConstellationLearningGroup { readonly id: ConstellationLearningGroupId; readonly displayName: string; readonly constellationIdentifiers: readonly Course50ConstellationIdentifier[]; }
 
-const group = (id: ConstellationLearningGroupId, displayName: string, constellationIdentifiers: readonly Course40ConstellationIdentifier[]): ConstellationLearningGroup => Object.freeze({ id, displayName, constellationIdentifiers: Object.freeze([...constellationIdentifiers]) });
+const group = (id: ConstellationLearningGroupId, displayName: string, constellationIdentifiers: readonly Course50ConstellationIdentifier[]): ConstellationLearningGroup => Object.freeze({ id, displayName, constellationIdentifiers: Object.freeze([...constellationIdentifiers]) });
 
 export const CONSTELLATION_LEARNING_GROUPS = Object.freeze([
   group('introduction-anchors', 'Introduction Anchors', ['ORI', 'UMA', 'CAS']),
@@ -30,6 +31,8 @@ export const CONSTELLATION_LEARNING_GROUPS = Object.freeze([
   group('orion-neighborhood', 'Orion Neighborhood', ['ORI', 'TAU', 'GEM', 'CMA', 'CMI', 'MON', 'LEP']),
   group('v3a-additions-only', 'V3A Additions Only', ['UMI', 'CNC', 'CVN', 'COM', 'CRV', 'CRT', 'MON', 'LEP', 'DEL', 'SGE', 'TRI']),
   group('all-course-40', 'All Course 40', COURSE_40_CONSTELLATION_IDENTIFIERS),
+  group('v3b-difficult-figures', 'V3B Difficult Figures', ['HYA', 'ERI', 'CET', 'VUL', 'LAC', 'EQU', 'SCT', 'SER', 'LUP', 'CRU']),
+  group('all-course-50', 'All Course 50', COURSE_50_CONSTELLATION_IDENTIFIERS),
 ]);
 
 export function constellationLearningGroup(id: string | null | undefined): ConstellationLearningGroup | undefined {
@@ -37,7 +40,7 @@ export function constellationLearningGroup(id: string | null | undefined): Const
 }
 
 export function validateConstellationLearningGroups(): readonly string[] {
-  const valid = new Set<string>(COURSE_40_CONSTELLATION_IDENTIFIERS);
+  const valid = new Set<string>(COURSE_50_CONSTELLATION_IDENTIFIERS);
   const errors: string[] = [];
   for (const value of CONSTELLATION_LEARNING_GROUPS) for (const identifier of value.constellationIdentifiers) if (!valid.has(identifier)) errors.push(`${value.id}: invalid identifier ${identifier}`);
   return Object.freeze(errors);

@@ -4,6 +4,13 @@
 
 ### Added
 
+- Added development-only `COSMIC_CONSTELLATION_CATALOG_V3B_COURSE_50`: ten NASA HEASARC BSC5P
+  audited difficult figures, 101 new canonical records, original reviewed connectivity,
+  `course-50`/`course-v3b` selection, a ten-member V3B Difficult Figures group, Course-50
+  diagnostics, and dedicated source/connectivity review. Hydra and Eridanus remain open; Serpens
+  remains one selectable code with two disconnected components; Crux remains catalogued without a
+  horizon adjustment. V1/V2/V3A and unrelated celestial contracts remain unchanged. This is not a
+  Quest-approval tag or stable promotion.
 - Recorded the V3A Course 40 physical Quest 3 result as an overall PASS: the user reported,
   "From what I can tell it looks good." No blocking stereo, stability, connectivity, highlighting,
   duplicate-line, or unrelated-system regression was reported; detailed checklist observations
