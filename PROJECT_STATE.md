@@ -23,6 +23,11 @@ an optional current appearance. The dial is educational synodic-cycle presentati
 Moon's daily path or physical orbit. Current illuminated fraction is provider-owned; the first
 release uses a documented standardized waxing-right/waning-left icon orientation while reporting
 the calculated Sun tangent for a future exact-roll refinement. The normal URL remains unchanged.
+Feature commit `09eb70d` was normally merged into development as `4fa087c`; clean merged
+validation passed `564/564` tests across `67` files, type-check, production build, zero-vulnerability
+audit, unchanged top-level dependency tree, diff checks, and desktop query/control diagnostics.
+Actions/Pages run `30003777513` completed successfully and the hosted app reported the exact merge
+SHA. Physical Quest acceptance of these new presentation layers remains pending.
 
 ## First constellation line layer (deployed development study)
 

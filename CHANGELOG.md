@@ -14,6 +14,11 @@
   optional phase notches/labels/procedural images, continuous current-phase indicator, and
   current Moon appearance. Procedural disks are cached, distinguish waxing/waning, retain a dark
   New Moon interior, and use a visible framing border. The normal URL remains unchanged.
+- Normally merged feature `09eb70d` into development as `4fa087c` and deployed it through
+  successful Actions/Pages run `30003777513`. Clean merged validation passed `564/564` tests
+  across `67` files, type-check, production build, zero-vulnerability audit, dependency-tree and
+  diff checks, plus desktop and hosted query/control verification. Physical Quest acceptance
+  remains pending.
 
 - Recorded physical Quest acceptance of the query-gated real-sky orientation bridge as the
   constellation-coordinate foundation: complete grid geometry, credible pole convergence, no
