@@ -1,5 +1,21 @@
 # Quest-approved development checkpoints
 
+## `quest-reviewed-celestial-personalization-v1`
+
+- **Annotated tag:** `quest-reviewed-celestial-personalization-v1`
+- **Exact development commit / visible build:** `c2bfcff1f5b5ede2ea78458d89b921259aa0d17a`
+- **Remote:** development remote only (`dev`)
+- **Annotation:** Quest-reviewed milestone: clean default visibility, curated constellation colors, orange instructional highlighting, coordinated lunar palettes, persisted appearance preferences, and the accepted 29-constellation and lunar-transit systems.
+
+Quest review accepted the clean defaults, Celestial Lavender, Observation Orange, Lunar Purple,
+appearance persistence/resets, and combined presentation for continued development. Deferred:
+Moon Daily Path remains an optional OFF-by-default scientific lesson; Earth-hidden transit
+brightness, exact Moon/transit-marker/path alignment, and any Moon billboard/tether work require a
+separate isolation task. No lunar behavior is changed by later catalog work.
+
+Recovery: `git switch -c recovery/celestial-personalization-v1 quest-reviewed-celestial-personalization-v1`.
+Never move or recreate this tag; stable is not tagged or modified.
+
 ## `quest-approved-expanded-constellations-v1`
 
 - **Annotated tag:** `quest-approved-expanded-constellations-v1`
