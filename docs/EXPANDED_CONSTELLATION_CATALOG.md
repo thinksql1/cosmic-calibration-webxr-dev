@@ -6,6 +6,9 @@ Development-only, query-gated expanded line study pending physical Quest validat
 the Quest-accepted seven-figure renderer and adds 22 figures, including Libra, for **29 total**.
 Constellation labels, IAU boundaries, and all-88 coverage remain deferred.
 
+Feature `349a3c7` was merged as `704d5e2` and deployed by development Actions/Pages run
+`30020584006`; hosted-bundle inspection confirmed the V2 catalog and merge build identifier.
+
 ## Data contract
 
 `COSMIC_CONSTELLATION_CATALOG_V2_EXPANDED_29` separates canonical BSC5P J2000 star records,

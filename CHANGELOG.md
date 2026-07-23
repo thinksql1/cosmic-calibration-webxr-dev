@@ -11,6 +11,8 @@
   de-duplicated public-domain NASA HEASARC BSC5P J2000 records, project-authored connectivity,
   declarative seasonal/learning groups, and the accepted immutable great-circle renderer. Libra is
   included for the Zodiac group; constellation labels remain deferred.
+- Merged feature `349a3c7` as `704d5e2` and deployed it through successful development-only
+  Actions/Pages run `30020584006`; the hosted bundle exposes `704d5e2` and the V2 catalog study.
 
 - Added the query-gated Lunar Phase Transit Path: one apparent-topocentric EQJ track from previous
   New Moon through next New Moon, authoritative arbitrary-angle phase events, 60-minute sampling,

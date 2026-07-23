@@ -14,6 +14,9 @@ connectivity, deterministic learning-group visibility sets, and the already acce
 great-circle/shared-orientation renderer. The first set remains a seven-only compatibility mode;
 the normal URL remains unchanged. This expanded study awaits physical Quest validation. No
 constellation labels, all-88 catalog, lessons, eclipse work, or stable promotion is authorized.
+Feature commit `349a3c7` was merged as `704d5e2`; development Actions/Pages run `30020584006`
+completed successfully and its hosted bundle verified the exact merge SHA. Physical Quest
+validation remains pending.
 
 ## Lunar Phase Transit Path and clean Moon billboards (development feature)
 
