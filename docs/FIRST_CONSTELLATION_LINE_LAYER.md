@@ -146,3 +146,12 @@ full set. Confirm recognizability, smoothness, fixed shapes across time, world l
 eye coherence, stable endpoints, separation from the grid, and absence of callback/incomplete-frame
 errors. If any segment ripples, snakes, deforms, mirrors, or separates between eyes, do not expand
 the catalog. Constellation labels remain separately deferred.
+
+## Physical acceptance and Sun-path separation
+
+Physical Quest review accepted all seven figures as recognizable, smooth, world-locked, and
+stereo-stable. They did not reproduce the Sun-path wobble. The failed
+`constellation-sun-path-comparison` URL was caused by the optional Sun path throwing before science
+readiness; no constellation buffer or coordinate source was implicated. The Sun readiness and
+presentation repair leaves constellation catalog coordinates, connectivity, sampling, shaders,
+and controls unchanged.

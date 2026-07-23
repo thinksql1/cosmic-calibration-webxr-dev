@@ -317,7 +317,20 @@ correction/sampling context is present.
 - Live IERS data, UT1 corrections, and polar motion.
 - Rendered civil-hour labels, sunrise/sunset events, annual Sun paths, multi-day paths, analemma,
   persistent trails, and richer animation controls.
-- Moon phase/orientation and next-24-hour or local-midnight lunar-cycle visualizations.
+- Exact apparent lunar bright-limb roll, broad lunar-cycle analytics, and event-jump controls.
 - Planetary trajectory/orbit visualization; ecliptic; Uranus, Neptune, Pluto; audio; and
   contemplative sequences.
 - Persistence of location, time, layer state, or calibration.
+
+## Solar/lunar extension
+
+The central clock and IANA civil-day resolver now serve both daily paths. Sun provider samples
+remain ten minutes apart; Moon samples are bounded to five minutes because topocentric lunar
+motion changes more quickly. Spherical presentation subdivision never invents an astronomical
+timestamp and does not change a provider direction. Cache identity includes civil day, observer,
+correction profile, provider, and time-zone revision; camera/head motion is excluded.
+
+Moon phase state is instant-based rather than civil-day-based. Astronomy Engine phase,
+illumination, previous-New-Moon search, and next-quarter search consume the same central instant.
+The current texture updates on a half-degree phase key; canonical textures never change. No
+second timer, arbitrary synodic epoch, or persistence layer exists.

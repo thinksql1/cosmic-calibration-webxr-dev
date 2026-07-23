@@ -1,5 +1,29 @@
 # Project State
 
+## Safe Sun path and query-gated Moon presentation (development feature)
+
+The seven first-set constellation figures have passed physical Quest review: all seven were
+recognizable, smooth, world-locked, and stereo-stable. The one failed comparison URL exposed an
+independent Sun-path defect: `apparent-sun-civil-day-projective-path` threw from `onBeforeRender`
+while science was not ready, aborting the left-eye traversal before the right eye.
+
+The current feature makes Sun-path readiness science/update-owned and locally suppressible. Its
+ordered Astronomy Engine samples are unchanged, but rendering now uploads one immutable
+application-direction buffer outside eye callbacks, subdivides spherical intervals to at most
+`1 degree`, and lets native XR model-view/projection operate independently for each eye. No
+ordinary not-ready state throws.
+
+A query-gated Moon study uses the same central clock, observer, IANA civil day, calibrated
+geographic parent, and Astronomy Engine `2.1.19`. The Moon path is apparent topocentric,
+airless under the current correction profile, sampled every five civil minutes, and preserves
+lunar parallax. The separate symbolic phase dial has eight conventional phases, immutable local
+ring/notch geometry at a finite `24 m` presentation anchor, procedural cached Moon disks with a
+visible framing border, optional native-Sprite labels, a continuous current-phase indicator, and
+an optional current appearance. The dial is educational synodic-cycle presentation—not the
+Moon's daily path or physical orbit. Current illuminated fraction is provider-owned; the first
+release uses a documented standardized waxing-right/waning-left icon orientation while reporting
+the calculated Sun tangent for a future exact-roll refinement. The normal URL remains unchanged.
+
 ## First constellation line layer (deployed development study)
 
 `feature/first-constellation-lines` adds a query-gated first set of Orion, Ursa Major,

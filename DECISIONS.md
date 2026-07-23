@@ -526,6 +526,23 @@
   spherical interpolation and the validated grid shader contract preserve shape, endpoint truth,
   stereo ownership, and world locking without copying the visually wobbly Sun-path renderer.
 
+### DEC-040: Contain Sun readiness and keep lunar daily/phase presentation separate
+- **Date:** 2026-07-23
+- **Status:** Accepted for development-only physical Quest validation
+- **Owner:** Darrell Wright / project control
+- **Decision:** Treat Sun-path not-ready science as local suppression, never a render exception.
+  Preserve provider samples while replacing per-eye buffer rewriting with immutable ordered
+  application-direction geometry, native stereo projection, and bounded one-degree spherical
+  subdivision. Add a separate apparent-topocentric Moon civil-day path sampled every five
+  minutes. Present the eight-phase synodic sequence only in a query-gated symbolic dial at
+  `24 m`; generate cached procedural disks with a non-illuminating border, native-Sprite labels,
+  and a continuous provider-phase indicator. Current Moon illumination is provider-owned; initial
+  icon roll uses the disclosed conventional waxing-right/waning-left fallback.
+- **Rationale:** Optional science cannot abort an XR frame. A daily apparent path and monthly phase
+  cycle answer different questions and must not be conflated. Immutable local dial geometry and
+  provider-owned phase values preserve stereo safety and scientific honesty without external
+  imagery, a second clock, or a second ephemeris.
+
 ## Proposed decisions awaiting review
 
 None yet.

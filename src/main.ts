@@ -21,6 +21,11 @@ import { createGeocentricCelestialStructureGroup } from './scene/createGeocentri
 import { createLocalHorizonGroup } from './scene/createLocalHorizonGroup';
 import { createSolarSystemBodiesGroup } from './scene/createSolarSystemBodiesGroup';
 import { createSolarDailyPathGroup } from './scene/createSolarDailyPathGroup';
+import { createMoonDailyPathGroup } from './scene/createMoonDailyPathGroup';
+import {
+  createMoonPhaseStudyGroup,
+  type MoonPhaseStudyDisplaySettings,
+} from './scene/createMoonPhaseStudyGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
 import {
@@ -39,6 +44,8 @@ import {
 import { createScientificProviderRegistry } from './science/providers/scientificProviderRegistry';
 import { SolarSystemBodyStateService } from './science/bodies/solarSystemBodyState';
 import { SolarDailyPathService } from './science/temporal/solarDailyPath';
+import { MoonDailyPathService } from './science/temporal/moonDailyPath';
+import { createMoonPhaseState } from './science/moon/moonPhase';
 import { ScientificSnapshotService } from './science/snapshot/scientificSnapshotService';
 import { GeographicCalibrationStateAdapter } from './science/state/geographicCalibrationState';
 import { ObserverStateStore } from './science/state/observerState';
@@ -65,6 +72,9 @@ import {
 import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
 import { parseSkyFrameStudyLaunch, type SkyFrameStudyMode } from './presentation/realSkyGridStudy';
 import { parseConstellationStudyLaunch } from './presentation/constellationStudy';
+import { parseMoonStudyLaunch } from './presentation/moonStudy';
+import { createMoonDailyPathPresentationModel } from './presentation/moonDailyPathPresentationModel';
+import { createMoonPhasePresentationModel } from './presentation/moonPhasePresentation';
 import { FIRST_CONSTELLATION_IDENTIFIERS, type FirstConstellationIdentifier } from './science/constellations/firstConstellationCatalog';
 import { FIRST_CONSTELLATION_DATASET_METADATA } from './presentation/firstConstellationLinePresentation';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
@@ -186,6 +196,15 @@ const constellationStudyControls = requireElement<HTMLDetailsElement>('#constell
 const showConstellationsInput = requireElement<HTMLInputElement>('#show-constellations');
 const showConstellationEndpointsInput = requireElement<HTMLInputElement>('#show-constellation-endpoints');
 const constellationStudyDiagnostics = requireElement<HTMLUListElement>('#constellation-study-diagnostics');
+const moonStudyControls = requireElement<HTMLDetailsElement>('#moon-study-controls');
+const showMoonPathInput = requireElement<HTMLInputElement>('#show-moon-path');
+const showMoonPhaseDialInput = requireElement<HTMLInputElement>('#show-moon-phase-dial');
+const showMoonPhaseNotchesInput = requireElement<HTMLInputElement>('#show-moon-phase-notches');
+const showMoonPhaseLabelsInput = requireElement<HTMLInputElement>('#show-moon-phase-labels');
+const showMoonPhaseImagesInput = requireElement<HTMLInputElement>('#show-moon-phase-images');
+const showCurrentMoonAppearanceInput = requireElement<HTMLInputElement>('#show-current-moon-appearance');
+const showCurrentPhaseIndicatorInput = requireElement<HTMLInputElement>('#show-current-phase-indicator');
+const moonStudyDiagnostics = requireElement<HTMLUListElement>('#moon-study-diagnostics');
 const constellationVisibilityInputs: Readonly<Record<FirstConstellationIdentifier, HTMLInputElement>> = Object.freeze({
   ORI: requireElement<HTMLInputElement>('#show-constellation-ori'),
   UMA: requireElement<HTMLInputElement>('#show-constellation-uma'),
@@ -243,6 +262,7 @@ const finiteCoreLaunch = parseFiniteCoreParallaxLaunch(window.location.search);
 const queryPlanetLabelStudyMode = parsePlanetLabelStudyMode(window.location.search);
 const skyFrameLaunch = parseSkyFrameStudyLaunch(window.location.search);
 const constellationStudyLaunch = parseConstellationStudyLaunch(window.location.search);
+const moonStudyLaunch = parseMoonStudyLaunch(window.location.search);
 planetLabelStudyControls.hidden = !(xrDiagnostics.enabled || queryPlanetLabelStudyMode !== 'baseline');
 planetLabelStudyModeSelect.value = queryPlanetLabelStudyMode;
 planetLabelScaleSelect.value = parsePlanetLabelScale(new URLSearchParams(window.location.search).get('labelScale'));
@@ -254,6 +274,14 @@ showConstellationEndpointsInput.checked = constellationStudyLaunch.showEndpointM
 for (const identifier of FIRST_CONSTELLATION_IDENTIFIERS) {
   constellationVisibilityInputs[identifier].checked = constellationStudyLaunch.enabledConstellations.has(identifier);
 }
+moonStudyControls.hidden = !(xrDiagnostics.enabled || moonStudyLaunch.explicitlyRequested);
+showMoonPathInput.checked = moonStudyLaunch.showMoonPath;
+showMoonPhaseDialInput.checked = moonStudyLaunch.showMoonPhaseDial;
+showMoonPhaseNotchesInput.checked = moonStudyLaunch.showMoonPhaseNotches;
+showMoonPhaseLabelsInput.checked = moonStudyLaunch.showMoonPhaseLabels;
+showMoonPhaseImagesInput.checked = moonStudyLaunch.showMoonPhaseImages;
+showCurrentMoonAppearanceInput.checked = moonStudyLaunch.showCurrentMoonAppearance;
+showCurrentPhaseIndicatorInput.checked = moonStudyLaunch.showCurrentPhaseIndicator;
 geoStudyControls.hidden = !(xrDiagnostics.enabled || queryStudyMode !== 'baseline');
 geoStudyModeSelect.value = queryStudyMode;
 const initialStudySettings = defaultObserverOffsetGeoStudySettings(queryStudyMode);
@@ -362,6 +390,8 @@ const solarSystemBodies = createSolarSystemBodiesGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
 );
 const solarDailyPath = createSolarDailyPathGroup();
+const moonDailyPath = createMoonDailyPathGroup();
+const moonPhaseStudy = createMoonPhaseStudyGroup();
 if (xrDiagnostics.enabled && diagnosticPreset.legacyAxisRoot) {
   geocentricCelestialStructure.remove(celestialAxis.group);
   geographicReference.add(geocentricCelestialStructure, celestialAxis.group);
@@ -374,6 +404,8 @@ if (xrDiagnostics.enabled && diagnosticPreset.simpleUnifiedRoot) {
 geographicReference.add(localHorizon.group);
 geographicReference.add(solarSystemBodies.group);
 geographicReference.add(solarDailyPath.group);
+geographicReference.add(moonDailyPath.group);
+geographicReference.add(moonPhaseStudy.group);
 geographicReference.add(finiteCoreParallaxExperiment.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
@@ -426,6 +458,9 @@ function applyDiagnosticObjectIsolation(): void {
     enforceEarthCoreToggle();
     solarSystemBodies.enforceVisibilityControls();
     firstConstellationLines.enforceVisibilityControls();
+    solarDailyPath.enforceVisibilityControls();
+    moonDailyPath.enforceVisibilityControls();
+    moonPhaseStudy.enforceVisibilityControls();
     return;
   }
   // Controller feedback objects are added only after XR session activation;
@@ -437,6 +472,9 @@ function applyDiagnosticObjectIsolation(): void {
   // Diagnostics may isolate descendants, but explicit body/label controls remain authoritative.
   solarSystemBodies.enforceVisibilityControls();
   firstConstellationLines.enforceVisibilityControls();
+  solarDailyPath.enforceVisibilityControls();
+  moonDailyPath.enforceVisibilityControls();
+  moonPhaseStudy.enforceVisibilityControls();
   if (signature === diagnosticIsolationSignature) return;
   diagnosticIsolationSignature = signature;
   xrDiagnostics.record('object-isolation.state', [
@@ -464,6 +502,7 @@ const scientificProviders = createScientificProviderRegistry();
 const scientificSnapshotService = new ScientificSnapshotService(scientificProviders);
 const solarSystemBodyStateService = new SolarSystemBodyStateService(scientificProviders);
 const solarDailyPathService = new SolarDailyPathService(scientificProviders);
+const moonDailyPathService = new MoonDailyPathService(scientificProviders);
 const civilTimeZoneState = new CivilTimeZoneStateStore();
 const realtimeCelestialUpdates = new RealtimeCelestialUpdateScheduler();
 let currentXrState: XRState = checkingState;
@@ -598,6 +637,17 @@ function currentSolarDailyPathDisplaySettings(): SolarDailyPathDisplaySettings {
   });
 }
 
+function currentMoonPhaseStudyDisplaySettings(): MoonPhaseStudyDisplaySettings {
+  return Object.freeze({
+    showDial: showMoonPhaseDialInput.checked,
+    showNotches: showMoonPhaseNotchesInput.checked,
+    showLabels: showMoonPhaseLabelsInput.checked,
+    showImages: showMoonPhaseImagesInput.checked,
+    showCurrentAppearance: showCurrentMoonAppearanceInput.checked,
+    showCurrentIndicator: showCurrentPhaseIndicatorInput.checked,
+  });
+}
+
 function selectedEyeMode(select: HTMLSelectElement): EyePresentationMode {
   return parseEyePresentationMode(select.value);
 }
@@ -697,7 +747,12 @@ function renderCelestialAxis(): void {
     finiteCoreParallaxExperiment.clear('scientific state not ready');
     currentFiniteCoreModel = undefined;
     solarSystemBodies.clear();
-    solarDailyPath.clear();
+    solarDailyPath.clear('scientific state not ready');
+    moonDailyPath.clear('scientific state not ready');
+    moonPhaseStudy.clear('scientific state not ready');
+    celestialDiagnostics.append(Object.assign(document.createElement('li'), {
+      textContent: 'Sun path readiness not-ready; visible false; suppression reason scientific state not ready; renderer traversal remains enabled for both eyes.',
+    }));
     return;
   }
   const geocentricPresentation =
@@ -890,6 +945,70 @@ function renderCelestialAxis(): void {
     currentSolarSystemBodyDisplaySettings(),
   );
   solarSystemBodies.update(bodyModel);
+  if (!moonStudyLaunch.enabled) {
+    moonDailyPath.clear('Moon study query absent');
+    moonPhaseStudy.clear('Moon study query absent');
+    moonStudyDiagnostics.replaceChildren();
+  } else {
+    let moonPathSummary = 'Moon path scientific model unavailable';
+    if (civilTimeZoneState.current.kind !== 'ready') {
+      moonDailyPath.clear('valid IANA civil time zone required');
+    } else {
+      try {
+        const moonPathState = moonDailyPathService.capture(
+          result.snapshot,
+          civilTimeZoneState.current.timeZone,
+          civilTimeZoneState.current.revision,
+        );
+        const moonPathModel = createMoonDailyPathPresentationModel(
+          result.snapshot,
+          bodyState,
+          moonPathState,
+          showMoonPathInput.checked,
+        );
+        moonDailyPath.update(moonPathModel);
+        moonPathSummary = `${moonPathModel.selectedCivilDate} ${moonPathModel.timeZone}; provider/render samples ${moonPathModel.samplingDiagnostics.providerSampleCount}/${moonPathModel.samplingDiagnostics.renderedSampleCount}; maximum time/angular step ${moonPathModel.samplingDiagnostics.maximumTimeStepMinutes.toFixed(1)} min/${moonPathModel.samplingDiagnostics.maximumRenderedAngularSpacingDeg.toFixed(3)} deg; below horizon ${moonPathModel.belowHorizonSampleCount}; ${moonPathModel.provenance.sourceFrame} to ${moonPathModel.provenance.outputFrame}; parallax ${moonPathModel.provenance.topocentricParallax}`;
+      } catch (error) {
+        moonDailyPath.clear(error instanceof Error ? error.message : 'Moon path calculation failed');
+      }
+    }
+    let activePhaseState: ReturnType<typeof createMoonPhaseState> | undefined;
+    let activePhaseModel: ReturnType<typeof createMoonPhasePresentationModel> | undefined;
+    try {
+      const moon = bodyModel.markers.find((marker) => marker.body === 'Moon');
+      const sun = bodyModel.markers.find((marker) => marker.body === 'Sun');
+      if (!moon || !sun) throw new Error('Sun/Moon presentation directions unavailable');
+      const phase = createMoonPhaseState(scientificProviders, result.snapshot.clock.instant);
+      activePhaseState = phase;
+      activePhaseModel = createMoonPhasePresentationModel(
+        phase,
+        moon.directionApplication,
+        sun.directionApplication,
+      );
+      moonPhaseStudy.update(
+        activePhaseModel,
+        currentMoonPhaseStudyDisplaySettings(),
+      );
+    } catch (error) {
+      moonPhaseStudy.clear(error instanceof Error ? error.message : 'Moon phase calculation failed');
+    }
+    const pathDiagnostics = moonDailyPath.getDiagnostics();
+    const phaseDiagnostics = moonPhaseStudy.getDiagnostics();
+    moonStudyDiagnostics.replaceChildren(...[
+      `Study ${moonStudyLaunch.mode}; Moon daily path ${pathDiagnostics.readiness === 'ready' ? 'ready' : `suppressed (${pathDiagnostics.suppressionReason})`}`,
+      `Moon path ${moonPathSummary}`,
+      `Moon path active lines ${pathDiagnostics.activeLineObjectCount}; orientation updates ${pathDiagnostics.orientationUpdateCount}; geometry builds ${pathDiagnostics.geometryBuildCount}; per-eye mutation ${pathDiagnostics.perEyeMutation}`,
+      `Moon phase ${activePhaseState?.phaseName ?? 'unavailable'}; longitude ${activePhaseState?.phaseLongitudeDeg.toFixed(3) ?? 'n/a'} deg; phase angle ${activePhaseState?.phaseAngleDeg.toFixed(3) ?? 'n/a'} deg; illuminated ${(100 * (activePhaseState?.illuminatedFraction ?? 0)).toFixed(1)}%; ${activePhaseState?.waxing ? 'waxing' : 'waning'}`,
+      `Previous New Moon ${activePhaseState?.previousNewMoonUtc ?? 'unavailable'}; age ${activePhaseState?.ageSinceNewMoonDays.toFixed(3) ?? 'n/a'} days; next principal phase ${activePhaseState?.nextPrincipalPhaseUtc ?? 'unavailable'} in ${activePhaseState?.timeUntilNextPrincipalPhaseDays.toFixed(3) ?? 'n/a'} days`,
+      `Phase dial ${phaseDiagnostics.ready ? 'ready' : `suppressed (${phaseDiagnostics.suppressionReason})`}; active ${phaseDiagnostics.activeObjectNames.join(', ') || 'none'}`,
+      `Dial center ${activePhaseModel?.dialCenter.map((value) => value.toFixed(4)).join(',') ?? 'unavailable'}; distance ${activePhaseModel?.presentationDistanceMeters.toFixed(1) ?? 'n/a'} m; radius ${activePhaseModel?.dialRadiusMeters.toFixed(1) ?? 'n/a'} m; tangent error ${activePhaseModel?.basis.orthonormalityError.toExponential(3) ?? 'n/a'}`,
+      `Bright-limb Sun tangent ${activePhaseModel?.projectedSunTangent.map((value) => value.toFixed(5)).join(',') ?? 'unavailable'}; calculated orientation ${activePhaseModel?.brightLimbOrientationDeg.toFixed(2) ?? 'n/a'} deg; rendered icon policy standardized waxing-right/waning-left`,
+      `Notches ${phaseDiagnostics.notchCount}; labels ${phaseDiagnostics.labelCount}; images ${phaseDiagnostics.imageCount}; canonical textures ${phaseDiagnostics.canonicalTextureCount}; current texture updates ${phaseDiagnostics.currentTextureUpdateCount}`,
+      `Current texture ${phaseDiagnostics.currentTexture?.width ?? 0}x${phaseDiagnostics.currentTexture?.height ?? 0}; visible alpha ${phaseDiagnostics.currentTexture?.visibleAlphaPixelCount ?? 0}; border pixels ${phaseDiagnostics.currentTexture?.borderPixelCount ?? 0}`,
+      `Current Moon projected centers ${Object.entries(phaseDiagnostics.currentProjectedCentersNdc).map(([eye, value]) => `${eye}:${value.map((component) => component.toFixed(4)).join(',')}`).join(';') || 'pending'}; stereo disparity ${phaseDiagnostics.currentStereoDisparityNdc?.toExponential(3) ?? 'pending'}; callback errors ${phaseDiagnostics.callbackErrorCount}`,
+      `Build ${buildIdentifier}`,
+    ].map((line) => Object.assign(document.createElement('li'), { textContent: line })));
+  }
   const bodyDiagnostics = solarSystemBodies.getDiagnostics();
   const planetLabelScale = getPlanetLabelScaleDefinition(bodyModel.labels[0]?.scale ?? parsePlanetLabelScale(planetLabelScaleSelect.value));
   const bridgeBodyNames = new Set(['Sun', 'Moon', 'Mercury', 'Jupiter', 'Uranus']);
@@ -945,10 +1064,13 @@ function renderCelestialAxis(): void {
         currentSolarDailyPathDisplaySettings(),
       );
       solarDailyPath.update(pathModel);
+      const safePathDiagnostics = solarDailyPath.getDiagnostics();
       celestialDiagnostics.append(
         ...[
           `Sun path: ${pathModel.selectedCivilDate} in ${pathModel.timeZone}; ${pathModel.samples.length} apparent samples and ${pathModel.hourNotches.length} valid civil-hour notches`,
           `Sun path ${pathModel.renderStrategy}; ${pathModel.provenance.samplingPolicy}; below-horizon path ${pathModel.pathVisible && currentSolarDailyPathDisplaySettings().showBelowHorizon ? 'available' : 'suppressed by presentation'}`,
+          `Sun path readiness ${safePathDiagnostics.readiness}; callbacks ${safePathDiagnostics.callbackCount}; callback errors ${safePathDiagnostics.callbackExceptionCount}; completed eyes ${safePathDiagnostics.completedEyes.join(', ') || 'pending'}; per-eye vertex mutation ${safePathDiagnostics.perEyeMutation}`,
+          `Sun path source samples ${pathModel.samplingDiagnostics.sourceSampleCount}; rendered ${pathModel.samplingDiagnostics.renderedSampleCount}; maximum source/render spacing ${pathModel.samplingDiagnostics.maximumSourceAngularSpacingDeg.toFixed(3)}/${pathModel.samplingDiagnostics.maximumRenderedAngularSpacingDeg.toFixed(3)} deg`,
         ].map((diagnostic) => {
           const item = document.createElement('li');
           item.textContent = diagnostic;
@@ -956,7 +1078,7 @@ function renderCelestialAxis(): void {
         }),
       );
     } catch (error) {
-      solarDailyPath.clear();
+      solarDailyPath.clear(error instanceof Error ? error.message : 'scientific path calculation failed');
       const item = document.createElement('li');
       item.textContent = `Sun path unavailable: ${error instanceof Error ? error.message : 'scientific path calculation failed.'}`;
       celestialDiagnostics.append(item);
@@ -1317,6 +1439,13 @@ useCurrentTimeButton.addEventListener('click', () => {
   showSolarDailyPathInput,
   showSolarHourNotchesInput,
   showSolarPathBelowHorizonInput,
+  showMoonPathInput,
+  showMoonPhaseDialInput,
+  showMoonPhaseNotchesInput,
+  showMoonPhaseLabelsInput,
+  showMoonPhaseImagesInput,
+  showCurrentMoonAppearanceInput,
+  showCurrentPhaseIndicatorInput,
   geoStudyRadiusInput,
   geoStudySurfaceInput,
   geoStudyEarthInput,
@@ -1495,6 +1624,8 @@ window.addEventListener('pagehide', () => {
   localHorizon.dispose();
   solarSystemBodies.dispose();
   solarDailyPath.dispose();
+  moonDailyPath.dispose();
+  moonPhaseStudy.dispose();
   xrDiagnostics.dispose();
 }, { once: true });
 

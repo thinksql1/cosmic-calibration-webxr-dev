@@ -155,7 +155,18 @@ Calibration is deliberately in memory only. Session exit, reload, room change, b
 Persistence, automatic geolocation, automatic heading, magnetic correction, broad user-programmable
 time controls, rendered civil-hour text labels, spatial anchors, hit testing, hand tracking, a full
 starfield, constellation labels or catalog expansion, precession trajectories, ecliptic/annual
-paths, additional body paths or phases, and experiential layers remain deferred. The published
+paths, additional planetary paths, exact lunar bright-limb roll, and experiential layers remain
+deferred. The published
 astronomy, celestial-rendering, civil-time/DST, provenance, warning/error, and live-refresh systems
 are not deferred. The first seven-figure constellation line study is local development work
 pending physical Quest validation, not part of the protected published baseline.
+
+## Solar/lunar presentation ownership
+
+Daily Sun and Moon astronomy is calculated outside rendering. Their scene groups own immutable
+ordered application-direction buffers and native per-eye shader projection. A missing model is an
+ordinary local suppression state, never an invariant exception. The Moon phase dial is separate
+finite presentation geometry under one world tangent-frame group; it owns no clock, observer, or
+ephemeris. See [Solar/Lunar Path Presentation](SOLAR_LUNAR_PATH_PRESENTATION.md),
+[Moon Phase Dial](MOON_PHASE_DIAL.md), and
+[Current Moon Appearance](CURRENT_MOON_APPEARANCE.md).

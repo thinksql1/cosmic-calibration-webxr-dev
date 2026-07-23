@@ -208,6 +208,20 @@ export interface ApparentTopocentricBodyResult {
   readonly validity: 'VALID';
 }
 
+/** Provider-owned geocentric synodic phase state; never used as a sky direction. */
+export interface MoonPhaseProviderResult {
+  readonly kind: 'VALID_MOON_PHASE_STATE';
+  readonly phaseLongitudeDeg: number;
+  readonly phaseAngleDeg: number;
+  readonly illuminatedFraction: number;
+  readonly previousNewMoonUtc: string;
+  readonly nextPrincipalPhaseUtc: string;
+  readonly nextPrincipalQuarter: 0 | 1 | 2 | 3;
+  readonly provider: string;
+  readonly providerVersion: string;
+  readonly simulationInstant: SimulationInstant;
+}
+
 export interface TerrestrialTime {
   readonly inputScale: 'UTC';
   readonly outputScale: 'TT';
