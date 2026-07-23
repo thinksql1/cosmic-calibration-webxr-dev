@@ -4,13 +4,16 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate the V3A constellation additions, completed Zodiac, extended learning groups, performance, and preservation of all accepted celestial systems
+**Title:** Implement and validate the V3B difficult ten-constellation Course 50 catalog in development
 
-Use a fresh private Quest session against the deployed development Course 40 build. Validate each
-new figure, V3A groups, Complete Zodiac, all-40 performance, canonical/real-sky diagnostics,
-orange/base-color integration, material-only color changes, stereo/world locking, and preservation
-of accepted solar, lunar, calibration, axis/core, and planetary systems. Record only observed PASS,
-FAIL, UNCERTAIN, or NOT RUN evidence; do not promote stable.
+Research NASA HEASARC BSC5P J2000 star records, author and review original project connectivity,
+and implement HYA, ERI, CET, VUL, LAC, EQU, SCT, SER, LUP, and CRU as a query-gated Course 50
+development study. Preserve V1, V2, and Quest-accepted V3A geometry and all celestial, lunar,
+calibration, XR, and semantic-material contracts. Treat Hydra and Eridanus as open winding
+figures, Serpens as one selectable code with two disconnected components, and Crux as catalogued
+regardless of horizon visibility. Finish with source/connectivity documentation, focused and full
+validation, an independent review gate, normal development-only merge/deployment, and then set the
+next task to physical Quest validation of V3B. Do not promote stable or tag V3B as Quest-approved.
 
 ## Recommended execution
 

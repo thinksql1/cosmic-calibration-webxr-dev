@@ -4,10 +4,17 @@
 
 ### Added
 
+- Recorded the V3A Course 40 physical Quest 3 result as an overall PASS: the user reported,
+  "From what I can tell it looks good." No blocking stereo, stability, connectivity, highlighting,
+  duplicate-line, or unrelated-system regression was reported; detailed checklist observations
+  were not individually captured and are not inferred. Created immutable development-only tag
+  `quest-approved-constellations-v3a-v1` at the exact physically tested deployment-record commit
+  `36346b2b5a80567ac4344db6595bbd0cd7dea427`. Stable remains untouched and V3B work is authorized
+  only in development.
 - Added development-only `COSMIC_CONSTELLATION_CATALOG_V3A_COURSE_40`: 11 NASA HEASARC BSC5P
   audited figures, 48 canonical records, original reviewed connectivity, Course-40 query mode,
   extended learning groups, diagnostics, and source-review documentation. V1/V2 and solar/lunar
-  presentation contracts remain unchanged; physical Quest validation is pending.
+  presentation contracts remain unchanged.
 - Merged feature `e6f3da3` as `1e8584589b38fc476ef924e95a76a3d69e174e67`; development-only
   Actions/Pages run `30041239809` passed and hosted Course-40 verification exposed that exact SHA.
 
