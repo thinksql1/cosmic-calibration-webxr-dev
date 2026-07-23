@@ -13,6 +13,10 @@ Selected Group, and Experimental Group Palette constellation modes. It changes m
 Quest acceptance of this color system is pending. Stable remains
 `7c8b756b9d14f90c853e62896142b5c1d381e4ff` and is untouched.
 
+The active personalization study preserves that geometry while resolving Axis, pole markers, pole
+labels, and Earth Core OFF by default; restoring Lunar Purple; and adding curated persisted
+constellation/lunar appearance selectors and resets. It awaits Quest validation.
+
 ## Quest-approved checkpoint and expanded constellation catalog V2 (development study)
 
 `quest-approved-lunar-transit-v1` is an immutable annotated development tag at

@@ -78,7 +78,10 @@ import {
 import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
 import { parseSkyFrameStudyLaunch, type SkyFrameStudyMode } from './presentation/realSkyGridStudy';
 import { parseConstellationStudyLaunch } from './presentation/constellationStudy';
-import { parseCelestialColorSettings } from './presentation/color/celestialColorModes';
+import { parseCelestialColorSettings, DEFAULT_CELESTIAL_COLOR_SETTINGS, validateCelestialAppearancePreferences, type CelestialAppearancePreferences } from './presentation/color/celestialColorModes';
+import { CONSTELLATION_BASE_SWATCHES, CONSTELLATION_HIGHLIGHT_SWATCHES, LUNAR_PALETTE_CATALOG, constellationBaseSwatch, constellationHighlightSwatch, lunarPaletteDefinition } from './presentation/color/celestialColorCatalog';
+import { CELESTIAL_APPEARANCE_STORAGE_KEY, readAppearancePreferences, writeAppearancePreferences, clearAppearancePreferences } from './presentation/color/celestialAppearancePersistence';
+import { resolveCelestialVisibility } from './presentation/defaultCelestialVisibility';
 import { resolveConstellationColor } from './presentation/color/constellationColorPolicy';
 import { lunarSemanticPalette } from './presentation/color/lunarColorPolicy';
 import { colorDistance, relativeLuminance } from './presentation/color/colorValidation';
@@ -219,7 +222,12 @@ const showConstellationsInput = requireElement<HTMLInputElement>('#show-constell
 const showConstellationEndpointsInput = requireElement<HTMLInputElement>('#show-constellation-endpoints');
 const constellationLearningGroupSelect = requireElement<HTMLSelectElement>('#constellation-learning-group');
 const constellationColorModeSelect = requireElement<HTMLSelectElement>('#constellation-color-mode');
+const constellationBaseColorSelect = requireElement<HTMLSelectElement>('#constellation-base-color');
+const constellationHighlightColorSelect = requireElement<HTMLSelectElement>('#constellation-highlight-color');
+const constellationBaseSwatchElement = requireElement<HTMLSpanElement>('#constellation-base-swatch');
+const constellationHighlightSwatchElement = requireElement<HTMLSpanElement>('#constellation-highlight-swatch');
 const constellationColorStrengthSelect = requireElement<HTMLSelectElement>('#constellation-color-strength');
+const resetConstellationColorsButton = requireElement<HTMLButtonElement>('#reset-constellation-colors');
 const constellationStudyDiagnostics = requireElement<HTMLUListElement>('#constellation-study-diagnostics');
 const moonStudyControls = requireElement<HTMLDetailsElement>('#moon-study-controls');
 const showMoonPathInput = requireElement<HTMLInputElement>('#show-moon-path');
@@ -237,6 +245,8 @@ const showCurrentMoonAppearanceInput = requireElement<HTMLInputElement>('#show-c
 const showCurrentPhaseIndicatorInput = requireElement<HTMLInputElement>('#show-current-phase-indicator');
 const moonPhaseLabelSizeSelect = requireElement<HTMLSelectElement>('#moon-phase-label-size');
 const lunarPathPaletteSelect = requireElement<HTMLSelectElement>('#lunar-path-palette');
+const resetLunarPaletteButton = requireElement<HTMLButtonElement>('#reset-lunar-palette');
+const resetAllAppearanceButton = requireElement<HTMLButtonElement>('#reset-all-appearance');
 const moonStudyDiagnostics = requireElement<HTMLUListElement>('#moon-study-diagnostics');
 const constellationVisibilityInputs = Object.freeze(EXPANDED_CONSTELLATION_IDENTIFIERS.reduce((inputs, identifier) => {
   const input = document.querySelector<HTMLInputElement>(`[data-constellation-identifier="${identifier}"]`);
@@ -293,7 +303,34 @@ const queryPlanetLabelStudyMode = parsePlanetLabelStudyMode(window.location.sear
 const skyFrameLaunch = parseSkyFrameStudyLaunch(window.location.search);
 const constellationStudyLaunch = parseConstellationStudyLaunch(window.location.search);
 const moonStudyLaunch = parseMoonStudyLaunch(window.location.search);
-const celestialColorLaunch = parseCelestialColorSettings(window.location.search);
+const defaultVisibilityLaunch = resolveCelestialVisibility(window.location.search);
+let appearanceStorage: Storage | undefined;
+try { appearanceStorage = window.localStorage; } catch { appearanceStorage = undefined; }
+const persistedAppearance = readAppearancePreferences(appearanceStorage, validateCelestialAppearancePreferences);
+let activeAppearancePreferences: CelestialAppearancePreferences = parseCelestialColorSettings(
+  window.location.search,
+  persistedAppearance.preferences ?? DEFAULT_CELESTIAL_COLOR_SETTINGS,
+);
+let appearanceLastSource: 'default' | 'persisted' | 'query' | 'user-change' | 'reset' =
+  persistedAppearance.preferences ? 'persisted' : 'default';
+if (['constellationColor', 'constellationBase', 'constellationHighlight', 'constellationColorStrength', 'lunarPalette']
+  .some((key) => new URLSearchParams(window.location.search).has(key))) appearanceLastSource = 'query';
+function populateCuratedOptions(select: HTMLSelectElement, values: readonly { id: string; displayName: string; token?: { cssHex: string } }[]): void {
+  select.replaceChildren(...values.map((value) => {
+    const option = document.createElement('option');
+    option.value = value.id;
+    option.textContent = value.displayName;
+    option.dataset.swatch = value.token?.cssHex ?? '';
+    return option;
+  }));
+}
+populateCuratedOptions(constellationBaseColorSelect, CONSTELLATION_BASE_SWATCHES);
+populateCuratedOptions(constellationHighlightColorSelect, CONSTELLATION_HIGHLIGHT_SWATCHES);
+populateCuratedOptions(lunarPathPaletteSelect, LUNAR_PALETTE_CATALOG.map((palette) => Object.freeze({ id: palette.id, displayName: palette.displayName, token: palette.transitVisible })));
+showAxisInput.checked = defaultVisibilityLaunch.values.axis;
+showEarthCoreInput.checked = defaultVisibilityLaunch.values.earthCore;
+showMarkersInput.checked = defaultVisibilityLaunch.values.northPoleMarker || defaultVisibilityLaunch.values.southPoleMarker;
+showLabelsInput.checked = defaultVisibilityLaunch.values.poleLabels;
 planetLabelStudyControls.hidden = !(xrDiagnostics.enabled || queryPlanetLabelStudyMode !== 'baseline');
 planetLabelStudyModeSelect.value = queryPlanetLabelStudyMode;
 planetLabelScaleSelect.value = parsePlanetLabelScale(new URLSearchParams(window.location.search).get('labelScale'));
@@ -303,8 +340,10 @@ constellationStudyControls.hidden = !constellationStudyLaunch.enabled;
 showConstellationsInput.checked = constellationStudyLaunch.masterVisible;
 showConstellationEndpointsInput.checked = constellationStudyLaunch.showEndpointMarkers;
 constellationLearningGroupSelect.value = constellationStudyLaunch.selectedGroup ?? 'clear';
-constellationColorModeSelect.value = celestialColorLaunch.constellationMode;
-constellationColorStrengthSelect.value = celestialColorLaunch.constellationStrength;
+constellationColorModeSelect.value = activeAppearancePreferences.constellationMode;
+constellationBaseColorSelect.value = activeAppearancePreferences.constellationBaseColor;
+constellationHighlightColorSelect.value = activeAppearancePreferences.constellationHighlightColor;
+constellationColorStrengthSelect.value = activeAppearancePreferences.constellationStrength;
 for (const identifier of EXPANDED_CONSTELLATION_IDENTIFIERS) {
   constellationVisibilityInputs[identifier].checked = constellationStudyLaunch.enabledConstellations.has(identifier);
 }
@@ -328,7 +367,7 @@ showCurrentPhaseIndicatorInput.checked = moonStudyLaunch.showCurrentPhaseIndicat
 moonPhaseLabelSizeSelect.value = parseMoonPhaseLabelPreset(
   new URLSearchParams(window.location.search).get('moonPhaseLabelSize'),
 );
-lunarPathPaletteSelect.value = celestialColorLaunch.lunarPalette;
+lunarPathPaletteSelect.value = activeAppearancePreferences.lunarPalette;
 geoStudyControls.hidden = !(xrDiagnostics.enabled || queryStudyMode !== 'baseline');
 geoStudyModeSelect.value = queryStudyMode;
 const initialStudySettings = defaultObserverOffsetGeoStudySettings(queryStudyMode);
@@ -648,13 +687,44 @@ function currentConstellationDisplaySettings() {
       (identifier) => constellationVisibilityInputs[identifier].checked,
     )),
     showEndpointMarkers: showConstellationEndpointsInput.checked,
-    colorMode: parseCelestialColorSettings(`?constellationColor=${constellationColorModeSelect.value}`).constellationMode,
-    colorStrength: parseCelestialColorSettings(`?constellationColorStrength=${constellationColorStrengthSelect.value}`).constellationStrength,
+    colorMode: activeAppearancePreferences.constellationMode,
+    colorStrength: activeAppearancePreferences.constellationStrength,
+    baseColor: activeAppearancePreferences.constellationBaseColor,
+    highlightColor: activeAppearancePreferences.constellationHighlightColor,
     selectedLearningGroup: constellationStudyLaunch.mode === 'expanded'
       ? constellationLearningGroup(constellationLearningGroupSelect.value)?.id
       : undefined,
   });
 }
+
+function resolvedAppearanceFromControls(): CelestialAppearancePreferences {
+  return parseCelestialColorSettings(
+    `?constellationColor=${constellationColorModeSelect.value}`
+      + `&constellationBase=${constellationBaseColorSelect.value}`
+      + `&constellationHighlight=${constellationHighlightColorSelect.value}`
+      + `&constellationColorStrength=${constellationColorStrengthSelect.value}`
+      + `&lunarPalette=${lunarPathPaletteSelect.value}`,
+    DEFAULT_CELESTIAL_COLOR_SETTINGS,
+  );
+}
+
+function persistAppearanceFromControls(source: 'user-change' | 'reset'): void {
+  activeAppearancePreferences = resolvedAppearanceFromControls();
+  appearanceLastSource = source;
+  writeAppearancePreferences(appearanceStorage, activeAppearancePreferences);
+}
+
+function applyAppearanceToControls(preferences: CelestialAppearancePreferences): void {
+  constellationColorModeSelect.value = preferences.constellationMode;
+  constellationBaseColorSelect.value = preferences.constellationBaseColor;
+  constellationHighlightColorSelect.value = preferences.constellationHighlightColor;
+  constellationColorStrengthSelect.value = preferences.constellationStrength;
+  lunarPathPaletteSelect.value = preferences.lunarPalette;
+  constellationBaseSwatchElement.style.backgroundColor = constellationBaseSwatch(preferences.constellationBaseColor)?.token.cssHex ?? '';
+  constellationHighlightSwatchElement.style.backgroundColor = constellationHighlightSwatch(preferences.constellationHighlightColor)?.token.cssHex ?? '';
+}
+
+applyAppearanceToControls(activeAppearancePreferences);
 
 function currentStudyDisplaySettings(): ObserverOffsetGeoStudySettings {
   return Object.freeze({
@@ -811,6 +881,7 @@ function renderCelestialAxis(): void {
     `Constellation study: ${constellationStudyLaunch.enabled ? `${constellationStudyLaunch.mode} enabled` : 'off'}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; live renderer counts are reported in the study diagnostics`,
     `Observer-offset study: ${currentStudyDisplaySettings().mode}; ${selectedObserverOffsetGeoStudyComponents(currentStudyDisplaySettings()).join(', ') || 'baseline only'}`,
     `Earth Core toggle ${showEarthCoreInput.checked ? 'ON' : 'OFF'}; selected representation ${selectedEarthCorePresentation()}; configured proxy distance ${finiteCoreExperimentDistanceMeters().toFixed(1)} m`,
+    `Default visibility axis ${showAxisInput.checked ? 'ON' : 'OFF'} (${defaultVisibilityLaunch.source.axis}); north pole ${showMarkersInput.checked ? 'ON' : 'OFF'} (${defaultVisibilityLaunch.source.northPoleMarker}); south pole ${showMarkersInput.checked ? 'ON' : 'OFF'} (${defaultVisibilityLaunch.source.southPoleMarker}); pole labels ${showLabelsInput.checked ? 'ON' : 'OFF'} (${defaultVisibilityLaunch.source.poleLabels}); Earth Core ${showEarthCoreInput.checked ? 'ON' : 'OFF'} (${defaultVisibilityLaunch.source.earthCore})`,
     `Configured observer ${observerLatitudeInput.value}°, ${observerLongitudeInput.value}° east-positive, ${observerElevationInput.value} m MSL (${observerLocationEntry === 'development-default' ? 'development defaults' : 'user-edited this session'}; no persistence)`,
     eyeModeDiagnostic('Local horizon', localHorizon.getEyePresentationDiagnostics()),
     'Quest observation: each layer was clean monocularly; binocular doubling was reported. Eye modes change presentation visibility only.',
@@ -975,15 +1046,14 @@ function renderCelestialAxis(): void {
   }
   if (constellationStudyLaunch.enabled) {
     const lineDiagnostics = firstConstellationLines.getDiagnostics();
-    const constellationColors = parseCelestialColorSettings(
-      `?constellationColor=${constellationColorModeSelect.value}&constellationColorStrength=${constellationColorStrengthSelect.value}`,
-    );
+    const constellationColors = activeAppearancePreferences;
     const selectedGroup = constellationLearningGroup(constellationLearningGroupSelect.value)?.id;
     const isolatedSegment = firstConstellationLines.group
       .getObjectByName('constellation-ori-segment-04')?.userData.segment;
     constellationStudyDiagnostics.replaceChildren(...[
       `Study ${constellationStudyLaunch.mode}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; group ${constellationLearningGroupSelect.value}; frame ${constellationStudyLaunch.frame}; enabled ${EXPANDED_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).join(', ') || 'none'}`,
-      `Color mode ${constellationColors.constellationMode}; strength ${constellationColors.constellationStrength}; renderer output ${renderer.outputColorSpace}; tone mapping ${renderer.toneMapping}; geometry hash ${lineDiagnostics.geometryHash}; material updates ${lineDiagnostics.colorMaterialUpdateCount}`,
+      `Color mode ${constellationColors.constellationMode}; base ${constellationBaseSwatch(constellationColors.constellationBaseColor)?.displayName}; highlight ${constellationHighlightSwatch(constellationColors.constellationHighlightColor)?.displayName}; strength ${constellationColors.constellationStrength}; renderer output ${renderer.outputColorSpace}; tone mapping ${renderer.toneMapping}; geometry hash ${lineDiagnostics.geometryHash}; material updates ${lineDiagnostics.colorMaterialUpdateCount}`,
+      `Appearance schema ${activeAppearancePreferences.schemaVersion}; storage ${CELESTIAL_APPEARANCE_STORAGE_KEY}; storage read ${persistedAppearance.status}; resolved source ${appearanceLastSource}`,
       `Dataset ${lineDiagnostics.datasetVersion}; source ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.starCoordinateSource}; license ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.license}`,
       `Frame ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.catalogFrame}; epoch ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.catalogEpoch}; proper motion ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.properMotionPolicy}`,
       `Stars ${lineDiagnostics.starCount}; constellations ${lineDiagnostics.constellationCount}; segments ${lineDiagnostics.segmentCount}; generated vertices ${lineDiagnostics.vertexCount}`,
@@ -996,13 +1066,13 @@ function renderCelestialAxis(): void {
           .map((group) => group.id)
           .join(', ') || 'none';
         const submitted = lineDiagnostics.activeLineObjectNames.filter((name) => name.startsWith(`constellation-${figure.identifier.toLowerCase()}-`)).length;
-        const color = resolveConstellationColor(figure.identifier, constellationColors.constellationMode, constellationColors.constellationStrength, selectedGroup);
+        const color = resolveConstellationColor(figure.identifier, constellationColors.constellationMode, constellationColors.constellationStrength, selectedGroup, constellationColors.constellationBaseColor, constellationColors.constellationHighlightColor);
         return `${figure.identifier} ${figure.displayName}: stars ${figure.starDirections.length}; segments ${figure.segments.length}; groups ${groups}; ${constellationVisibilityInputs[figure.identifier].checked ? 'enabled' : 'disabled'}; submitted ${submitted}; color ${color.token.cssHex} (${color.token.id}/${color.role}/${color.colorSource}); luminance ${relativeLuminance(color.token).toFixed(3)}; source BSC5P/project-authored`;
       }),
       isolatedSegment
         ? `Diagnostic segment ${isolatedSegment.startStar.displayName} to ${isolatedSegment.endStar.displayName}; angle ${isolatedSegment.angularSeparationDegrees.toFixed(4)} deg; samples ${isolatedSegment.intervalCount + 1}; max adjacent ${isolatedSegment.maximumAdjacentAngularSeparationDegrees.toFixed(4)} deg; minor arc ${isolatedSegment.minorArc}`
         : 'Diagnostic segment unavailable',
-      `Noise: active hue families ${new Set(EXPANDED_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).map((identifier) => resolveConstellationColor(identifier, constellationColors.constellationMode, constellationColors.constellationStrength, selectedGroup).token.id)).size}; Build ${buildIdentifier}`,
+      `Noise: active hue families ${new Set(EXPANDED_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).map((identifier) => resolveConstellationColor(identifier, constellationColors.constellationMode, constellationColors.constellationStrength, selectedGroup, constellationColors.constellationBaseColor, constellationColors.constellationHighlightColor).token.id)).size}; Build ${buildIdentifier}`,
     ].map((line) => Object.assign(document.createElement('li'), { textContent: line })));
   } else {
     constellationStudyDiagnostics.replaceChildren();
@@ -1049,7 +1119,7 @@ function renderCelestialAxis(): void {
     currentSolarSystemBodyDisplaySettings(),
   );
   solarSystemBodies.update(bodyModel);
-  const lunarPalette = parseCelestialColorSettings(`?lunarPalette=${lunarPathPaletteSelect.value}`).lunarPalette;
+  const lunarPalette = activeAppearancePreferences.lunarPalette;
   moonDailyPath.setLunarPalette(lunarPalette);
   lunarPhaseTransit.setLunarPalette(lunarPalette);
   if (!moonStudyLaunch.enabled) {
@@ -1121,12 +1191,12 @@ function renderCelestialAxis(): void {
     const pathDiagnostics = moonDailyPath.getDiagnostics();
     const phaseDiagnostics = moonPhaseStudy.getDiagnostics();
     const transitDiagnostics = lunarPhaseTransit.getDiagnostics();
-    const activeLunarPalette = parseCelestialColorSettings(`?lunarPalette=${lunarPathPaletteSelect.value}`).lunarPalette;
+    const activeLunarPalette = activeAppearancePreferences.lunarPalette;
     const lunarColors = lunarSemanticPalette(activeLunarPalette);
     moonStudyDiagnostics.replaceChildren(...[
       `Study ${moonStudyLaunch.mode}; Moon daily path ${pathDiagnostics.readiness === 'ready' ? 'ready' : `suppressed (${pathDiagnostics.suppressionReason})`}`,
-      `Lunar palette ${activeLunarPalette}; daily ${lunarColors.dailyPath.cssHex}; transit visible ${lunarColors.transitVisible.cssHex}; hidden ${lunarColors.transitHidden.cssHex}; notches ${lunarColors.transitNotch.cssHex}; current ${lunarColors.currentTransit.cssHex}; next ${lunarColors.nextPhase.cssHex}; label token ${lunarColors.phaseLabel.cssHex}`,
-      `Lunar luminance daily/transit/hidden/current ${relativeLuminance(lunarColors.dailyPath).toFixed(3)}/${relativeLuminance(lunarColors.transitVisible).toFixed(3)}/${relativeLuminance(lunarColors.transitHidden).toFixed(3)}/${relativeLuminance(lunarColors.currentTransit).toFixed(3)}; constellation distance ${colorDistance(lunarColors.transitVisible, resolveConstellationColor('ORI', 'unified', 'subtle', undefined).token).toFixed(1)}`,
+      `Lunar palette ${lunarPaletteDefinition(activeLunarPalette)?.displayName ?? activeLunarPalette}; daily ${lunarColors.dailyPath.cssHex}; transit visible ${lunarColors.transitVisible.cssHex}; hidden ${lunarColors.transitHidden.cssHex}; notches ${lunarColors.transitNotch.cssHex}; current ${lunarColors.currentTransit.cssHex}; next ${lunarColors.nextPhase.cssHex}; label token ${lunarColors.phaseLabel.cssHex}`,
+      `Lunar luminance daily/transit/hidden/current ${relativeLuminance(lunarColors.dailyPath).toFixed(3)}/${relativeLuminance(lunarColors.transitVisible).toFixed(3)}/${relativeLuminance(lunarColors.transitHidden).toFixed(3)}/${relativeLuminance(lunarColors.currentTransit).toFixed(3)}; constellation distance ${colorDistance(lunarColors.transitVisible, resolveConstellationColor('ORI', 'unified', 'subtle', undefined, activeAppearancePreferences.constellationBaseColor, activeAppearancePreferences.constellationHighlightColor).token).toFixed(1)}`,
       `Moon path ${moonPathSummary}`,
       `Moon path active lines ${pathDiagnostics.activeLineObjectCount}; token ${pathDiagnostics.colorToken}; geometry hash ${pathDiagnostics.geometryHash}; orientation updates ${pathDiagnostics.orientationUpdateCount}; geometry builds ${pathDiagnostics.geometryBuildCount}; per-eye mutation ${pathDiagnostics.perEyeMutation}`,
       `Moon phase ${activePhaseState?.phaseName ?? 'unavailable'}; longitude ${activePhaseState?.phaseLongitudeDeg.toFixed(3) ?? 'n/a'} deg; phase angle ${activePhaseState?.phaseAngleDeg.toFixed(3) ?? 'n/a'} deg; illuminated ${(100 * (activePhaseState?.illuminatedFraction ?? 0)).toFixed(1)}%; ${activePhaseState?.waxing ? 'waxing' : 'waning'}`,
@@ -1572,8 +1642,6 @@ useCurrentTimeButton.addEventListener('click', () => {
   showConstellationsInput,
   showConstellationEndpointsInput,
   constellationLearningGroupSelect,
-  constellationColorModeSelect,
-  constellationColorStrengthSelect,
   ...Object.values(constellationVisibilityInputs),
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
@@ -1598,7 +1666,6 @@ useCurrentTimeButton.addEventListener('click', () => {
   showCurrentMoonAppearanceInput,
   showCurrentPhaseIndicatorInput,
   moonPhaseLabelSizeSelect,
-  lunarPathPaletteSelect,
   geoStudyRadiusInput,
   geoStudySurfaceInput,
   geoStudyEarthInput,
@@ -1660,28 +1727,69 @@ constellationLearningGroupSelect.addEventListener('change', () => {
 });
 
 constellationColorModeSelect.addEventListener('change', () => {
-  const mode = parseCelestialColorSettings(`?constellationColor=${constellationColorModeSelect.value}`).constellationMode;
-  constellationColorModeSelect.value = mode;
+  persistAppearanceFromControls('user-change');
   const url = new URL(window.location.href);
-  url.searchParams.set('constellationColor', mode);
+  url.searchParams.set('constellationColor', activeAppearancePreferences.constellationMode);
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
+});
+
+constellationBaseColorSelect.addEventListener('change', () => {
+  persistAppearanceFromControls('user-change');
+  const url = new URL(window.location.href);
+  url.searchParams.set('constellationBase', activeAppearancePreferences.constellationBaseColor);
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
+});
+
+constellationHighlightColorSelect.addEventListener('change', () => {
+  persistAppearanceFromControls('user-change');
+  const url = new URL(window.location.href);
+  url.searchParams.set('constellationHighlight', activeAppearancePreferences.constellationHighlightColor);
   window.history.replaceState({}, '', url);
   renderCelestialAxis();
 });
 
 constellationColorStrengthSelect.addEventListener('change', () => {
-  const strength = parseCelestialColorSettings(`?constellationColorStrength=${constellationColorStrengthSelect.value}`).constellationStrength;
-  constellationColorStrengthSelect.value = strength;
+  persistAppearanceFromControls('user-change');
   const url = new URL(window.location.href);
-  url.searchParams.set('constellationColorStrength', strength);
+  url.searchParams.set('constellationColorStrength', activeAppearancePreferences.constellationStrength);
   window.history.replaceState({}, '', url);
   renderCelestialAxis();
 });
 
 lunarPathPaletteSelect.addEventListener('change', () => {
-  const palette = parseCelestialColorSettings(`?lunarPalette=${lunarPathPaletteSelect.value}`).lunarPalette;
-  lunarPathPaletteSelect.value = palette;
+  persistAppearanceFromControls('user-change');
   const url = new URL(window.location.href);
-  url.searchParams.set('lunarPalette', palette);
+  url.searchParams.set('lunarPalette', activeAppearancePreferences.lunarPalette);
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
+});
+
+resetConstellationColorsButton.addEventListener('click', () => {
+  const reset = Object.freeze({ ...activeAppearancePreferences, ...DEFAULT_CELESTIAL_COLOR_SETTINGS, lunarPalette: activeAppearancePreferences.lunarPalette });
+  applyAppearanceToControls(reset);
+  persistAppearanceFromControls('reset');
+  const url = new URL(window.location.href);
+  ['constellationColor', 'constellationBase', 'constellationHighlight', 'constellationColorStrength'].forEach((key) => url.searchParams.delete(key));
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
+});
+resetLunarPaletteButton.addEventListener('click', () => {
+  const reset = Object.freeze({ ...activeAppearancePreferences, lunarPalette: DEFAULT_CELESTIAL_COLOR_SETTINGS.lunarPalette });
+  applyAppearanceToControls(reset);
+  persistAppearanceFromControls('reset');
+  const url = new URL(window.location.href);
+  url.searchParams.delete('lunarPalette');
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
+});
+resetAllAppearanceButton.addEventListener('click', () => {
+  clearAppearancePreferences(appearanceStorage);
+  applyAppearanceToControls(DEFAULT_CELESTIAL_COLOR_SETTINGS);
+  persistAppearanceFromControls('reset');
+  const url = new URL(window.location.href);
+  ['constellationColor', 'constellationBase', 'constellationHighlight', 'constellationColorStrength', 'lunarPalette'].forEach((key) => url.searchParams.delete(key));
   window.history.replaceState({}, '', url);
   renderCelestialAxis();
 });

@@ -297,6 +297,10 @@ privacy, and comfort review without borrowing the authority of science.
 
 ## Explicit non-commitments
 
+Curated appearance preferences are a bounded accessibility/presentation control. Arbitrary color
+entry, lesson presets, and guided-course sequencing remain separate future work pending physical
+Quest validation of the selector and persistence contract.
+
 This roadmap does not authorize automatic geolocation, automatic compass access, location sharing,
 cloud accounts, a general planetarium, dense dashboards, forced animation, persistent room
 calibration, medical/therapeutic claims, or any specific AI, media, game, or contemplative

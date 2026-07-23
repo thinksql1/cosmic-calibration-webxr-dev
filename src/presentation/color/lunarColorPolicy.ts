@@ -1,7 +1,9 @@
-import { CELESTIAL_COLOR_TOKENS, LEGACY_LUNAR_COLOR_TOKENS, type CelestialColorToken } from './celestialColorTokens';
+import { type CelestialColorToken } from './celestialColorTokens';
+import { lunarPaletteDefinition } from './celestialColorCatalog';
 import type { LunarPalette } from './celestialColorModes';
 export interface LunarSemanticPalette { readonly dailyPath: CelestialColorToken; readonly transitVisible: CelestialColorToken; readonly transitHidden: CelestialColorToken; readonly transitNotch: CelestialColorToken; readonly currentTransit: CelestialColorToken; readonly nextPhase: CelestialColorToken; readonly phaseLabel: CelestialColorToken; }
 export function lunarSemanticPalette(palette: LunarPalette): LunarSemanticPalette {
-  const values = palette === 'legacy-purple' ? LEGACY_LUNAR_COLOR_TOKENS : CELESTIAL_COLOR_TOKENS;
-  return Object.freeze({ dailyPath: values.moonDailyPath, transitVisible: values.lunarTransitVisible, transitHidden: values.lunarTransitHidden, transitNotch: values.lunarPhaseNotch, currentTransit: values.lunarCurrentTransit, nextPhase: values.lunarNextPhase, phaseLabel: values.moonPhaseLabel });
+  const values = lunarPaletteDefinition(palette);
+  if (!values) throw new Error(`Unknown curated lunar palette: ${palette}`);
+  return Object.freeze({ dailyPath: values.dailyPath, transitVisible: values.transitVisible, transitHidden: values.transitHidden, transitNotch: values.transitNotch, currentTransit: values.currentTransit, nextPhase: values.nextPhase, phaseLabel: values.phaseLabel });
 }

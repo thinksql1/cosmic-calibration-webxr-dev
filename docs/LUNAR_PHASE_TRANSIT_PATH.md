@@ -131,6 +131,11 @@ Legacy `showMoonPath` remains accepted. The compact dial retains its existing in
 
 ## Known limits and acceptance
 
+Lunar path colors are presentation-only. Lunar Purple is the default restored accepted family;
+Moonlit Water, Silver Moon, Deep Ocean, Arctic Moon, and Mystic Rose are optional coordinated
+families. No palette changes event times, directions, geometry, the Earth-hidden path, or Moon
+billboard anchors. See `CELESTIAL_APPEARANCE_PERSONALIZATION.md`.
+
 - The path is observer-relative topocentric EQJ, not a literal orbital-distance model.
 - Above/below-horizon styling uses the current real-sky rotation.
 - The inertial endpoint residual is scientifically expected; no decorative closure is added.

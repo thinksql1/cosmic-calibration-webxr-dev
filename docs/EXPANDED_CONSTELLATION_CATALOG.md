@@ -56,6 +56,10 @@ experimental group palette. This presentation metadata does not alter BSC5P coor
 project-authored connectivity, samples, buffers, or shared orientation. See
 `SEMANTIC_CELESTIAL_COLOR_SYSTEM.md`.
 
+Curated base and highlight swatches are presentation preferences only; Unified Celestial Lavender
+and Observation Orange remain defaults. They never alter catalog rows, connectivity, minor arcs,
+or shared real-sky orientation.
+
 ## Physical validation
 
 Validate first-set preservation, each seasonal group, Zodiac including Libra, all-expanded

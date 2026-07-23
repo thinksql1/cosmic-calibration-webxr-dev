@@ -33,6 +33,8 @@ export interface EarthAxisDisplaySettings {
 }
 
 export const DEFAULT_EARTH_AXIS_DISPLAY_SETTINGS: EarthAxisDisplaySettings = Object.freeze({
+  // Model callers retain the complete scientific baseline. The application
+  // resolves fresh-session visibility centrally before constructing this input.
   showAxis: true,
   showEarthCore: true,
   showMarkers: true,

@@ -4,13 +4,12 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate the semantic celestial color system on Quest
+**Title:** Physically validate clean defaults and celestial appearance personalization on Quest
 
-Use the cache-busted development build to compare Unified, Highlight Selected Group, and
-Experimental Group Palette constellation modes; Moonlit Water and Legacy Purple lunar palettes;
-daily versus transit distinction; lunar versus constellation/Sun separation; stereo stability;
-and preservation of all Quest-approved geometry. Record only observed PASS, FAIL, UNCERTAIN, or
-NOT RUN evidence. Do not begin the guided introductory course framework.
+Use a fresh private Quest session to validate Axis/poles/pole-labels/Earth Core OFF defaults,
+Lunar Purple default, curated constellation base/highlight swatches, optional lunar families,
+persistence/reload/query precedence/resets, stereo stability, and preserved geometry. Record only
+observed PASS, FAIL, UNCERTAIN, or NOT RUN evidence. Do not begin the guided course framework.
 
 ## Recommended execution
 
