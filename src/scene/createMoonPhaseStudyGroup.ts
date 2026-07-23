@@ -4,14 +4,22 @@ import {
   createMoonPhasePixels,
   MOON_PHASE_DIAL_RADIUS_METERS,
   MOON_PHASE_IMAGE_DIAMETER_METERS,
-  MOON_PHASE_LABEL_SIZE_METERS,
-  type MoonPhasePixelData,
   type MoonPhasePresentationModel,
+  type MoonPhasePixelData,
 } from '../presentation/moonPhasePresentation';
 import {
-  createPlanetLabelTexture,
   type PlanetLabelCanvasFactory,
 } from '../presentation/planetLabelPresentation';
+import {
+  createMoonPhaseLabelTexture,
+  moonPhaseLabelWorldSize,
+  type MoonPhaseLabelPreset,
+} from '../presentation/moonPhaseLabels';
+import {
+  createMoonPhaseTextureCache,
+  type CachedMoonPhaseTexture,
+  type MoonPhaseTextureCache,
+} from './moonPhaseTextureCache';
 
 export interface MoonPhaseStudyDisplaySettings {
   readonly showDial: boolean;
@@ -20,6 +28,7 @@ export interface MoonPhaseStudyDisplaySettings {
   readonly showImages: boolean;
   readonly showCurrentAppearance: boolean;
   readonly showCurrentIndicator: boolean;
+  readonly labelPreset?: MoonPhaseLabelPreset;
 }
 
 export interface MoonPhaseStudyDiagnostics {
@@ -37,6 +46,15 @@ export interface MoonPhaseStudyDiagnostics {
   readonly currentProjectedCentersNdc: Readonly<Record<string, readonly [number, number, number]>>;
   readonly currentStereoDisparityNdc?: number;
   readonly callbackErrorCount: number;
+  readonly spriteShapeEvidence: readonly {
+    readonly name: string;
+    readonly parent: string;
+    readonly localScale: readonly [number, number, number];
+    readonly worldScale: readonly [number, number, number];
+    readonly aspectRatio: number;
+    readonly textureDimensions?: readonly [number, number];
+    readonly shearError: number;
+  }[];
   readonly currentTexture?: {
     readonly width: number;
     readonly height: number;
@@ -55,16 +73,11 @@ export interface MoonPhaseStudyGroupHandle {
   dispose(): void;
 }
 
-interface CachedTexture {
-  readonly texture: THREE.DataTexture;
-  readonly pixels: MoonPhasePixelData;
-}
-
 const point = (value: readonly [number, number, number]): THREE.Vector3 =>
   new THREE.Vector3(value[0], value[1], value[2]);
 
-function createPhaseTexture(phaseDeg: number, borderStrength = 0.65): CachedTexture {
-  const pixels = createMoonPhasePixels(phaseDeg, borderStrength);
+function createDynamicPhaseTexture(phaseDeg: number): CachedMoonPhaseTexture {
+  const pixels: MoonPhasePixelData = createMoonPhasePixels(phaseDeg);
   const texture = new THREE.DataTexture(
     pixels.pixels,
     pixels.width,
@@ -114,7 +127,10 @@ function activeNames(root: THREE.Object3D): readonly string[] {
 
 export function createMoonPhaseStudyGroup(
   canvasFactory?: PlanetLabelCanvasFactory,
+  sharedTextureCache?: MoonPhaseTextureCache,
 ): MoonPhaseStudyGroupHandle {
+  const ownsTextureCache = sharedTextureCache === undefined;
+  const textureCache = sharedTextureCache ?? createMoonPhaseTextureCache();
   const group = new THREE.Group();
   group.name = 'moon-phase-presentation-study';
   group.visible = false;
@@ -182,10 +198,12 @@ export function createMoonPhaseStudyGroup(
   indicator.frustumCulled = false;
   dialAnchor.add(indicator);
 
-  const canonicalTextureCache = new Map<string, CachedTexture>();
+  const canonicalTextureCache = new Map<string, CachedMoonPhaseTexture>();
   const imageSprites: THREE.Sprite[] = [];
+  const imageAnchors: THREE.Group[] = [];
   const imageMaterials: THREE.SpriteMaterial[] = [];
-  const labelSprites: THREE.Sprite[] = [];
+  const labelSprites: (THREE.Sprite | undefined)[] = [];
+  const labelAnchors: THREE.Group[] = [];
   const labelMaterials: THREE.SpriteMaterial[] = [];
   const labelTextures: THREE.Texture[] = [];
 
@@ -200,7 +218,7 @@ export function createMoonPhaseStudyGroup(
     ['waning-crescent', 'Waning Crescent', 315],
   ] as const;
   for (const [id, name, angle] of phaseNames) {
-    const cached = createPhaseTexture(angle);
+    const cached = textureCache.get(id, angle);
     canonicalTextureCache.set(id, cached);
     const material = createSpriteMaterial(cached.texture);
     const sprite = new THREE.Sprite(material);
@@ -210,26 +228,41 @@ export function createMoonPhaseStudyGroup(
     sprite.frustumCulled = false;
     sprite.renderOrder = 29;
     imageSprites.push(sprite);
+    const imageAnchor = new THREE.Group();
+    imageAnchor.name = `clean-moon-phase-image-anchor-${id}`;
+    imageAnchor.add(sprite);
+    imageAnchors.push(imageAnchor);
     imageMaterials.push(material);
-    dialAnchor.add(sprite);
+    group.add(imageAnchor);
 
-    const labelTexture = createPlanetLabelTexture(name, canvasFactory);
-    if (labelTexture.kind === 'VALID_PLANET_LABEL_TEXTURE') {
+    const labelTexture = createMoonPhaseLabelTexture(name, canvasFactory);
+    if (labelTexture.kind === 'VALID_MOON_PHASE_LABEL_TEXTURE') {
       const labelMaterial = createSpriteMaterial(labelTexture.texture);
       const label = new THREE.Sprite(labelMaterial);
       label.name = `moon-phase-label-${id}`;
-      label.scale.set(MOON_PHASE_LABEL_SIZE_METERS[0], MOON_PHASE_LABEL_SIZE_METERS[1], 1);
+      const labelSize = moonPhaseLabelWorldSize(labelTexture.width, labelTexture.height, 'medium');
+      label.scale.set(labelSize[0], labelSize[1], 1);
       label.visible = false;
       label.frustumCulled = false;
       label.renderOrder = 30;
       labelTextures.push(labelTexture.texture);
       labelMaterials.push(labelMaterial);
       labelSprites.push(label);
-      dialAnchor.add(label);
+      const labelAnchor = new THREE.Group();
+      labelAnchor.name = `clean-moon-phase-label-anchor-${id}`;
+      labelAnchor.add(label);
+      labelAnchors.push(labelAnchor);
+      group.add(labelAnchor);
+    } else {
+      labelSprites.push(undefined);
+      const labelAnchor = new THREE.Group();
+      labelAnchor.name = `clean-moon-phase-label-anchor-${id}`;
+      labelAnchors.push(labelAnchor);
+      group.add(labelAnchor);
     }
   }
 
-  let currentTexture = createPhaseTexture(0);
+  let currentTexture = createDynamicPhaseTexture(0);
   let currentTextureKey = 'initial';
   const currentMaterial = createSpriteMaterial(currentTexture.texture);
   const currentAppearance = new THREE.Sprite(currentMaterial);
@@ -242,7 +275,10 @@ export function createMoonPhaseStudyGroup(
   currentAppearance.visible = false;
   currentAppearance.frustumCulled = false;
   currentAppearance.renderOrder = 30;
-  dialAnchor.add(currentAppearance);
+  const currentAppearanceAnchor = new THREE.Group();
+  currentAppearanceAnchor.name = 'current-moon-appearance-clean-anchor';
+  currentAppearanceAnchor.add(currentAppearance);
+  group.add(currentAppearanceAnchor);
   const projectedCenters = new Map<string, readonly [number, number, number]>();
   let callbackErrorCount = 0;
   const worldScratch = new THREE.Vector3();
@@ -284,7 +320,7 @@ export function createMoonPhaseStudyGroup(
       sprite.visible = ready && Boolean(settings?.showDial && settings.showImages);
     });
     labelSprites.forEach((sprite) => {
-      sprite.visible = ready && Boolean(settings?.showDial && settings.showLabels);
+      if (sprite) sprite.visible = ready && Boolean(settings?.showDial && settings.showLabels);
     });
     currentAppearance.visible = ready && Boolean(settings?.showCurrentAppearance);
   };
@@ -319,14 +355,18 @@ export function createMoonPhaseStudyGroup(
       );
       dialAnchor.quaternion.setFromRotationMatrix(basisMatrix);
       model.positions.forEach((position, index: number) => {
-        imageSprites[index]?.position.set(position.dialX, position.dialY, 0);
-        const labelRadius = model.dialRadiusMeters + 0.68;
-        const angle = position.phaseAngleDeg * Math.PI / 180;
-        labelSprites[index]?.position.set(
-          Math.sin(angle) * labelRadius,
-          Math.cos(angle) * labelRadius,
-          0,
-        );
+        imageAnchors[index]?.position.set(...position.imagePosition);
+        labelAnchors[index]?.position.set(...position.labelPosition);
+        const label = labelSprites[index];
+        const image = label?.material.map?.image as { width?: number; height?: number } | undefined;
+        if (label && image) {
+          const labelSize = moonPhaseLabelWorldSize(
+            Number(image.width),
+            Number(image.height),
+            settings.labelPreset ?? 'medium',
+          );
+          label.scale.set(labelSize[0], labelSize[1], 1);
+        }
       });
       const indicatorAngle = model.phase.phaseLongitudeDeg * Math.PI / 180;
       indicator.position.set(
@@ -334,10 +374,10 @@ export function createMoonPhaseStudyGroup(
         Math.cos(indicatorAngle) * (model.dialRadiusMeters - 0.25),
         0,
       );
-      currentAppearance.position.set(0.58, 0.32, 0);
+      currentAppearanceAnchor.position.set(...model.currentAppearanceAnchor);
 
       if (model.currentTextureKey !== currentTextureKey) {
-        const replacement = createPhaseTexture(model.phase.phaseLongitudeDeg);
+        const replacement = createDynamicPhaseTexture(model.phase.phaseLongitudeDeg);
         const previous = currentTexture;
         currentTexture = replacement;
         currentTextureKey = model.currentTextureKey;
@@ -360,23 +400,49 @@ export function createMoonPhaseStudyGroup(
     getDiagnostics(): MoonPhaseStudyDiagnostics {
       const left = projectedCenters.get('left');
       const right = projectedCenters.get('right');
+      group.updateWorldMatrix(true, true);
+      const spriteShapeEvidence = [...imageSprites, ...labelSprites].filter(
+        (sprite): sprite is THREE.Sprite => sprite !== undefined,
+      )
+        .filter((sprite) => sprite.visible)
+        .map((sprite) => {
+          const worldScale = new THREE.Vector3();
+          sprite.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), worldScale);
+          const basisX = new THREE.Vector3().setFromMatrixColumn(sprite.matrixWorld, 0).normalize();
+          const basisY = new THREE.Vector3().setFromMatrixColumn(sprite.matrixWorld, 1).normalize();
+          return Object.freeze({
+            name: sprite.name,
+            parent: sprite.parent?.name ?? 'none',
+            localScale: Object.freeze([sprite.scale.x, sprite.scale.y, sprite.scale.z] as const),
+            worldScale: Object.freeze([worldScale.x, worldScale.y, worldScale.z] as const),
+            aspectRatio: worldScale.x / worldScale.y,
+            textureDimensions: sprite.material.map?.image
+              ? Object.freeze([
+                  Number((sprite.material.map.image as { width?: number }).width),
+                  Number((sprite.material.map.image as { height?: number }).height),
+                ] as const)
+              : undefined,
+            shearError: Math.abs(basisX.dot(basisY)),
+          });
+        });
       return Object.freeze({
         ready: currentModel !== undefined && suppressionReason === undefined,
         suppressionReason,
         activeObjectNames: activeNames(group),
-        textureCacheKeys: Object.freeze([...canonicalTextureCache.keys(), currentTextureKey]),
+        textureCacheKeys: Object.freeze(textureCache.keys),
         canonicalTextureCount: canonicalTextureCache.size,
         currentTextureUpdateCount,
         geometryBuildCount,
         perEyeMutation: false,
         notchCount: currentModel?.positions.length ?? 0,
-        labelCount: labelSprites.filter((sprite) => sprite.visible).length,
+        labelCount: labelSprites.filter((sprite) => sprite?.visible).length,
         imageCount: imageSprites.filter((sprite) => sprite.visible).length,
         currentProjectedCentersNdc: Object.freeze(Object.fromEntries(projectedCenters)),
         currentStereoDisparityNdc: left && right
           ? Math.hypot(left[0] - right[0], left[1] - right[1])
           : undefined,
         callbackErrorCount,
+        spriteShapeEvidence: Object.freeze(spriteShapeEvidence),
         currentTexture: Object.freeze({
           width: currentTexture.pixels.width,
           height: currentTexture.pixels.height,
@@ -396,12 +462,12 @@ export function createMoonPhaseStudyGroup(
       notchMaterial.dispose();
       indicatorGeometry.dispose();
       indicatorMaterial.dispose();
-      for (const cached of canonicalTextureCache.values()) cached.texture.dispose();
       for (const material of imageMaterials) material.dispose();
       for (const texture of labelTextures) texture.dispose();
       for (const material of labelMaterials) material.dispose();
-      currentTexture.texture.dispose();
       currentMaterial.dispose();
+      currentTexture.texture.dispose();
+      if (ownsTextureCache) textureCache.dispose();
     },
   });
   applyVisibility();

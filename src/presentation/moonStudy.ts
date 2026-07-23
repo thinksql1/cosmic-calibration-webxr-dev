@@ -2,6 +2,7 @@ export const MOON_STUDY_MODES = Object.freeze([
   'off',
   'daily-path',
   'phase-dial',
+  'phase-transit',
   'current-appearance',
   'combined',
 ] as const);
@@ -12,6 +13,12 @@ export interface MoonStudyLaunch {
   readonly explicitlyRequested: boolean;
   readonly mode: MoonStudyMode;
   readonly showMoonPath: boolean;
+  readonly showLunarPhaseTransitPath: boolean;
+  readonly showEarthHiddenLunarPath: boolean;
+  readonly showLunarPhaseNotches: boolean;
+  readonly showLunarTransitImages: boolean;
+  readonly showLunarTransitLabels: boolean;
+  readonly showCurrentLunarTransit: boolean;
   readonly showMoonPhaseDial: boolean;
   readonly showMoonPhaseNotches: boolean;
   readonly showMoonPhaseLabels: boolean;
@@ -34,8 +41,16 @@ export function parseMoonStudyLaunch(search: string): MoonStudyLaunch {
     : 'off';
   const combined = mode === 'combined';
   const dial = mode === 'phase-dial' || combined;
+  const transit = mode === 'phase-transit' || combined;
   const directParameterNames = [
     'showMoonPath',
+    'showMoonDailyPath',
+    'showLunarPhaseTransitPath',
+    'showEarthHiddenLunarPath',
+    'showLunarPhaseNotches',
+    'showLunarTransitImages',
+    'showLunarTransitLabels',
+    'showCurrentLunarTransit',
     'showMoonPhaseDial',
     'showMoonPhaseNotches',
     'showMoonPhaseLabels',
@@ -50,7 +65,17 @@ export function parseMoonStudyLaunch(search: string): MoonStudyLaunch {
     enabled,
     explicitlyRequested: raw !== null || directRequested,
     mode,
-    showMoonPath: direct(parameters, 'showMoonPath', mode === 'daily-path' || combined),
+    showMoonPath: direct(
+      parameters,
+      'showMoonDailyPath',
+      direct(parameters, 'showMoonPath', mode === 'daily-path' || combined),
+    ),
+    showLunarPhaseTransitPath: direct(parameters, 'showLunarPhaseTransitPath', transit),
+    showEarthHiddenLunarPath: direct(parameters, 'showEarthHiddenLunarPath', transit),
+    showLunarPhaseNotches: direct(parameters, 'showLunarPhaseNotches', transit),
+    showLunarTransitImages: direct(parameters, 'showLunarTransitImages', false),
+    showLunarTransitLabels: direct(parameters, 'showLunarTransitLabels', false),
+    showCurrentLunarTransit: direct(parameters, 'showCurrentLunarTransit', transit),
     showMoonPhaseDial: direct(parameters, 'showMoonPhaseDial', dial),
     showMoonPhaseNotches: direct(parameters, 'showMoonPhaseNotches', dial),
     showMoonPhaseLabels: direct(parameters, 'showMoonPhaseLabels', combined),

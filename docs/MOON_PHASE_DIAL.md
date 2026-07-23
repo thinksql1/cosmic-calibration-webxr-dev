@@ -57,3 +57,17 @@ Physical Quest review must confirm that the dial reads as a symbolic instrument,
 New Moon remains visible without looking illuminated; opposite quarters and waxing/waning pairs
 are unambiguous; labels/images are readable in both eyes; and the entire instrument remains
 world-locked. No production choice is implied before that review.
+
+## Physical acceptance and billboard repair
+
+Quest review accepted the compact dial, its procedural Moon faces, and its continuous phase
+indicator. The `24 m` center and `3.2 m` radius remain unchanged. A later report identified
+occasional Sprite flattening/tilt and compressed labels. Ring/notch geometry remains under its
+rotated tangent anchor, but every image and label now uses a separate clean identity-scale
+world anchor. Images remain square at local and world scale; label visibility and size changes
+cannot mutate image matrices.
+
+Phase labels now use measured dynamic-width `256 px`-high textures and dedicated
+Small/Medium/Large/XL world-height presets (`0.45/0.90/1.80/3.60 m`), with Medium default. This
+same repaired billboard contract is used by the separate Lunar Phase Transit Path described in
+`LUNAR_PHASE_TRANSIT_PATH.md`.

@@ -1,5 +1,13 @@
 # Astronomy Adapter Contract
 
+## Lunar transit additions
+
+The Astronomy Engine `2.1.19` adapter exposes bounded operations for arbitrary
+`SearchMoonPhase(targetLongitude)` events, current phase longitude, and apparent topocentric
+Moon EQJ directions using `Equator(..., ofdate=false, aberration=true)`. The EQJ result includes
+provider light time, aberration, and observer parallax. It is never converted through the sample
+instant's local horizontal frame for the monthly transit layer.
+
 **Status:** Milestone 2A0 bounded contract validated on 2026-07-16
 
 **Runtime provider:** `astronomy-engine@2.1.19`

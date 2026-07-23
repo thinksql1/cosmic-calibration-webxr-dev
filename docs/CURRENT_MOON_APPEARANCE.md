@@ -19,6 +19,10 @@ The optional current image is a native Three.js Sprite at a finite `24 m` anchor
 actual apparent topocentric Moon direction, under the same calibrated geographic frame as the Moon
 marker. The anchor is fixed shared scene state and native XR cameras project it independently.
 
+The current image now uses the same clean identity-scale billboard-anchor repair as the compact
+dial and Lunar Phase Transit images. It does not inherit the rotated dial group, and phase-label
+visibility cannot alter its world matrix.
+
 The texture is regenerated only when its half-degree phase cache key changes or a relevant
 presentation setting changes. Illumination shape follows authoritative phase longitude and is
 cross-reported against the provider illuminated fraction. Near New Moon, the disk remains dark

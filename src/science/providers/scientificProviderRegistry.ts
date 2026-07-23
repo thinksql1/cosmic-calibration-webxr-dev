@@ -1,6 +1,9 @@
 import {
   getApparentTopocentricBody,
   getMoonPhaseState,
+  getMoonPhaseLongitudeDeg,
+  getApparentTopocentricEqjMoonDirection,
+  searchMoonPhaseEvent,
   getObserverRelativePosition,
   toTerrestrialTime,
 } from '../astronomy/astronomyEngineAdapter';
@@ -21,6 +24,9 @@ export interface ScientificProviderRegistry {
     readonly getObserverRelativePosition: typeof getObserverRelativePosition;
     readonly getApparentTopocentricBody: typeof getApparentTopocentricBody;
     readonly getMoonPhaseState: typeof getMoonPhaseState;
+    readonly getMoonPhaseLongitudeDeg: typeof getMoonPhaseLongitudeDeg;
+    readonly getApparentTopocentricEqjMoonDirection: typeof getApparentTopocentricEqjMoonDirection;
+    readonly searchMoonPhaseEvent: typeof searchMoonPhaseEvent;
   };
   readonly meanPole: {
     readonly provider: typeof P03_MEAN_POLE_PROVIDER;
@@ -39,6 +45,9 @@ export function createScientificProviderRegistry(): ScientificProviderRegistry {
       getObserverRelativePosition,
       getApparentTopocentricBody,
       getMoonPhaseState,
+      getMoonPhaseLongitudeDeg,
+      getApparentTopocentricEqjMoonDirection,
+      searchMoonPhaseEvent,
     }),
     meanPole: Object.freeze({
       provider: P03_MEAN_POLE_PROVIDER,

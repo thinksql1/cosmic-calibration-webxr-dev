@@ -65,6 +65,26 @@ const MOON_PHASE_DIAL_NAMES = Object.freeze([
   ...MOON_PHASE_IMAGE_NAMES,
   'moon-current-phase-indicator',
 ]);
+const LUNAR_TRANSIT_PATH_NAMES = Object.freeze([
+  'lunar-phase-transit-visible-sky-path',
+  'lunar-phase-transit-earth-hidden-path',
+]);
+const LUNAR_TRANSIT_IMAGE_NAMES = Object.freeze(
+  MOON_PHASE_IDS.map((id) => `lunar-transit-phase-image-${id}`),
+);
+const LUNAR_TRANSIT_NOTCH_NAMES = Object.freeze(
+  MOON_PHASE_IDS.map((id) => `lunar-transit-notch-${id}`),
+);
+const LUNAR_TRANSIT_LABEL_NAMES = Object.freeze(
+  MOON_PHASE_IDS.map((id) => `lunar-transit-phase-label-${id}`),
+);
+const LUNAR_TRANSIT_COMPLETE_NAMES = Object.freeze([
+  ...LUNAR_TRANSIT_PATH_NAMES,
+  ...LUNAR_TRANSIT_NOTCH_NAMES,
+  'current-lunar-phase-transit-marker',
+  ...LUNAR_TRANSIT_IMAGE_NAMES,
+  ...LUNAR_TRANSIT_LABEL_NAMES,
+]);
 
 export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Object.freeze([
   state('all', 'Preset behavior — no object isolation', []),
@@ -155,12 +175,39 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('moon-marker', 'Moon marker only', ['apparent-moon-marker']),
   state('moon-daily-path', 'Moon daily path only', ['apparent-moon-civil-day-projective-path']),
   state('moon-marker-daily-path', 'Moon marker plus daily path', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path']),
+  state('lunar-phase-transit-path', 'Lunar Phase Transit Path only', LUNAR_TRANSIT_PATH_NAMES),
+  state('lunar-phase-transit-visible', 'Transit path visible-sky portion', ['lunar-phase-transit-visible-sky-path']),
+  state('lunar-phase-transit-hidden', 'Transit path Earth-hidden portion', ['lunar-phase-transit-earth-hidden-path']),
+  state('lunar-phase-transit-current-moon', 'Transit path plus current Moon', [...LUNAR_TRANSIT_PATH_NAMES, 'apparent-moon-marker']),
+  state('lunar-phase-transit-notches', 'Transit path plus phase notches', [...LUNAR_TRANSIT_PATH_NAMES, ...LUNAR_TRANSIT_NOTCH_NAMES]),
+  state('lunar-transit-notches-only', 'Lunar transit phase notches only', LUNAR_TRANSIT_NOTCH_NAMES),
+  state('lunar-transit-images', 'Lunar transit phase images only', LUNAR_TRANSIT_IMAGE_NAMES),
+  state('lunar-transit-labels', 'Lunar transit phase labels only', LUNAR_TRANSIT_LABEL_NAMES),
+  state('lunar-transit-path-images', 'Transit path plus images', [...LUNAR_TRANSIT_PATH_NAMES, ...LUNAR_TRANSIT_IMAGE_NAMES]),
+  state('lunar-transit-path-labels', 'Transit path plus labels', [...LUNAR_TRANSIT_PATH_NAMES, ...LUNAR_TRANSIT_LABEL_NAMES]),
+  state('lunar-transit-path-images-labels', 'Transit path plus images and labels', [...LUNAR_TRANSIT_PATH_NAMES, ...LUNAR_TRANSIT_IMAGE_NAMES, ...LUNAR_TRANSIT_LABEL_NAMES]),
+  state('lunar-current-transit', 'Current lunar transit marker only', ['current-lunar-phase-transit-marker']),
+  state('lunar-transit-previous-next', 'Previous and next phase notches', LUNAR_TRANSIT_NOTCH_NAMES),
+  state('lunar-transit-new-moon', 'New Moon transit notch and image', ['lunar-transit-notch-new-moon', 'lunar-transit-phase-image-new-moon']),
+  state('lunar-transit-first-quarter', 'First Quarter transit notch and image', ['lunar-transit-notch-first-quarter', 'lunar-transit-phase-image-first-quarter']),
+  state('lunar-transit-full-moon', 'Full Moon transit notch and image', ['lunar-transit-notch-full-moon', 'lunar-transit-phase-image-full-moon']),
+  state('lunar-transit-last-quarter', 'Last Quarter transit notch and image', ['lunar-transit-notch-last-quarter', 'lunar-transit-phase-image-last-quarter']),
+  state('lunar-phase-transit-complete', 'Complete lunar phase transit presentation', LUNAR_TRANSIT_COMPLETE_NAMES),
+  state('lunar-transit-grid', 'Transit path plus real-sky grid', [...LUNAR_TRANSIT_PATH_NAMES, ...CELESTIAL_GRID_LINE_NAMES]),
+  state('lunar-transit-constellations', 'Transit path plus constellations', [...LUNAR_TRANSIT_PATH_NAMES, ...FIRST_CONSTELLATION_LINE_NAMES]),
+  state('moon-daily-transit-paths', 'Moon daily path plus phase transit path', ['apparent-moon-civil-day-projective-path', ...LUNAR_TRANSIT_PATH_NAMES]),
   state('moon-phase-dial-ring', 'Moon phase dial ring only', ['moon-phase-dial-ring']),
   state('moon-phase-notches', 'Moon phase notches only', ['moon-phase-dial-notches']),
   state('moon-phase-labels', 'Moon phase labels only', MOON_PHASE_LABEL_NAMES),
   state('moon-phase-images', 'All eight phase images only', MOON_PHASE_IMAGE_NAMES),
   ...MOON_PHASE_IDS.map((id) => state(`moon-phase-${id}`, `${id} phase image only`, [`moon-phase-image-${id}`])),
   state('moon-phase-dial-complete', 'Complete symbolic Moon phase dial', MOON_PHASE_DIAL_NAMES),
+  state('moon-dial-images-labels-off', 'Compact dial images with labels off', MOON_PHASE_IMAGE_NAMES),
+  state('moon-dial-images-labels-on', 'Compact dial images and labels', [...MOON_PHASE_IMAGE_NAMES, ...MOON_PHASE_LABEL_NAMES]),
+  state('moon-dial-label-distortion-proof', 'Compact dial label distortion proof', MOON_PHASE_LABEL_NAMES),
+  state('moon-dial-image-aspect-proof', 'Compact dial image aspect-ratio proof', MOON_PHASE_IMAGE_NAMES),
+  state('lunar-transit-image-aspect-proof', 'Transit image aspect-ratio proof', LUNAR_TRANSIT_IMAGE_NAMES),
+  state('lunar-transit-label-readability-proof', 'Transit label readability proof', LUNAR_TRANSIT_LABEL_NAMES),
   state('current-moon-appearance', 'Current Moon appearance only', ['current-moon-appearance']),
   state('current-moon-marker', 'Current Moon appearance plus Moon marker', ['current-moon-appearance', 'apparent-moon-marker']),
   state('current-moon-sun', 'Current Moon appearance plus Sun marker', ['current-moon-appearance', 'apparent-sun-marker']),
@@ -168,6 +215,7 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('moon-path-phase-dial', 'Moon daily path plus phase dial', ['apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES]),
   state('moon-path-current-appearance', 'Moon daily path plus current appearance', ['apparent-moon-civil-day-projective-path', 'current-moon-appearance']),
   state('moon-study-complete', 'Complete Moon study', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance']),
+  state('moon-presentation-complete', 'Complete Moon presentation including phase transit', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance', ...LUNAR_TRANSIT_COMPLETE_NAMES]),
   state('moon-study-grid', 'Moon study plus real-sky grid', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance', ...CELESTIAL_GRID_LINE_NAMES]),
   state('moon-study-planets', 'Moon study plus planets', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance', 'apparent-mercury-marker', 'apparent-venus-marker', 'apparent-mars-marker', 'apparent-jupiter-marker', 'apparent-saturn-marker', 'apparent-uranus-marker', 'apparent-neptune-marker', 'apparent-pluto-marker']),
   state('moon-study-constellations', 'Moon study plus constellations', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance', ...FIRST_CONSTELLATION_LINE_NAMES]),

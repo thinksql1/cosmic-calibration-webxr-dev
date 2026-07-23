@@ -32,10 +32,12 @@ import {
   CORRECTION_PROFILES,
   type CorrectionProfileId,
   type ApparentTopocentricBodyResult,
+  type ApparentTopocentricEqjDirectionResult,
   type EquatorialPositionResult,
   type ObserverRelativeBody,
   type ObserverRelativePositionResult,
   type MoonPhaseProviderResult,
+  type MoonPhaseEventProviderResult,
   type ResultProvenance,
   type SimulationInstant,
   type TerrestrialTime,
@@ -389,5 +391,129 @@ export function getMoonPhaseState(
     provider: ASTRONOMY_ENGINE_PROVIDER,
     providerVersion: ASTRONOMY_ENGINE_VERSION,
     simulationInstant: instant,
+  });
+}
+
+/** Bounded provider-owned geocentric Sun-Moon ecliptic longitude difference. */
+export function getMoonPhaseLongitudeDeg(instant: SimulationInstant): number {
+  const value = MoonPhase(providerTime(instant));
+  if (!Number.isFinite(value) || value < 0 || value >= 360) {
+    throw new AstronomyContractError(
+      'MALFORMED_PROVIDER_RESULT',
+      'Astronomy Engine returned an invalid Moon phase longitude.',
+      Object.freeze({
+        operation: 'getMoonPhaseLongitudeDeg',
+        actual: Object.freeze({ phaseLongitudeDeg: value }),
+      }),
+    );
+  }
+  return value;
+}
+
+/**
+ * Finds one authoritative geocentric phase-longitude event. Astronomy Engine
+ * accepts every target in [0, 360), including the four intermediate 45-degree
+ * phases used by the transit study.
+ */
+export function searchMoonPhaseEvent(
+  targetPhaseLongitudeDeg: number,
+  start: SimulationInstant,
+  limitDays: number,
+): MoonPhaseEventProviderResult | null {
+  if (
+    !Number.isFinite(targetPhaseLongitudeDeg)
+    || targetPhaseLongitudeDeg < 0
+    || targetPhaseLongitudeDeg >= 360
+    || !Number.isFinite(limitDays)
+    || limitDays === 0
+  ) {
+    throw new AstronomyContractError(
+      'INVALID_ANGLE',
+      'Moon phase-event search inputs are outside the provider contract.',
+      Object.freeze({
+        operation: 'searchMoonPhaseEvent',
+        actual: Object.freeze({ targetPhaseLongitudeDeg, limitDays }),
+      }),
+    );
+  }
+  const event = SearchMoonPhase(targetPhaseLongitudeDeg, providerTime(start), limitDays);
+  if (!event) return null;
+  const eventInstant: SimulationInstant = Object.freeze({
+    utcIso: event.date.toISOString(),
+    unixMilliseconds: event.date.getTime(),
+    source: 'frozen-test',
+  });
+  return Object.freeze({
+    kind: 'VALID_MOON_PHASE_EVENT',
+    targetPhaseLongitudeDeg,
+    eventInstant,
+    provider: ASTRONOMY_ENGINE_PROVIDER,
+    providerVersion: ASTRONOMY_ENGINE_VERSION,
+  });
+}
+
+/**
+ * Apparent topocentric Moon direction expressed in the provider's J2000 mean
+ * equator/equinox (EQJ). This deliberately preserves parallax while avoiding
+ * a sample-time horizontal transform.
+ */
+export function getApparentTopocentricEqjMoonDirection(
+  instant: SimulationInstant,
+  observer: ValidatedObserver,
+): ApparentTopocentricEqjDirectionResult {
+  const equatorial = Equator(
+    Body.Moon,
+    providerTime(instant),
+    providerObserver(observer),
+    false,
+    true,
+  );
+  const direction = normalizeCartesianDirection(
+    'EQJ_J2000',
+    equatorial.vec.x,
+    equatorial.vec.y,
+    equatorial.vec.z,
+  );
+  if (
+    ![
+      equatorial.ra,
+      equatorial.dec,
+      equatorial.dist,
+      direction.x,
+      direction.y,
+      direction.z,
+    ].every(Number.isFinite)
+    || equatorial.dist <= 0
+  ) {
+    throw new AstronomyContractError(
+      'MALFORMED_PROVIDER_RESULT',
+      'Astronomy Engine returned an invalid apparent topocentric EQJ Moon direction.',
+      Object.freeze({
+        operation: 'getApparentTopocentricEqjMoonDirection',
+        actual: Object.freeze({
+          rightAscensionHours: equatorial.ra,
+          declinationDeg: equatorial.dec,
+          distanceAu: equatorial.dist,
+        }),
+      }),
+    );
+  }
+  return Object.freeze({
+    kind: 'VALID_APPARENT_TOPOCENTRIC_EQJ_DIRECTION',
+    body: 'Moon',
+    center: 'TOPOCENTRIC',
+    frame: 'EQJ_J2000',
+    coordinateClass: 'PROVIDER_APPARENT_TOPOCENTRIC',
+    rightAscensionHours: equatorial.ra,
+    declinationDeg: equatorial.dec,
+    distanceAu: equatorial.dist,
+    direction,
+    simulationInstant: instant,
+    observer,
+    provider: ASTRONOMY_ENGINE_PROVIDER,
+    providerVersion: ASTRONOMY_ENGINE_VERSION,
+    aberration: 'included',
+    lightTime: 'included',
+    topocentricParallax: 'included',
   });
 }

@@ -1,5 +1,13 @@
 # Cosmic Calibration WebXR Architecture
 
+## Lunar phase transit
+
+The monthly transit layer is specified in `LUNAR_PHASE_TRANSIT_PATH.md`. Provider event searches
+and apparent topocentric EQJ directions are science-owned. Presentation sampling produces immutable
+canonical buffers. One current accepted real-sky rotation is shader-owned per update, geographic
+yaw remains parent-owned, and native XR cameras remain eye-owned. Phase images and labels use
+independent finite identity-scale anchors; neither may inherit line-group scale/rotation.
+
 ## Frames and boundaries
 
 The application uses one shared Three.js scene for desktop and immersive AR while keeping the

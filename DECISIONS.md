@@ -543,6 +543,24 @@
   provider-owned phase values preserve stereo safety and scientific honesty without external
   imagery, a second clock, or a second ephemeris.
 
+### DEC-041: Represent one active lunation as an apparent topocentric EQJ transit track
+- **Date:** 2026-07-23
+- **Status:** Accepted for development-only physical Quest validation
+- **Owner:** Darrell Wright / project control
+- **Decision:** Bracket the active lunation with provider `SearchMoonPhase(0)` events, calculate all
+  eight canonical event times with arbitrary provider phase-longitude searches, and sample the
+  configured observer's apparent topocentric Moon direction in J2000/EQJ every 60 minutes. Apply
+  one current accepted EQJ real-sky orientation to the immutable complete track, retain the
+  below-horizon portion, and interpolate the current transit marker without moving the existing
+  Moon marker. Keep the separate daily path and accepted compact symbolic dial. Move every phase
+  image and label to independent identity-scale world anchors; use measured dynamic-width phase
+  label textures with Medium (`0.90 m` height) default.
+- **Rationale:** Historical/future local-horizontal samples would incorrectly inject Earth's daily
+  rotation into a lunation track. Topocentric EQJ preserves the validated observer relationship and
+  marker alignment while remaining one coherent celestial route. Independent billboard anchors
+  remove inherited rotation/nonuniform-transform coupling, and dynamic texture aspect removes the
+  prior label compression without changing accepted procedural images.
+
 ## Proposed decisions awaiting review
 
 None yet.
