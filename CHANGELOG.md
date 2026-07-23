@@ -9,6 +9,10 @@
 - Added the query-gated semantic celestial color system: Moonlit Water/Legacy Purple lunar
   palettes, Unified/Highlight Selected Group/Experimental Group Palette constellation modes,
   bounded strength controls, material reuse, luminance diagnostics, and no geometry mutation.
+- Merged feature `66722d8` as `55fb0c5` and deployed it through successful development-only
+  Actions/Pages run `30027473325`; hosted control verification confirmed the visible `55fb0c5` build,
+  Highlight/Winter initialization, and Moonlit Water initialization. Physical Quest validation
+  remains pending.
 
 - Created immutable development tag `quest-approved-lunar-transit-v1` at accepted build
   `0d3f7219774bac51c0b3f5061205a307e67546d3`, pushed only to the development remote, and recorded

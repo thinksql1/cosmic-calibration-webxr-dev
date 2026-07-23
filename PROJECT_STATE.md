@@ -3,13 +3,15 @@
 ## Current control record — 2026-07-23
 
 The historical narrative below is retained as evidence but is superseded for active planning by
-the development state at `d54a830ab04fb920838e78a350c0a7e540740997`: Quest-approved lunar
-transit presentation and 29-constellation catalog/learning groups are checkpointed development
+the accepted `d54a830ab04fb920838e78a350c0a7e540740997` baseline: Quest-approved lunar transit
+presentation and 29-constellation catalog/learning groups remain checkpointed development
 baseline. `quest-approved-expanded-constellations-v1` tags that accepted commit on the development
-remote only. The current query-gated semantic celestial color study adds Moonlit Water and Legacy
-Purple lunar palettes plus Unified, Highlight Selected Group, and Experimental Group Palette
-constellation modes. It changes material style only; Quest acceptance of this color system is
-pending. Stable remains `7c8b756b9d14f90c853e62896142b5c1d381e4ff` and is untouched.
+remote only. Semantic celestial color implementation `66722d8` was merged to development as
+`55fb0c5` and deployed through the successful development-only Actions/Pages run `30027473325`.
+The query-gated study adds Moonlit Water and Legacy Purple lunar palettes plus Unified, Highlight
+Selected Group, and Experimental Group Palette constellation modes. It changes material style only;
+Quest acceptance of this color system is pending. Stable remains
+`7c8b756b9d14f90c853e62896142b5c1d381e4ff` and is untouched.
 
 ## Quest-approved checkpoint and expanded constellation catalog V2 (development study)
 
