@@ -180,6 +180,22 @@
             <p class="simulation-note">Catalog coordinates use the provider-native J2000 EQJ bridge. The existing mean-of-date grid uses the provider-native EQD phase so its validated pole convergence remains exact. Both are geometric and non-refracted.</p>
             <ul id="sky-frame-study-diagnostics" class="diagnostics-list"></ul>
           </details>
+          <details id="constellation-study-controls" hidden>
+            <summary>First constellation-line study</summary>
+            <div class="toggle-grid" aria-label="First constellation visibility">
+              <label><input id="show-constellations" type="checkbox" />Constellations</label>
+              <label><input id="show-constellation-ori" type="checkbox" checked />Orion</label>
+              <label><input id="show-constellation-uma" type="checkbox" checked />Ursa Major</label>
+              <label><input id="show-constellation-cas" type="checkbox" checked />Cassiopeia</label>
+              <label><input id="show-constellation-cyg" type="checkbox" checked />Cygnus</label>
+              <label><input id="show-constellation-tau" type="checkbox" checked />Taurus</label>
+              <label><input id="show-constellation-leo" type="checkbox" checked />Leo</label>
+              <label><input id="show-constellation-sco" type="checkbox" checked />Scorpius</label>
+              <label><input id="show-constellation-endpoints" type="checkbox" />Diagnostic endpoints</label>
+            </div>
+            <p class="simulation-note">Query-gated J2000 stick figures use the accepted real-sky bridge. Connectivity is a conventional project-authored visualization, not an IAU boundary or standardized IAU figure. Constellation labels are not included.</p>
+            <ul id="constellation-study-diagnostics" class="diagnostics-list"></ul>
+          </details>
           <details id="geo-study-controls" hidden>
             <summary>Observer-offset geocentric study</summary>
             <p class="simulation-note">Development-only explanatory aids. They do not change the validated celestial grid, equator, or calibration.</p>

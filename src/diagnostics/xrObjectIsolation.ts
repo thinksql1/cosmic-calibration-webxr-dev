@@ -32,6 +32,26 @@ const CELESTIAL_GRID_LINE_NAMES = Object.freeze([
 const REAL_SKY_OVERLAY_LINE_NAMES = Object.freeze(
   CELESTIAL_GRID_LINE_NAMES.map((name) => `real-sky-overlay-${name}`),
 );
+const CONSTELLATION_SEGMENT_COUNTS = Object.freeze({ ori: 8, uma: 7, cas: 4, cyg: 4, tau: 4, leo: 7, sco: 6 } as const);
+const constellationLineNames = (identifier: keyof typeof CONSTELLATION_SEGMENT_COUNTS) => Object.freeze(
+  Array.from({ length: CONSTELLATION_SEGMENT_COUNTS[identifier] }, (_, index) =>
+    `constellation-${identifier}-segment-${String(index + 1).padStart(2, '0')}`),
+);
+const ORION_CONSTELLATION_NAMES = constellationLineNames('ori');
+const URSA_MAJOR_CONSTELLATION_NAMES = constellationLineNames('uma');
+const CASSIOPEIA_CONSTELLATION_NAMES = constellationLineNames('cas');
+const CYGNUS_CONSTELLATION_NAMES = constellationLineNames('cyg');
+const TAURUS_CONSTELLATION_NAMES = constellationLineNames('tau');
+const LEO_CONSTELLATION_NAMES = constellationLineNames('leo');
+const SCORPIUS_CONSTELLATION_NAMES = constellationLineNames('sco');
+const FIRST_CONSTELLATION_LINE_NAMES = Object.freeze([
+  ...ORION_CONSTELLATION_NAMES, ...URSA_MAJOR_CONSTELLATION_NAMES,
+  ...CASSIOPEIA_CONSTELLATION_NAMES, ...CYGNUS_CONSTELLATION_NAMES,
+  ...TAURUS_CONSTELLATION_NAMES, ...LEO_CONSTELLATION_NAMES, ...SCORPIUS_CONSTELLATION_NAMES,
+]);
+const FIRST_CONSTELLATION_ENDPOINT_NAMES = Object.freeze(
+  Object.keys(CONSTELLATION_SEGMENT_COUNTS).map((identifier) => `constellation-${identifier}-endpoint-markers`),
+);
 
 export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Object.freeze([
   state('all', 'Preset behavior — no object isolation', []),
@@ -63,6 +83,23 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('real-sky-ra-zero', 'Real-sky RA zero meridian only', ['right-ascension-meridian-00h']),
   state('real-sky-ra-quadrants', 'Real-sky RA 6h, 12h, and 18h meridians', ['right-ascension-meridian-06h', 'right-ascension-meridian-12h', 'right-ascension-meridian-18h']),
   state('real-sky-basis-axes', 'Astronomy basis axes represented by cardinal RA meridians and poles', ['right-ascension-meridian-00h', 'right-ascension-meridian-06h', 'right-ascension-meridian-12h', 'right-ascension-meridian-18h', 'north-celestial-pole-marker', 'south-celestial-pole-marker']),
+  state('constellations-first-set', 'All seven first-set constellation figures', FIRST_CONSTELLATION_LINE_NAMES),
+  state('constellation-orion', 'Orion only', ORION_CONSTELLATION_NAMES),
+  state('constellation-ursa-major', 'Ursa Major only', URSA_MAJOR_CONSTELLATION_NAMES),
+  state('constellation-cassiopeia', 'Cassiopeia only', CASSIOPEIA_CONSTELLATION_NAMES),
+  state('constellation-cygnus', 'Cygnus only', CYGNUS_CONSTELLATION_NAMES),
+  state('constellation-taurus', 'Taurus only', TAURUS_CONSTELLATION_NAMES),
+  state('constellation-leo', 'Leo only', LEO_CONSTELLATION_NAMES),
+  state('constellation-scorpius', 'Scorpius only', SCORPIUS_CONSTELLATION_NAMES),
+  state('constellation-orion-grid', 'Orion plus celestial grid', [...ORION_CONSTELLATION_NAMES, ...CELESTIAL_GRID_LINE_NAMES]),
+  state('constellations-real-sky-grid', 'All constellations plus real-sky grid', [...FIRST_CONSTELLATION_LINE_NAMES, ...CELESTIAL_GRID_LINE_NAMES]),
+  state('constellations-horizon-compass', 'All constellations plus horizon and compass', [...FIRST_CONSTELLATION_LINE_NAMES, 'local-astronomical-horizon-circle', 'geographic-north-south-line', 'geographic-east-west-line', 'cardinal-n', 'cardinal-s', 'cardinal-e', 'cardinal-w']),
+  state('constellations-planets', 'All constellations plus planet markers', [...FIRST_CONSTELLATION_LINE_NAMES, 'apparent-mercury-marker', 'apparent-venus-marker', 'apparent-mars-marker', 'apparent-jupiter-marker', 'apparent-saturn-marker', 'apparent-uranus-marker', 'apparent-neptune-marker', 'apparent-pluto-marker']),
+  state('constellation-endpoints', 'First-set catalog endpoint markers only', FIRST_CONSTELLATION_ENDPOINT_NAMES),
+  state('constellation-segment-samples', 'One Orion belt segment with sample points', ['constellation-ori-segment-04', 'constellation-ori-endpoint-markers']),
+  state('constellations-canonical-eqj', 'Canonical EQJ constellation geometry (use constellationFrame=canonical)', FIRST_CONSTELLATION_LINE_NAMES),
+  state('constellations-real-sky', 'Real-sky transformed constellation geometry', FIRST_CONSTELLATION_LINE_NAMES),
+  state('constellation-sun-path-comparison', 'Sun path plus Orion for wobble comparison', ['apparent-sun-civil-day-projective-path', ...ORION_CONSTELLATION_NAMES]),
   state('declination-grid', 'Declination circles only', ['declination-circle-plus-60', 'declination-circle-plus-30', 'declination-circle-minus-30', 'declination-circle-minus-60']),
   state('right-ascension-grid', 'Right-ascension meridians only', ['right-ascension-meridian-00h', 'right-ascension-meridian-02h', 'right-ascension-meridian-04h', 'right-ascension-meridian-06h', 'right-ascension-meridian-08h', 'right-ascension-meridian-10h', 'right-ascension-meridian-12h', 'right-ascension-meridian-14h', 'right-ascension-meridian-16h', 'right-ascension-meridian-18h', 'right-ascension-meridian-20h', 'right-ascension-meridian-22h']),
   state('right-ascension-00h', '0h meridian only', ['right-ascension-meridian-00h']),

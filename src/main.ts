@@ -14,6 +14,7 @@ import {
 import { createEarthAxisGroup } from './scene/createEarthAxisGroup';
 import { createCelestialEquatorGroup } from './scene/createCelestialEquatorGroup';
 import { createCelestialCoordinateGridGroup } from './scene/createCelestialCoordinateGridGroup';
+import { createFirstConstellationLineGroup } from './scene/createFirstConstellationLineGroup';
 import { createObserverOffsetGeocentricStudyGroup } from './scene/createObserverOffsetGeocentricStudyGroup';
 import { createFiniteCoreParallaxExperimentGroup } from './scene/createFiniteCoreParallaxExperimentGroup';
 import { createGeocentricCelestialStructureGroup } from './scene/createGeocentricCelestialStructureGroup';
@@ -27,6 +28,7 @@ import {
   createRealSkyEquatorialOrientation,
   createRealSkyGridDirectionRotation,
   equatorialOfDateToHorizontalEnu,
+  type Matrix3Rows,
   type RealSkyEquatorialOrientationReady,
 } from './science/astronomy/realSkyEquatorialOrientation';
 import { angularSeparationDeg } from './science/astronomy/frameTransforms';
@@ -62,6 +64,9 @@ import {
 } from './presentation/celestialEquatorPresentationModel';
 import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
 import { parseSkyFrameStudyLaunch, type SkyFrameStudyMode } from './presentation/realSkyGridStudy';
+import { parseConstellationStudyLaunch } from './presentation/constellationStudy';
+import { FIRST_CONSTELLATION_IDENTIFIERS, type FirstConstellationIdentifier } from './science/constellations/firstConstellationCatalog';
+import { FIRST_CONSTELLATION_DATASET_METADATA } from './presentation/firstConstellationLinePresentation';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
 import {
   defaultObserverOffsetGeoStudySettings,
@@ -177,6 +182,19 @@ const showRightAscensionGridInput = requireElement<HTMLInputElement>('#show-righ
 const skyFrameStudyControls = requireElement<HTMLDetailsElement>('#sky-frame-study-controls');
 const skyFrameStudyModeSelect = requireElement<HTMLSelectElement>('#sky-frame-study-mode');
 const skyFrameStudyDiagnostics = requireElement<HTMLUListElement>('#sky-frame-study-diagnostics');
+const constellationStudyControls = requireElement<HTMLDetailsElement>('#constellation-study-controls');
+const showConstellationsInput = requireElement<HTMLInputElement>('#show-constellations');
+const showConstellationEndpointsInput = requireElement<HTMLInputElement>('#show-constellation-endpoints');
+const constellationStudyDiagnostics = requireElement<HTMLUListElement>('#constellation-study-diagnostics');
+const constellationVisibilityInputs: Readonly<Record<FirstConstellationIdentifier, HTMLInputElement>> = Object.freeze({
+  ORI: requireElement<HTMLInputElement>('#show-constellation-ori'),
+  UMA: requireElement<HTMLInputElement>('#show-constellation-uma'),
+  CAS: requireElement<HTMLInputElement>('#show-constellation-cas'),
+  CYG: requireElement<HTMLInputElement>('#show-constellation-cyg'),
+  TAU: requireElement<HTMLInputElement>('#show-constellation-tau'),
+  LEO: requireElement<HTMLInputElement>('#show-constellation-leo'),
+  SCO: requireElement<HTMLInputElement>('#show-constellation-sco'),
+});
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const showPlanetLabelsInput = requireElement<HTMLInputElement>('#show-planet-labels');
@@ -214,16 +232,28 @@ const equatorEyeModeSelect = requireElement<HTMLSelectElement>('#equator-eye-mod
 const horizonEyeModeSelect = requireElement<HTMLSelectElement>('#horizon-eye-mode');
 const eyePresentationStatus = requireElement<HTMLParagraphElement>('#eye-presentation-status');
 const xrDiagnostics = createXrPerEyeDiagnostics();
+const CANONICAL_EQJ_ROWS: Matrix3Rows = Object.freeze([
+  Object.freeze([1, 0, 0] as const),
+  Object.freeze([0, 1, 0] as const),
+  Object.freeze([0, 0, 1] as const),
+]);
 const buildIdentifier = import.meta.env.VITE_BUILD_IDENTIFIER ?? 'development-local';
 const queryStudyMode = parseObserverOffsetGeoStudyMode(window.location.search);
 const finiteCoreLaunch = parseFiniteCoreParallaxLaunch(window.location.search);
 const queryPlanetLabelStudyMode = parsePlanetLabelStudyMode(window.location.search);
 const skyFrameLaunch = parseSkyFrameStudyLaunch(window.location.search);
+const constellationStudyLaunch = parseConstellationStudyLaunch(window.location.search);
 planetLabelStudyControls.hidden = !(xrDiagnostics.enabled || queryPlanetLabelStudyMode !== 'baseline');
 planetLabelStudyModeSelect.value = queryPlanetLabelStudyMode;
 planetLabelScaleSelect.value = parsePlanetLabelScale(new URLSearchParams(window.location.search).get('labelScale'));
 skyFrameStudyControls.hidden = !(xrDiagnostics.enabled || skyFrameLaunch.explicitlyRequested);
 skyFrameStudyModeSelect.value = skyFrameLaunch.mode;
+constellationStudyControls.hidden = !constellationStudyLaunch.enabled;
+showConstellationsInput.checked = constellationStudyLaunch.masterVisible;
+showConstellationEndpointsInput.checked = constellationStudyLaunch.showEndpointMarkers;
+for (const identifier of FIRST_CONSTELLATION_IDENTIFIERS) {
+  constellationVisibilityInputs[identifier].checked = constellationStudyLaunch.enabledConstellations.has(identifier);
+}
 geoStudyControls.hidden = !(xrDiagnostics.enabled || queryStudyMode !== 'baseline');
 geoStudyModeSelect.value = queryStudyMode;
 const initialStudySettings = defaultObserverOffsetGeoStudySettings(queryStudyMode);
@@ -310,6 +340,9 @@ const realSkyOverlayGrid = createCelestialCoordinateGridGroup(
     renderOrder: 21,
   },
 );
+const firstConstellationLines = createFirstConstellationLineGroup(
+  (event, detail) => xrDiagnostics.record(event, detail),
+);
 const observerOffsetStudy = createObserverOffsetGeocentricStudyGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
 );
@@ -323,6 +356,7 @@ const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
   observerOffsetStudy.group,
 );
 geocentricCelestialStructure.add(realSkyOverlayGrid.group);
+geocentricCelestialStructure.add(firstConstellationLines.group);
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 const solarSystemBodies = createSolarSystemBodiesGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
@@ -391,6 +425,7 @@ function applyDiagnosticObjectIsolation(): void {
   if (!xrDiagnostics.enabled) {
     enforceEarthCoreToggle();
     solarSystemBodies.enforceVisibilityControls();
+    firstConstellationLines.enforceVisibilityControls();
     return;
   }
   // Controller feedback objects are added only after XR session activation;
@@ -401,6 +436,7 @@ function applyDiagnosticObjectIsolation(): void {
   enforceEarthCoreToggle();
   // Diagnostics may isolate descendants, but explicit body/label controls remain authoritative.
   solarSystemBodies.enforceVisibilityControls();
+  firstConstellationLines.enforceVisibilityControls();
   if (signature === diagnosticIsolationSignature) return;
   diagnosticIsolationSignature = signature;
   xrDiagnostics.record('object-isolation.state', [
@@ -510,6 +546,17 @@ function currentGridDisplaySettings(): CelestialCoordinateGridDisplaySettings {
 
 function currentSkyFrameStudyMode(): SkyFrameStudyMode {
   return parseSkyFrameStudyLaunch(`?skyFrameStudy=${skyFrameStudyModeSelect.value}`).mode;
+}
+
+function currentConstellationDisplaySettings() {
+  return Object.freeze({
+    studyEnabled: constellationStudyLaunch.enabled,
+    masterVisible: showConstellationsInput.checked,
+    enabledConstellations: new Set(FIRST_CONSTELLATION_IDENTIFIERS.filter(
+      (identifier) => constellationVisibilityInputs[identifier].checked,
+    )),
+    showEndpointMarkers: showConstellationEndpointsInput.checked,
+  });
 }
 
 function currentStudyDisplaySettings(): ObserverOffsetGeoStudySettings {
@@ -622,6 +669,7 @@ function renderCelestialAxis(): void {
     eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),
     `Celestial grid: ${celestialCoordinateGrid.group.userData.activeLineCount ?? 0} active lines; longitude reference ${celestialCoordinateGrid.group.userData.longitudeReference ?? 'not-ready'}`,
     `Sky-frame study: ${currentSkyFrameStudyMode()}; catalog EQJ bridge and mean-of-date grid phase remain query-gated`,
+    `Constellation study: ${constellationStudyLaunch.enabled ? 'first-set enabled' : 'off'}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; live renderer counts are reported in the study diagnostics`,
     `Observer-offset study: ${currentStudyDisplaySettings().mode}; ${selectedObserverOffsetGeoStudyComponents(currentStudyDisplaySettings()).join(', ') || 'baseline only'}`,
     `Earth Core toggle ${showEarthCoreInput.checked ? 'ON' : 'OFF'}; selected representation ${selectedEarthCorePresentation()}; configured proxy distance ${finiteCoreExperimentDistanceMeters().toFixed(1)} m`,
     `Configured observer ${observerLatitudeInput.value}°, ${observerLongitudeInput.value}° east-positive, ${observerElevationInput.value} m MSL (${observerLocationEntry === 'development-default' ? 'development defaults' : 'user-edited this session'}; no persistence)`,
@@ -643,6 +691,7 @@ function renderCelestialAxis(): void {
     celestialEquator.clear();
     celestialCoordinateGrid.clear();
     realSkyOverlayGrid.clear();
+    firstConstellationLines.clear('scientific state not ready');
     currentRealSkyOrientation = undefined;
     observerOffsetStudy.clear();
     finiteCoreParallaxExperiment.clear('scientific state not ready');
@@ -694,6 +743,19 @@ function renderCelestialAxis(): void {
   currentRealSkyOrientation = realSkyOrientation.kind === 'ready'
     ? realSkyOrientation
     : undefined;
+  if (constellationStudyLaunch.enabled && realSkyOrientation.kind === 'ready') {
+    firstConstellationLines.update({
+      structure: geocentricPresentation,
+      orientationRows: constellationStudyLaunch.frame === 'canonical-eqj'
+        ? CANONICAL_EQJ_ROWS
+        : realSkyOrientation.eqjToApplicationRows,
+      settings: currentConstellationDisplaySettings(),
+    });
+  } else {
+    firstConstellationLines.clear(
+      constellationStudyLaunch.enabled ? 'real-sky orientation not ready' : 'study query absent',
+    );
+  }
   if (skyMode === 'real-sky') {
     if (orientationReady) {
       celestialCoordinateGrid.update(gridModel, gridSettings, {
@@ -765,6 +827,26 @@ function renderCelestialAxis(): void {
     skyFrameStudyDiagnostics.replaceChildren(Object.assign(document.createElement('li'), {
       textContent: `Real-sky orientation locally suppressed: ${reason}`,
     }));
+  }
+  if (constellationStudyLaunch.enabled) {
+    const lineDiagnostics = firstConstellationLines.getDiagnostics();
+    const isolatedSegment = firstConstellationLines.group
+      .getObjectByName('constellation-ori-segment-04')?.userData.segment;
+    constellationStudyDiagnostics.replaceChildren(...[
+      `First set ${showConstellationsInput.checked ? 'ON' : 'OFF'}; frame ${constellationStudyLaunch.frame}; enabled ${FIRST_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).join(', ') || 'none'}`,
+      `Dataset ${lineDiagnostics.datasetVersion}; source ${FIRST_CONSTELLATION_DATASET_METADATA.starCoordinateSource}; license ${FIRST_CONSTELLATION_DATASET_METADATA.license}`,
+      `Frame ${FIRST_CONSTELLATION_DATASET_METADATA.catalogFrame}; epoch ${FIRST_CONSTELLATION_DATASET_METADATA.catalogEpoch}; proper motion ${FIRST_CONSTELLATION_DATASET_METADATA.properMotionPolicy}`,
+      `Stars ${lineDiagnostics.starCount}; constellations ${lineDiagnostics.constellationCount}; segments ${lineDiagnostics.segmentCount}; generated vertices ${lineDiagnostics.vertexCount}`,
+      `Maximum angular step 1.5 deg; active lines ${lineDiagnostics.activeDrawCount}; geometry builds ${lineDiagnostics.geometryBuildCount}; orientation updates ${lineDiagnostics.orientationUpdateCount}`,
+      `Per-eye shared mutation ${lineDiagnostics.perEyeMutation}; endpoints ${showConstellationEndpointsInput.checked ? 'shown' : 'hidden'}`,
+      `Submitted callback objects ${lineDiagnostics.submittedObjectNames.join(', ') || 'none observed yet'}; suppressed ${lineDiagnostics.suppressedObjectNames.join(', ') || 'none'}`,
+      isolatedSegment
+        ? `Diagnostic segment ${isolatedSegment.startStar.displayName} to ${isolatedSegment.endStar.displayName}; angle ${isolatedSegment.angularSeparationDegrees.toFixed(4)} deg; samples ${isolatedSegment.intervalCount + 1}; max adjacent ${isolatedSegment.maximumAdjacentAngularSeparationDegrees.toFixed(4)} deg; minor arc ${isolatedSegment.minorArc}`
+        : 'Diagnostic segment unavailable',
+      `Build ${buildIdentifier}`,
+    ].map((line) => Object.assign(document.createElement('li'), { textContent: line })));
+  } else {
+    constellationStudyDiagnostics.replaceChildren();
   }
   const observerOffsetContract = createObserverOffsetGeocentricPresentation(geocentricPresentation);
   if (observerOffsetContract.kind === 'not-ready') {
@@ -1223,6 +1305,9 @@ useCurrentTimeButton.addEventListener('click', () => {
   showCelestialGridInput,
   showDeclinationGridInput,
   showRightAscensionGridInput,
+  showConstellationsInput,
+  showConstellationEndpointsInput,
+  ...Object.values(constellationVisibilityInputs),
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
   showPlanetLabelsInput,
@@ -1255,6 +1340,29 @@ skyFrameStudyModeSelect.addEventListener('change', () => {
   url.searchParams.set('skyFrameStudy', mode);
   window.history.replaceState({}, '', url);
   renderCelestialAxis();
+});
+
+showConstellationsInput.addEventListener('change', () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set('showConstellations', showConstellationsInput.checked ? '1' : '0');
+  window.history.replaceState({}, '', url);
+});
+
+for (const input of Object.values(constellationVisibilityInputs)) {
+  input.addEventListener('change', () => {
+    const enabled = FIRST_CONSTELLATION_IDENTIFIERS.filter(
+      (identifier) => constellationVisibilityInputs[identifier].checked,
+    );
+    const url = new URL(window.location.href);
+    url.searchParams.set('constellations', enabled.join(','));
+    window.history.replaceState({}, '', url);
+  });
+}
+
+showConstellationEndpointsInput.addEventListener('change', () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set('constellationEndpoints', showConstellationEndpointsInput.checked ? '1' : '0');
+  window.history.replaceState({}, '', url);
 });
 
 geoStudyModeSelect.addEventListener('change', () => {
@@ -1315,6 +1423,7 @@ function applyEyePresentationForFrame(frame?: XRFrame): void {
   celestialEquator.applyEyePresentationViews(views, renderer.xr.isPresenting);
   celestialCoordinateGrid.applyEyePresentationViews(views, renderer.xr.isPresenting);
   realSkyOverlayGrid.applyEyePresentationViews(views, renderer.xr.isPresenting);
+  firstConstellationLines.applyEyePresentationViews(views, renderer.xr.isPresenting);
   localHorizon.applyEyePresentationViews(views, renderer.xr.isPresenting);
   updateEyePresentationStatus();
 }
@@ -1381,6 +1490,7 @@ window.addEventListener('pagehide', () => {
   celestialEquator.dispose();
   celestialCoordinateGrid.dispose();
   realSkyOverlayGrid.dispose();
+  firstConstellationLines.dispose();
   finiteCoreParallaxExperiment.dispose();
   localHorizon.dispose();
   solarSystemBodies.dispose();

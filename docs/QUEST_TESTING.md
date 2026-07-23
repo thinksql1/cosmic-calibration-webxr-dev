@@ -298,7 +298,7 @@ astronomical distance; XL/XXL overlap is intentional test evidence, not a collis
 The completed physical comparison selected Medium. Retain the other presets as bounded diagnostics
 and do not infer constellation-label readiness from this procedure.
 
-## Query-gated real-sky equatorial orientation — pending
+## Query-gated real-sky equatorial orientation — accepted reported foundation scope
 
 Use a fresh private Quest Browser session and exact cache-busted development URL. Confirm the
 visible build SHA, Swartz Creek defaults, and Medium planet-label default; enter XR and calibrate
@@ -319,9 +319,40 @@ north once. Compare `skyFrameStudy=canonical`, `real-sky`, and diagnostic `overl
 8. Confirm planet labels, finite Earth core, poles, horizon, bodies, Sun path, and parked spindle
    remain unchanged.
 
-This is a physical gate for the catalog-coordinate foundation. Do not begin constellation lines
-or labels until it passes. See
+**Reported physical result: PASS as the catalog-coordinate foundation.** Grid geometry remained
+complete, pole convergence appeared correct, no obvious east/west mirror or north/south inversion
+was seen, planets appeared naturally situated, stereo/world locking appeared sound, and no
+blocking callback or incomplete-frame failure was observed. This does not infer every numerical
+subcheck, promote real-sky mode to the ordinary default, or approve constellation labels. See
 [Real-Sky Equatorial Orientation](REAL_SKY_EQUATORIAL_ORIENTATION.md).
+
+## Query-gated first constellation line layer - pending
+
+Use `constellationStudy=first-set&showConstellations=1` in a fresh private Quest Browser session.
+Confirm the exact cache-busted build SHA, Swartz Creek defaults, Medium planet labels, and one
+north calibration.
+
+1. Isolate Orion and confirm its belt/body shape is recognizable and every segment is smooth.
+2. Move the head slowly; confirm world locking and fixed endpoints in both eyes independently.
+3. Isolate Ursa Major and confirm the Big Dipper pattern.
+4. Isolate Cassiopeia and confirm the W-like form.
+5. Inspect Cygnus, Taurus, Leo, and Scorpius independently.
+6. Enable all seven and confirm they remain distinguishable from the celestial grid and naturally
+   placed with planets.
+7. Compare two fixed `skyTime` values. Shapes and topology must remain rigid while the shared sky
+   orientation changes.
+8. Use endpoint and one-segment sampling diagnostics; reject detached endpoints, ripples,
+   reversals, snakes, or deformation.
+9. Compare Orion with the existing Sun path only to detect shared visual wobble. Do not treat this
+   as authorization to repair the Sun path.
+10. Turn the master OFF and confirm zero constellation lines remain while all other layers stay
+    unchanged.
+11. Confirm no stereo separation, callback error, incomplete frame, duplicate object, or resource
+    growth after repeated toggling.
+
+If the first set passes, catalog expansion or a separately gated constellation-label study may be
+considered. Do not do either before this gate. See
+[First Constellation Line Layer](FIRST_CONSTELLATION_LINE_LAYER.md).
 
 ## Milestone 2F 24-hour Sun path and live celestial updates (pending)
 

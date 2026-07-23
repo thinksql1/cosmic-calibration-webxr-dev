@@ -496,7 +496,7 @@
 
 ### DEC-038: Use provider-native EQJ catalog conversion and EQD phase for the real-sky grid study
 - **Date:** 2026-07-22
-- **Status:** Accepted for query-gated development study; physical Quest validation pending
+- **Status:** Accepted as the constellation-coordinate foundation by physical Quest evidence
 - **Owner:** Darrell Wright / project control
 - **Decision:** Convert catalog J2000 RA/declination through Astronomy Engine `Rotation_EQJ_HOR`
   into geometric `HORIZONTAL_ENU`. Orient the already validated mean-date grid with
@@ -509,6 +509,22 @@
   convergence. The two explicit provider frames preserve each contract without double-applying
   UTC, longitude, sidereal phase, or calibration yaw. A shader-side rotation about the encoded core
   retains immutable homogeneous grid geometry and native stereo projection.
+
+### DEC-039: Use a public-domain J2000 subset and immutable minor arcs for the first constellation figures
+- **Date:** 2026-07-22
+- **Status:** Accepted for development-only physical Quest validation
+- **Owner:** Darrell Wright / project control
+- **Decision:** Store a versioned 43-star subset of NASA HEASARC BSC5P J2000 coordinates and a
+  small original project connectivity set for Orion, Ursa Major, Cassiopeia, Cygnus, Taurus, Leo,
+  and Scorpius. Describe the connections as conventional Western stick figures, not IAU-standard
+  figures. Render each of 40 segments as one immutable open minor-great-circle arc sampled at no
+  more than `1.5 degrees`, with a 120-interval cap. Apply only the accepted shared EQJ real-sky
+  orientation and geographic-parent calibration. Keep the feature query-gated, master-OFF by
+  default, label-free, locally suppressible, and physically unaccepted until Quest review.
+- **Rationale:** BSC5P provides legally clear public-domain catalog truth without a large package.
+  Project-authored connectivity avoids importing an ambiguously licensed sky-culture blob. Static
+  spherical interpolation and the validated grid shader contract preserve shape, endpoint truth,
+  stereo ownership, and world locking without copying the visually wobbly Sun-path renderer.
 
 ## Proposed decisions awaiting review
 
