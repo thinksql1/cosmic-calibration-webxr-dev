@@ -2,7 +2,10 @@
 
 ## Status
 
-**Status: development-only query-gated study; automated and desktop validation complete; physical Quest validation pending.**
+**Status: deployed development-only query-gated study; automated and desktop validation complete; physical Quest validation pending.**
+
+Feature `3d6af53` was normally merged as `92ccdb0` and deployed by successful development
+Actions/Pages run `29974413436`. The deployment is test evidence, not physical Quest acceptance.
 
 The layer adds conventional stick figures for Orion, Ursa Major, Cassiopeia, Cygnus, Taurus,
 Leo, and Scorpius. It does not add constellation labels, IAU boundaries, a star field, or all 88

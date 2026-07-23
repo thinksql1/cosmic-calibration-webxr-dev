@@ -1,6 +1,6 @@
 # Project State
 
-## First constellation line layer (local development study)
+## First constellation line layer (deployed development study)
 
 `feature/first-constellation-lines` adds a query-gated first set of Orion, Ursa Major,
 Cassiopeia, Cygnus, Taurus, Leo, and Scorpius. The 43-star J2000 coordinate subset comes from the
@@ -16,8 +16,10 @@ updated outside eye callbacks, and native XR cameras project the same geometry i
 The normal URL and controls remain unchanged unless `constellationStudy=first-set` is explicit;
 the query-gated master defaults OFF and all seven individual selections default enabled. Automated
 validation currently passes `552/552` tests across `61` files, type-check, and production build.
-Physical Quest validation of line recognizability, smoothness, world locking, and stereo stability
-remains pending. Constellation labels and catalog expansion remain deferred.
+Feature `3d6af53` was normally merged into development as `92ccdb0`; clean merged validation
+passed, and Actions/Pages run `29974413436` deployed the merge successfully. Physical Quest
+validation of line recognizability, smoothness, world locking, and stereo stability remains
+pending. Constellation labels and catalog expansion remain deferred.
 
 The existing Sun path was reported visually wobbly during the real-sky Quest review. That issue is
 known and non-blocking; this feature does not change the Sun path. A diagnostic comparison exists

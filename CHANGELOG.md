@@ -14,6 +14,11 @@
   minor-great-circle arcs at no more than `1.5 degrees` per sample interval. The layer consumes
   the accepted EQJ bridge, reuses the grid-style bounded homogeneous XR contract, defaults OFF,
   adds independent controls/diagnostic isolation, and adds no labels or new astronomy dependency.
+- Normally merged feature `3d6af53` into development as `92ccdb0` and deployed it through
+  successful Actions/Pages run `29974413436`. Clean merged validation passed `552/552` tests
+  across `61` files, type-check, production build, zero-vulnerability dependency audit, dependency
+  tree and diff checks, plus desktop query/control verification. This remains development-only
+  hosted evidence; physical Quest validation is pending.
 - Recorded the reported non-blocking Sun-path visual wobble as a separate deferred issue. This
   feature does not change the Sun path; a read-only comparison isolation helps ensure the new
   constellation arcs do not reproduce it.
