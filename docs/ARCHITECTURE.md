@@ -110,6 +110,14 @@ with civil-hour notches. Celestial overlays use bounded projective or camera-rel
 layer-local linear non-writing depth behavior, explicit eye presentation modes where applicable,
 and owned clear/dispose lifecycle contracts.
 
+The physically accepted real-sky bridge uses Astronomy Engine `2.1.19` to map catalog EQJ J2000
+directions into geometric local horizontal ENU at the shared UTC/observer state. Calibration yaw
+remains exclusively on the geographic parent. The query-gated first constellation layer consumes
+that same matrix for a 43-star NASA BSC5P subset and 40 immutable minor-great-circle segments.
+Canonical EQJ unit buffers, one bounded homogeneous Earth-core anchor, and one shared orientation
+uniform are projected independently by native XR eye cameras. No constellation layer owns a clock,
+observer, sidereal formula, camera transform, label, or mutable per-eye geometry.
+
 ## Desktop simulation and UI
 
 `src/main.ts` maps calibration state to the panel, buttons, geographic group, and controller rays. Desktop simulation converts a clockwise bearing—`0°` north, `90°` east, `180°` south, `270°` west—to a horizontal vector and calls the same state/math functions used by physical capture. It contains no separate yaw logic.
@@ -135,6 +143,8 @@ Calibration is deliberately in memory only. Session exit, reload, room change, b
   Uranus, Neptune, and Pluto state service. Sun/Moon remain separate categories; Pluto is a dwarf
   planet. Planet/Pluto labels reuse each marker's projective apparent direction and remain
   independently controlled.
+- `src/science/constellations/`: versioned public-domain BSC5P first-set catalog records,
+  project-authored conventional connectivity, validation, and bounded minor-great-circle sampling.
 - `src/science/temporal/` and `src/temporal/`: IANA civil-day/DST resolution, Sun daily-path service, civil-hour metadata, and central-clock live refresh scheduling.
 - `src/calibration/math.ts` and `src/calibration/state.ts`: pure projection/signed-yaw logic and calibration records.
 - `src/xr/state.ts` and `src/xr/controllerCalibration.ts`: capability detection, owned immersive-session lifecycle, target-ray visualization, and native select capture.
@@ -143,7 +153,9 @@ Calibration is deliberately in memory only. Session exit, reload, room change, b
 ## Deferred architecture
 
 Persistence, automatic geolocation, automatic heading, magnetic correction, broad user-programmable
-time controls, rendered civil-hour text labels, spatial anchors, hit testing, hand tracking, stars,
-precession trajectories, ecliptic/annual paths, additional body paths or phases, and experiential
-layers remain deferred. The published astronomy, celestial-rendering, civil-time/DST, provenance,
-warning/error, and live-refresh systems are not deferred.
+time controls, rendered civil-hour text labels, spatial anchors, hit testing, hand tracking, a full
+starfield, constellation labels or catalog expansion, precession trajectories, ecliptic/annual
+paths, additional body paths or phases, and experiential layers remain deferred. The published
+astronomy, celestial-rendering, civil-time/DST, provenance, warning/error, and live-refresh systems
+are not deferred. The first seven-figure constellation line study is local development work
+pending physical Quest validation, not part of the protected published baseline.

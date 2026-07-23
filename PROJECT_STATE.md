@@ -1,6 +1,29 @@
 # Project State
 
-## Real-sky equatorial orientation bridge (local development study)
+## First constellation line layer (local development study)
+
+`feature/first-constellation-lines` adds a query-gated first set of Orion, Ursa Major,
+Cassiopeia, Cygnus, Taurus, Leo, and Scorpius. The 43-star J2000 coordinate subset comes from the
+public-domain NASA HEASARC BSC5P catalog; the 40-segment conventional Western connectivity is a
+small project-authored versioned selection, not an IAU boundary or standardized IAU figure.
+Each open segment is one immutable sampled minor-great-circle arc with a maximum `1.5 degree`
+interval and a 120-interval safety cap.
+
+The layer consumes the physically accepted `EQJ -> HORIZONTAL_ENU` bridge and the existing
+geographic calibration parent exactly once. Its shader follows the celestial-grid bounded
+homogeneous contract: canonical unit buffers remain immutable, one shared orientation matrix is
+updated outside eye callbacks, and native XR cameras project the same geometry independently.
+The normal URL and controls remain unchanged unless `constellationStudy=first-set` is explicit;
+the query-gated master defaults OFF and all seven individual selections default enabled. Automated
+validation currently passes `552/552` tests across `61` files, type-check, and production build.
+Physical Quest validation of line recognizability, smoothness, world locking, and stereo stability
+remains pending. Constellation labels and catalog expansion remain deferred.
+
+The existing Sun path was reported visually wobbly during the real-sky Quest review. That issue is
+known and non-blocking; this feature does not change the Sun path. A diagnostic comparison exists
+only to detect whether constellation lines reproduce the observation.
+
+## Real-sky equatorial orientation bridge (development foundation accepted on Quest)
 
 `feature/real-sky-equatorial-orientation` adds a query-gated, provider-native bridge from catalog
 J2000 RA/declination to geometric local `HORIZONTAL_ENU` at the central-clock UTC and validated
@@ -14,13 +37,16 @@ The catalog bridge uses EQJ J2000. The existing mean-date grid uses the provider
 phase so its NCP/SCP convergence remains exactly aligned with the validated pole markers; raw J2000
 `+Z` and the current mean-date pole are not falsely conflated. The rigid grid is geometric and
 non-refracted. Airless topocentric EQD cross-checks cover Sun, Moon, Mercury, Jupiter, and Uranus
-without changing any body direction. Focused and complete validation currently pass `531/531`
+without changing any body direction. Focused and complete validation passed `531/531`
 tests across `56` files, type-check, production build, dependency audit/tree, and diff checks.
 Desktop fixed-time verification confirms a stationary pole, sidereal RA rotation, the intentional
 32-line canonical/real-sky overlay, zero grid/pole error, and no callback errors. Feature
 `2e257db` was normally merged into development as `ccf37fd`; clean merged validation passed, and
-Actions/Pages run `29969698393` deployed the merge successfully. Physical Quest validation remains
-pending, the canonical grid remains the ordinary default, and constellations remain deferred.
+Actions/Pages run `29969698393` deployed the merge successfully. Physical Quest review found the
+grid complete, pole convergence credible, no obvious east/west mirror or north/south inversion,
+natural planet placement, sound world locking/stereo behavior, and no blocking callback or
+incomplete-frame error. The bridge is accepted as the constellation-coordinate foundation; the
+canonical grid remains available and is still the ordinary default.
 
 The latest user-reported Quest result accepts the native Sprite planet-label contract and Medium
 as the preferred preset: `2.24 × 0.56 m` at the unchanged `24 m` presentation distance. Attachment,
@@ -668,7 +694,8 @@ recorded below without inferring the unreported detailed checklist cases.
 
 ## Current decision horizon
 
-Physically validate the query-gated real-sky equatorial orientation bridge on Quest. Compare the
-canonical, real-sky, and overlay modes at deterministic UTC instants; verify poles, horizon,
-compass, body alignment, both eyes, and single-application calibration. Record only observed
-results. Do not begin constellation lines or labels until this gate passes.
+Physically validate the seven query-gated first-set constellation line figures on Quest. Inspect
+each figure and the combined set for recognizability, correct real-sky placement, smooth immutable
+great-circle sampling, rigid time response, world locking, and independent eye coherence. Record
+only observed results. Do not expand the catalog, add constellation labels, or repair the separate
+Sun-path wobble until this gate passes.

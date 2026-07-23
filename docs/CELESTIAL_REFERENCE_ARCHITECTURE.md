@@ -19,6 +19,13 @@ feature documents. This document defines frames, scientific ownership, transform
 axis/pole/equator models, precision tiers, display layers, and invalidation; it is not the current
 implementation-status authority.
 
+The development repository additionally contains a physically accepted, query-gated real-sky
+EQJ/EQD orientation bridge and a local first-set constellation-line study. The latter uses a
+public-domain 43-star BSC5P J2000 subset and 40 immutable great-circle segments for seven
+conventional figures; it remains pending physical Quest acceptance and does not add labels or a
+general star catalog. See [Real-Sky Equatorial Orientation](REAL_SKY_EQUATORIAL_ORIENTATION.md)
+and [First Constellation Line Layer](FIRST_CONSTELLATION_LINE_LAYER.md).
+
 External model and platform facts trace to the [official astronomy source
 register](OFFICIAL_ASTRONOMY_SOURCES.md). Recommendations and unresolved assumptions are labelled
 separately near the end of this document.
@@ -640,7 +647,7 @@ published/local status declared at the top of this document.
   horizon; apparent Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, and Pluto; central clock;
   IANA/DST-aware civil-day handling; daily Sun path; civil-hour notches; provenance; structured
   warnings/errors; and live refresh.
-- **Genuinely deferred:** geolocation; ecliptic and annual paths; labels/object identification;
-  Moon phase/orientation and lunar temporal paths; planetary trails; Uranus/Neptune/Pluto; stars
-  and constellations; broad accelerated/reverse/historical time controls; full-cycle precession;
+- **Genuinely deferred:** geolocation; ecliptic and annual paths; constellation labels and catalog
+  expansion; Moon phase/orientation and lunar temporal paths; planetary trails; a full starfield;
+  broad accelerated/reverse/historical time controls; full-cycle precession;
   nutation detail, EOP, polar motion; persistence; and contemplative sequencing.

@@ -1,13 +1,17 @@
 # Real-Sky Equatorial Orientation
 
 Development deployment: feature `2e257db`, normal merge `ccf37fd`, successful Actions/Pages run
-`29969698393`. The hosted study remains query-gated pending physical Quest acceptance.
+`29969698393`. The hosted study remains query-gated; its coordinate behavior has now passed the
+reported physical Quest foundation gate.
 
 ## Status
 
-**Development-only query-gated study; automated validation passed; physical Quest validation
-pending.** The ordinary development URL retains the previously validated canonical non-sidereal
-grid. No constellation geometry or label policy is included.
+**Development-only query-gated study; automated and reported physical Quest foundation validation
+passed.** Quest review found complete grid geometry, credible pole convergence, no obvious
+east/west mirror or north/south inversion, natural planet placement, sound world locking/stereo,
+and no blocking callback or incomplete-frame failure. The ordinary development URL retains the
+canonical non-sidereal grid. The bridge is accepted for catalog-coordinate consumers; it does not
+itself define constellation connectivity or a label policy.
 
 ## Provider audit
 
@@ -130,10 +134,11 @@ that local sky aligns to the physical room and owns accepted calibration yaw. Lo
 sidereal phase, azimuth conversion, and calibration yaw are each applied once. Headset yaw is
 never astronomical time.
 
-## Quest acceptance gate
+## Quest acceptance record
 
-Use a fresh private Quest Browser session, exact cache-busted URL, visible build SHA, Swartz Creek
-defaults, and one north calibration. Compare canonical, real-sky, and overlay modes; verify poles,
-east/west equator crossings, body agreement, time response, latitude/longitude response, both
-eyes, world locking, and absence of callback/incomplete-frame errors. Keep canonical mode until
-this physical gate passes. Constellation lines remain deferred until then.
+Physical review reported a complete stable grid, credible pole convergence, no obvious axis
+mirroring or inversion, natural planet placement, coherent stereo/world locking, and no blocking
+callback/incomplete-frame failure. That evidence accepts this bridge as the coordinate foundation
+for the query-gated first constellation-line study. It does not validate every numerical
+diagnostic, promote the real-sky grid to the ordinary default, or approve constellation labels.
+See [First Constellation Line Layer](FIRST_CONSTELLATION_LINE_LAYER.md).

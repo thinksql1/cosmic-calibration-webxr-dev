@@ -119,7 +119,7 @@ ambient `new Date()` loop, or independently interpreted civil time.
 | Validated long-term precession trajectory | Planned; research required | Sample one adopted long-term model with declared date domain; preserve pole antipodes and disclose that a rendered path is not an observed instantaneous pole | Current physical acceptance; dedicated model/fixture decision; projective-rendering and Quest review |
 | Ecliptic | Planned | One explicitly named mean or true ecliptic great circle, distinct from the P03 celestial equator | Independently validated obliquity/frame fixtures; separate model provenance and visibility gate |
 | Earth geographic, observer-horizontal, celestial-equatorial, and ecliptic grids | Exploratory | Each grid names its center, plane, basis, epoch, and display scale. A local horizon grid is not a celestial grid | Individual frame/scale/label-density reviews; do not introduce a generic grid bundle by default |
-| Stars and constellations | Exploratory; research required | Catalog/provider, epoch, proper-motion policy, magnitude/visibility policy, and constellation-culture source are explicit | Batched/LOD performance design, label-density controls, source licensing, Quest contrast and comfort evidence |
+| Stars and constellations | Seven-figure development line study implemented; physical Quest acceptance pending; expansion deferred | First set uses public-domain BSC5P J2000 coordinates, fixed-J2000 proper-motion policy, and project-authored conventional connectivity; no labels or starfield | First-set Quest contrast/stereo/smoothness gate before catalog expansion; label scale/decluttering and batched/LOD starfield remain separate reviews |
 
 ### 2. Solar, lunar, and planetary layers
 

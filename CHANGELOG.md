@@ -4,6 +4,20 @@
 
 ### Added
 
+- Recorded physical Quest acceptance of the query-gated real-sky orientation bridge as the
+  constellation-coordinate foundation: complete grid geometry, credible pole convergence, no
+  obvious mirror/inversion, natural planet placement, sound stereo/world locking, and no blocking
+  callback or incomplete-frame failure. The canonical grid remains available.
+- Added the query-gated seven-figure first constellation line study: Orion, Ursa Major,
+  Cassiopeia, Cygnus, Taurus, Leo, and Scorpius. A versioned 43-star public-domain NASA HEASARC
+  BSC5P J2000 subset and project-authored conventional 40-segment connectivity feed immutable
+  minor-great-circle arcs at no more than `1.5 degrees` per sample interval. The layer consumes
+  the accepted EQJ bridge, reuses the grid-style bounded homogeneous XR contract, defaults OFF,
+  adds independent controls/diagnostic isolation, and adds no labels or new astronomy dependency.
+- Recorded the reported non-blocking Sun-path visual wobble as a separate deferred issue. This
+  feature does not change the Sun path; a read-only comparison isolation helps ensure the new
+  constellation arcs do not reproduce it.
+
 - Added a query-gated real-sky equatorial orientation study using installed Astronomy Engine
   `2.1.19`: catalog J2000 RA/declination follows `EQJ -> HOR`, while the existing mean-date grid
   takes provider-native `EQD -> HOR` sidereal phase to preserve exact pole-marker convergence.

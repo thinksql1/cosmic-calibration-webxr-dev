@@ -48,5 +48,7 @@ The default-hidden master **Celestial coordinate grid** switch controls the feat
 
 ## Deferred
 
-Constellations, constellation labels, star catalogues, ecliptic, and trajectory rendering are not
-included. Real-sky orientation remains query-gated pending physical Quest validation.
+The coordinate-grid feature itself does not include constellation data. The later real-sky bridge
+has passed its reported Quest foundation gate, and a separate query-gated seven-figure
+constellation-line study now consumes it. Constellation labels, a full star catalog/field, catalog
+expansion, ecliptic, and trajectory rendering remain deferred pending their own gates.
