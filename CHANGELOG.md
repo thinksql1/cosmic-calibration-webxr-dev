@@ -4,6 +4,21 @@
 
 ### Added
 
+- Added the query-gated Lunar Phase Transit Path: one apparent-topocentric EQJ track from previous
+  New Moon through next New Moon, authoritative arbitrary-angle phase events, 60-minute sampling,
+  bounded one-degree minor-arc subdivision, visible and Earth-hidden portions, eight event notches,
+  and a continuous current transit marker. It remains distinct from the Moon Daily Path and compact
+  symbolic phase dial.
+- Repaired compact-dial and transit phase billboard transforms with independent identity-scale
+  anchors. Procedural Moon faces remain square and cached; labels no longer share or mutate image
+  transforms. Phase labels now use measured dynamic-width `256 px` textures and dedicated
+  Small/Medium/Large/XL presets with Medium default.
+- Focused and full automated validation passes `571/571` tests across `71` files. Desktop
+  fixed-lunation verification confirms eight chronological provider events, bounded complete-path
+  sampling, exact notch alignment, continuous sub-degree current-path alignment, full hidden-path
+  retention, dynamic label aspect, and clean square Sprite anchors. Quest acceptance remains
+  pending.
+
 - Recorded physical Quest acceptance of all seven first-set constellation figures: recognizable,
   smooth, world-locked, and stereo-stable. The failed Sun/Orion URL is an independent Sun-path
   exception-containment defect, not a constellation failure.

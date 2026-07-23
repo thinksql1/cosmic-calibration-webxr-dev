@@ -1,5 +1,14 @@
 # Quest 3 Manual Acceptance Checklists
 
+## Lunar Phase Transit Path gate
+
+Use `moonStudy=phase-transit` in a fresh private session. Confirm the full silver-lavender track,
+including the dim Earth-hidden half, remains complete and stable in each eye. Enable eight event
+notches, then images and labels. Verify the current marker lies between the correct previous/next
+events and moves continuously with deterministic time. Toggle labels repeatedly and confirm no
+Moon face tilts, flattens, stretches, or moves. Compare the accepted compact dial and separate
+Moon Daily Path. This feature is not physically accepted until these checks pass.
+
 Desktop success is not Quest success. Record each physical criterion as **PASS**, **FAIL**, **UNCERTAIN**, or **NOT RUN** with notes and evidence.
 
 ## Development finite-core parallax experiment — pending

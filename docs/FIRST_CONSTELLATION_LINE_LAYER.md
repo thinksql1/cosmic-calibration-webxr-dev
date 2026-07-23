@@ -2,7 +2,10 @@
 
 ## Status
 
-**Status: deployed development-only query-gated study; automated and desktop validation complete; physical Quest validation pending.**
+**Status: deployed development-only query-gated study; physical Quest rendering accepted.**
+
+Quest review found all seven figures recognizable, smooth, world-locked, and stereo-stable. The
+Lunar Phase Transit work does not alter constellation data, geometry, sampling, or rendering.
 
 Feature `3d6af53` was normally merged as `92ccdb0` and deployed by successful development
 Actions/Pages run `29974413436`. The deployment is test evidence, not physical Quest acceptance.

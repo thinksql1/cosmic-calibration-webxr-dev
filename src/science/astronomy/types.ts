@@ -222,6 +222,33 @@ export interface MoonPhaseProviderResult {
   readonly simulationInstant: SimulationInstant;
 }
 
+export interface MoonPhaseEventProviderResult {
+  readonly kind: 'VALID_MOON_PHASE_EVENT';
+  readonly targetPhaseLongitudeDeg: number;
+  readonly eventInstant: SimulationInstant;
+  readonly provider: string;
+  readonly providerVersion: string;
+}
+
+export interface ApparentTopocentricEqjDirectionResult {
+  readonly kind: 'VALID_APPARENT_TOPOCENTRIC_EQJ_DIRECTION';
+  readonly body: 'Moon';
+  readonly center: 'TOPOCENTRIC';
+  readonly frame: 'EQJ_J2000';
+  readonly coordinateClass: 'PROVIDER_APPARENT_TOPOCENTRIC';
+  readonly rightAscensionHours: number;
+  readonly declinationDeg: number;
+  readonly distanceAu: number;
+  readonly direction: CartesianUnitDirection<'EQJ_J2000'>;
+  readonly simulationInstant: SimulationInstant;
+  readonly observer: ValidatedObserver;
+  readonly provider: string;
+  readonly providerVersion: string;
+  readonly aberration: 'included';
+  readonly lightTime: 'included';
+  readonly topocentricParallax: 'included';
+}
+
 export interface TerrestrialTime {
   readonly inputScale: 'UTC';
   readonly outputScale: 'TT';

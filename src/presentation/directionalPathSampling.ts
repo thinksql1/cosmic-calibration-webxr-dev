@@ -12,6 +12,7 @@ export interface DirectionalPathRenderSample {
   readonly opacity: number;
   readonly aboveHorizon: boolean;
   readonly sourceSample: boolean;
+  readonly timestampMilliseconds?: number;
 }
 
 export interface DirectionalPathSamplingResult {
@@ -100,6 +101,8 @@ export function sampleOrderedDirectionalPath(
         opacity: previous.opacity + (current.opacity - previous.opacity) * t,
         aboveHorizon: step === intervals ? current.aboveHorizon : previous.aboveHorizon,
         sourceSample: step === intervals,
+        timestampMilliseconds: previous.timestampMilliseconds
+          + (current.timestampMilliseconds - previous.timestampMilliseconds) * t,
       }));
       if (samples.length > maximumRenderedSamples) {
         throw new Error('Directional path exceeds bounded rendered sample capacity.');

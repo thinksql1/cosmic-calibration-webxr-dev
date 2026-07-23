@@ -1,5 +1,32 @@
 # Project State
 
+## Lunar Phase Transit Path and clean Moon billboards (development feature)
+
+Physical Quest review accepted the compact `24 m` / `3.2 m` Moon phase dial, its procedural phase
+faces, and continuous phase indicator, while reporting occasional image flattening/tilt and small,
+compressed labels. The development feature keeps that accepted instrument and the separate Moon
+Daily Path intact, and adds a third query-gated layer: an apparent topocentric EQJ lunation track
+from previous New Moon through next New Moon.
+
+Astronomy Engine `2.1.19` supplies arbitrary `SearchMoonPhase` events at all eight canonical
+longitudes and apparent topocentric J2000 directions through `Equator(..., ofdate=false,
+aberration=true)`. Sixty-minute provider samples plus exact events are minor-arc subdivided to at
+most `1°`, retained below the current horizon, and transformed by one current real-sky orientation.
+The current transit marker interpolates continuously along that path; no sample uses its own
+historical/future horizontal frame. An expected inertial previous-New/next-New endpoint residual is
+measured, not hidden with a false closing segment.
+
+Compact-dial and transit Moon images now live under independent identity-scale billboard anchors,
+separate from label anchors and rotated line geometry. Images remain square; label toggles cannot
+change their matrices. Dynamic `256 px`-high label textures preserve measured text aspect ratios.
+Dedicated Small/Medium/Large/XL phase-label heights are `0.45/0.90/1.80/3.60 m`, with Medium
+default. Focused and complete automated validation passes `571/571` tests across `71` files,
+type-check, and production build. Desktop fixed-lunation diagnostics confirm eight ordered events,
+`712` provider/render vertices, `0.8124°` maximum spacing, equal above/hidden sample counts at the
+fixed test time, exact event-path alignment, `0.0006°` current path error, clean square image
+anchors, and dynamic label widths. Physical Quest validation and development deployment remain
+pending.
+
 ## Safe Sun path and query-gated Moon presentation (development feature)
 
 The seven first-set constellation figures have passed physical Quest review: all seven were

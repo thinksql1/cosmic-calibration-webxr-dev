@@ -26,6 +26,8 @@ import {
   createMoonPhaseStudyGroup,
   type MoonPhaseStudyDisplaySettings,
 } from './scene/createMoonPhaseStudyGroup';
+import { createLunarPhaseTransitGroup } from './scene/createLunarPhaseTransitGroup';
+import { createMoonPhaseTextureCache } from './scene/moonPhaseTextureCache';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
 import {
@@ -45,6 +47,7 @@ import { createScientificProviderRegistry } from './science/providers/scientific
 import { SolarSystemBodyStateService } from './science/bodies/solarSystemBodyState';
 import { SolarDailyPathService } from './science/temporal/solarDailyPath';
 import { MoonDailyPathService } from './science/temporal/moonDailyPath';
+import { LunarPhaseTransitService } from './science/moon/lunarPhaseTransit';
 import { createMoonPhaseState } from './science/moon/moonPhase';
 import { ScientificSnapshotService } from './science/snapshot/scientificSnapshotService';
 import { GeographicCalibrationStateAdapter } from './science/state/geographicCalibrationState';
@@ -75,6 +78,11 @@ import { parseConstellationStudyLaunch } from './presentation/constellationStudy
 import { parseMoonStudyLaunch } from './presentation/moonStudy';
 import { createMoonDailyPathPresentationModel } from './presentation/moonDailyPathPresentationModel';
 import { createMoonPhasePresentationModel } from './presentation/moonPhasePresentation';
+import {
+  createLunarPhaseTransitPresentation,
+  type LunarTransitPresentationSettings,
+} from './presentation/lunarPhaseTransitPresentation';
+import { parseMoonPhaseLabelPreset } from './presentation/moonPhaseLabels';
 import { FIRST_CONSTELLATION_IDENTIFIERS, type FirstConstellationIdentifier } from './science/constellations/firstConstellationCatalog';
 import { FIRST_CONSTELLATION_DATASET_METADATA } from './presentation/firstConstellationLinePresentation';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
@@ -198,12 +206,19 @@ const showConstellationEndpointsInput = requireElement<HTMLInputElement>('#show-
 const constellationStudyDiagnostics = requireElement<HTMLUListElement>('#constellation-study-diagnostics');
 const moonStudyControls = requireElement<HTMLDetailsElement>('#moon-study-controls');
 const showMoonPathInput = requireElement<HTMLInputElement>('#show-moon-path');
+const showLunarPhaseTransitPathInput = requireElement<HTMLInputElement>('#show-lunar-phase-transit-path');
+const showEarthHiddenLunarPathInput = requireElement<HTMLInputElement>('#show-earth-hidden-lunar-path');
+const showLunarPhaseNotchesInput = requireElement<HTMLInputElement>('#show-lunar-phase-notches');
+const showLunarTransitImagesInput = requireElement<HTMLInputElement>('#show-lunar-transit-images');
+const showLunarTransitLabelsInput = requireElement<HTMLInputElement>('#show-lunar-transit-labels');
+const showCurrentLunarTransitInput = requireElement<HTMLInputElement>('#show-current-lunar-transit');
 const showMoonPhaseDialInput = requireElement<HTMLInputElement>('#show-moon-phase-dial');
 const showMoonPhaseNotchesInput = requireElement<HTMLInputElement>('#show-moon-phase-notches');
 const showMoonPhaseLabelsInput = requireElement<HTMLInputElement>('#show-moon-phase-labels');
 const showMoonPhaseImagesInput = requireElement<HTMLInputElement>('#show-moon-phase-images');
 const showCurrentMoonAppearanceInput = requireElement<HTMLInputElement>('#show-current-moon-appearance');
 const showCurrentPhaseIndicatorInput = requireElement<HTMLInputElement>('#show-current-phase-indicator');
+const moonPhaseLabelSizeSelect = requireElement<HTMLSelectElement>('#moon-phase-label-size');
 const moonStudyDiagnostics = requireElement<HTMLUListElement>('#moon-study-diagnostics');
 const constellationVisibilityInputs: Readonly<Record<FirstConstellationIdentifier, HTMLInputElement>> = Object.freeze({
   ORI: requireElement<HTMLInputElement>('#show-constellation-ori'),
@@ -276,12 +291,21 @@ for (const identifier of FIRST_CONSTELLATION_IDENTIFIERS) {
 }
 moonStudyControls.hidden = !(xrDiagnostics.enabled || moonStudyLaunch.explicitlyRequested);
 showMoonPathInput.checked = moonStudyLaunch.showMoonPath;
+showLunarPhaseTransitPathInput.checked = moonStudyLaunch.showLunarPhaseTransitPath;
+showEarthHiddenLunarPathInput.checked = moonStudyLaunch.showEarthHiddenLunarPath;
+showLunarPhaseNotchesInput.checked = moonStudyLaunch.showLunarPhaseNotches;
+showLunarTransitImagesInput.checked = moonStudyLaunch.showLunarTransitImages;
+showLunarTransitLabelsInput.checked = moonStudyLaunch.showLunarTransitLabels;
+showCurrentLunarTransitInput.checked = moonStudyLaunch.showCurrentLunarTransit;
 showMoonPhaseDialInput.checked = moonStudyLaunch.showMoonPhaseDial;
 showMoonPhaseNotchesInput.checked = moonStudyLaunch.showMoonPhaseNotches;
 showMoonPhaseLabelsInput.checked = moonStudyLaunch.showMoonPhaseLabels;
 showMoonPhaseImagesInput.checked = moonStudyLaunch.showMoonPhaseImages;
 showCurrentMoonAppearanceInput.checked = moonStudyLaunch.showCurrentMoonAppearance;
 showCurrentPhaseIndicatorInput.checked = moonStudyLaunch.showCurrentPhaseIndicator;
+moonPhaseLabelSizeSelect.value = parseMoonPhaseLabelPreset(
+  new URLSearchParams(window.location.search).get('moonPhaseLabelSize'),
+);
 geoStudyControls.hidden = !(xrDiagnostics.enabled || queryStudyMode !== 'baseline');
 geoStudyModeSelect.value = queryStudyMode;
 const initialStudySettings = defaultObserverOffsetGeoStudySettings(queryStudyMode);
@@ -391,7 +415,9 @@ const solarSystemBodies = createSolarSystemBodiesGroup(
 );
 const solarDailyPath = createSolarDailyPathGroup();
 const moonDailyPath = createMoonDailyPathGroup();
-const moonPhaseStudy = createMoonPhaseStudyGroup();
+const moonPhaseTextureCache = createMoonPhaseTextureCache();
+const moonPhaseStudy = createMoonPhaseStudyGroup(undefined, moonPhaseTextureCache);
+const lunarPhaseTransit = createLunarPhaseTransitGroup(moonPhaseTextureCache);
 if (xrDiagnostics.enabled && diagnosticPreset.legacyAxisRoot) {
   geocentricCelestialStructure.remove(celestialAxis.group);
   geographicReference.add(geocentricCelestialStructure, celestialAxis.group);
@@ -406,6 +432,7 @@ geographicReference.add(solarSystemBodies.group);
 geographicReference.add(solarDailyPath.group);
 geographicReference.add(moonDailyPath.group);
 geographicReference.add(moonPhaseStudy.group);
+geographicReference.add(lunarPhaseTransit.group);
 geographicReference.add(finiteCoreParallaxExperiment.group);
 scene.add(geographicReference);
 scene.background = desktopBackground;
@@ -461,6 +488,7 @@ function applyDiagnosticObjectIsolation(): void {
     solarDailyPath.enforceVisibilityControls();
     moonDailyPath.enforceVisibilityControls();
     moonPhaseStudy.enforceVisibilityControls();
+    lunarPhaseTransit.enforceVisibilityControls();
     return;
   }
   // Controller feedback objects are added only after XR session activation;
@@ -475,6 +503,7 @@ function applyDiagnosticObjectIsolation(): void {
   solarDailyPath.enforceVisibilityControls();
   moonDailyPath.enforceVisibilityControls();
   moonPhaseStudy.enforceVisibilityControls();
+  lunarPhaseTransit.enforceVisibilityControls();
   if (signature === diagnosticIsolationSignature) return;
   diagnosticIsolationSignature = signature;
   xrDiagnostics.record('object-isolation.state', [
@@ -503,6 +532,7 @@ const scientificSnapshotService = new ScientificSnapshotService(scientificProvid
 const solarSystemBodyStateService = new SolarSystemBodyStateService(scientificProviders);
 const solarDailyPathService = new SolarDailyPathService(scientificProviders);
 const moonDailyPathService = new MoonDailyPathService(scientificProviders);
+const lunarPhaseTransitService = new LunarPhaseTransitService(scientificProviders);
 const civilTimeZoneState = new CivilTimeZoneStateStore();
 const realtimeCelestialUpdates = new RealtimeCelestialUpdateScheduler();
 let currentXrState: XRState = checkingState;
@@ -645,6 +675,19 @@ function currentMoonPhaseStudyDisplaySettings(): MoonPhaseStudyDisplaySettings {
     showImages: showMoonPhaseImagesInput.checked,
     showCurrentAppearance: showCurrentMoonAppearanceInput.checked,
     showCurrentIndicator: showCurrentPhaseIndicatorInput.checked,
+    labelPreset: parseMoonPhaseLabelPreset(moonPhaseLabelSizeSelect.value),
+  });
+}
+
+function currentLunarTransitDisplaySettings(): LunarTransitPresentationSettings {
+  return Object.freeze({
+    showPath: showLunarPhaseTransitPathInput.checked,
+    showEarthHiddenPath: showEarthHiddenLunarPathInput.checked,
+    showNotches: showLunarPhaseNotchesInput.checked,
+    showImages: showLunarTransitImagesInput.checked,
+    showLabels: showLunarTransitLabelsInput.checked,
+    showCurrentTransit: showCurrentLunarTransitInput.checked,
+    labelPreset: parseMoonPhaseLabelPreset(moonPhaseLabelSizeSelect.value),
   });
 }
 
@@ -750,6 +793,7 @@ function renderCelestialAxis(): void {
     solarDailyPath.clear('scientific state not ready');
     moonDailyPath.clear('scientific state not ready');
     moonPhaseStudy.clear('scientific state not ready');
+    lunarPhaseTransit.clear('scientific state not ready');
     celestialDiagnostics.append(Object.assign(document.createElement('li'), {
       textContent: 'Sun path readiness not-ready; visible false; suppression reason scientific state not ready; renderer traversal remains enabled for both eyes.',
     }));
@@ -948,6 +992,7 @@ function renderCelestialAxis(): void {
   if (!moonStudyLaunch.enabled) {
     moonDailyPath.clear('Moon study query absent');
     moonPhaseStudy.clear('Moon study query absent');
+    lunarPhaseTransit.clear('Moon study query absent');
     moonStudyDiagnostics.replaceChildren();
   } else {
     let moonPathSummary = 'Moon path scientific model unavailable';
@@ -974,6 +1019,7 @@ function renderCelestialAxis(): void {
     }
     let activePhaseState: ReturnType<typeof createMoonPhaseState> | undefined;
     let activePhaseModel: ReturnType<typeof createMoonPhasePresentationModel> | undefined;
+    let activeTransitModel: ReturnType<typeof createLunarPhaseTransitPresentation> | undefined;
     try {
       const moon = bodyModel.markers.find((marker) => marker.body === 'Moon');
       const sun = bodyModel.markers.find((marker) => marker.body === 'Sun');
@@ -992,8 +1038,26 @@ function renderCelestialAxis(): void {
     } catch (error) {
       moonPhaseStudy.clear(error instanceof Error ? error.message : 'Moon phase calculation failed');
     }
+    try {
+      if (!currentRealSkyOrientation) {
+        throw new Error('current real-sky orientation unavailable');
+      }
+      const transit = lunarPhaseTransitService.capture(result.snapshot);
+      activeTransitModel = createLunarPhaseTransitPresentation(
+        transit,
+        currentRealSkyOrientation,
+        geocentricPresentation,
+        currentLunarTransitDisplaySettings(),
+      );
+      lunarPhaseTransit.update(activeTransitModel, geocentricPresentation);
+    } catch (error) {
+      lunarPhaseTransit.clear(
+        error instanceof Error ? error.message : 'Lunar phase-transit calculation failed',
+      );
+    }
     const pathDiagnostics = moonDailyPath.getDiagnostics();
     const phaseDiagnostics = moonPhaseStudy.getDiagnostics();
+    const transitDiagnostics = lunarPhaseTransit.getDiagnostics();
     moonStudyDiagnostics.replaceChildren(...[
       `Study ${moonStudyLaunch.mode}; Moon daily path ${pathDiagnostics.readiness === 'ready' ? 'ready' : `suppressed (${pathDiagnostics.suppressionReason})`}`,
       `Moon path ${moonPathSummary}`,
@@ -1005,7 +1069,18 @@ function renderCelestialAxis(): void {
       `Bright-limb Sun tangent ${activePhaseModel?.projectedSunTangent.map((value) => value.toFixed(5)).join(',') ?? 'unavailable'}; calculated orientation ${activePhaseModel?.brightLimbOrientationDeg.toFixed(2) ?? 'n/a'} deg; rendered icon policy standardized waxing-right/waning-left`,
       `Notches ${phaseDiagnostics.notchCount}; labels ${phaseDiagnostics.labelCount}; images ${phaseDiagnostics.imageCount}; canonical textures ${phaseDiagnostics.canonicalTextureCount}; current texture updates ${phaseDiagnostics.currentTextureUpdateCount}`,
       `Current texture ${phaseDiagnostics.currentTexture?.width ?? 0}x${phaseDiagnostics.currentTexture?.height ?? 0}; visible alpha ${phaseDiagnostics.currentTexture?.visibleAlphaPixelCount ?? 0}; border pixels ${phaseDiagnostics.currentTexture?.borderPixelCount ?? 0}`,
+      `Compact dial clean billboard evidence ${phaseDiagnostics.spriteShapeEvidence.map((entry) => `${entry.name} local=${entry.localScale[0].toFixed(3)}x${entry.localScale[1].toFixed(3)} world=${entry.worldScale[0].toFixed(3)}x${entry.worldScale[1].toFixed(3)} parent=${entry.parent} shear=${entry.shearError.toExponential(2)}`).join('; ') || 'none'}`,
       `Current Moon projected centers ${Object.entries(phaseDiagnostics.currentProjectedCentersNdc).map(([eye, value]) => `${eye}:${value.map((component) => component.toFixed(4)).join(',')}`).join(';') || 'pending'}; stereo disparity ${phaseDiagnostics.currentStereoDisparityNdc?.toExponential(3) ?? 'pending'}; callback errors ${phaseDiagnostics.callbackErrorCount}`,
+      `Lunar phase transit ${transitDiagnostics.ready ? 'ready' : `suppressed (${transitDiagnostics.suppressionReason})`}; coordinate apparent topocentric EQJ, one current real-sky orientation`,
+      `Active lunation ${activeTransitModel?.transit.previousNewMoon.utcIso ?? 'unavailable'} to ${activeTransitModel?.transit.nextNewMoon.utcIso ?? 'unavailable'}; ${activeTransitModel?.transit.durationDays.toFixed(6) ?? 'n/a'} days`,
+      `Transit samples provider/rendered ${transitDiagnostics.providerSampleCount}/${transitDiagnostics.renderedVertexCount}; maximum angular interval ${transitDiagnostics.maximumAngularSpacingDeg.toFixed(4)} deg; closure residual ${transitDiagnostics.closureErrorDeg.toFixed(4)} deg`,
+      `Transit visible/earth-hidden samples ${transitDiagnostics.aboveHorizonCount}/${transitDiagnostics.earthHiddenCount}; geometry builds ${transitDiagnostics.geometryBuildCount}; orientation updates ${transitDiagnostics.orientationUpdateCount}; per-eye mutation ${transitDiagnostics.perEyeMutation}`,
+      `Transit current ${activeTransitModel?.transit.current.previousPhase.name ?? 'unavailable'} to ${activeTransitModel?.transit.current.nextPhase.name ?? 'unavailable'}; progress ${((activeTransitModel?.transit.current.progressFraction ?? 0) * 100).toFixed(2)}%; path error ${transitDiagnostics.currentPathErrorDeg?.toFixed(4) ?? 'n/a'} deg`,
+      `Transit projected centers ${Object.entries(transitDiagnostics.currentProjectedCentersNdc).map(([eye, value]) => `${eye}:${value.map((component) => component.toFixed(4)).join(',')}`).join(';') || 'pending'}; stereo disparity ${transitDiagnostics.currentStereoDisparityNdc?.toExponential(3) ?? 'pending'}`,
+      `Transit notches/images/labels ${transitDiagnostics.notchCount}/${transitDiagnostics.imageCount}/${transitDiagnostics.labelCount}; shared phase textures ${transitDiagnostics.textureCacheSize}; callback errors ${transitDiagnostics.callbackErrorCount}`,
+      ...(activeTransitModel?.events.map((event) =>
+        `${event.phaseName} ${event.phaseAngleDeg} deg at ${event.eventUtc}; path ${(100 * event.pathParameter).toFixed(3)}%; alignment ${event.pathAlignmentErrorDeg.toFixed(5)} deg`) ?? []),
+      `Phase billboard clean anchors; label preset ${moonPhaseLabelSizeSelect.value}; visible Sprite evidence ${transitDiagnostics.spriteShapeEvidence.map((entry) => `${entry.name} ${entry.localScale[0].toFixed(3)}x${entry.localScale[1].toFixed(3)} parent=${entry.parent} shear=${entry.shearError.toExponential(2)}`).join('; ') || 'none'}`,
       `Build ${buildIdentifier}`,
     ].map((line) => Object.assign(document.createElement('li'), { textContent: line })));
   }
@@ -1440,12 +1515,19 @@ useCurrentTimeButton.addEventListener('click', () => {
   showSolarHourNotchesInput,
   showSolarPathBelowHorizonInput,
   showMoonPathInput,
+  showLunarPhaseTransitPathInput,
+  showEarthHiddenLunarPathInput,
+  showLunarPhaseNotchesInput,
+  showLunarTransitImagesInput,
+  showLunarTransitLabelsInput,
+  showCurrentLunarTransitInput,
   showMoonPhaseDialInput,
   showMoonPhaseNotchesInput,
   showMoonPhaseLabelsInput,
   showMoonPhaseImagesInput,
   showCurrentMoonAppearanceInput,
   showCurrentPhaseIndicatorInput,
+  moonPhaseLabelSizeSelect,
   geoStudyRadiusInput,
   geoStudySurfaceInput,
   geoStudyEarthInput,
@@ -1626,6 +1708,8 @@ window.addEventListener('pagehide', () => {
   solarDailyPath.dispose();
   moonDailyPath.dispose();
   moonPhaseStudy.dispose();
+  lunarPhaseTransit.dispose();
+  moonPhaseTextureCache.dispose();
   xrDiagnostics.dispose();
 }, { once: true });
 

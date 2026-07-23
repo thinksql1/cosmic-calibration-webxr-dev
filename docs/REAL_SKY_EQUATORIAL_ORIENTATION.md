@@ -1,5 +1,9 @@
 # Real-Sky Equatorial Orientation
 
+The physically accepted EQJ bridge is now also the sole orientation owner for the Lunar Phase
+Transit Path. The complete canonical lunation track receives one current EQJ-to-application
+rotation; individual past/future samples are never transformed through their own local horizons.
+
 Development deployment: feature `2e257db`, normal merge `ccf37fd`, successful Actions/Pages run
 `29969698393`. The hosted study remains query-gated; its coordinate behavior has now passed the
 reported physical Quest foundation gate.

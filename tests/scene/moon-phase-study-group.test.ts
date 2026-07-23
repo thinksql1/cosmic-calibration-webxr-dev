@@ -59,6 +59,11 @@ describe('Moon phase study Three.js group', () => {
     expect(namesBefore.filter((name) => name.startsWith('moon-phase-label-'))).toHaveLength(8);
     expect(handle.group.getObjectByName('moon-phase-dial-notches')).toBeInstanceOf(THREE.LineSegments);
     expect(handle.group.getObjectByName('current-moon-appearance')).toBeInstanceOf(THREE.Sprite);
+    const fullMoonImage = handle.group.getObjectByName('moon-phase-image-full-moon') as THREE.Sprite;
+    expect(fullMoonImage.parent?.name).toBe('clean-moon-phase-image-anchor-full-moon');
+    expect(fullMoonImage.scale.x).toBe(fullMoonImage.scale.y);
+    handle.group.updateMatrixWorld(true);
+    const fullMoonMatrix = fullMoonImage.matrixWorld.clone();
     expect(handle.group.parent).toBeNull();
     expect(handle.getDiagnostics()).toMatchObject({
       ready: true,
@@ -69,6 +74,8 @@ describe('Moon phase study Three.js group', () => {
       perEyeMutation: false,
     });
     handle.update(model, { ...settings, showLabels: false, showImages: false });
+    handle.group.updateMatrixWorld(true);
+    expect(fullMoonImage.matrixWorld.equals(fullMoonMatrix)).toBe(true);
     const namesAfter: string[] = [];
     handle.group.traverse((object) => namesAfter.push(object.name));
     expect(namesAfter).toEqual(namesBefore);

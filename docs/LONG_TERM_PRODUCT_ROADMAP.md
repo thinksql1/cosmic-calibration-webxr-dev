@@ -1,5 +1,12 @@
 # Long-Term Product Roadmap
 
+## Current bounded gate
+
+Before catalog expansion or constellation labels, physically validate the complete Lunar Phase
+Transit Path and repaired Moon billboards. The transit feature is a development study, not a
+literal-distance lunar orbit. Expansion remains blocked if event notches, current progress,
+stereo stability, image aspect, or label readability fail on Quest.
+
 ## Purpose and status
 
 This document preserves the product's long-term direction without authorizing implementation. It

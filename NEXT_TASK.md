@@ -4,15 +4,16 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate the safe Sun path and query-gated Moon presentation on Quest.
+**Title:** Physically validate the Lunar Phase Transit Path and repaired Moon billboards on Quest.
 
-Use a fresh private Quest Browser session and exact cache-busted development URLs. First enter XR
-with the safe Sun/Orion comparison before calibration and prove the not-ready Sun path cannot
-abort either eye or leave the app loading. After calibration, compare Sun smoothness, the apparent
-topocentric Moon daily path, the symbolic eight-phase dial, phase labels/images, New Moon border,
-continuous phase indicator, and current Moon appearance. Check world locking, both eyes, query and
-UI toggles, and unaffected accepted layers. Record whether the current icon's standardized
-waxing/waning orientation is sufficient or exact sky-roll should be a bounded follow-up.
+Use a fresh private Quest Browser session and exact cache-busted development URLs. Compare the
+complete apparent-topocentric EQJ lunation track, its visible and Earth-hidden portions, eight
+calculated phase-event notches, continuous current transit marker, optional shared procedural
+phase images, and dynamic-width phase labels. Verify both eyes, head-motion world locking, actual
+phase order, current progress toward the next notch, square image shape, label readability, and
+image-matrix stability while labels are toggled. Recheck the accepted compact phase dial and the
+separate Moon Daily Path, and confirm all established Sun, constellation, grid, planet, core, and
+calibration behavior remains unchanged.
 
 ## Exclusions
 

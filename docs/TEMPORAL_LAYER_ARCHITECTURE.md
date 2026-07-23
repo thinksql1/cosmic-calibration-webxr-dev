@@ -1,5 +1,12 @@
 # Temporal Layer Architecture
 
+## Active lunation cache
+
+The Lunar Phase Transit cache identity contains previous/next New Moon, observer,
+observer/configuration revisions, and its 60-minute sampling policy. It rebuilds on lunation or
+relevant scientific identity change, never on headset/eye motion or visibility toggles. Current
+transit progress updates from the central simulation instant without a second timer.
+
 ## Purpose and status
 
 **Status: partially implemented temporal architecture.** This document began as a design record;

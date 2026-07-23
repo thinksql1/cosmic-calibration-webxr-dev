@@ -2,9 +2,11 @@
 
 ## Distinct scientific layers
 
-The Sun and Moon paths are apparent topocentric directions during one selected local civil day.
-They are not annual or monthly orbits. The Moon phase dial is a separate symbolic synodic-cycle
-instrument and never places eight phases along the daily Moon path.
+The Sun and Moon daily paths are apparent topocentric directions during one selected local civil
+day. They are not annual or monthly orbits. The compact Moon phase dial is a separate symbolic
+synodic-cycle instrument. The query-gated Lunar Phase Transit Path is a third layer: an
+observer-relative apparent EQJ track from previous New Moon to next New Moon, transformed by one
+current real-sky orientation. See `LUNAR_PHASE_TRANSIT_PATH.md`.
 
 Both daily paths use:
 
@@ -56,7 +58,7 @@ left/right eye rendering never rebuild it. The Moon marker remains independently
 ## Query and controls
 
 The ordinary URL adds no Moon study geometry. Supported study modes are `off`, `daily-path`,
-`phase-dial`, `current-appearance`, and `combined` via `moonStudy`. Direct bounded controls use
+`phase-dial`, `phase-transit`, `current-appearance`, and `combined` via `moonStudy`. Direct bounded controls use
 `showMoonPath`, `showMoonPhaseDial`, `showMoonPhaseNotches`, `showMoonPhaseLabels`,
 `showMoonPhaseImages`, `showCurrentMoonAppearance`, and `showCurrentPhaseIndicator`.
 Invalid values suppress locally.

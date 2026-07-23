@@ -198,16 +198,37 @@
           </details>
           <details id="moon-study-controls" hidden>
             <summary>Solar/lunar presentation study</summary>
+            <p class="simulation-note"><strong>Daily motion</strong></p>
             <div class="toggle-grid" aria-label="Moon presentation study visibility">
-              <label><input id="show-moon-path" type="checkbox" />Moon Path</label>
+              <label><input id="show-moon-path" type="checkbox" />Moon Daily Path</label>
+            </div>
+            <p class="simulation-note"><strong>Monthly phase transit</strong></p>
+            <div class="toggle-grid" aria-label="Lunar phase transit visibility">
+              <label><input id="show-lunar-phase-transit-path" type="checkbox" />Lunar Phase Transit Path</label>
+              <label><input id="show-earth-hidden-lunar-path" type="checkbox" checked />Show Earth-Hidden Lunar Path</label>
+              <label><input id="show-lunar-phase-notches" type="checkbox" checked />Lunar Phase Notches</label>
+              <label><input id="show-lunar-transit-images" type="checkbox" />Lunar Transit Phase Images</label>
+              <label><input id="show-lunar-transit-labels" type="checkbox" />Lunar Transit Phase Labels</label>
+              <label><input id="show-current-lunar-transit" type="checkbox" checked />Current Lunar Phase Transit</label>
+            </div>
+            <p class="simulation-note"><strong>Compact phase instrument</strong></p>
+            <div class="toggle-grid" aria-label="Compact Moon phase dial visibility">
               <label><input id="show-moon-phase-dial" type="checkbox" />Moon Phase Dial</label>
               <label><input id="show-moon-phase-notches" type="checkbox" checked />Moon Phase Notches</label>
               <label><input id="show-moon-phase-labels" type="checkbox" />Moon Phase Labels</label>
               <label><input id="show-moon-phase-images" type="checkbox" />Moon Phase Images</label>
-              <label><input id="show-current-moon-appearance" type="checkbox" />Current Moon Appearance</label>
               <label><input id="show-current-phase-indicator" type="checkbox" checked />Current Phase Indicator</label>
             </div>
-            <p class="simulation-note">The Moon Path is an apparent topocentric civil-day trace. The clock-like phase dial is a separate symbolic synodic-cycle aid, not the lunar orbit or daily path.</p>
+            <label for="moon-phase-label-size">Phase label size</label>
+            <select id="moon-phase-label-size">
+              <option value="small">Small</option><option value="medium" selected>Medium</option>
+              <option value="large">Large</option><option value="xl">XL</option>
+            </select>
+            <p class="simulation-note"><strong>Current body presentation</strong></p>
+            <div class="toggle-grid">
+              <label><input id="show-current-moon-appearance" type="checkbox" />Current Moon Appearance</label>
+            </div>
+            <p class="simulation-note">The Moon Daily Path is an apparent topocentric civil-day trace. The Lunar Phase Transit Path is a complete observer-relative EQJ lunation track transformed by the current sky orientation. The compact clock-like dial remains a separate symbolic instrument; neither phase layer is a literal lunar orbit.</p>
             <ul id="moon-study-diagnostics" class="diagnostics-list"></ul>
           </details>
           <details id="geo-study-controls" hidden>
