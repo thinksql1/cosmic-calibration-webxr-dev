@@ -604,6 +604,16 @@
 - **Rationale:** Quest feedback prioritized reduced initial clutter, legible purple lunar motion,
   restrained instructional orange, and personalization isolated from calibration and science.
 
+### DEC-044: V3A Course 40 reuses V2 records and adds original reviewed connectivity
+- **Date:** 2026-07-23
+- **Status:** Implemented development study; physical Quest validation pending
+- **Decision:** Keep V1/V2 geometry immutable. Compose `COSMIC_CONSTELLATION_CATALOG_V3A_COURSE_40`
+  from the V2 catalog plus 48 new NASA HEASARC BSC5P EQJ/J2000 records and 11 project-authored
+  figures. Keep `first-set` and `expanded` query behavior unchanged; add `course-40` with a
+  master-off Introduction Anchors default.
+- **Rationale:** Primary-source coordinates and original connectivity meet provenance and licensing
+  requirements without treating an external stick-figure table as an authority.
+
 None yet.
 
 ## Superseded decisions

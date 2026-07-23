@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY } from '../../src/presentation/firstConstellationLinePresentation';
+import { COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY, EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY } from '../../src/presentation/firstConstellationLinePresentation';
 import { catalogJ2000Direction } from '../../src/science/constellations/greatCircleArc';
 
 describe('expanded constellation canonical presentation geometry', () => {
+  it('keeps V3A inside the declared course-40 geometry budget', () => {
+    expect(COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY.figures).toHaveLength(40);
+    expect(COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY.starCount).toBe(190);
+    expect(COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY.segmentCount).toBe(170);
+    expect(COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY.vertexCount).toBe(1163);
+    expect(COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY.maximumAngularStepDegrees).toBeLessThanOrEqual(1.5);
+  });
   it('contains the bounded twenty-nine-figure catalog with immutable open minor-arc segments', () => {
     expect(EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY.figures).toHaveLength(29);
     expect(EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY.segmentCount).toBeLessThanOrEqual(220);

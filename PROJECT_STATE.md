@@ -1,5 +1,15 @@
 # Project State
 
+## V3A local implementation record — 2026-07-23
+
+V3A Course 40 is implemented locally on `feature/constellation-catalog-v3a-40` from clean
+development commit `10b3229a873dabd91d3c5bc55451038c04e42241`. It preserves V2 geometry and all
+accepted solar/lunar, calibration, XR, and semantic-material contracts while adding 11 audited
+BSC5P figures, 48 new canonical records, original reviewed connectivity, Course-40 selection,
+extended groups, and diagnostic isolation states. Focused tests, the full 590-test suite,
+type-check, build, and diff check pass locally; physical Quest review, merge, deployment record,
+hosted verification, and development deployment remain pending. Stable is untouched.
+
 ## Current control record — 2026-07-23
 
 The historical narrative below is retained as evidence but is superseded for active planning by

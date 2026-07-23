@@ -197,3 +197,10 @@ finite presentation geometry under one world tangent-frame group; it owns no clo
 ephemeris. See [Solar/Lunar Path Presentation](SOLAR_LUNAR_PATH_PRESENTATION.md),
 [Moon Phase Dial](MOON_PHASE_DIAL.md), and
 [Current Moon Appearance](CURRENT_MOON_APPEARANCE.md).
+
+## V3A catalog selection
+
+`constellationCatalogV3A` composes V2's immutable figure objects and canonical BSC5P records with
+one V3A-only canonical star-record array. Query parsing selects V2 geometry for `expanded` and the
+separate Course-40 geometry only for `course-40`; renderer, material cache, EQJ bridge, calibration
+parent, and lunar/solar ownership are unchanged.

@@ -4,12 +4,13 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate clean defaults and celestial appearance personalization on Quest
+**Title:** Physically validate the V3A constellation additions, completed Zodiac, extended learning groups, performance, and preservation of all accepted celestial systems
 
-Use a fresh private Quest session to validate Axis/poles/pole-labels/Earth Core OFF defaults,
-Lunar Purple default, curated constellation base/highlight swatches, optional lunar families,
-persistence/reload/query precedence/resets, stereo stability, and preserved geometry. Record only
-observed PASS, FAIL, UNCERTAIN, or NOT RUN evidence. Do not begin the guided course framework.
+Use a fresh private Quest session against the deployed development Course 40 build. Validate each
+new figure, V3A groups, Complete Zodiac, all-40 performance, canonical/real-sky diagnostics,
+orange/base-color integration, material-only color changes, stereo/world locking, and preservation
+of accepted solar, lunar, calibration, axis/core, and planetary systems. Record only observed PASS,
+FAIL, UNCERTAIN, or NOT RUN evidence; do not promote stable.
 
 ## Recommended execution
 

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {
   FIRST_CONSTELLATION_CANONICAL_GEOMETRY,
   FIRST_CONSTELLATION_DATASET_METADATA,
+  type FirstConstellationCanonicalGeometry,
   type FirstConstellationPresentationUpdate,
 } from '../presentation/firstConstellationLinePresentation';
 import { createEyePresentationLayerFilter, type EyePresentationDiagnostics, type XrViewIdentitySource } from './eyePresentationLayerFilter';
@@ -88,7 +89,7 @@ export interface FirstConstellationLineGroupHandle {
   dispose(): void;
 }
 
-export function createFirstConstellationLineGroup(reportDiagnostic: (event: string, detail: string) => void = () => undefined): FirstConstellationLineGroupHandle {
+export function createFirstConstellationLineGroup(reportDiagnostic: (event: string, detail: string) => void = () => undefined, canonicalGeometry: FirstConstellationCanonicalGeometry = FIRST_CONSTELLATION_CANONICAL_GEOMETRY, datasetMetadata = FIRST_CONSTELLATION_DATASET_METADATA): FirstConstellationLineGroupHandle {
   const group = new THREE.Group();
   group.name = 'constellation-line-layer';
   group.visible = false;
@@ -140,7 +141,7 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
     };
   }
 
-  for (const figure of FIRST_CONSTELLATION_CANONICAL_GEOMETRY.figures) {
+  for (const figure of canonicalGeometry.figures) {
     const figureGroup = new THREE.Group();
     figureGroup.name = `constellation-${figure.identifier.toLowerCase()}`;
     groups.set(figure.identifier, figureGroup);
@@ -251,8 +252,8 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
       }
       enforce();
       group.userData.catalogFrame = 'EQJ_J2000';
-      group.userData.datasetSource = FIRST_CONSTELLATION_DATASET_METADATA.starCoordinateSource;
-      group.userData.datasetLicense = FIRST_CONSTELLATION_DATASET_METADATA.license;
+      group.userData.datasetSource = datasetMetadata.starCoordinateSource;
+      group.userData.datasetLicense = datasetMetadata.license;
       group.userData.geometryRebuildCount = geometryBuildCount;
       group.userData.perEyeMutation = false;
     },
@@ -269,11 +270,11 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
     getDiagnostics(): FirstConstellationLineDiagnostics {
       const active = entries.filter((entry) => entry.object.visible && !entry.endpointMarker).map((entry) => entry.object.name);
       return Object.freeze({
-        datasetVersion: FIRST_CONSTELLATION_DATASET_METADATA.version,
-        starCount: FIRST_CONSTELLATION_CANONICAL_GEOMETRY.starCount,
-        constellationCount: FIRST_CONSTELLATION_CANONICAL_GEOMETRY.figures.length,
-        segmentCount: FIRST_CONSTELLATION_CANONICAL_GEOMETRY.segmentCount,
-        vertexCount: FIRST_CONSTELLATION_CANONICAL_GEOMETRY.vertexCount,
+        datasetVersion: datasetMetadata.version,
+        starCount: canonicalGeometry.starCount,
+        constellationCount: canonicalGeometry.figures.length,
+        segmentCount: canonicalGeometry.segmentCount,
+        vertexCount: canonicalGeometry.vertexCount,
         activeLineObjectNames: Object.freeze(active),
         activeDrawCount: active.length,
         suppressedObjectNames: Object.freeze([...suppressed]),
@@ -285,7 +286,7 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
         bufferCount: entries.length,
         colorMaterialUpdateCount,
         materialCreationCount: lineMaterials.size + 1,
-        geometryHash: FIRST_CONSTELLATION_CANONICAL_GEOMETRY.figures
+        geometryHash: canonicalGeometry.figures
           .flatMap((figure) => figure.segments.map((segment) => `${segment.name}:${segment.directions.length}`))
           .join('|'),
       });

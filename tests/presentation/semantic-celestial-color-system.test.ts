@@ -29,7 +29,7 @@ describe('semantic celestial color system', () => {
   });
 
   it('assigns one deterministic experimental primary group to every catalog figure', () => {
-    expect(Object.keys(CONSTELLATION_PRIMARY_COLOR_GROUP)).toHaveLength(29);
+    expect(Object.keys(CONSTELLATION_PRIMARY_COLOR_GROUP)).toHaveLength(40);
     expect(resolveConstellationColor('LIB', 'group-palette', 'subtle', 'all-expanded').colorSource).toBe('zodiac');
     expect(resolveConstellationColor('ORI', 'group-palette', 'subtle', 'introduction-anchors').colorSource).toBe('winter');
     expect(resolveConstellationColor('TAU', 'group-palette', 'subtle', 'zodiac').colorSource).toBe('zodiac');

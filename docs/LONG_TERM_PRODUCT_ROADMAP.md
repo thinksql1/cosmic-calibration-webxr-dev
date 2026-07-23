@@ -306,3 +306,9 @@ cloud accounts, a general planetarium, dense dashboards, forced animation, persi
 calibration, medical/therapeutic claims, or any specific AI, media, game, or contemplative
 experience. It also does not change the current validated P03, Earth-core, depth, calibration,
 eye-presentation, horizon, or lifecycle contracts.
+
+## Deferred after V3A
+
+V3A is a bounded 40-figure course catalog, not an all-sky commitment. V3B candidates (Hydra,
+Eridanus, Serpens, Cetus, Vulpecula, Lacerta, Equuleus, Scutum, Lupus, Crux), constellation labels,
+Milky Way/Galactic Center work, and deferred lunar observations remain independently scoped.

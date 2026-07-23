@@ -21,7 +21,7 @@ export interface ConstellationSegment {
 export interface ConstellationFigure<Identifier extends string = string> {
   readonly identifier: Identifier;
   readonly displayName: string;
-  readonly sourceTradition: 'PROJECT_AUTHORED_CONVENTIONAL_WESTERN_V2';
+  readonly sourceTradition: 'PROJECT_AUTHORED_CONVENTIONAL_WESTERN_V2' | 'PROJECT_AUTHORED_CONVENTIONAL_WESTERN_V3A';
   readonly starCatalogIdentifiers: readonly CatalogStarIdentifier[];
   readonly segments: readonly ConstellationSegment[];
   readonly suggestedLabelAnchorCatalogIdentifier: CatalogStarIdentifier;
@@ -54,6 +54,6 @@ export interface ConstellationDatasetMetadata {
   readonly catalogFrame: CatalogFrame;
   readonly catalogEpoch: CatalogEpoch;
   readonly properMotionPolicy: 'OMITTED_FIXED_J2000_VISUAL_CATALOG';
-  readonly connectivitySource: 'PROJECT_AUTHORED_CONVENTIONAL_WESTERN_V2';
+  readonly connectivitySource: 'PROJECT_AUTHORED_CONVENTIONAL_WESTERN_V2' | 'PROJECT_AUTHORED_CONVENTIONAL_WESTERN_V3A';
   readonly connectivityPolicy: string;
 }
