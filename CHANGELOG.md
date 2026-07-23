@@ -8,6 +8,8 @@
   audited figures, 48 canonical records, original reviewed connectivity, Course-40 query mode,
   extended learning groups, diagnostics, and source-review documentation. V1/V2 and solar/lunar
   presentation contracts remain unchanged; physical Quest validation is pending.
+- Merged feature `e6f3da3` as `1e8584589b38fc476ef924e95a76a3d69e174e67`; development-only
+  Actions/Pages run `30041239809` passed and hosted Course-40 verification exposed that exact SHA.
 
 - Added development-only clean celestial defaults and curated appearance personalization:
   Axis/poles/pole labels/Earth Core OFF on fresh load; persisted versioned constellation base and

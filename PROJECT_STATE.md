@@ -7,8 +7,11 @@ development commit `10b3229a873dabd91d3c5bc55451038c04e42241`. It preserves V2 g
 accepted solar/lunar, calibration, XR, and semantic-material contracts while adding 11 audited
 BSC5P figures, 48 new canonical records, original reviewed connectivity, Course-40 selection,
 extended groups, and diagnostic isolation states. Focused tests, the full 590-test suite,
-type-check, build, and diff check pass locally; physical Quest review, merge, deployment record,
-hosted verification, and development deployment remain pending. Stable is untouched.
+type-check, build, and diff check pass locally. Feature `e6f3da3` merged as
+`1e8584589b38fc476ef924e95a76a3d69e174e67`; development Actions/Pages run `30041239809` passed.
+Hosted Course-40 verification confirmed the visible exact build SHA, all 40 controls, all 11 new
+identifiers, and the master-OFF Introduction Anchors default. Physical Quest review remains
+pending. Stable is untouched.
 
 ## Current control record — 2026-07-23
 
