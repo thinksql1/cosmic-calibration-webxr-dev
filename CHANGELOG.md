@@ -8,6 +8,8 @@
   Axis/poles/pole labels/Earth Core OFF on fresh load; persisted versioned constellation base and
   selected-group swatches; Lunar Purple default plus five coordinated lunar families; reset
   controls; query precedence; and bounded material-only lifecycle protection.
+- Merged feature `eb97879` as `b813f81` and deployed it through successful development-only
+  Actions/Pages run `30033294200`; hosted bundle verification exposed the exact merge SHA.
 
 - Created immutable development checkpoint `quest-approved-expanded-constellations-v1` at
   Quest-approved build `d54a830ab04fb920838e78a350c0a7e540740997`, pushed only to `dev`.

@@ -17,6 +17,9 @@ The active personalization study preserves that geometry while resolving Axis, p
 labels, and Earth Core OFF by default; restoring Lunar Purple; and adding curated persisted
 constellation/lunar appearance selectors and resets. It awaits Quest validation.
 
+Feature `eb97879` merged as `b813f81`; development-only Actions/Pages run `30033294200` passed
+and the hosted bundle exposed that exact build. Physical Quest acceptance remains pending.
+
 ## Quest-approved checkpoint and expanded constellation catalog V2 (development study)
 
 `quest-approved-lunar-transit-v1` is an immutable annotated development tag at
