@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CONSTELLATION_CATALOG_V2_FIGURES } from '../science/constellations/constellationCatalogV2';
 import { CONSTELLATION_CATALOG_V3A_FIGURES } from '../science/constellations/constellationCatalogV3A';
+import { CONSTELLATION_CATALOG_V3B_FIGURES } from '../science/constellations/constellationCatalogV3B';
 import { CONSTELLATION_LEARNING_GROUPS } from '../science/constellations/constellationLearningGroups';
 
 export interface XrObjectIsolationState {
@@ -36,7 +37,7 @@ const REAL_SKY_OVERLAY_LINE_NAMES = Object.freeze(
   CELESTIAL_GRID_LINE_NAMES.map((name) => `real-sky-overlay-${name}`),
 );
 const constellationLineNames = (identifier: string) => Object.freeze(
-  Array.from({ length: CONSTELLATION_CATALOG_V2_FIGURES.find((figure) => figure.identifier.toLowerCase() === identifier)?.segments.length ?? 0 }, (_, index) =>
+  Array.from({ length: CONSTELLATION_CATALOG_V3B_FIGURES.find((figure) => figure.identifier.toLowerCase() === identifier)?.segments.length ?? 0 }, (_, index) =>
     `constellation-${identifier}-segment-${String(index + 1).padStart(2, '0')}`),
 );
 const ORION_CONSTELLATION_NAMES = constellationLineNames('ori');
@@ -49,6 +50,7 @@ const SCORPIUS_CONSTELLATION_NAMES = constellationLineNames('sco');
 const FIRST_CONSTELLATION_LINE_NAMES = Object.freeze(['ori', 'uma', 'cas', 'cyg', 'tau', 'leo', 'sco'].flatMap(constellationLineNames));
 const EXPANDED_CONSTELLATION_LINE_NAMES = Object.freeze(CONSTELLATION_CATALOG_V2_FIGURES.flatMap((figure) => constellationLineNames(figure.identifier.toLowerCase())));
 const COURSE_40_CONSTELLATION_LINE_NAMES = Object.freeze(CONSTELLATION_CATALOG_V3A_FIGURES.flatMap((figure) => constellationLineNames(figure.identifier.toLowerCase())));
+const COURSE_50_CONSTELLATION_LINE_NAMES = Object.freeze(CONSTELLATION_CATALOG_V3B_FIGURES.flatMap((figure) => constellationLineNames(figure.identifier.toLowerCase())));
 const FIRST_CONSTELLATION_ENDPOINT_NAMES = Object.freeze(['ori', 'uma', 'cas', 'cyg', 'tau', 'leo', 'sco'].map((identifier) => `constellation-${identifier}-endpoint-markers`));
 const constellationGroupNames = (groupId: string) => {
   const group = CONSTELLATION_LEARNING_GROUPS.find((value) => value.id === groupId);
@@ -185,6 +187,20 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('constellations-v3a-alternate-base', 'V3A alternate-base-color integration', constellationGroupNames('v3a-additions-only')),
   state('constellations-v3a-geometry-hash', 'V3A geometry-hash preservation', COURSE_40_CONSTELLATION_LINE_NAMES),
   state('constellations-v3a-performance', 'V3A performance diagnostic', COURSE_40_CONSTELLATION_LINE_NAMES),
+  state('constellations-course-50', 'Course 50', constellationGroupNames('introduction-anchors')),
+  state('constellations-v3b-difficult-figures', 'V3B Difficult Figures', constellationGroupNames('v3b-difficult-figures')),
+  state('constellations-course-50-performance', 'All 50 performance', COURSE_50_CONSTELLATION_LINE_NAMES),
+  ...CONSTELLATION_CATALOG_V3B_FIGURES.filter((figure) => ['HYA', 'ERI', 'CET', 'VUL', 'LAC', 'EQU', 'SCT', 'SER', 'LUP', 'CRU'].includes(figure.identifier)).map((figure) =>
+    state(`constellation-${figure.identifier.toLowerCase()}`, `${figure.displayName} only`, constellationLineNames(figure.identifier.toLowerCase()))),
+  state('constellations-v3b-canonical-eqj', 'V3B canonical EQJ', COURSE_50_CONSTELLATION_LINE_NAMES),
+  state('constellations-v3b-real-sky', 'V3B real-sky transformed', COURSE_50_CONSTELLATION_LINE_NAMES),
+  state('constellations-v3b-grid', 'V3B plus real-sky grid', [...COURSE_50_CONSTELLATION_LINE_NAMES, ...CELESTIAL_GRID_LINE_NAMES]),
+  state('constellations-v3b-planets', 'V3B plus planets', [...COURSE_50_CONSTELLATION_LINE_NAMES, 'apparent-mercury-marker', 'apparent-venus-marker', 'apparent-mars-marker', 'apparent-jupiter-marker', 'apparent-saturn-marker', 'apparent-uranus-marker', 'apparent-neptune-marker', 'apparent-pluto-marker']),
+  state('constellations-v3b-lunar-transit', 'V3B plus Lunar Phase Transit', [...COURSE_50_CONSTELLATION_LINE_NAMES, ...LUNAR_TRANSIT_PATH_NAMES]),
+  state('constellations-v3b-orange-highlight', 'V3B orange-highlight integration', constellationGroupNames('v3b-difficult-figures')),
+  state('constellations-v3b-alternate-base', 'V3B alternate-base-color integration', constellationGroupNames('v3b-difficult-figures')),
+  state('constellations-v3b-geometry-hash', 'V3B geometry-hash preservation', COURSE_50_CONSTELLATION_LINE_NAMES),
+  state('constellations-v3b-performance', 'V3B performance diagnostic', COURSE_50_CONSTELLATION_LINE_NAMES),
   state('semantic-unified-introduction', 'Unified Introduction Anchors', constellationGroupNames('introduction-anchors')),
   state('semantic-highlight-introduction', 'Highlighted Introduction Anchors', constellationGroupNames('introduction-anchors')),
   state('semantic-highlight-circumpolar', 'Highlighted Circumpolar', constellationGroupNames('circumpolar')),

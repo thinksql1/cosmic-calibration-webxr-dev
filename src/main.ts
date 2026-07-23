@@ -96,12 +96,15 @@ import { parseMoonPhaseLabelPreset } from './presentation/moonPhaseLabels';
 import {
   EXPANDED_CONSTELLATION_IDENTIFIERS,
 } from './science/constellations/constellationCatalogV2';
-import { COURSE_40_CONSTELLATION_IDENTIFIERS, type Course40ConstellationIdentifier } from './science/constellations/constellationCatalogV3A';
+import { COURSE_40_CONSTELLATION_IDENTIFIERS } from './science/constellations/constellationCatalogV3A';
+import { COURSE_50_CONSTELLATION_IDENTIFIERS, type Course50ConstellationIdentifier } from './science/constellations/constellationCatalogV3B';
 import { CONSTELLATION_LEARNING_GROUPS, constellationLearningGroup } from './science/constellations/constellationLearningGroups';
 import {
   CONSTELLATION_CATALOG_V2_DATASET_METADATA,
   CONSTELLATION_CATALOG_V3A_DATASET_METADATA,
+  CONSTELLATION_CATALOG_V3B_DATASET_METADATA,
   COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY,
+  COURSE_50_CONSTELLATION_CANONICAL_GEOMETRY,
   EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY,
 } from './presentation/firstConstellationLinePresentation';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
@@ -250,12 +253,12 @@ const lunarPathPaletteSelect = requireElement<HTMLSelectElement>('#lunar-path-pa
 const resetLunarPaletteButton = requireElement<HTMLButtonElement>('#reset-lunar-palette');
 const resetAllAppearanceButton = requireElement<HTMLButtonElement>('#reset-all-appearance');
 const moonStudyDiagnostics = requireElement<HTMLUListElement>('#moon-study-diagnostics');
-const constellationVisibilityInputs = Object.freeze(COURSE_40_CONSTELLATION_IDENTIFIERS.reduce((inputs, identifier) => {
+const constellationVisibilityInputs = Object.freeze(COURSE_50_CONSTELLATION_IDENTIFIERS.reduce((inputs, identifier) => {
   const input = document.querySelector<HTMLInputElement>(`[data-constellation-identifier="${identifier}"]`);
   if (!input) throw new Error(`Missing constellation input ${identifier}.`);
   inputs[identifier] = input;
   return inputs;
-}, {} as Record<Course40ConstellationIdentifier, HTMLInputElement>));
+}, {} as Record<Course50ConstellationIdentifier, HTMLInputElement>));
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const showPlanetLabelsInput = requireElement<HTMLInputElement>('#show-planet-labels');
@@ -304,9 +307,9 @@ const finiteCoreLaunch = parseFiniteCoreParallaxLaunch(window.location.search);
 const queryPlanetLabelStudyMode = parsePlanetLabelStudyMode(window.location.search);
 const skyFrameLaunch = parseSkyFrameStudyLaunch(window.location.search);
 const constellationStudyLaunch = parseConstellationStudyLaunch(window.location.search);
-const activeConstellationIdentifiers = constellationStudyLaunch.mode === 'course-40' ? COURSE_40_CONSTELLATION_IDENTIFIERS : EXPANDED_CONSTELLATION_IDENTIFIERS;
-const activeConstellationGeometry = constellationStudyLaunch.mode === 'course-40' ? COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY : EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY;
-const activeConstellationMetadata = constellationStudyLaunch.mode === 'course-40' ? CONSTELLATION_CATALOG_V3A_DATASET_METADATA : CONSTELLATION_CATALOG_V2_DATASET_METADATA;
+const activeConstellationIdentifiers = constellationStudyLaunch.mode === 'course-50' ? COURSE_50_CONSTELLATION_IDENTIFIERS : constellationStudyLaunch.mode === 'course-40' ? COURSE_40_CONSTELLATION_IDENTIFIERS : EXPANDED_CONSTELLATION_IDENTIFIERS;
+const activeConstellationGeometry = constellationStudyLaunch.mode === 'course-50' ? COURSE_50_CONSTELLATION_CANONICAL_GEOMETRY : constellationStudyLaunch.mode === 'course-40' ? COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY : EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY;
+const activeConstellationMetadata = constellationStudyLaunch.mode === 'course-50' ? CONSTELLATION_CATALOG_V3B_DATASET_METADATA : constellationStudyLaunch.mode === 'course-40' ? CONSTELLATION_CATALOG_V3A_DATASET_METADATA : CONSTELLATION_CATALOG_V2_DATASET_METADATA;
 const moonStudyLaunch = parseMoonStudyLaunch(window.location.search);
 const defaultVisibilityLaunch = resolveCelestialVisibility(window.location.search);
 let appearanceStorage: Storage | undefined;
@@ -349,11 +352,17 @@ constellationColorModeSelect.value = activeAppearancePreferences.constellationMo
 constellationBaseColorSelect.value = activeAppearancePreferences.constellationBaseColor;
 constellationHighlightColorSelect.value = activeAppearancePreferences.constellationHighlightColor;
 constellationColorStrengthSelect.value = activeAppearancePreferences.constellationStrength;
-for (const identifier of COURSE_40_CONSTELLATION_IDENTIFIERS) {
+for (const identifier of COURSE_50_CONSTELLATION_IDENTIFIERS) {
   constellationVisibilityInputs[identifier].checked = constellationStudyLaunch.enabledConstellations.has(identifier);
 }
 for (const control of document.querySelectorAll<HTMLElement>('[data-expanded-constellation]')) {
-  control.hidden = constellationStudyLaunch.mode !== 'expanded' && constellationStudyLaunch.mode !== 'course-40';
+  control.hidden = constellationStudyLaunch.mode !== 'expanded' && constellationStudyLaunch.mode !== 'course-40' && constellationStudyLaunch.mode !== 'course-50';
+}
+for (const control of document.querySelectorAll<HTMLElement>('[data-course50-constellation]')) {
+  control.hidden = constellationStudyLaunch.mode !== 'course-50';
+}
+for (const option of document.querySelectorAll<HTMLOptionElement>('[data-course50-group]')) {
+  option.hidden = constellationStudyLaunch.mode !== 'course-50';
 }
 moonStudyControls.hidden = !(xrDiagnostics.enabled || moonStudyLaunch.explicitlyRequested);
 showMoonPathInput.checked = moonStudyLaunch.showMoonPath;
@@ -698,7 +707,7 @@ function currentConstellationDisplaySettings() {
     colorStrength: activeAppearancePreferences.constellationStrength,
     baseColor: activeAppearancePreferences.constellationBaseColor,
     highlightColor: activeAppearancePreferences.constellationHighlightColor,
-    selectedLearningGroup: constellationStudyLaunch.mode === 'expanded' || constellationStudyLaunch.mode === 'course-40'
+    selectedLearningGroup: constellationStudyLaunch.mode === 'expanded' || constellationStudyLaunch.mode === 'course-40' || constellationStudyLaunch.mode === 'course-50'
       ? constellationLearningGroup(constellationLearningGroupSelect.value)?.id
       : undefined,
   });
@@ -1706,7 +1715,7 @@ showConstellationsInput.addEventListener('change', () => {
 
 for (const input of Object.values(constellationVisibilityInputs)) {
   input.addEventListener('change', () => {
-    const enabled = EXPANDED_CONSTELLATION_IDENTIFIERS.filter(
+    const enabled = activeConstellationIdentifiers.filter(
       (identifier) => constellationVisibilityInputs[identifier].checked,
     );
     const url = new URL(window.location.href);
@@ -1719,11 +1728,11 @@ for (const input of Object.values(constellationVisibilityInputs)) {
 }
 
 constellationLearningGroupSelect.addEventListener('change', () => {
-  if (constellationStudyLaunch.mode !== 'expanded' && constellationStudyLaunch.mode !== 'course-40') return;
+  if (constellationStudyLaunch.mode !== 'expanded' && constellationStudyLaunch.mode !== 'course-40' && constellationStudyLaunch.mode !== 'course-50') return;
   const group = constellationLearningGroup(constellationLearningGroupSelect.value);
   if (!group) return;
   const selected = new Set(group.constellationIdentifiers);
-  for (const identifier of EXPANDED_CONSTELLATION_IDENTIFIERS) {
+  for (const identifier of activeConstellationIdentifiers) {
     constellationVisibilityInputs[identifier].checked = selected.has(identifier);
   }
   const url = new URL(window.location.href);

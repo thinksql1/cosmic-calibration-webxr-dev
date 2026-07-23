@@ -1,5 +1,18 @@
 # Project State
 
+## V3B Course 50 implementation record — 2026-07-23
+
+Development feature branch `feature/constellation-catalog-v3b-difficult-10` appends exactly HYA,
+ERI, CET, VUL, LAC, EQU, SCT, SER, LUP, and CRU as
+`COSMIC_CONSTELLATION_CATALOG_V3B_COURSE_50`. NASA HEASARC BSC5P research supplied 101 new,
+auditable EQJ/J2000 canonical records with no duplicate V2/V3A identity. Original project-authored
+connectivity keeps Hydra and Eridanus open, treats Serpens as one selectable code with two
+disconnected components, and retains Crux independently of default-horizon visibility. V1, V2,
+and Quest-approved V3A figures remain unchanged. `course-50` and `course-v3b` are query-gated;
+the V3B Difficult Figures group contains exactly ten. Type-check, production build, and the full
+76-file / 595-test suite pass locally. This is development-only implementation evidence, not
+physical Quest acceptance; stable remains untouched.
+
 ## V3A local implementation record — 2026-07-23
 
 V3A Course 40 is implemented locally on `feature/constellation-catalog-v3a-40` from clean
