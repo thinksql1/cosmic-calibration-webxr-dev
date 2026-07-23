@@ -4,6 +4,18 @@
 
 ### Added
 
+- Added a query-gated real-sky equatorial orientation study using installed Astronomy Engine
+  `2.1.19`: catalog J2000 RA/declination follows `EQJ -> HOR`, while the existing mean-date grid
+  takes provider-native `EQD -> HOR` sidereal phase to preserve exact pole-marker convergence.
+  The explicit right-handed HOR-to-application remap, geometric/non-refracted policy, bounded
+  shader rotation about the encoded Earth core, canonical/real-sky/overlay modes, deterministic
+  `skyTime` URLs, body cross-checks, diagnostics, and isolation modes add no constellation data and
+  leave the ordinary canonical scene unchanged pending Quest validation.
+- Recorded the completed planet-label Quest result: native Three.js Sprites render immediately,
+  remain marker-attached and world-locked in both eyes, and toggle correctly. Medium
+  (`2.24 × 0.56 m`) at `24 m` is the physically preferred and already-default planet-label preset;
+  no constellation-label scale or overlap policy is inferred.
+
 - Recorded physical Quest confirmation that the repaired native Sprite planet labels render and
   remain attached to their markers. The prior largest size was still too small to read comfortably,
   so the scale table now promotes old Large to new Small and supplies Medium/Large/XL/XXL at
@@ -11,7 +23,7 @@
   experiments, and overlap handling plus constellation-label approval remain deferred.
 - Deployed the scale revision `cd37479` to development through successful Actions/Pages run
   `29962714264`. The hosted development response is HTTP 200 and exposes the exact build SHA;
-  physical Quest readability selection remains pending.
+  the later physical Quest comparison selected Medium.
 
 - Diagnosed the Quest-invisible Planet Labels in development build `51b6fff` as zero-area
   projective plane geometry: the label vertex shader ignored every plane vertex. Added a

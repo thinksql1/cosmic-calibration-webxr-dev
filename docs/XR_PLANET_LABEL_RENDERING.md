@@ -35,8 +35,9 @@ normalized apparent body direction * 24 m
 The tangent basis is derived deterministically from the exact marker direction with a fallback
 axis chosen away from parallel. The offset is perpendicular to the body direction, so the label
 does not cover its own marker. `24 m` is a bounded visual distance, not astronomical distance.
-Physical Quest testing confirmed that the Sprite contract renders and stays marker-attached, but
-the original Small/Medium/Large sizes were too small for comfortable reading. The old Large
+Physical Quest testing confirmed that the Sprite contract renders and stays marker-attached. A
+subsequent physical comparison selected Medium (`2.24 × 0.56 m`) as comfortably readable at the
+unchanged `24 m` presentation distance. The old Large
 (`1.12 × 0.28 m`) is now new Small. Canonical non-compounding readability presets are Small
 `1.12 × 0.28 m` (`1×` old Large), Medium `2.24 × 0.56 m` (`2×`), Large `4.48 × 1.12 m` (`4×`),
 XL `8.96 × 2.24 m` (`8×`), and XXL `17.92 × 4.48 m` (`16×`). Normal labels default to Medium.
@@ -66,6 +67,6 @@ tangent offset, per-eye NDC centers, disparity, camera distance, callback errors
 ## Limits and future use
 
 Inter-label collision layout remains deliberately absent; occasional overlap is a known first-pass
-limitation. This contract is a candidate—not yet an accepted foundation—for future constellation
-labels. It must first pass physical Quest validation in both eyes. Constellation lines and real-sky
-orientation remain separate work.
+limitation. The Sprite contract and Medium preset are accepted for planet labels, but neither the
+same scale nor the overlap policy is automatically approved for constellation labels.
+Constellation lines and the real-sky orientation gate remain separate work.

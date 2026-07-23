@@ -5,7 +5,14 @@ import {
   Equator,
   Horizon,
   Observer,
+  RotateVector,
+  Rotation_EQD_HOR,
+  Rotation_EQJ_EQD,
+  Rotation_EQJ_HOR,
   SetDeltaTFunction,
+  SiderealTime,
+  Vector,
+  type RotationMatrix,
 } from 'astronomy-engine';
 import {
   APPARENT_TOPOCENTRIC_ADAPTER_VERSION,
@@ -36,6 +43,19 @@ export {
 };
 const JULIAN_DATE_J2000 = 2_451_545;
 const DAYS_PER_JULIAN_CENTURY = 36_525;
+
+export type AstronomyEngineRotationRows = readonly [
+  readonly [number, number, number],
+  readonly [number, number, number],
+  readonly [number, number, number],
+];
+
+export interface AstronomyEngineRealSkyRotations {
+  readonly eqjToEqdRows: AstronomyEngineRotationRows;
+  readonly eqdToHorRows: AstronomyEngineRotationRows;
+  readonly eqjToHorRows: AstronomyEngineRotationRows;
+  readonly greenwichApparentSiderealTimeHours: number;
+}
 
 type HorizontalCorrectionProfile = Extract<
   CorrectionProfileId,
@@ -79,6 +99,37 @@ function providerBody(body: ObserverRelativeBody): Body {
     case 'Neptune': return Body.Neptune;
     case 'Pluto': return Body.Pluto;
   }
+}
+
+function providerRotationRows(
+  rotation: RotationMatrix,
+  time: AstroTime,
+): AstronomyEngineRotationRows {
+  const basis = [
+    new Vector(1, 0, 0, time),
+    new Vector(0, 1, 0, time),
+    new Vector(0, 0, 1, time),
+  ].map((vector) => RotateVector(rotation, vector));
+  return Object.freeze([
+    Object.freeze([basis[0]!.x, basis[1]!.x, basis[2]!.x] as const),
+    Object.freeze([basis[0]!.y, basis[1]!.y, basis[2]!.y] as const),
+    Object.freeze([basis[0]!.z, basis[1]!.z, basis[2]!.z] as const),
+  ]);
+}
+
+/** Raw provider rotations remain confined to this adapter boundary. */
+export function getAstronomyEngineRealSkyRotations(
+  instant: SimulationInstant,
+  observer: ValidatedObserver,
+): AstronomyEngineRealSkyRotations {
+  const time = providerTime(instant);
+  const rawObserver = providerObserver(observer);
+  return Object.freeze({
+    eqjToEqdRows: providerRotationRows(Rotation_EQJ_EQD(time), time),
+    eqdToHorRows: providerRotationRows(Rotation_EQD_HOR(time, rawObserver), time),
+    eqjToHorRows: providerRotationRows(Rotation_EQJ_HOR(time, rawObserver), time),
+    greenwichApparentSiderealTimeHours: SiderealTime(time),
+  });
 }
 
 function provenance(

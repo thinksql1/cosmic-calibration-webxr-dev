@@ -4,20 +4,20 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically select the smallest comfortably readable planet-label preset on Quest before deciding what scale strategy should be used for future constellation labels.
+**Title:** Physically validate the query-gated real-sky equatorial orientation bridge on Quest.
 
-Use a fresh private Quest Browser session and the exact cache-busted development URL. Confirm the
-build identifier and Swartz Creek defaults, calibrate north, then open the query-gated Uranus proof.
-Confirm the finite `Uranus` sprite and all enabled planet/Pluto labels remain marker-attached in
-both eyes, then compare Small, Medium, Large, XL, and XXL. Record the smallest comfortably readable
-preset while checking that changing size neither moves anchors nor duplicates resources. Preserve
-Planet Labels OFF behavior and all core/grid/equator/poles/horizon/Sun/Moon behavior.
+Use a fresh private Quest Browser session and exact cache-busted development URLs. Confirm the
+build identifier, Swartz Creek defaults, and accepted Medium planet labels; calibrate north once.
+Compare canonical, real-sky, and overlay grids, including three fixed UTC instants. Verify exact
+pole convergence, east/west equator crossings, horizon/compass/body agreement, time/longitude/
+latitude response, world locking, and independent left/right-eye stability. Reject mirroring,
+double rotation, callback failure, or unexplained body-frame discrepancy.
 
 ## Exclusions
 
-Do not begin constellation labels, resume the parked spindle, alter the scientific Earth-core source,
-move the grid, add location persistence, or promote development work to the protected stable
-repository.
+Do not begin constellation lines or labels, resume the parked spindle, alter body positions or the
+scientific Earth-core source, move the grid center, add location persistence, or promote
+development work to the protected stable repository.
 
 ## Recommended execution
 

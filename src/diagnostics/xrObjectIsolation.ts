@@ -29,6 +29,9 @@ const CELESTIAL_GRID_LINE_NAMES = Object.freeze([
   'right-ascension-meridian-16h', 'right-ascension-meridian-18h',
   'right-ascension-meridian-20h', 'right-ascension-meridian-22h',
 ]);
+const REAL_SKY_OVERLAY_LINE_NAMES = Object.freeze(
+  CELESTIAL_GRID_LINE_NAMES.map((name) => `real-sky-overlay-${name}`),
+);
 
 export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Object.freeze([
   state('all', 'Preset behavior — no object isolation', []),
@@ -46,6 +49,20 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('local-horizon-circle', 'Local astronomical horizon circle only', ['local-astronomical-horizon-circle'], { 'local-astronomical-horizon-circle': 0x00ff66 }),
   state('celestial-equator-ring', 'Celestial equator ring only', ['mean-celestial-equator-geocentric-reference-ring'], { 'mean-celestial-equator-geocentric-reference-ring': 0xff8800 }),
   state('celestial-grid', 'All celestial coordinate grid lines only', ['declination-circle-plus-60', 'declination-circle-plus-30', 'declination-circle-minus-30', 'declination-circle-minus-60', 'right-ascension-meridian-00h', 'right-ascension-meridian-02h', 'right-ascension-meridian-04h', 'right-ascension-meridian-06h', 'right-ascension-meridian-08h', 'right-ascension-meridian-10h', 'right-ascension-meridian-12h', 'right-ascension-meridian-14h', 'right-ascension-meridian-16h', 'right-ascension-meridian-18h', 'right-ascension-meridian-20h', 'right-ascension-meridian-22h']),
+  state('canonical-grid-only', 'Canonical non-sidereal grid only', CELESTIAL_GRID_LINE_NAMES),
+  state('real-sky-grid-only', 'Real-sky grid only', CELESTIAL_GRID_LINE_NAMES),
+  state('canonical-real-sky-overlay', 'Canonical and real-sky grid overlay', [...CELESTIAL_GRID_LINE_NAMES, ...REAL_SKY_OVERLAY_LINE_NAMES]),
+  state('real-sky-overlay-only', 'Real-sky overlay representation only', REAL_SKY_OVERLAY_LINE_NAMES),
+  state('real-sky-horizon-compass', 'Real-sky grid plus local horizon and compass', [...CELESTIAL_GRID_LINE_NAMES, 'local-astronomical-horizon-circle', 'geographic-north-south-line', 'geographic-east-west-line', 'cardinal-n', 'cardinal-s', 'cardinal-e', 'cardinal-w']),
+  state('real-sky-poles', 'Real-sky grid plus pole markers', [...CELESTIAL_GRID_LINE_NAMES, 'north-celestial-pole-marker', 'south-celestial-pole-marker']),
+  state('real-sky-sun-moon', 'Real-sky grid plus Sun and Moon', [...CELESTIAL_GRID_LINE_NAMES, 'apparent-sun-marker', 'apparent-moon-marker']),
+  state('real-sky-planets', 'Real-sky grid plus planet markers', [...CELESTIAL_GRID_LINE_NAMES, 'apparent-mercury-marker', 'apparent-venus-marker', 'apparent-mars-marker', 'apparent-jupiter-marker', 'apparent-saturn-marker', 'apparent-uranus-marker', 'apparent-neptune-marker', 'apparent-pluto-marker']),
+  state('real-sky-north-pole-alignment', 'North celestial pole convergence alignment', ['north-celestial-pole-marker', ...CELESTIAL_GRID_LINE_NAMES.filter((name) => name.startsWith('right-ascension-'))]),
+  state('real-sky-south-pole-alignment', 'South celestial pole convergence alignment', ['south-celestial-pole-marker', ...CELESTIAL_GRID_LINE_NAMES.filter((name) => name.startsWith('right-ascension-'))]),
+  state('real-sky-equator-horizon', 'Celestial equator and geometric horizon relationship', ['mean-celestial-equator-geocentric-reference-ring', 'local-astronomical-horizon-circle', ...CELESTIAL_GRID_LINE_NAMES.filter((name) => name.startsWith('declination-'))]),
+  state('real-sky-ra-zero', 'Real-sky RA zero meridian only', ['right-ascension-meridian-00h']),
+  state('real-sky-ra-quadrants', 'Real-sky RA 6h, 12h, and 18h meridians', ['right-ascension-meridian-06h', 'right-ascension-meridian-12h', 'right-ascension-meridian-18h']),
+  state('real-sky-basis-axes', 'Astronomy basis axes represented by cardinal RA meridians and poles', ['right-ascension-meridian-00h', 'right-ascension-meridian-06h', 'right-ascension-meridian-12h', 'right-ascension-meridian-18h', 'north-celestial-pole-marker', 'south-celestial-pole-marker']),
   state('declination-grid', 'Declination circles only', ['declination-circle-plus-60', 'declination-circle-plus-30', 'declination-circle-minus-30', 'declination-circle-minus-60']),
   state('right-ascension-grid', 'Right-ascension meridians only', ['right-ascension-meridian-00h', 'right-ascension-meridian-02h', 'right-ascension-meridian-04h', 'right-ascension-meridian-06h', 'right-ascension-meridian-08h', 'right-ascension-meridian-10h', 'right-ascension-meridian-12h', 'right-ascension-meridian-14h', 'right-ascension-meridian-16h', 'right-ascension-meridian-18h', 'right-ascension-meridian-20h', 'right-ascension-meridian-22h']),
   state('right-ascension-00h', '0h meridian only', ['right-ascension-meridian-00h']),

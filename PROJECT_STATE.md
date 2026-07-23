@@ -1,5 +1,31 @@
 # Project State
 
+## Real-sky equatorial orientation bridge (local development study)
+
+`feature/real-sky-equatorial-orientation` adds a query-gated, provider-native bridge from catalog
+J2000 RA/declination to geometric local `HORIZONTAL_ENU` at the central-clock UTC and validated
+observer. Astronomy Engine `2.1.19` owns `EQJ -> EQD -> HOR`; the explicit HOR
+`(north, west, up)` to application `(east, up, -north)` remap is right-handed with determinant
+`+1`. The normal URL retains the validated canonical non-sidereal grid. `real-sky` mode reuses its
+topology and bounded homogeneous buffers, applying one immutable shader rotation about the encoded
+Earth core outside per-eye callbacks. `overlay` adds exactly one intentional warm comparison copy.
+
+The catalog bridge uses EQJ J2000. The existing mean-date grid uses the provider's EQD longitude
+phase so its NCP/SCP convergence remains exactly aligned with the validated pole markers; raw J2000
+`+Z` and the current mean-date pole are not falsely conflated. The rigid grid is geometric and
+non-refracted. Airless topocentric EQD cross-checks cover Sun, Moon, Mercury, Jupiter, and Uranus
+without changing any body direction. Focused and complete validation currently pass `531/531`
+tests across `56` files, type-check, production build, dependency audit/tree, and diff checks.
+Desktop fixed-time verification confirms a stationary pole, sidereal RA rotation, the intentional
+32-line canonical/real-sky overlay, zero grid/pole error, and no callback errors. Integration,
+development deployment, and physical Quest validation remain pending. Constellations remain
+deferred.
+
+The latest user-reported Quest result accepts the native Sprite planet-label contract and Medium
+as the preferred preset: `2.24 × 0.56 m` at the unchanged `24 m` presentation distance. Attachment,
+world locking, stereo stability, and toggle behavior passed. Medium was already the default; this
+does not establish a constellation-label scale or decluttering policy.
+
 ## Outer planets and independent Planet Labels (development deployed)
 
 The local `feature/outer-planets-and-labels` extension expands the existing Astronomy Engine
@@ -25,23 +51,23 @@ the plane's vertex position, collapsing every textured quad to one clip-space po
 rasterized area. The local repair replaces only label presentation with reusable finite `24 m`,
 tangent-offset, world-anchored Three.js sprites. Textures must contain visible alpha; normal and
 forced Uranus-proof state are distinguished; invalid labels suppress locally. The repaired
-contract has now passed its basic physical Quest rendering/attachment gate. Its original Small,
-Medium, and Large sizes were nevertheless too small for comfortable reading; a development-only
-five-preset readability revision is in progress. No constellation-label approval is implied.
+contract has now passed physical Quest rendering, attachment, world-locking, stereo, and toggle
+gates. Its original Small, Medium, and Large sizes were too small; the five-preset revision was
+tested and Medium was selected. No constellation-label scale or overlap approval is implied.
 
 Repair feature `3a31b92619ee4b0e61224173b4b67a48bcb4664d` was normally merged into
 development as `c18e28a9536facb4ac39487fe6071646744ca860`. Clean merged validation passed
 `508/508` tests across `54` files, type-check, build, dependency audit/tree, and diff checks.
 Development Actions/Pages run `29960227474` completed successfully, and the hosted bundle reports
 the merge SHA and includes the finite-label proof and diagnostics. This is deployment evidence only;
-physical Quest validation of the repaired labels remains pending, and stable remains unchanged.
+the later physical Quest result accepted the repaired labels; stable remains unchanged.
 
 Scale revision `cd37479b65c4c9366fde914ec15b7be761383231` updates only the immutable Sprite
 dimensions: old Large is new Small, with Medium/Large/XL/XXL at `2×/4×/8×/16×` that base and
 Medium as default. All `511/511` tests across `54` files, type-check, build, audit, dependency
 tree, diff checks, and desktop selector/query verification passed. Development Actions/Pages run
-`29962714264` passed and the hosted bundle reports that exact SHA. Physical Quest selection of the
-smallest comfortable preset remains pending; stable is unchanged.
+`29962714264` passed and the hosted bundle reports that exact SHA. The later physical Quest
+comparison selected Medium; stable is unchanged.
 
 ## Integrated finite holographic Earth-core proxy (development only)
 
@@ -111,7 +137,7 @@ passed build and Pages deployment. The hosted development app loads repository-r
 observer/calibration readiness and master/family grid controls pass with no blocking console error.
 Physical Quest stereo acceptance remains NOT RUN.
 
-**Last updated:** 2026-07-20 America/New_York
+**Last updated:** 2026-07-22 America/New_York
 
 **Updated by:** Codex / project control
 
@@ -574,8 +600,8 @@ recorded below without inferring the unreported detailed checklist cases.
 
 - The durable [long-term product roadmap](docs/LONG_TERM_PRODUCT_ROADMAP.md) preserves future
   celestial, geographic, interpretive, media, and performance directions. It is not a schedule or
-  authorization: physical Quest acceptance of the unified geocentric structure is the only next
-  task.
+  authorization: physical Quest validation of the query-gated real-sky orientation bridge is the
+  only next task.
 - After that physical acceptance, later work still requires a bounded selection from the established
   sequence: physical acceptance, validated long-term precession, ecliptic, accelerated or reverse
   simulation-time controls, arbitrary historical/future date selection, annual or multi-day
@@ -641,7 +667,7 @@ recorded below without inferring the unreported detailed checklist cases.
 
 ## Current decision horizon
 
-Run the physical Quest acceptance test for the unified geocentric celestial structure. Use the
-canonical pending 23-step checklist in `docs/QUEST_TESTING.md`; record only observed results. Do
-not infer unperformed physical evidence or begin labels, ecliptic, orbital paths, Moon phase,
-precession, or other later work.
+Physically validate the query-gated real-sky equatorial orientation bridge on Quest. Compare the
+canonical, real-sky, and overlay modes at deterministic UTC instants; verify poles, horizon,
+compass, body alignment, both eyes, and single-application calibration. Record only observed
+results. Do not begin constellation lines or labels until this gate passes.

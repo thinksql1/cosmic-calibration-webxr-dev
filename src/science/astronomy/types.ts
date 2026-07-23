@@ -38,6 +38,7 @@ export interface ValidatedObserver {
 }
 
 export type CelestialFrameTag =
+  | 'EQJ_J2000'
   | 'EQD_TRUE'
   | 'GCRS'
   | 'P03_MEAN_EQUATOR_OF_DATE';

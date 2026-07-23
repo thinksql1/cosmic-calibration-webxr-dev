@@ -263,7 +263,7 @@ alignment, world locking, reset/re-entry, performance, or comfort details. The p
 the regression checklist for any later Quest evidence. See
 [Milestone 2D Physical Acceptance](MILESTONE_2D_PHYSICAL_ACCEPTANCE.md).
 
-## Development outer planets and Planet Labels (readability selection pending)
+## Development outer planets and Planet Labels (accepted reported scope)
 
 Test the development default-hidden ten-body layer using the
 selected observer and UTC instant. Confirm that Sun/Moon directions are broadly plausible, planets
@@ -277,9 +277,11 @@ Enable **Planet Labels** and verify labels are anchored to enabled planet/Pluto 
 eyes, do not hide their own marker, and disappear without hiding markers when the master is OFF.
 Disable one planet and verify its marker and label both disappear. This procedure does not measure
 angular accuracy, identify Moon phase, or authorize a constellation/label-layout system.
-**Physical Quest marker and Sprite-rendering evidence: PASS for the reported scope.** The tested
-labels rendered and stayed associated with their markers, but the original dimensions were too
-small for comfortable reading. The scale-selection procedure below remains pending.
+**Physical Quest marker, Sprite-rendering, and Medium-readability evidence: PASS for the reported
+scope.** Labels rendered immediately, remained marker-attached and world-locked in both eyes, and
+their toggle behavior passed. Medium (`2.24 × 0.56 m`) at the unchanged `24 m` presentation
+distance was selected and is already the default. This acceptance does not approve the same scale
+or overlap policy for future constellation labels.
 
 ### Repaired finite planet-label contract
 
@@ -293,7 +295,33 @@ and each successive preset doubles width and height. Record the smallest comfort
 preset while checking adjacency, head motion, viewport edges, each eye, Planet Labels OFF behavior,
 and no duplicate/callback errors. The finite `24 m` label anchor is presentation geometry, not
 astronomical distance; XL/XXL overlap is intentional test evidence, not a collision-layout claim.
-Do not infer constellation-label readiness from this procedure.
+The completed physical comparison selected Medium. Retain the other presets as bounded diagnostics
+and do not infer constellation-label readiness from this procedure.
+
+## Query-gated real-sky equatorial orientation — pending
+
+Use a fresh private Quest Browser session and exact cache-busted development URL. Confirm the
+visible build SHA, Swartz Creek defaults, and Medium planet-label default; enter XR and calibrate
+north once. Compare `skyFrameStudy=canonical`, `real-sky`, and diagnostic `overlay` modes.
+
+1. Confirm canonical mode is visually unchanged.
+2. In real-sky mode, confirm all meridians converge at the existing NCP/SCP markers.
+3. Confirm the equator remains perpendicular to the pole axis and crosses the horizon near east
+   and west.
+4. Compare the grid with horizon/compass, Sun/Moon, and planets; reject east/west mirroring,
+   north/south inversion, or double rotation.
+5. Use three fixed `skyTime` UTC URLs separated by several hours. Confirm RA phase moves around a
+   fixed pole.
+6. Change longitude diagnostically and confirm phase response; change latitude and confirm pole
+   altitude response.
+7. Move the head and inspect both eyes independently. Confirm world locking, complete immutable
+   grid geometry, and no callback/incomplete-frame error.
+8. Confirm planet labels, finite Earth core, poles, horizon, bodies, Sun path, and parked spindle
+   remain unchanged.
+
+This is a physical gate for the catalog-coordinate foundation. Do not begin constellation lines
+or labels until it passes. See
+[Real-Sky Equatorial Orientation](REAL_SKY_EQUATORIAL_ORIENTATION.md).
 
 ## Milestone 2F 24-hour Sun path and live celestial updates (pending)
 
