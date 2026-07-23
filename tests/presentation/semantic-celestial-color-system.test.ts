@@ -4,13 +4,14 @@ import { CONSTELLATION_BASE_SWATCHES, CONSTELLATION_HIGHLIGHT_SWATCHES, LUNAR_PA
 import { DEFAULT_CELESTIAL_VISIBILITY, resolveCelestialVisibility } from '../../src/presentation/defaultCelestialVisibility';
 import { CELESTIAL_APPEARANCE_STORAGE_KEY, readAppearancePreferences, writeAppearancePreferences } from '../../src/presentation/color/celestialAppearancePersistence';
 import { CELESTIAL_COLOR_TOKENS } from '../../src/presentation/color/celestialColorTokens';
-import { colorDistance, relativeLuminance, validateCelestialColorTokens } from '../../src/presentation/color/colorValidation';
+import { colorDistance, relativeLuminance, validateCelestialColorTokens, validateCuratedAppearanceCatalog } from '../../src/presentation/color/colorValidation';
 import { CONSTELLATION_PRIMARY_COLOR_GROUP, resolveConstellationColor } from '../../src/presentation/color/constellationColorPolicy';
 import { lunarSemanticPalette } from '../../src/presentation/color/lunarColorPolicy';
 
 describe('semantic celestial color system', () => {
   it('validates finite unique semantic tokens and safe query fallbacks', () => {
     expect(validateCelestialColorTokens()).toEqual([]);
+    expect(validateCuratedAppearanceCatalog()).toEqual([]);
     expect(parseCelestialColorSettings('?constellationColor=group-palette&constellationColorStrength=standard&lunarPalette=legacy-purple')).toMatchObject({
       constellationMode: 'group-palette', constellationStrength: 'standard', lunarPalette: 'lunar-purple',
     });
