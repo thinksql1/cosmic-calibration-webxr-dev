@@ -468,3 +468,11 @@ new Moon layers:
 See [Solar/Lunar Path Presentation](SOLAR_LUNAR_PATH_PRESENTATION.md),
 [Moon Phase Dial](MOON_PHASE_DIAL.md), and
 [Current Moon Appearance](CURRENT_MOON_APPEARANCE.md).
+
+## V3A Course 40 physical validation — pending
+
+Use `?constellationStudy=course-40&showConstellations=1`. Confirm only ORI/UMA/CAS initially;
+review each V3A addition, complete Zodiac (including Cancer), all extended groups, all-40
+performance, orange highlight, alternate base color, canonical/real-sky diagnostic orientation,
+and preservation of every accepted solar and lunar layer. Record observed PASS, FAIL, UNCERTAIN,
+or NOT RUN only.

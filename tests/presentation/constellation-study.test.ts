@@ -28,4 +28,10 @@ describe('first constellation query gate', () => {
     expect(launch).toMatchObject({ enabled: true, mode: 'expanded', selectedGroup: 'zodiac', masterVisible: true });
     expect([...launch.enabledConstellations]).toContain('LIB');
   });
+  it('adds a separate course-40 mode without changing the expanded selection', () => {
+    const launch = parseConstellationStudyLaunch('?constellationStudy=course-40');
+    expect(launch).toMatchObject({ enabled: true, mode: 'course-40', masterVisible: false, selectedGroup: 'introduction-anchors' });
+    expect([...launch.enabledConstellations]).toEqual(['ORI', 'UMA', 'CAS']);
+    expect(parseConstellationStudyLaunch('?constellationStudy=course-v3a&constellationGroup=v3a-additions-only&showConstellations=1').enabledConstellations.size).toBe(11);
+  });
 });

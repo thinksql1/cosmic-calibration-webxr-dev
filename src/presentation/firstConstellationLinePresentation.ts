@@ -4,8 +4,13 @@ import {
   CONSTELLATION_CATALOG_V2_FIGURES,
   CONSTELLATION_CATALOG_V2_STARS,
   type ConstellationCatalogStar,
-  type ExpandedConstellationIdentifier,
 } from '../science/constellations/constellationCatalogV2';
+import {
+  CONSTELLATION_CATALOG_V3A_DATASET_METADATA,
+  CONSTELLATION_CATALOG_V3A_FIGURES,
+  CONSTELLATION_CATALOG_V3A_STARS,
+  type Course40ConstellationIdentifier,
+} from '../science/constellations/constellationCatalogV3A';
 import {
   catalogJ2000Direction,
   CONSTELLATION_MAX_ANGULAR_STEP_DEGREES,
@@ -16,10 +21,11 @@ import type { Matrix3Rows } from '../science/astronomy/realSkyEquatorialOrientat
 import type { ConstellationColorMode, ConstellationColorStrength } from './color/celestialColorModes';
 import type { ConstellationBaseColorId, ConstellationHighlightColorId } from './color/celestialColorCatalog';
 import type { ConstellationLearningGroupId } from '../science/constellations/constellationLearningGroups';
+import type { ConstellationFigure } from '../science/constellations/constellationCatalogTypes';
 
 export interface FirstConstellationCanonicalSegment {
   readonly name: string;
-  readonly constellationIdentifier: ExpandedConstellationIdentifier;
+  readonly constellationIdentifier: Course40ConstellationIdentifier;
   readonly startStar: ConstellationCatalogStar;
   readonly endStar: ConstellationCatalogStar;
   readonly directions: readonly UnitVector3[];
@@ -29,7 +35,7 @@ export interface FirstConstellationCanonicalSegment {
   readonly minorArc: true;
 }
 export interface FirstConstellationCanonicalFigure {
-  readonly identifier: ExpandedConstellationIdentifier;
+  readonly identifier: Course40ConstellationIdentifier;
   readonly displayName: string;
   readonly starDirections: readonly { readonly star: ConstellationCatalogStar; readonly direction: UnitVector3 }[];
   readonly segments: readonly FirstConstellationCanonicalSegment[];
@@ -46,7 +52,7 @@ export interface FirstConstellationCanonicalGeometry {
 export interface FirstConstellationDisplaySettings {
   readonly studyEnabled: boolean;
   readonly masterVisible: boolean;
-  readonly enabledConstellations: ReadonlySet<ExpandedConstellationIdentifier>;
+  readonly enabledConstellations: ReadonlySet<Course40ConstellationIdentifier>;
   readonly showEndpointMarkers: boolean;
   readonly colorMode?: ConstellationColorMode;
   readonly colorStrength?: ConstellationColorStrength;
@@ -60,9 +66,9 @@ export interface FirstConstellationPresentationUpdate {
   readonly settings: FirstConstellationDisplaySettings;
 }
 
-function createCanonicalGeometry(): FirstConstellationCanonicalGeometry {
-  const stars = new Map(CONSTELLATION_CATALOG_V2_STARS.map((star) => [star.catalogIdentifier, star]));
-  const figures = CONSTELLATION_CATALOG_V2_FIGURES.map((figure) => {
+function createCanonicalGeometry(figuresInput: readonly ConstellationFigure<Course40ConstellationIdentifier>[], starsInput: readonly ConstellationCatalogStar[]): FirstConstellationCanonicalGeometry {
+  const stars = new Map(starsInput.map((star) => [star.catalogIdentifier, star]));
+  const figures = figuresInput.map((figure) => {
     const starDirections = figure.starCatalogIdentifiers.map((identifier) => {
       const catalogStar = stars.get(identifier);
       if (!catalogStar) throw new Error(`Missing catalog star ${identifier}.`);
@@ -97,14 +103,16 @@ function createCanonicalGeometry(): FirstConstellationCanonicalGeometry {
     kind: 'ready',
     frame: 'EQJ_J2000',
     figures: Object.freeze(figures),
-    starCount: CONSTELLATION_CATALOG_V2_STARS.length,
+    starCount: starsInput.length,
     segmentCount: figures.reduce((sum, figure) => sum + figure.segments.length, 0),
     vertexCount: figures.reduce((sum, figure) => sum + figure.segments.reduce((figureSum, segment) => figureSum + segment.directions.length, 0), 0),
     maximumAngularStepDegrees: CONSTELLATION_MAX_ANGULAR_STEP_DEGREES,
   });
 }
 
-export const FIRST_CONSTELLATION_CANONICAL_GEOMETRY = createCanonicalGeometry();
+export const FIRST_CONSTELLATION_CANONICAL_GEOMETRY = createCanonicalGeometry(CONSTELLATION_CATALOG_V2_FIGURES, CONSTELLATION_CATALOG_V2_STARS);
 export const EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY = FIRST_CONSTELLATION_CANONICAL_GEOMETRY;
+export const COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY = createCanonicalGeometry(CONSTELLATION_CATALOG_V3A_FIGURES, CONSTELLATION_CATALOG_V3A_STARS);
 export const FIRST_CONSTELLATION_DATASET_METADATA = CONSTELLATION_CATALOG_V2_DATASET_METADATA;
 export { CONSTELLATION_CATALOG_V2_DATASET_METADATA };
+export { CONSTELLATION_CATALOG_V3A_DATASET_METADATA };

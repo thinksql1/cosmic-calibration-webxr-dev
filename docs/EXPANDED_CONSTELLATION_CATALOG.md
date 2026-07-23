@@ -67,3 +67,10 @@ responsiveness, world locking, left/right-eye coherence, no wobble/deformation, 
 group changes, and preservation of the approved solar/lunar presentation. If the full set is
 educationally dense but technically sound, preserve it and make guided presets the next bounded
 task.
+
+## V3A course-40 follow-on
+
+V2 remains immutable at 29 figures. The development-only V3A course milestone adds 11 separately
+audited figures without changing V2 coordinates or connectivity. See
+[Constellation Catalog V3A Course 40](CONSTELLATION_CATALOG_V3A_COURSE_40.md) and the complete
+[source and connectivity review](CONSTELLATION_CATALOG_V3A_SOURCE_REVIEW.md).

@@ -95,11 +95,13 @@ import {
 import { parseMoonPhaseLabelPreset } from './presentation/moonPhaseLabels';
 import {
   EXPANDED_CONSTELLATION_IDENTIFIERS,
-  type ExpandedConstellationIdentifier,
 } from './science/constellations/constellationCatalogV2';
+import { COURSE_40_CONSTELLATION_IDENTIFIERS, type Course40ConstellationIdentifier } from './science/constellations/constellationCatalogV3A';
 import { CONSTELLATION_LEARNING_GROUPS, constellationLearningGroup } from './science/constellations/constellationLearningGroups';
 import {
   CONSTELLATION_CATALOG_V2_DATASET_METADATA,
+  CONSTELLATION_CATALOG_V3A_DATASET_METADATA,
+  COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY,
   EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY,
 } from './presentation/firstConstellationLinePresentation';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
@@ -248,12 +250,12 @@ const lunarPathPaletteSelect = requireElement<HTMLSelectElement>('#lunar-path-pa
 const resetLunarPaletteButton = requireElement<HTMLButtonElement>('#reset-lunar-palette');
 const resetAllAppearanceButton = requireElement<HTMLButtonElement>('#reset-all-appearance');
 const moonStudyDiagnostics = requireElement<HTMLUListElement>('#moon-study-diagnostics');
-const constellationVisibilityInputs = Object.freeze(EXPANDED_CONSTELLATION_IDENTIFIERS.reduce((inputs, identifier) => {
+const constellationVisibilityInputs = Object.freeze(COURSE_40_CONSTELLATION_IDENTIFIERS.reduce((inputs, identifier) => {
   const input = document.querySelector<HTMLInputElement>(`[data-constellation-identifier="${identifier}"]`);
   if (!input) throw new Error(`Missing constellation input ${identifier}.`);
   inputs[identifier] = input;
   return inputs;
-}, {} as Record<ExpandedConstellationIdentifier, HTMLInputElement>));
+}, {} as Record<Course40ConstellationIdentifier, HTMLInputElement>));
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const showPlanetLabelsInput = requireElement<HTMLInputElement>('#show-planet-labels');
@@ -302,6 +304,9 @@ const finiteCoreLaunch = parseFiniteCoreParallaxLaunch(window.location.search);
 const queryPlanetLabelStudyMode = parsePlanetLabelStudyMode(window.location.search);
 const skyFrameLaunch = parseSkyFrameStudyLaunch(window.location.search);
 const constellationStudyLaunch = parseConstellationStudyLaunch(window.location.search);
+const activeConstellationIdentifiers = constellationStudyLaunch.mode === 'course-40' ? COURSE_40_CONSTELLATION_IDENTIFIERS : EXPANDED_CONSTELLATION_IDENTIFIERS;
+const activeConstellationGeometry = constellationStudyLaunch.mode === 'course-40' ? COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY : EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY;
+const activeConstellationMetadata = constellationStudyLaunch.mode === 'course-40' ? CONSTELLATION_CATALOG_V3A_DATASET_METADATA : CONSTELLATION_CATALOG_V2_DATASET_METADATA;
 const moonStudyLaunch = parseMoonStudyLaunch(window.location.search);
 const defaultVisibilityLaunch = resolveCelestialVisibility(window.location.search);
 let appearanceStorage: Storage | undefined;
@@ -344,11 +349,11 @@ constellationColorModeSelect.value = activeAppearancePreferences.constellationMo
 constellationBaseColorSelect.value = activeAppearancePreferences.constellationBaseColor;
 constellationHighlightColorSelect.value = activeAppearancePreferences.constellationHighlightColor;
 constellationColorStrengthSelect.value = activeAppearancePreferences.constellationStrength;
-for (const identifier of EXPANDED_CONSTELLATION_IDENTIFIERS) {
+for (const identifier of COURSE_40_CONSTELLATION_IDENTIFIERS) {
   constellationVisibilityInputs[identifier].checked = constellationStudyLaunch.enabledConstellations.has(identifier);
 }
 for (const control of document.querySelectorAll<HTMLElement>('[data-expanded-constellation]')) {
-  control.hidden = constellationStudyLaunch.mode !== 'expanded';
+  control.hidden = constellationStudyLaunch.mode !== 'expanded' && constellationStudyLaunch.mode !== 'course-40';
 }
 moonStudyControls.hidden = !(xrDiagnostics.enabled || moonStudyLaunch.explicitlyRequested);
 showMoonPathInput.checked = moonStudyLaunch.showMoonPath;
@@ -456,6 +461,8 @@ const realSkyOverlayGrid = createCelestialCoordinateGridGroup(
 );
 const firstConstellationLines = createFirstConstellationLineGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
+  activeConstellationGeometry,
+  activeConstellationMetadata,
 );
 const observerOffsetStudy = createObserverOffsetGeocentricStudyGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
@@ -683,7 +690,7 @@ function currentConstellationDisplaySettings() {
   return Object.freeze({
     studyEnabled: constellationStudyLaunch.enabled,
     masterVisible: showConstellationsInput.checked,
-    enabledConstellations: new Set(EXPANDED_CONSTELLATION_IDENTIFIERS.filter(
+    enabledConstellations: new Set(activeConstellationIdentifiers.filter(
       (identifier) => constellationVisibilityInputs[identifier].checked,
     )),
     showEndpointMarkers: showConstellationEndpointsInput.checked,
@@ -691,7 +698,7 @@ function currentConstellationDisplaySettings() {
     colorStrength: activeAppearancePreferences.constellationStrength,
     baseColor: activeAppearancePreferences.constellationBaseColor,
     highlightColor: activeAppearancePreferences.constellationHighlightColor,
-    selectedLearningGroup: constellationStudyLaunch.mode === 'expanded'
+    selectedLearningGroup: constellationStudyLaunch.mode === 'expanded' || constellationStudyLaunch.mode === 'course-40'
       ? constellationLearningGroup(constellationLearningGroupSelect.value)?.id
       : undefined,
   });
@@ -1051,16 +1058,16 @@ function renderCelestialAxis(): void {
     const isolatedSegment = firstConstellationLines.group
       .getObjectByName('constellation-ori-segment-04')?.userData.segment;
     constellationStudyDiagnostics.replaceChildren(...[
-      `Study ${constellationStudyLaunch.mode}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; group ${constellationLearningGroupSelect.value}; frame ${constellationStudyLaunch.frame}; enabled ${EXPANDED_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).join(', ') || 'none'}`,
+      `Study ${constellationStudyLaunch.mode}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; group ${constellationLearningGroupSelect.value}; frame ${constellationStudyLaunch.frame}; enabled ${activeConstellationIdentifiers.filter((identifier) => constellationVisibilityInputs[identifier].checked).join(', ') || 'none'}`,
       `Color mode ${constellationColors.constellationMode}; base ${constellationBaseSwatch(constellationColors.constellationBaseColor)?.displayName}; highlight ${constellationHighlightSwatch(constellationColors.constellationHighlightColor)?.displayName}; strength ${constellationColors.constellationStrength}; renderer output ${renderer.outputColorSpace}; tone mapping ${renderer.toneMapping}; geometry hash ${lineDiagnostics.geometryHash}; material updates ${lineDiagnostics.colorMaterialUpdateCount}`,
       `Appearance schema ${activeAppearancePreferences.schemaVersion}; storage ${CELESTIAL_APPEARANCE_STORAGE_KEY}; storage read ${persistedAppearance.status}; resolved source ${appearanceLastSource}`,
-      `Dataset ${lineDiagnostics.datasetVersion}; source ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.starCoordinateSource}; license ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.license}`,
-      `Frame ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.catalogFrame}; epoch ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.catalogEpoch}; proper motion ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.properMotionPolicy}`,
+      `Dataset ${lineDiagnostics.datasetVersion}; source ${activeConstellationMetadata.starCoordinateSource}; license ${activeConstellationMetadata.license}`,
+      `Frame ${activeConstellationMetadata.catalogFrame}; epoch ${activeConstellationMetadata.catalogEpoch}; proper motion ${activeConstellationMetadata.properMotionPolicy}`,
       `Stars ${lineDiagnostics.starCount}; constellations ${lineDiagnostics.constellationCount}; segments ${lineDiagnostics.segmentCount}; generated vertices ${lineDiagnostics.vertexCount}`,
       `Maximum angular step 1.5 deg; active lines ${lineDiagnostics.activeDrawCount}; geometry builds ${lineDiagnostics.geometryBuildCount}; orientation updates ${lineDiagnostics.orientationUpdateCount}; materials ${lineDiagnostics.materialCount ?? 'n/a'}; buffers ${lineDiagnostics.bufferCount ?? 'n/a'}`,
       `Per-eye shared mutation ${lineDiagnostics.perEyeMutation}; endpoints ${showConstellationEndpointsInput.checked ? 'shown' : 'hidden'}`,
       `Submitted callback objects ${lineDiagnostics.submittedObjectNames.join(', ') || 'none observed yet'}; suppressed ${lineDiagnostics.suppressedObjectNames.join(', ') || 'none'}`,
-      ...EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY.figures.map((figure) => {
+      ...activeConstellationGeometry.figures.map((figure) => {
         const groups = CONSTELLATION_LEARNING_GROUPS
           .filter((group) => group.constellationIdentifiers.includes(figure.identifier))
           .map((group) => group.id)
@@ -1072,7 +1079,7 @@ function renderCelestialAxis(): void {
       isolatedSegment
         ? `Diagnostic segment ${isolatedSegment.startStar.displayName} to ${isolatedSegment.endStar.displayName}; angle ${isolatedSegment.angularSeparationDegrees.toFixed(4)} deg; samples ${isolatedSegment.intervalCount + 1}; max adjacent ${isolatedSegment.maximumAdjacentAngularSeparationDegrees.toFixed(4)} deg; minor arc ${isolatedSegment.minorArc}`
         : 'Diagnostic segment unavailable',
-      `Noise: active hue families ${new Set(EXPANDED_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).map((identifier) => resolveConstellationColor(identifier, constellationColors.constellationMode, constellationColors.constellationStrength, selectedGroup, constellationColors.constellationBaseColor, constellationColors.constellationHighlightColor).token.id)).size}; Build ${buildIdentifier}`,
+      `Noise: active hue families ${new Set(activeConstellationIdentifiers.filter((identifier) => constellationVisibilityInputs[identifier].checked).map((identifier) => resolveConstellationColor(identifier, constellationColors.constellationMode, constellationColors.constellationStrength, selectedGroup, constellationColors.constellationBaseColor, constellationColors.constellationHighlightColor).token.id)).size}; Build ${buildIdentifier}`,
     ].map((line) => Object.assign(document.createElement('li'), { textContent: line })));
   } else {
     constellationStudyDiagnostics.replaceChildren();
@@ -1712,7 +1719,7 @@ for (const input of Object.values(constellationVisibilityInputs)) {
 }
 
 constellationLearningGroupSelect.addEventListener('change', () => {
-  if (constellationStudyLaunch.mode !== 'expanded') return;
+  if (constellationStudyLaunch.mode !== 'expanded' && constellationStudyLaunch.mode !== 'course-40') return;
   const group = constellationLearningGroup(constellationLearningGroupSelect.value);
   if (!group) return;
   const selected = new Set(group.constellationIdentifiers);

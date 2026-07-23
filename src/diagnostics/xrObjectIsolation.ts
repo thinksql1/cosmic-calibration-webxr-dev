@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { CONSTELLATION_CATALOG_V2_FIGURES } from '../science/constellations/constellationCatalogV2';
+import { CONSTELLATION_CATALOG_V3A_FIGURES } from '../science/constellations/constellationCatalogV3A';
 import { CONSTELLATION_LEARNING_GROUPS } from '../science/constellations/constellationLearningGroups';
 
 export interface XrObjectIsolationState {
@@ -47,6 +48,7 @@ const LEO_CONSTELLATION_NAMES = constellationLineNames('leo');
 const SCORPIUS_CONSTELLATION_NAMES = constellationLineNames('sco');
 const FIRST_CONSTELLATION_LINE_NAMES = Object.freeze(['ori', 'uma', 'cas', 'cyg', 'tau', 'leo', 'sco'].flatMap(constellationLineNames));
 const EXPANDED_CONSTELLATION_LINE_NAMES = Object.freeze(CONSTELLATION_CATALOG_V2_FIGURES.flatMap((figure) => constellationLineNames(figure.identifier.toLowerCase())));
+const COURSE_40_CONSTELLATION_LINE_NAMES = Object.freeze(CONSTELLATION_CATALOG_V3A_FIGURES.flatMap((figure) => constellationLineNames(figure.identifier.toLowerCase())));
 const FIRST_CONSTELLATION_ENDPOINT_NAMES = Object.freeze(['ori', 'uma', 'cas', 'cyg', 'tau', 'leo', 'sco'].map((identifier) => `constellation-${identifier}-endpoint-markers`));
 const constellationGroupNames = (groupId: string) => {
   const group = CONSTELLATION_LEARNING_GROUPS.find((value) => value.id === groupId);
@@ -153,6 +155,36 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('constellations-expanded-shared-star', 'Shared-star proof: Andromeda and Pegasus', [...constellationLineNames('and'), ...constellationLineNames('peg')]),
   state('constellations-expanded-canonical', 'Canonical EQJ expanded catalog', EXPANDED_CONSTELLATION_LINE_NAMES),
   state('constellations-expanded-real-sky', 'Real-sky transformed expanded catalog', EXPANDED_CONSTELLATION_LINE_NAMES),
+  state('constellations-course-40', 'Course 40', constellationGroupNames('introduction-anchors')),
+  state('constellations-v3a-additions-only', 'V3A additions only', constellationGroupNames('v3a-additions-only')),
+  state('constellations-north-star-circumpolar', 'North Star and Circumpolar', constellationGroupNames('north-star-and-circumpolar')),
+  state('constellations-winter-extended', 'Winter Extended', constellationGroupNames('winter-extended')),
+  state('constellations-spring-extended', 'Spring Extended', constellationGroupNames('spring-extended')),
+  state('constellations-summer-compact', 'Summer Compact Figures', constellationGroupNames('summer-compact-figures')),
+  state('constellations-autumn-extended', 'Autumn Extended', constellationGroupNames('autumn-extended')),
+  state('constellations-complete-zodiac', 'Complete Zodiac', constellationGroupNames('complete-zodiac')),
+  state('constellations-orion-neighborhood', 'Orion Neighborhood', constellationGroupNames('orion-neighborhood')),
+  state('constellations-course-40-performance', 'All 40 performance', COURSE_40_CONSTELLATION_LINE_NAMES),
+  state('constellation-ursa-minor', 'Ursa Minor only', constellationLineNames('umi')),
+  state('constellation-cancer', 'Cancer only', constellationLineNames('cnc')),
+  state('constellation-canes-venatici', 'Canes Venatici only', constellationLineNames('cvn')),
+  state('constellation-coma-berenices', 'Coma Berenices only', constellationLineNames('com')),
+  state('constellation-corvus', 'Corvus only', constellationLineNames('crv')),
+  state('constellation-crater', 'Crater only', constellationLineNames('crt')),
+  state('constellation-monoceros', 'Monoceros only', constellationLineNames('mon')),
+  state('constellation-lepus', 'Lepus only', constellationLineNames('lep')),
+  state('constellation-delphinus', 'Delphinus only', constellationLineNames('del')),
+  state('constellation-sagitta', 'Sagitta only', constellationLineNames('sge')),
+  state('constellation-triangulum', 'Triangulum only', constellationLineNames('tri')),
+  state('constellations-v3a-canonical-eqj', 'V3A canonical EQJ', COURSE_40_CONSTELLATION_LINE_NAMES),
+  state('constellations-v3a-real-sky', 'V3A real-sky transformed', COURSE_40_CONSTELLATION_LINE_NAMES),
+  state('constellations-v3a-grid', 'V3A plus real-sky grid', [...COURSE_40_CONSTELLATION_LINE_NAMES, ...CELESTIAL_GRID_LINE_NAMES]),
+  state('constellations-v3a-planets', 'V3A plus planets', [...COURSE_40_CONSTELLATION_LINE_NAMES, 'apparent-mercury-marker', 'apparent-venus-marker', 'apparent-mars-marker', 'apparent-jupiter-marker', 'apparent-saturn-marker', 'apparent-uranus-marker', 'apparent-neptune-marker', 'apparent-pluto-marker']),
+  state('constellations-v3a-lunar-transit', 'V3A plus Lunar Phase Transit', [...COURSE_40_CONSTELLATION_LINE_NAMES, ...LUNAR_TRANSIT_PATH_NAMES]),
+  state('constellations-v3a-orange-highlight', 'V3A orange-highlight integration', constellationGroupNames('v3a-additions-only')),
+  state('constellations-v3a-alternate-base', 'V3A alternate-base-color integration', constellationGroupNames('v3a-additions-only')),
+  state('constellations-v3a-geometry-hash', 'V3A geometry-hash preservation', COURSE_40_CONSTELLATION_LINE_NAMES),
+  state('constellations-v3a-performance', 'V3A performance diagnostic', COURSE_40_CONSTELLATION_LINE_NAMES),
   state('semantic-unified-introduction', 'Unified Introduction Anchors', constellationGroupNames('introduction-anchors')),
   state('semantic-highlight-introduction', 'Highlighted Introduction Anchors', constellationGroupNames('introduction-anchors')),
   state('semantic-highlight-circumpolar', 'Highlighted Circumpolar', constellationGroupNames('circumpolar')),

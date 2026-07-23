@@ -4,6 +4,11 @@
 
 ### Added
 
+- Added development-only `COSMIC_CONSTELLATION_CATALOG_V3A_COURSE_40`: 11 NASA HEASARC BSC5P
+  audited figures, 48 canonical records, original reviewed connectivity, Course-40 query mode,
+  extended learning groups, diagnostics, and source-review documentation. V1/V2 and solar/lunar
+  presentation contracts remain unchanged; physical Quest validation is pending.
+
 - Added development-only clean celestial defaults and curated appearance personalization:
   Axis/poles/pole labels/Earth Core OFF on fresh load; persisted versioned constellation base and
   selected-group swatches; Lunar Purple default plus five coordinated lunar families; reset
