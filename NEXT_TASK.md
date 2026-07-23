@@ -4,21 +4,21 @@ This file contains exactly one bounded next task.
 
 ## Task
 
-**Title:** Physically validate the Lunar Phase Transit Path and repaired Moon billboards on Quest.
+**Title:** Physically validate the expanded 29-constellation catalog and learning-group visibility controls on Quest.
 
-Use a fresh private Quest Browser session and exact cache-busted development URLs. Compare the
-complete apparent-topocentric EQJ lunation track, its visible and Earth-hidden portions, eight
-calculated phase-event notches, continuous current transit marker, optional shared procedural
-phase images, and dynamic-width phase labels. Verify both eyes, head-motion world locking, actual
-phase order, current progress toward the next notch, square image shape, label readability, and
-image-matrix stability while labels are toggled. Recheck the accepted compact phase dial and the
-separate Moon Daily Path, and confirm all established Sun, constellation, grid, planet, core, and
-calibration behavior remains unchanged.
+Use a fresh private Quest Browser session and exact cache-busted development URLs. Confirm the
+accepted seven figures remain unchanged, then compare Introduction Anchors, Circumpolar, Winter,
+Spring, Summer, Autumn, Zodiac, and All Expanded selections. Verify recognizable forms, smooth
+great-circle lines, world locking, coherent left/right-eye rendering, responsive all-expanded
+performance, deterministic group replacement, and no duplicate lines. Confirm every approved
+Sun, Moon, phase-transit, planet-label, grid, core, horizon, and calibration feature remains
+unchanged.
 
 ## Exclusions
 
-Do not expand constellations, add constellation labels, resume the parked spindle, redesign the
-accepted real-sky/body layers, add location persistence, or promote to protected stable.
+Do not add constellation labels, expand to all 88 figures, implement guided lessons, resume the
+parked spindle, redesign accepted real-sky/body layers, add location persistence, or promote
+protected stable.
 
 ## Recommended execution
 

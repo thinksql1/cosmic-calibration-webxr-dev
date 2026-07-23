@@ -1,11 +1,11 @@
 import type { GeocentricCelestialStructurePresentation } from './geocentricCelestialStructurePresentation';
 import {
-  FIRST_CONSTELLATION_DATASET_METADATA,
-  FIRST_CONSTELLATION_FIGURES,
-  FIRST_CONSTELLATION_STARS,
-  type FirstConstellationCatalogStar,
-  type FirstConstellationIdentifier,
-} from '../science/constellations/firstConstellationCatalog';
+  CONSTELLATION_CATALOG_V2_DATASET_METADATA,
+  CONSTELLATION_CATALOG_V2_FIGURES,
+  CONSTELLATION_CATALOG_V2_STARS,
+  type ConstellationCatalogStar,
+  type ExpandedConstellationIdentifier,
+} from '../science/constellations/constellationCatalogV2';
 import {
   catalogJ2000Direction,
   CONSTELLATION_MAX_ANGULAR_STEP_DEGREES,
@@ -16,9 +16,9 @@ import type { Matrix3Rows } from '../science/astronomy/realSkyEquatorialOrientat
 
 export interface FirstConstellationCanonicalSegment {
   readonly name: string;
-  readonly constellationIdentifier: FirstConstellationIdentifier;
-  readonly startStar: FirstConstellationCatalogStar;
-  readonly endStar: FirstConstellationCatalogStar;
+  readonly constellationIdentifier: ExpandedConstellationIdentifier;
+  readonly startStar: ConstellationCatalogStar;
+  readonly endStar: ConstellationCatalogStar;
   readonly directions: readonly UnitVector3[];
   readonly angularSeparationDegrees: number;
   readonly intervalCount: number;
@@ -26,9 +26,9 @@ export interface FirstConstellationCanonicalSegment {
   readonly minorArc: true;
 }
 export interface FirstConstellationCanonicalFigure {
-  readonly identifier: FirstConstellationIdentifier;
+  readonly identifier: ExpandedConstellationIdentifier;
   readonly displayName: string;
-  readonly starDirections: readonly { readonly star: FirstConstellationCatalogStar; readonly direction: UnitVector3 }[];
+  readonly starDirections: readonly { readonly star: ConstellationCatalogStar; readonly direction: UnitVector3 }[];
   readonly segments: readonly FirstConstellationCanonicalSegment[];
 }
 export interface FirstConstellationCanonicalGeometry {
@@ -43,7 +43,7 @@ export interface FirstConstellationCanonicalGeometry {
 export interface FirstConstellationDisplaySettings {
   readonly studyEnabled: boolean;
   readonly masterVisible: boolean;
-  readonly enabledConstellations: ReadonlySet<FirstConstellationIdentifier>;
+  readonly enabledConstellations: ReadonlySet<ExpandedConstellationIdentifier>;
   readonly showEndpointMarkers: boolean;
 }
 export interface FirstConstellationPresentationUpdate {
@@ -53,11 +53,11 @@ export interface FirstConstellationPresentationUpdate {
 }
 
 function createCanonicalGeometry(): FirstConstellationCanonicalGeometry {
-  const stars = new Map(FIRST_CONSTELLATION_STARS.map((star) => [star.catalogIdentifier, star]));
-  const figures = FIRST_CONSTELLATION_FIGURES.map((figure) => {
+  const stars = new Map(CONSTELLATION_CATALOG_V2_STARS.map((star) => [star.catalogIdentifier, star]));
+  const figures = CONSTELLATION_CATALOG_V2_FIGURES.map((figure) => {
     const starDirections = figure.starCatalogIdentifiers.map((identifier) => {
       const catalogStar = stars.get(identifier);
-      if (!catalogStar) throw new Error(`Missing first-set star ${identifier}.`);
+      if (!catalogStar) throw new Error(`Missing catalog star ${identifier}.`);
       const direction = catalogJ2000Direction(catalogStar.rightAscensionHours, catalogStar.declinationDegrees);
       if (!direction) throw new Error(`Invalid J2000 coordinate for ${identifier}.`);
       return Object.freeze({ star: catalogStar, direction });
@@ -65,12 +65,12 @@ function createCanonicalGeometry(): FirstConstellationCanonicalGeometry {
     const segments = figure.segments.map((segment, index) => {
       const startStar = stars.get(segment.startCatalogIdentifier);
       const endStar = stars.get(segment.endCatalogIdentifier);
-      if (!startStar || !endStar) throw new Error(`Missing first-set segment endpoint for ${figure.identifier}.`);
+      if (!startStar || !endStar) throw new Error(`Missing segment endpoint for ${figure.identifier}.`);
       const start = catalogJ2000Direction(startStar.rightAscensionHours, startStar.declinationDegrees);
       const end = catalogJ2000Direction(endStar.rightAscensionHours, endStar.declinationDegrees);
-      if (!start || !end) throw new Error(`Invalid first-set segment endpoint for ${figure.identifier}.`);
+      if (!start || !end) throw new Error(`Invalid segment endpoint for ${figure.identifier}.`);
       const arc = sampleMinorGreatCircleArc(start, end);
-      if (arc.kind !== 'ready') throw new Error(`Invalid first-set arc ${figure.identifier}-${index}: ${arc.reason}`);
+      if (arc.kind !== 'ready') throw new Error(`Invalid catalog arc ${figure.identifier}-${index}: ${arc.reason}`);
       return Object.freeze({
         name: `constellation-${figure.identifier.toLowerCase()}-segment-${String(index + 1).padStart(2, '0')}`,
         constellationIdentifier: figure.identifier,
@@ -89,7 +89,7 @@ function createCanonicalGeometry(): FirstConstellationCanonicalGeometry {
     kind: 'ready',
     frame: 'EQJ_J2000',
     figures: Object.freeze(figures),
-    starCount: FIRST_CONSTELLATION_STARS.length,
+    starCount: CONSTELLATION_CATALOG_V2_STARS.length,
     segmentCount: figures.reduce((sum, figure) => sum + figure.segments.length, 0),
     vertexCount: figures.reduce((sum, figure) => sum + figure.segments.reduce((figureSum, segment) => figureSum + segment.directions.length, 0), 0),
     maximumAngularStepDegrees: CONSTELLATION_MAX_ANGULAR_STEP_DEGREES,
@@ -97,4 +97,6 @@ function createCanonicalGeometry(): FirstConstellationCanonicalGeometry {
 }
 
 export const FIRST_CONSTELLATION_CANONICAL_GEOMETRY = createCanonicalGeometry();
-export { FIRST_CONSTELLATION_DATASET_METADATA };
+export const EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY = FIRST_CONSTELLATION_CANONICAL_GEOMETRY;
+export const FIRST_CONSTELLATION_DATASET_METADATA = CONSTELLATION_CATALOG_V2_DATASET_METADATA;
+export { CONSTELLATION_CATALOG_V2_DATASET_METADATA };

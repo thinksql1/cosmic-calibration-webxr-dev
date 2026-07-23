@@ -1,30 +1,59 @@
-import { FIRST_CONSTELLATION_IDENTIFIERS, type FirstConstellationIdentifier } from '../science/constellations/firstConstellationCatalog';
+import {
+  EXPANDED_CONSTELLATION_IDENTIFIERS,
+  type ExpandedConstellationIdentifier,
+} from '../science/constellations/constellationCatalogV2';
+import { FIRST_CONSTELLATION_IDENTIFIERS } from '../science/constellations/firstConstellationCatalog';
+import {
+  constellationLearningGroup,
+  type ConstellationLearningGroupId,
+} from '../science/constellations/constellationLearningGroups';
 
 export const FIRST_CONSTELLATION_STUDY_MODE = 'first-set' as const;
+export const EXPANDED_CONSTELLATION_STUDY_MODE = 'expanded' as const;
+export type ConstellationStudyMode = typeof FIRST_CONSTELLATION_STUDY_MODE | typeof EXPANDED_CONSTELLATION_STUDY_MODE;
 
 export interface ConstellationStudyLaunch {
   readonly enabled: boolean;
   readonly explicitlyRequested: boolean;
+  readonly mode: ConstellationStudyMode | 'off';
   readonly masterVisible: boolean;
-  readonly enabledConstellations: ReadonlySet<FirstConstellationIdentifier>;
+  readonly enabledConstellations: ReadonlySet<ExpandedConstellationIdentifier>;
+  readonly selectedGroup: ConstellationLearningGroupId | undefined;
   readonly showEndpointMarkers: boolean;
   readonly frame: 'real-sky' | 'canonical-eqj';
 }
 
+function parseMode(raw: string | null): ConstellationStudyMode | 'off' {
+  if (raw === FIRST_CONSTELLATION_STUDY_MODE) return FIRST_CONSTELLATION_STUDY_MODE;
+  if (raw === EXPANDED_CONSTELLATION_STUDY_MODE || raw === 'course-set') return EXPANDED_CONSTELLATION_STUDY_MODE;
+  return 'off';
+}
+
 export function parseConstellationStudyLaunch(search: string): ConstellationStudyLaunch {
   const parameters = new URLSearchParams(search);
-  const rawMode = parameters.get('constellationStudy');
-  const enabled = rawMode === FIRST_CONSTELLATION_STUDY_MODE;
+  const mode = parseMode(parameters.get('constellationStudy'));
+  const enabled = mode !== 'off';
+  const group = mode === EXPANDED_CONSTELLATION_STUDY_MODE
+    ? constellationLearningGroup(parameters.get('constellationGroup') ?? 'introduction-anchors')
+    : undefined;
+  const validIdentifiers: readonly ExpandedConstellationIdentifier[] = mode === FIRST_CONSTELLATION_STUDY_MODE
+    ? FIRST_CONSTELLATION_IDENTIFIERS
+    : EXPANDED_CONSTELLATION_IDENTIFIERS;
   const requestedIdentifiers = (parameters.get('constellations') ?? '')
     .split(',')
     .map((value) => value.trim().toUpperCase())
-    .filter((value): value is FirstConstellationIdentifier => FIRST_CONSTELLATION_IDENTIFIERS.includes(value as FirstConstellationIdentifier));
+    .filter((value): value is ExpandedConstellationIdentifier => validIdentifiers.includes(value as ExpandedConstellationIdentifier));
+  const fallback = mode === FIRST_CONSTELLATION_STUDY_MODE
+    ? FIRST_CONSTELLATION_IDENTIFIERS
+    : group?.constellationIdentifiers ?? [];
   const explicitMaster = parameters.get('showConstellations');
   return Object.freeze({
     enabled,
-    explicitlyRequested: rawMode !== null,
+    explicitlyRequested: parameters.has('constellationStudy'),
+    mode,
     masterVisible: enabled && (explicitMaster === '1' || explicitMaster === 'true'),
-    enabledConstellations: new Set(requestedIdentifiers.length > 0 ? requestedIdentifiers : FIRST_CONSTELLATION_IDENTIFIERS),
+    enabledConstellations: new Set(requestedIdentifiers.length > 0 ? requestedIdentifiers : fallback),
+    selectedGroup: group?.id,
     showEndpointMarkers: enabled && parameters.get('constellationEndpoints') === '1',
     frame: parameters.get('constellationFrame') === 'canonical' ? 'canonical-eqj' : 'real-sky',
   });

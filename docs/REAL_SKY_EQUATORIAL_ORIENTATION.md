@@ -1,5 +1,8 @@
 # Real-Sky Equatorial Orientation
 
+The V2 expanded constellation catalog continues to consume this bridge unchanged: canonical
+J2000/EQJ figure geometry receives this one shared orientation outside per-eye callbacks.
+
 The physically accepted EQJ bridge is now also the sole orientation owner for the Lunar Phase
 Transit Path. The complete canonical lunation track receives one current EQJ-to-application
 rotation; individual past/future samples are never transformed through their own local horizons.

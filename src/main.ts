@@ -86,8 +86,15 @@ import {
   type LunarTransitPresentationSettings,
 } from './presentation/lunarPhaseTransitPresentation';
 import { parseMoonPhaseLabelPreset } from './presentation/moonPhaseLabels';
-import { FIRST_CONSTELLATION_IDENTIFIERS, type FirstConstellationIdentifier } from './science/constellations/firstConstellationCatalog';
-import { FIRST_CONSTELLATION_DATASET_METADATA } from './presentation/firstConstellationLinePresentation';
+import {
+  EXPANDED_CONSTELLATION_IDENTIFIERS,
+  type ExpandedConstellationIdentifier,
+} from './science/constellations/constellationCatalogV2';
+import { CONSTELLATION_LEARNING_GROUPS, constellationLearningGroup } from './science/constellations/constellationLearningGroups';
+import {
+  CONSTELLATION_CATALOG_V2_DATASET_METADATA,
+  EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY,
+} from './presentation/firstConstellationLinePresentation';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
 import {
   defaultObserverOffsetGeoStudySettings,
@@ -206,6 +213,7 @@ const skyFrameStudyDiagnostics = requireElement<HTMLUListElement>('#sky-frame-st
 const constellationStudyControls = requireElement<HTMLDetailsElement>('#constellation-study-controls');
 const showConstellationsInput = requireElement<HTMLInputElement>('#show-constellations');
 const showConstellationEndpointsInput = requireElement<HTMLInputElement>('#show-constellation-endpoints');
+const constellationLearningGroupSelect = requireElement<HTMLSelectElement>('#constellation-learning-group');
 const constellationStudyDiagnostics = requireElement<HTMLUListElement>('#constellation-study-diagnostics');
 const moonStudyControls = requireElement<HTMLDetailsElement>('#moon-study-controls');
 const showMoonPathInput = requireElement<HTMLInputElement>('#show-moon-path');
@@ -223,15 +231,12 @@ const showCurrentMoonAppearanceInput = requireElement<HTMLInputElement>('#show-c
 const showCurrentPhaseIndicatorInput = requireElement<HTMLInputElement>('#show-current-phase-indicator');
 const moonPhaseLabelSizeSelect = requireElement<HTMLSelectElement>('#moon-phase-label-size');
 const moonStudyDiagnostics = requireElement<HTMLUListElement>('#moon-study-diagnostics');
-const constellationVisibilityInputs: Readonly<Record<FirstConstellationIdentifier, HTMLInputElement>> = Object.freeze({
-  ORI: requireElement<HTMLInputElement>('#show-constellation-ori'),
-  UMA: requireElement<HTMLInputElement>('#show-constellation-uma'),
-  CAS: requireElement<HTMLInputElement>('#show-constellation-cas'),
-  CYG: requireElement<HTMLInputElement>('#show-constellation-cyg'),
-  TAU: requireElement<HTMLInputElement>('#show-constellation-tau'),
-  LEO: requireElement<HTMLInputElement>('#show-constellation-leo'),
-  SCO: requireElement<HTMLInputElement>('#show-constellation-sco'),
-});
+const constellationVisibilityInputs = Object.freeze(EXPANDED_CONSTELLATION_IDENTIFIERS.reduce((inputs, identifier) => {
+  const input = document.querySelector<HTMLInputElement>(`[data-constellation-identifier="${identifier}"]`);
+  if (!input) throw new Error(`Missing constellation input ${identifier}.`);
+  inputs[identifier] = input;
+  return inputs;
+}, {} as Record<ExpandedConstellationIdentifier, HTMLInputElement>));
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const showPlanetLabelsInput = requireElement<HTMLInputElement>('#show-planet-labels');
@@ -289,8 +294,12 @@ skyFrameStudyModeSelect.value = skyFrameLaunch.mode;
 constellationStudyControls.hidden = !constellationStudyLaunch.enabled;
 showConstellationsInput.checked = constellationStudyLaunch.masterVisible;
 showConstellationEndpointsInput.checked = constellationStudyLaunch.showEndpointMarkers;
-for (const identifier of FIRST_CONSTELLATION_IDENTIFIERS) {
+constellationLearningGroupSelect.value = constellationStudyLaunch.selectedGroup ?? 'clear';
+for (const identifier of EXPANDED_CONSTELLATION_IDENTIFIERS) {
   constellationVisibilityInputs[identifier].checked = constellationStudyLaunch.enabledConstellations.has(identifier);
+}
+for (const control of document.querySelectorAll<HTMLElement>('[data-expanded-constellation]')) {
+  control.hidden = constellationStudyLaunch.mode !== 'expanded';
 }
 moonStudyControls.hidden = !(xrDiagnostics.enabled || moonStudyLaunch.explicitlyRequested);
 showMoonPathInput.checked = moonStudyLaunch.showMoonPath;
@@ -624,7 +633,7 @@ function currentConstellationDisplaySettings() {
   return Object.freeze({
     studyEnabled: constellationStudyLaunch.enabled,
     masterVisible: showConstellationsInput.checked,
-    enabledConstellations: new Set(FIRST_CONSTELLATION_IDENTIFIERS.filter(
+    enabledConstellations: new Set(EXPANDED_CONSTELLATION_IDENTIFIERS.filter(
       (identifier) => constellationVisibilityInputs[identifier].checked,
     )),
     showEndpointMarkers: showConstellationEndpointsInput.checked,
@@ -783,7 +792,7 @@ function renderCelestialAxis(): void {
     eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),
     `Celestial grid: ${celestialCoordinateGrid.group.userData.activeLineCount ?? 0} active lines; longitude reference ${celestialCoordinateGrid.group.userData.longitudeReference ?? 'not-ready'}`,
     `Sky-frame study: ${currentSkyFrameStudyMode()}; catalog EQJ bridge and mean-of-date grid phase remain query-gated`,
-    `Constellation study: ${constellationStudyLaunch.enabled ? 'first-set enabled' : 'off'}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; live renderer counts are reported in the study diagnostics`,
+    `Constellation study: ${constellationStudyLaunch.enabled ? `${constellationStudyLaunch.mode} enabled` : 'off'}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; live renderer counts are reported in the study diagnostics`,
     `Observer-offset study: ${currentStudyDisplaySettings().mode}; ${selectedObserverOffsetGeoStudyComponents(currentStudyDisplaySettings()).join(', ') || 'baseline only'}`,
     `Earth Core toggle ${showEarthCoreInput.checked ? 'ON' : 'OFF'}; selected representation ${selectedEarthCorePresentation()}; configured proxy distance ${finiteCoreExperimentDistanceMeters().toFixed(1)} m`,
     `Configured observer ${observerLatitudeInput.value}°, ${observerLongitudeInput.value}° east-positive, ${observerElevationInput.value} m MSL (${observerLocationEntry === 'development-default' ? 'development defaults' : 'user-edited this session'}; no persistence)`,
@@ -953,13 +962,21 @@ function renderCelestialAxis(): void {
     const isolatedSegment = firstConstellationLines.group
       .getObjectByName('constellation-ori-segment-04')?.userData.segment;
     constellationStudyDiagnostics.replaceChildren(...[
-      `First set ${showConstellationsInput.checked ? 'ON' : 'OFF'}; frame ${constellationStudyLaunch.frame}; enabled ${FIRST_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).join(', ') || 'none'}`,
-      `Dataset ${lineDiagnostics.datasetVersion}; source ${FIRST_CONSTELLATION_DATASET_METADATA.starCoordinateSource}; license ${FIRST_CONSTELLATION_DATASET_METADATA.license}`,
-      `Frame ${FIRST_CONSTELLATION_DATASET_METADATA.catalogFrame}; epoch ${FIRST_CONSTELLATION_DATASET_METADATA.catalogEpoch}; proper motion ${FIRST_CONSTELLATION_DATASET_METADATA.properMotionPolicy}`,
+      `Study ${constellationStudyLaunch.mode}; master ${showConstellationsInput.checked ? 'ON' : 'OFF'}; group ${constellationLearningGroupSelect.value}; frame ${constellationStudyLaunch.frame}; enabled ${EXPANDED_CONSTELLATION_IDENTIFIERS.filter((identifier) => constellationVisibilityInputs[identifier].checked).join(', ') || 'none'}`,
+      `Dataset ${lineDiagnostics.datasetVersion}; source ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.starCoordinateSource}; license ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.license}`,
+      `Frame ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.catalogFrame}; epoch ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.catalogEpoch}; proper motion ${CONSTELLATION_CATALOG_V2_DATASET_METADATA.properMotionPolicy}`,
       `Stars ${lineDiagnostics.starCount}; constellations ${lineDiagnostics.constellationCount}; segments ${lineDiagnostics.segmentCount}; generated vertices ${lineDiagnostics.vertexCount}`,
-      `Maximum angular step 1.5 deg; active lines ${lineDiagnostics.activeDrawCount}; geometry builds ${lineDiagnostics.geometryBuildCount}; orientation updates ${lineDiagnostics.orientationUpdateCount}`,
+      `Maximum angular step 1.5 deg; active lines ${lineDiagnostics.activeDrawCount}; geometry builds ${lineDiagnostics.geometryBuildCount}; orientation updates ${lineDiagnostics.orientationUpdateCount}; materials ${lineDiagnostics.materialCount ?? 'n/a'}; buffers ${lineDiagnostics.bufferCount ?? 'n/a'}`,
       `Per-eye shared mutation ${lineDiagnostics.perEyeMutation}; endpoints ${showConstellationEndpointsInput.checked ? 'shown' : 'hidden'}`,
       `Submitted callback objects ${lineDiagnostics.submittedObjectNames.join(', ') || 'none observed yet'}; suppressed ${lineDiagnostics.suppressedObjectNames.join(', ') || 'none'}`,
+      ...EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY.figures.map((figure) => {
+        const groups = CONSTELLATION_LEARNING_GROUPS
+          .filter((group) => group.constellationIdentifiers.includes(figure.identifier))
+          .map((group) => group.id)
+          .join(', ') || 'none';
+        const submitted = lineDiagnostics.activeLineObjectNames.filter((name) => name.startsWith(`constellation-${figure.identifier.toLowerCase()}-`)).length;
+        return `${figure.identifier} ${figure.displayName}: stars ${figure.starDirections.length}; segments ${figure.segments.length}; groups ${groups}; ${constellationVisibilityInputs[figure.identifier].checked ? 'enabled' : 'disabled'}; submitted ${submitted}; source BSC5P/project-authored`;
+      }),
       isolatedSegment
         ? `Diagnostic segment ${isolatedSegment.startStar.displayName} to ${isolatedSegment.endStar.displayName}; angle ${isolatedSegment.angularSeparationDegrees.toFixed(4)} deg; samples ${isolatedSegment.intervalCount + 1}; max adjacent ${isolatedSegment.maximumAdjacentAngularSeparationDegrees.toFixed(4)} deg; minor arc ${isolatedSegment.minorArc}`
         : 'Diagnostic segment unavailable',
@@ -1525,6 +1542,7 @@ useCurrentTimeButton.addEventListener('click', () => {
   showRightAscensionGridInput,
   showConstellationsInput,
   showConstellationEndpointsInput,
+  constellationLearningGroupSelect,
   ...Object.values(constellationVisibilityInputs),
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
@@ -1582,14 +1600,31 @@ showConstellationsInput.addEventListener('change', () => {
 
 for (const input of Object.values(constellationVisibilityInputs)) {
   input.addEventListener('change', () => {
-    const enabled = FIRST_CONSTELLATION_IDENTIFIERS.filter(
+    const enabled = EXPANDED_CONSTELLATION_IDENTIFIERS.filter(
       (identifier) => constellationVisibilityInputs[identifier].checked,
     );
     const url = new URL(window.location.href);
     url.searchParams.set('constellations', enabled.join(','));
+    url.searchParams.delete('constellationGroup');
+    constellationLearningGroupSelect.value = 'clear';
     window.history.replaceState({}, '', url);
   });
 }
+
+constellationLearningGroupSelect.addEventListener('change', () => {
+  if (constellationStudyLaunch.mode !== 'expanded') return;
+  const group = constellationLearningGroup(constellationLearningGroupSelect.value);
+  if (!group) return;
+  const selected = new Set(group.constellationIdentifiers);
+  for (const identifier of EXPANDED_CONSTELLATION_IDENTIFIERS) {
+    constellationVisibilityInputs[identifier].checked = selected.has(identifier);
+  }
+  const url = new URL(window.location.href);
+  url.searchParams.set('constellationGroup', group.id);
+  url.searchParams.set('constellations', group.constellationIdentifiers.join(','));
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
+});
 
 showConstellationEndpointsInput.addEventListener('change', () => {
   const url = new URL(window.location.href);

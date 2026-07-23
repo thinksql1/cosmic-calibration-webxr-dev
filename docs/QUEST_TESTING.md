@@ -1,5 +1,13 @@
 # Quest 3 Manual Acceptance Checklists
 
+## Expanded constellation catalog validation
+
+Use `constellationStudy=first-set` to recheck the accepted seven, then use
+`constellationStudy=expanded&showConstellations=1`. Confirm Introduction Anchors initially selects
+Orion/Ursa Major/Cassiopeia; compare Circumpolar, Winter, Spring, Summer, Autumn, Zodiac, and All
+Expanded. Check each eye, head-motion world locking, line smoothness, group replacement without
+duplicates, all-expanded responsiveness, and preservation of all accepted solar/lunar layers.
+
 ## Lunar Phase Transit Path gate
 
 Use `moonStudy=phase-transit` in a fresh private session. Confirm the full silver-lavender track,

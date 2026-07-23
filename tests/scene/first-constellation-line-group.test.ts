@@ -11,7 +11,7 @@ import { GeographicCalibrationStateAdapter } from '../../src/science/state/geogr
 import { ObserverStateStore } from '../../src/science/state/observerState';
 import { ScientificConfigurationStore } from '../../src/science/state/scientificConfiguration';
 import { SimulationClock } from '../../src/science/state/simulationClock';
-import type { FirstConstellationIdentifier } from '../../src/science/constellations/firstConstellationCatalog';
+import type { ExpandedConstellationIdentifier } from '../../src/science/constellations/constellationCatalogV2';
 
 function source(utcIso = '2026-03-20T04:00:00.000Z', latitudeDeg = 42.9572, longitudeDegEast = -83.8308) {
   const observer = new ObserverStateStore();
@@ -25,7 +25,7 @@ function source(utcIso = '2026-03-20T04:00:00.000Z', latitudeDeg = 42.9572, long
   if (orientation.kind !== 'ready') throw new Error('Ready orientation required.');
   return { structure: createGeocentricCelestialStructurePresentation(result.snapshot), orientation };
 }
-const settings = (masterVisible: boolean, enabledConstellations: readonly FirstConstellationIdentifier[] = ['ORI', 'UMA', 'CAS', 'CYG', 'TAU', 'LEO', 'SCO'], showEndpointMarkers = false) => ({ studyEnabled: true, masterVisible, enabledConstellations: new Set(enabledConstellations), showEndpointMarkers });
+const settings = (masterVisible: boolean, enabledConstellations: readonly ExpandedConstellationIdentifier[] = ['ORI', 'UMA', 'CAS', 'CYG', 'TAU', 'LEO', 'SCO'], showEndpointMarkers = false) => ({ studyEnabled: true, masterVisible, enabledConstellations: new Set(enabledConstellations), showEndpointMarkers });
 
 describe('first constellation XR-safe line group', () => {
   it('builds each immutable figure once with the expected segment topology', () => {
@@ -36,7 +36,7 @@ describe('first constellation XR-safe line group', () => {
     const points: THREE.Points[] = [];
     handle.group.traverse((object) => { if (object instanceof THREE.Line) lines.push(object); if (object instanceof THREE.Points) points.push(object); });
     expect(lines).toHaveLength(FIRST_CONSTELLATION_CANONICAL_GEOMETRY.segmentCount);
-    expect(points).toHaveLength(7);
+    expect(points).toHaveLength(FIRST_CONSTELLATION_CANONICAL_GEOMETRY.figures.length);
     expect(new Set(lines.map(({ name }) => name)).size).toBe(lines.length);
     expect(handle.group.getObjectByName('constellation-ori')).toBeInstanceOf(THREE.Group);
     expect(handle.group.getObjectByName('constellation-ori-segment-01')).toBeInstanceOf(THREE.Line);
