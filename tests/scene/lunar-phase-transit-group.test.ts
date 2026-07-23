@@ -84,6 +84,22 @@ describe('Lunar Phase Transit Three.js group', () => {
       .every((entry) => Math.abs(entry.localScale[0] - entry.localScale[1]) < 1e-12
         && Math.abs(entry.worldScale[0] - entry.worldScale[1]) < 1e-12
         && entry.shearError < 1e-12)).toBe(true);
+    handle.update(
+      createLunarPhaseTransitPresentation(transit, orientation, structure, {
+        ...settings,
+        isolatedNotchPhaseIds: ['full-moon', 'last-quarter'],
+      }),
+      structure,
+    );
+    const visibleNotches = handle.group
+      .getObjectByName('lunar-phase-transit-notches')!
+      .children
+      .filter((child) => child.visible)
+      .map((child) => child.name);
+    expect(visibleNotches).toEqual([
+      'lunar-transit-notch-full-moon',
+      'lunar-transit-notch-last-quarter',
+    ]);
     handle.dispose();
     handle.dispose();
     cache.dispose();

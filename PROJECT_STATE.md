@@ -24,8 +24,10 @@ default. Focused and complete automated validation passes `571/571` tests across
 type-check, and production build. Desktop fixed-lunation diagnostics confirm eight ordered events,
 `712` provider/render vertices, `0.8124°` maximum spacing, equal above/hidden sample counts at the
 fixed test time, exact event-path alignment, `0.0006°` current path error, clean square image
-anchors, and dynamic label widths. Physical Quest validation and development deployment remain
-pending.
+anchors, and dynamic label widths. Feature commit `6cca323` was normally merged as `77e99e9`;
+development Actions/Pages run `30011414309` completed successfully. A follow-up isolation guard
+narrows the previous/next diagnostic to the actual adjacent events. Physical Quest validation
+remains pending.
 
 ## Safe Sun path and query-gated Moon presentation (development feature)
 

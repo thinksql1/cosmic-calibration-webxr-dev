@@ -47,7 +47,10 @@ import { createScientificProviderRegistry } from './science/providers/scientific
 import { SolarSystemBodyStateService } from './science/bodies/solarSystemBodyState';
 import { SolarDailyPathService } from './science/temporal/solarDailyPath';
 import { MoonDailyPathService } from './science/temporal/moonDailyPath';
-import { LunarPhaseTransitService } from './science/moon/lunarPhaseTransit';
+import {
+  LunarPhaseTransitService,
+  type LunarPhaseTransit,
+} from './science/moon/lunarPhaseTransit';
 import { createMoonPhaseState } from './science/moon/moonPhase';
 import { ScientificSnapshotService } from './science/snapshot/scientificSnapshotService';
 import { GeographicCalibrationStateAdapter } from './science/state/geographicCalibrationState';
@@ -679,11 +682,29 @@ function currentMoonPhaseStudyDisplaySettings(): MoonPhaseStudyDisplaySettings {
   });
 }
 
-function currentLunarTransitDisplaySettings(): LunarTransitPresentationSettings {
+function currentLunarTransitDisplaySettings(
+  transit?: LunarPhaseTransit,
+): LunarTransitPresentationSettings {
+  const isolation = xrDiagnostics.isolation.id;
+  const isolatedNotchPhaseIds = isolation === 'lunar-transit-previous-next' && transit
+    ? Object.freeze([
+      transit.current.previousPhase.id,
+      transit.current.nextPhase.id,
+    ])
+    : isolation === 'lunar-transit-new-moon'
+      ? Object.freeze(['new-moon'])
+      : isolation === 'lunar-transit-first-quarter'
+        ? Object.freeze(['first-quarter'])
+        : isolation === 'lunar-transit-full-moon'
+          ? Object.freeze(['full-moon'])
+          : isolation === 'lunar-transit-last-quarter'
+            ? Object.freeze(['last-quarter'])
+            : undefined;
   return Object.freeze({
     showPath: showLunarPhaseTransitPathInput.checked,
     showEarthHiddenPath: showEarthHiddenLunarPathInput.checked,
     showNotches: showLunarPhaseNotchesInput.checked,
+    isolatedNotchPhaseIds,
     showImages: showLunarTransitImagesInput.checked,
     showLabels: showLunarTransitLabelsInput.checked,
     showCurrentTransit: showCurrentLunarTransitInput.checked,
@@ -1047,7 +1068,7 @@ function renderCelestialAxis(): void {
         transit,
         currentRealSkyOrientation,
         geocentricPresentation,
-        currentLunarTransitDisplaySettings(),
+        currentLunarTransitDisplaySettings(transit),
       );
       lunarPhaseTransit.update(activeTransitModel, geocentricPresentation);
     } catch (error) {

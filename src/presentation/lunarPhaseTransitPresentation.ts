@@ -17,6 +17,7 @@ export interface LunarTransitPresentationSettings {
   readonly showPath: boolean;
   readonly showEarthHiddenPath: boolean;
   readonly showNotches: boolean;
+  readonly isolatedNotchPhaseIds?: readonly string[];
   readonly showImages: boolean;
   readonly showLabels: boolean;
   readonly showCurrentTransit: boolean;

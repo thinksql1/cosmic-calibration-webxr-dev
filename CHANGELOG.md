@@ -18,6 +18,9 @@
   sampling, exact notch alignment, continuous sub-degree current-path alignment, full hidden-path
   retention, dynamic label aspect, and clean square Sprite anchors. Quest acceptance remains
   pending.
+- Normally merged feature `6cca323` into development as `77e99e9` and deployed it through
+  successful Actions/Pages run `30011414309`. The deployment-record follow-up also makes the
+  previous/next-notch diagnostic submit only the two scientifically adjacent events.
 
 - Recorded physical Quest acceptance of all seven first-set constellation figures: recognizable,
   smooth, world-locked, and stereo-stable. The failed Sun/Orion URL is an independent Sun-path

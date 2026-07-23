@@ -297,6 +297,16 @@ export function createLunarPhaseTransitGroup(
     visiblePath.visible = ready && Boolean(settings?.showPath);
     hiddenPath.visible = ready && Boolean(settings?.showPath && settings.showEarthHiddenPath);
     notchGroup.visible = ready && Boolean(settings?.showNotches);
+    notchEntries.forEach((entry, index) => {
+      const phaseId = phaseData[index]?.[0];
+      entry.line.visible = notchGroup.visible && Boolean(
+        phaseId
+        && (
+          !settings?.isolatedNotchPhaseIds
+          || settings.isolatedNotchPhaseIds.includes(phaseId)
+        )
+      );
+    });
     currentMarker.visible = ready && Boolean(settings?.showCurrentTransit);
     imageSprites.forEach((sprite) => { sprite.visible = ready && Boolean(settings?.showImages); });
     labelSprites.forEach((sprite) => {
