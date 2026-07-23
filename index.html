@@ -196,6 +196,20 @@
             <p class="simulation-note">Query-gated J2000 stick figures use the accepted real-sky bridge. Connectivity is a conventional project-authored visualization, not an IAU boundary or standardized IAU figure. Constellation labels are not included.</p>
             <ul id="constellation-study-diagnostics" class="diagnostics-list"></ul>
           </details>
+          <details id="moon-study-controls" hidden>
+            <summary>Solar/lunar presentation study</summary>
+            <div class="toggle-grid" aria-label="Moon presentation study visibility">
+              <label><input id="show-moon-path" type="checkbox" />Moon Path</label>
+              <label><input id="show-moon-phase-dial" type="checkbox" />Moon Phase Dial</label>
+              <label><input id="show-moon-phase-notches" type="checkbox" checked />Moon Phase Notches</label>
+              <label><input id="show-moon-phase-labels" type="checkbox" />Moon Phase Labels</label>
+              <label><input id="show-moon-phase-images" type="checkbox" />Moon Phase Images</label>
+              <label><input id="show-current-moon-appearance" type="checkbox" />Current Moon Appearance</label>
+              <label><input id="show-current-phase-indicator" type="checkbox" checked />Current Phase Indicator</label>
+            </div>
+            <p class="simulation-note">The Moon Path is an apparent topocentric civil-day trace. The clock-like phase dial is a separate symbolic synodic-cycle aid, not the lunar orbit or daily path.</p>
+            <ul id="moon-study-diagnostics" class="diagnostics-list"></ul>
+          </details>
           <details id="geo-study-controls" hidden>
             <summary>Observer-offset geocentric study</summary>
             <p class="simulation-note">Development-only explanatory aids. They do not change the validated celestial grid, equator, or calibration.</p>

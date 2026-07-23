@@ -1,8 +1,11 @@
-import type { ApplicationBasisDirection } from './mapEnuToApplicationBasis';
 import { mapEnuToApplicationBasis } from './mapEnuToApplicationBasis';
 import type { SolarSystemBodyState } from '../science/bodies/solarSystemBodyState';
 import type { ScientificSnapshot } from '../science/snapshot/scientificSnapshot';
 import type { SolarDailyPath } from '../science/temporal/solarDailyPath';
+import {
+  sampleOrderedDirectionalPath,
+  type DirectionalPathRenderSample,
+} from './directionalPathSampling';
 
 export interface SolarDailyPathDisplaySettings {
   readonly showPath: boolean;
@@ -16,11 +19,7 @@ export const DEFAULT_SOLAR_DAILY_PATH_DISPLAY_SETTINGS: SolarDailyPathDisplaySet
   showBelowHorizon: true,
 });
 
-export interface SolarDailyPathDisplaySample {
-  readonly directionApplication: ApplicationBasisDirection;
-  readonly aboveHorizon: boolean;
-  readonly opacity: number;
-}
+export interface SolarDailyPathDisplaySample extends DirectionalPathRenderSample {}
 
 export interface SolarDailyHourNotchDisplayModel extends SolarDailyPathDisplaySample {
   readonly localLabel: string;
@@ -44,6 +43,15 @@ export interface SolarDailyPathPresentationModel {
   readonly currentHourNotchIndex: number | undefined;
   readonly pathVisible: boolean;
   readonly hourNotchesVisible: boolean;
+  readonly samplingDiagnostics: {
+    readonly sourceSampleCount: number;
+    readonly renderedSampleCount: number;
+    readonly timestampsMonotonic: boolean;
+    readonly duplicateSourceSamplesSuppressed: number;
+    readonly maximumSourceAngularSpacingDeg: number;
+    readonly maximumRenderedAngularSpacingDeg: number;
+    readonly maximumAngularStepDeg: number;
+  };
   readonly snapshotIdentity: {
     readonly pathCacheKey: string;
     readonly bodyCacheKey: string;
@@ -114,6 +122,7 @@ function sampleDisplay(
     }),
     aboveHorizon,
     opacity: aboveHorizon ? 0.56 : showBelowHorizon ? 0.18 : 0,
+    sourceSample: true,
   });
 }
 
@@ -126,9 +135,15 @@ export function createSolarDailyPathPresentationModel(
 ): SolarDailyPathPresentationModel {
   validateInputs(snapshot, bodyState, path);
   const emphasizedNotch = currentHourNotchIndex(path, snapshot.clock.instant.unixMilliseconds);
-  const samples = Object.freeze(path.samples.map((sample) =>
-    sampleDisplay(sample.direction, sample.aboveHorizon, settings.showBelowHorizon),
-  ));
+  const sampledPath = sampleOrderedDirectionalPath(
+    path.samples.map((sample) => ({
+      ...sampleDisplay(sample.direction, sample.aboveHorizon, settings.showBelowHorizon),
+      timestampMilliseconds: sample.instant.unixMilliseconds,
+    })),
+    1,
+    768,
+  );
+  const samples = sampledPath.samples;
   const hourNotches = Object.freeze(path.hourNotches.map((notch, index) => {
     const display = sampleDisplay(notch.direction, notch.aboveHorizon, settings.showBelowHorizon);
     const emphasized = index === emphasizedNotch;
@@ -155,6 +170,15 @@ export function createSolarDailyPathPresentationModel(
     currentHourNotchIndex: emphasizedNotch,
     pathVisible: settings.showPath,
     hourNotchesVisible: settings.showHourNotches,
+    samplingDiagnostics: Object.freeze({
+      sourceSampleCount: sampledPath.sourceSampleCount,
+      renderedSampleCount: sampledPath.renderedSampleCount,
+      timestampsMonotonic: sampledPath.timestampsMonotonic,
+      duplicateSourceSamplesSuppressed: sampledPath.duplicateSourceSamplesSuppressed,
+      maximumSourceAngularSpacingDeg: sampledPath.maximumSourceAngularSpacingDeg,
+      maximumRenderedAngularSpacingDeg: sampledPath.maximumRenderedAngularSpacingDeg,
+      maximumAngularStepDeg: sampledPath.maximumAngularStepDeg,
+    }),
     snapshotIdentity: Object.freeze({
       pathCacheKey: path.cacheKey,
       bodyCacheKey: bodyState.cacheKey,

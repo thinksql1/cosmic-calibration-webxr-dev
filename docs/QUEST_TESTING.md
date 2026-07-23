@@ -396,3 +396,31 @@ persistence is implied. Record only observed results and keep the spindle parked
 The canonical 23-step unified-geocentric procedure above supersedes the historical spindle-only
 checklist. The correction is independently integrated and deployed; physical acceptance remains
 **NOT RUN** until this checklist is executed on Quest.
+
+## Safe Sun path and query-gated Moon presentation
+
+The seven first-set constellation figures are physically accepted as recognizable, smooth,
+world-locked, and stereo-stable. Use this separate checklist for the failed Sun comparison and
+new Moon layers:
+
+1. Use a fresh private Quest session and confirm the exact build SHA, Swartz Creek defaults, and
+   Medium planet labels.
+2. Before calibration, open the safe Sun/Orion isolation. Confirm the app leaves loading, the Sun
+   path suppresses, both eyes complete, and no window/incomplete-frame error appears.
+3. Calibrate north. Confirm the Sun path appears and compare its smoothness with unchanged Orion.
+4. Inspect the apparent Moon daily path alone and with its marker. Confirm smooth, ordered,
+   world-locked stereo rendering and independent toggles.
+5. Inspect the dial ring and eight evenly spaced notches. It must read as a clock-like symbolic
+   cycle, not an orbit or daily path.
+6. Enable labels and verify the exact eight names, including “Last Quarter.”
+7. Enable images and verify New, waxing, Full, and waning order; opposite quarters; and a visible
+   but non-illuminating New Moon border.
+8. Enable the current appearance and indicator. Compare illuminated fraction with the current
+   phase and assess whether standardized waxing-right/waning-left orientation is acceptable.
+9. Move the head and inspect both eyes independently. Reject head locking, stereo separation,
+   duplicate resources, callback errors, incomplete frames, or changes to accepted layers.
+10. Toggle every Moon component off independently and confirm unrelated objects remain visible.
+
+See [Solar/Lunar Path Presentation](SOLAR_LUNAR_PATH_PRESENTATION.md),
+[Moon Phase Dial](MOON_PHASE_DIAL.md), and
+[Current Moon Appearance](CURRENT_MOON_APPEARANCE.md).

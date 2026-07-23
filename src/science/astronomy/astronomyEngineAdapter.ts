@@ -4,11 +4,15 @@ import {
   DeltaT_EspenakMeeus,
   Equator,
   Horizon,
+  Illumination,
+  MoonPhase,
   Observer,
   RotateVector,
   Rotation_EQD_HOR,
   Rotation_EQJ_EQD,
   Rotation_EQJ_HOR,
+  SearchMoonPhase,
+  SearchMoonQuarter,
   SetDeltaTFunction,
   SiderealTime,
   Vector,
@@ -31,6 +35,7 @@ import {
   type EquatorialPositionResult,
   type ObserverRelativeBody,
   type ObserverRelativePositionResult,
+  type MoonPhaseProviderResult,
   type ResultProvenance,
   type SimulationInstant,
   type TerrestrialTime,
@@ -324,5 +329,65 @@ export function getApparentTopocentricBody(
     correctionProfile: CORRECTION_PROFILES[correctionProfile],
     warnings: Object.freeze([]) as readonly [],
     validity: 'VALID',
+  });
+}
+
+/**
+ * Returns the provider's geocentric synodic phase state. The phase longitude
+ * convention is 0° new, 90° first quarter, 180° full, and 270° last quarter.
+ * This result is presentation metadata and never substitutes for the
+ * topocentric Moon direction.
+ */
+export function getMoonPhaseState(
+  instant: SimulationInstant,
+): MoonPhaseProviderResult {
+  const time = providerTime(instant);
+  const phaseLongitudeDeg = MoonPhase(time);
+  const illumination = Illumination(Body.Moon, time);
+  const previousNewMoon = SearchMoonPhase(0, time, -35);
+  const nextQuarter = SearchMoonQuarter(time);
+  const values = [
+    phaseLongitudeDeg,
+    illumination.phase_angle,
+    illumination.phase_fraction,
+    previousNewMoon?.date.getTime(),
+    nextQuarter.time.date.getTime(),
+  ];
+  if (
+    !previousNewMoon ||
+    !values.every((value) => Number.isFinite(value)) ||
+    phaseLongitudeDeg < 0 ||
+    phaseLongitudeDeg >= 360 ||
+    illumination.phase_fraction < 0 ||
+    illumination.phase_fraction > 1 ||
+    ![0, 1, 2, 3].includes(nextQuarter.quarter)
+  ) {
+    throw new AstronomyContractError(
+      'MALFORMED_PROVIDER_RESULT',
+      'Astronomy Engine returned an invalid Moon phase state.',
+      Object.freeze({
+        operation: 'getMoonPhaseState',
+        actual: Object.freeze({
+          phaseLongitudeDeg,
+          phaseAngleDeg: illumination.phase_angle,
+          illuminatedFraction: illumination.phase_fraction,
+          previousNewMoonUtc: previousNewMoon?.date.toISOString(),
+          nextPrincipalPhaseUtc: nextQuarter.time.date.toISOString(),
+          nextPrincipalQuarter: nextQuarter.quarter,
+        }),
+      }),
+    );
+  }
+  return Object.freeze({
+    kind: 'VALID_MOON_PHASE_STATE',
+    phaseLongitudeDeg,
+    phaseAngleDeg: illumination.phase_angle,
+    illuminatedFraction: illumination.phase_fraction,
+    previousNewMoonUtc: previousNewMoon.date.toISOString(),
+    nextPrincipalPhaseUtc: nextQuarter.time.date.toISOString(),
+    nextPrincipalQuarter: nextQuarter.quarter as 0 | 1 | 2 | 3,
+    provider: ASTRONOMY_ENGINE_PROVIDER,
+    providerVersion: ASTRONOMY_ENGINE_VERSION,
+    simulationInstant: instant,
   });
 }

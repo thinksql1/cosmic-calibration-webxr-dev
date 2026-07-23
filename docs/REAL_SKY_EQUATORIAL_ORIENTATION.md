@@ -142,3 +142,10 @@ callback/incomplete-frame failure. That evidence accepts this bridge as the coor
 for the query-gated first constellation-line study. It does not validate every numerical
 diagnostic, promote the real-sky grid to the ordinary default, or approve constellation labels.
 See [First Constellation Line Layer](FIRST_CONSTELLATION_LINE_LAYER.md).
+
+## Solar/lunar compatibility
+
+The safe Sun and Moon daily paths do not change this bridge. Both remain provider-owned
+`EQD_TRUE -> HORIZONTAL_ENU` directions under the calibrated geographic parent and do not apply
+an additional sidereal transform. The symbolic phase dial is anchored on the already transformed
+Moon direction and owns no celestial-coordinate convention.

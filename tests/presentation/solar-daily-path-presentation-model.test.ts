@@ -40,10 +40,15 @@ describe('solar daily-path presentation model', () => {
       showHourNotches: true,
       showBelowHorizon: true,
     });
-    expect(model.samples).toHaveLength(path.samples.length);
+    expect(model.samplingDiagnostics.sourceSampleCount).toBe(path.samples.length);
+    expect(model.samples.length).toBeGreaterThanOrEqual(path.samples.length);
     expect(model.hourNotches).toHaveLength(path.hourNotches.length);
     for (const notch of model.hourNotches) {
-      expect(notch.directionApplication).toEqual(model.samples[notch.pathSampleIndex]!.directionApplication);
+      const sourceSamples = model.samples.filter((sample) => sample.sourceSample);
+      const source = sourceSamples[notch.pathSampleIndex]!.directionApplication;
+      expect(notch.directionApplication.x).toBeCloseTo(source.x, 14);
+      expect(notch.directionApplication.y).toBeCloseTo(source.y, 14);
+      expect(notch.directionApplication.z).toBeCloseTo(source.z, 14);
     }
     expect(model.samples.some((sample) => !sample.aboveHorizon && sample.opacity > 0)).toBe(true);
     expect(model.renderStrategy).toContain('PROJECTIVE_APPARENT_SUN_PATH');

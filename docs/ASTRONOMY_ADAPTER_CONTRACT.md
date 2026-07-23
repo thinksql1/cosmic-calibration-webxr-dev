@@ -319,3 +319,16 @@ Milestone 2B now reaches the adapter only through the validated scientific snaps
 does not import Astronomy Engine or the P03 provider directly. The integrated production build
 emits a 662.83 kB minified / 178.12 kB gzip application/Three.js/astronomy chunk. The existing
 500 kB size advisory remains and physical Quest startup/performance evidence is pending.
+
+## Moon phase provider capability
+
+The installed Astronomy Engine `2.1.19` adapter exposes one bounded Moon phase result. `MoonPhase`
+uses longitude separation where 0/90/180/270 degrees mean New/First Quarter/Full/Last Quarter.
+`Illumination(Body.Moon)` supplies phase angle and illuminated fraction.
+`SearchMoonPhase(0, ...)` finds the preceding New Moon and `SearchMoonQuarter` finds the next
+principal phase. Provider identity, version, instant identity, finite ranges, and event ordering
+are validated before presentation. Failure is structured and locally suppressible.
+
+The daily Moon path continues to use the established apparent topocentric body operation, not the
+geocentric phase angle as a sky direction. This preserves lunar parallax and the existing
+`EQD_TRUE -> HORIZONTAL_ENU` correction contract.

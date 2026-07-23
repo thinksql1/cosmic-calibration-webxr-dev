@@ -4,6 +4,17 @@
 
 ### Added
 
+- Recorded physical Quest acceptance of all seven first-set constellation figures: recognizable,
+  smooth, world-locked, and stereo-stable. The failed Sun/Orion URL is an independent Sun-path
+  exception-containment defect, not a constellation failure.
+- Repaired ordinary Sun-path not-ready handling so it suppresses locally and never throws from
+  `onBeforeRender`. Rendering now uses one immutable ordered direction buffer, native per-eye
+  projection, and bounded one-degree spherical subdivision without changing provider samples.
+- Added a query-gated apparent-topocentric Moon civil-day path, symbolic eight-phase dial,
+  optional phase notches/labels/procedural images, continuous current-phase indicator, and
+  current Moon appearance. Procedural disks are cached, distinguish waxing/waning, retain a dark
+  New Moon interior, and use a visible framing border. The normal URL remains unchanged.
+
 - Recorded physical Quest acceptance of the query-gated real-sky orientation bridge as the
   constellation-coordinate foundation: complete grid geometry, credible pole convergence, no
   obvious mirror/inversion, natural planet placement, sound stereo/world locking, and no blocking

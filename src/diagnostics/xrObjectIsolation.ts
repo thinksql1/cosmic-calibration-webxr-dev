@@ -52,6 +52,19 @@ const FIRST_CONSTELLATION_LINE_NAMES = Object.freeze([
 const FIRST_CONSTELLATION_ENDPOINT_NAMES = Object.freeze(
   Object.keys(CONSTELLATION_SEGMENT_COUNTS).map((identifier) => `constellation-${identifier}-endpoint-markers`),
 );
+const MOON_PHASE_IDS = Object.freeze([
+  'new-moon', 'waxing-crescent', 'first-quarter', 'waxing-gibbous',
+  'full-moon', 'waning-gibbous', 'last-quarter', 'waning-crescent',
+]);
+const MOON_PHASE_IMAGE_NAMES = Object.freeze(MOON_PHASE_IDS.map((id) => `moon-phase-image-${id}`));
+const MOON_PHASE_LABEL_NAMES = Object.freeze(MOON_PHASE_IDS.map((id) => `moon-phase-label-${id}`));
+const MOON_PHASE_DIAL_NAMES = Object.freeze([
+  'moon-phase-dial-ring',
+  'moon-phase-dial-notches',
+  ...MOON_PHASE_LABEL_NAMES,
+  ...MOON_PHASE_IMAGE_NAMES,
+  'moon-current-phase-indicator',
+]);
 
 export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Object.freeze([
   state('all', 'Preset behavior — no object isolation', []),
@@ -137,6 +150,29 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('sun-moon', 'Sun and Moon only', ['apparent-sun-marker', 'apparent-moon-marker']),
   state('sun-path', 'Apparent Sun daily path only', ['apparent-sun-civil-day-projective-path'], { 'apparent-sun-civil-day-projective-path': 0xff5500 }),
   state('sun-notches', 'Sun civil-hour notches only', ['apparent-sun-civil-hour-notches']),
+  state('sun-path-notches', 'Safe Sun path with civil-hour notches', ['apparent-sun-civil-day-projective-path', 'apparent-sun-civil-hour-notches']),
+  state('sun-path-orion-safe', 'Orion plus safe Sun path', ['apparent-sun-civil-day-projective-path', ...ORION_CONSTELLATION_NAMES]),
+  state('moon-marker', 'Moon marker only', ['apparent-moon-marker']),
+  state('moon-daily-path', 'Moon daily path only', ['apparent-moon-civil-day-projective-path']),
+  state('moon-marker-daily-path', 'Moon marker plus daily path', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path']),
+  state('moon-phase-dial-ring', 'Moon phase dial ring only', ['moon-phase-dial-ring']),
+  state('moon-phase-notches', 'Moon phase notches only', ['moon-phase-dial-notches']),
+  state('moon-phase-labels', 'Moon phase labels only', MOON_PHASE_LABEL_NAMES),
+  state('moon-phase-images', 'All eight phase images only', MOON_PHASE_IMAGE_NAMES),
+  ...MOON_PHASE_IDS.map((id) => state(`moon-phase-${id}`, `${id} phase image only`, [`moon-phase-image-${id}`])),
+  state('moon-phase-dial-complete', 'Complete symbolic Moon phase dial', MOON_PHASE_DIAL_NAMES),
+  state('current-moon-appearance', 'Current Moon appearance only', ['current-moon-appearance']),
+  state('current-moon-marker', 'Current Moon appearance plus Moon marker', ['current-moon-appearance', 'apparent-moon-marker']),
+  state('current-moon-sun', 'Current Moon appearance plus Sun marker', ['current-moon-appearance', 'apparent-sun-marker']),
+  state('moon-current-phase-indicator', 'Current phase indicator only', ['moon-current-phase-indicator']),
+  state('moon-path-phase-dial', 'Moon daily path plus phase dial', ['apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES]),
+  state('moon-path-current-appearance', 'Moon daily path plus current appearance', ['apparent-moon-civil-day-projective-path', 'current-moon-appearance']),
+  state('moon-study-complete', 'Complete Moon study', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance']),
+  state('moon-study-grid', 'Moon study plus real-sky grid', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance', ...CELESTIAL_GRID_LINE_NAMES]),
+  state('moon-study-planets', 'Moon study plus planets', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance', 'apparent-mercury-marker', 'apparent-venus-marker', 'apparent-mars-marker', 'apparent-jupiter-marker', 'apparent-saturn-marker', 'apparent-uranus-marker', 'apparent-neptune-marker', 'apparent-pluto-marker']),
+  state('moon-study-constellations', 'Moon study plus constellations', ['apparent-moon-marker', 'apparent-moon-civil-day-projective-path', ...MOON_PHASE_DIAL_NAMES, 'current-moon-appearance', ...FIRST_CONSTELLATION_LINE_NAMES]),
+  state('sun-moon-paths', 'Sun and Moon paths together', ['apparent-sun-civil-day-projective-path', 'apparent-moon-civil-day-projective-path']),
+  state('sun-moon-path-smoothness', 'Sun and Moon path smoothness comparison', ['apparent-sun-civil-day-projective-path', 'apparent-moon-civil-day-projective-path', 'apparent-sun-civil-hour-notches']),
   state('calibration-ray', 'North-calibration target ray only', ['north-calibration-target-ray'], { 'north-calibration-target-ray': 0xffee00 }),
   state('controller-feedback', 'Controller calibration feedback only', ['north-calibration-controller-feedback']),
   state('world-feedback', 'World calibration feedback only', ['north-calibration-world-feedback']),
