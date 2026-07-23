@@ -17,9 +17,10 @@ non-refracted. Airless topocentric EQD cross-checks cover Sun, Moon, Mercury, Ju
 without changing any body direction. Focused and complete validation currently pass `531/531`
 tests across `56` files, type-check, production build, dependency audit/tree, and diff checks.
 Desktop fixed-time verification confirms a stationary pole, sidereal RA rotation, the intentional
-32-line canonical/real-sky overlay, zero grid/pole error, and no callback errors. Integration,
-development deployment, and physical Quest validation remain pending. Constellations remain
-deferred.
+32-line canonical/real-sky overlay, zero grid/pole error, and no callback errors. Feature
+`2e257db` was normally merged into development as `ccf37fd`; clean merged validation passed, and
+Actions/Pages run `29969698393` deployed the merge successfully. Physical Quest validation remains
+pending, the canonical grid remains the ordinary default, and constellations remain deferred.
 
 The latest user-reported Quest result accepts the native Sprite planet-label contract and Medium
 as the preferred preset: `2.24 × 0.56 m` at the unchanged `24 m` presentation distance. Attachment,

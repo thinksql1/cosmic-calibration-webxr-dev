@@ -1,5 +1,8 @@
 # Real-Sky Equatorial Orientation
 
+Development deployment: feature `2e257db`, normal merge `ccf37fd`, successful Actions/Pages run
+`29969698393`. The hosted study remains query-gated pending physical Quest acceptance.
+
 ## Status
 
 **Development-only query-gated study; automated validation passed; physical Quest validation

@@ -11,6 +11,10 @@
   shader rotation about the encoded Earth core, canonical/real-sky/overlay modes, deterministic
   `skyTime` URLs, body cross-checks, diagnostics, and isolation modes add no constellation data and
   leave the ordinary canonical scene unchanged pending Quest validation.
+- Normally merged the bridge as `ccf37fd` into development and deployed it through successful
+  Actions/Pages run `29969698393`. Clean merged validation passed `531/531` tests across `56`
+  files, type-check, build, dependency audit/tree, diff checks, and desktop fixed-time verification.
+  This is development-only hosted evidence; physical Quest validation remains pending.
 - Recorded the completed planet-label Quest result: native Three.js Sprites render immediately,
   remain marker-attached and world-locked in both eyes, and toggle correctly. Medium
   (`2.24 × 0.56 m`) at `24 m` is the physically preferred and already-default planet-label preset;
