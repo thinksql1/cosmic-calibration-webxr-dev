@@ -23,6 +23,14 @@ import { createSolarDailyPathGroup } from './scene/createSolarDailyPathGroup';
 import { createReferenceScene } from './scene/createReferenceScene';
 import { createSimulationInstant } from './science/astronomy/time';
 import {
+  catalogEquatorialJ2000ToHorizontalEnu,
+  createRealSkyEquatorialOrientation,
+  createRealSkyGridDirectionRotation,
+  equatorialOfDateToHorizontalEnu,
+  type RealSkyEquatorialOrientationReady,
+} from './science/astronomy/realSkyEquatorialOrientation';
+import { angularSeparationDeg } from './science/astronomy/frameTransforms';
+import {
   SUPPORTED_PLANET_AND_DWARF_PLANET_BODIES,
   type SupportedPlanetBody,
 } from './science/astronomy/types';
@@ -53,6 +61,7 @@ import {
   type CelestialEquatorDisplaySettings,
 } from './presentation/celestialEquatorPresentationModel';
 import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
+import { parseSkyFrameStudyLaunch, type SkyFrameStudyMode } from './presentation/realSkyGridStudy';
 import { createGeocentricCelestialStructurePresentation } from './presentation/geocentricCelestialStructurePresentation';
 import {
   defaultObserverOffsetGeoStudySettings,
@@ -165,6 +174,9 @@ const showCelestialEquatorInput = requireElement<HTMLInputElement>('#show-celest
 const showCelestialGridInput = requireElement<HTMLInputElement>('#show-celestial-coordinate-grid');
 const showDeclinationGridInput = requireElement<HTMLInputElement>('#show-declination-lines');
 const showRightAscensionGridInput = requireElement<HTMLInputElement>('#show-right-ascension-lines');
+const skyFrameStudyControls = requireElement<HTMLDetailsElement>('#sky-frame-study-controls');
+const skyFrameStudyModeSelect = requireElement<HTMLSelectElement>('#sky-frame-study-mode');
+const skyFrameStudyDiagnostics = requireElement<HTMLUListElement>('#sky-frame-study-diagnostics');
 const showLocalHorizonInput = requireElement<HTMLInputElement>('#show-local-horizon');
 const showSolarSystemBodiesInput = requireElement<HTMLInputElement>('#show-solar-system-bodies');
 const showPlanetLabelsInput = requireElement<HTMLInputElement>('#show-planet-labels');
@@ -206,9 +218,12 @@ const buildIdentifier = import.meta.env.VITE_BUILD_IDENTIFIER ?? 'development-lo
 const queryStudyMode = parseObserverOffsetGeoStudyMode(window.location.search);
 const finiteCoreLaunch = parseFiniteCoreParallaxLaunch(window.location.search);
 const queryPlanetLabelStudyMode = parsePlanetLabelStudyMode(window.location.search);
+const skyFrameLaunch = parseSkyFrameStudyLaunch(window.location.search);
 planetLabelStudyControls.hidden = !(xrDiagnostics.enabled || queryPlanetLabelStudyMode !== 'baseline');
 planetLabelStudyModeSelect.value = queryPlanetLabelStudyMode;
 planetLabelScaleSelect.value = parsePlanetLabelScale(new URLSearchParams(window.location.search).get('labelScale'));
+skyFrameStudyControls.hidden = !(xrDiagnostics.enabled || skyFrameLaunch.explicitlyRequested);
+skyFrameStudyModeSelect.value = skyFrameLaunch.mode;
 geoStudyControls.hidden = !(xrDiagnostics.enabled || queryStudyMode !== 'baseline');
 geoStudyModeSelect.value = queryStudyMode;
 const initialStudySettings = defaultObserverOffsetGeoStudySettings(queryStudyMode);
@@ -242,6 +257,20 @@ if (xrDiagnostics.enabled) {
   showSolarHourNotchesInput.checked = diagnosticPreset.sunPath;
 }
 if (finiteCoreLaunch.enabled) showCelestialGridInput.checked = true;
+if (skyFrameLaunch.explicitlyRequested) {
+  showCelestialGridInput.checked = true;
+  const isolation = xrDiagnostics.isolation.id;
+  if (isolation.includes('horizon')) {
+    showLocalHorizonInput.checked = true;
+    showCelestialEquatorInput.checked = true;
+  }
+  if (isolation.includes('poles') || isolation.includes('pole-alignment') || isolation.includes('basis-axes')) {
+    showMarkersInput.checked = true;
+  }
+  if (isolation.includes('sun-moon') || isolation.includes('planets')) {
+    showSolarSystemBodiesInput.checked = true;
+  }
+}
 const celestialOverlayControls = [
   ...celestialPanel.querySelectorAll<HTMLElement>('button, input, select, summary'),
 ];
@@ -271,6 +300,16 @@ const celestialEquator = createCelestialEquatorGroup(
 const celestialCoordinateGrid = createCelestialCoordinateGridGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
 );
+const realSkyOverlayGrid = createCelestialCoordinateGridGroup(
+  (event, detail) => xrDiagnostics.record(event, detail),
+  {
+    groupName: 'real-sky-celestial-coordinate-grid-overlay',
+    lineNamePrefix: 'real-sky-overlay-',
+    color: 0xffb45c,
+    opacityMultiplier: 0.82,
+    renderOrder: 21,
+  },
+);
 const observerOffsetStudy = createObserverOffsetGeocentricStudyGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
 );
@@ -283,6 +322,7 @@ const geocentricCelestialStructure = createGeocentricCelestialStructureGroup(
   celestialCoordinateGrid.group,
   observerOffsetStudy.group,
 );
+geocentricCelestialStructure.add(realSkyOverlayGrid.group);
 const localHorizon = createLocalHorizonGroup(LOCAL_HORIZON_SAMPLE_COUNT);
 const solarSystemBodies = createSolarSystemBodiesGroup(
   (event, detail) => xrDiagnostics.record(event, detail),
@@ -380,7 +420,7 @@ controls.update();
 const northCalibration = new NorthCalibrationController();
 const observerState = new ObserverStateStore();
 const simulationClock = new SimulationClock(
-  createSimulationInstant('2025-06-21T16:00:00.000Z', 'user-selected'),
+  createSimulationInstant(skyFrameLaunch.frozenUtc ?? '2025-06-21T16:00:00.000Z', 'user-selected'),
 );
 const scientificConfiguration = new ScientificConfigurationStore();
 const scientificCalibration = new GeographicCalibrationStateAdapter();
@@ -398,6 +438,10 @@ let previousCalibrationKind: NorthCalibrationState['kind'] | undefined;
 let currentFiniteCoreModel: FiniteCoreParallaxModel | undefined;
 let lastFiniteCoreDiagnosticUpdateMs = Number.NEGATIVE_INFINITY;
 let observerLocationEntry: 'development-default' | 'user-edited' = 'development-default';
+let realSkyOrientationUpdateCount = 0;
+let realSkyOrientationSignature = '';
+let realSkyOrientationLastReason = 'initial construction';
+let currentRealSkyOrientation: RealSkyEquatorialOrientationReady | undefined;
 
 function diagnosticSnapshot(label: string, state: NorthCalibrationState): void {
   xrDiagnostics.snapshot(
@@ -462,6 +506,10 @@ function currentGridDisplaySettings(): CelestialCoordinateGridDisplaySettings {
     showDeclinationLines: showDeclinationGridInput.checked,
     showRightAscensionLines: showRightAscensionGridInput.checked,
   });
+}
+
+function currentSkyFrameStudyMode(): SkyFrameStudyMode {
+  return parseSkyFrameStudyLaunch(`?skyFrameStudy=${skyFrameStudyModeSelect.value}`).mode;
 }
 
 function currentStudyDisplaySettings(): ObserverOffsetGeoStudySettings {
@@ -573,6 +621,7 @@ function renderCelestialAxis(): void {
     eyeModeDiagnostic('Axis/poles', celestialAxis.getEyePresentationDiagnostics()),
     eyeModeDiagnostic('Celestial equator', celestialEquator.getEyePresentationDiagnostics()),
     `Celestial grid: ${celestialCoordinateGrid.group.userData.activeLineCount ?? 0} active lines; longitude reference ${celestialCoordinateGrid.group.userData.longitudeReference ?? 'not-ready'}`,
+    `Sky-frame study: ${currentSkyFrameStudyMode()}; catalog EQJ bridge and mean-of-date grid phase remain query-gated`,
     `Observer-offset study: ${currentStudyDisplaySettings().mode}; ${selectedObserverOffsetGeoStudyComponents(currentStudyDisplaySettings()).join(', ') || 'baseline only'}`,
     `Earth Core toggle ${showEarthCoreInput.checked ? 'ON' : 'OFF'}; selected representation ${selectedEarthCorePresentation()}; configured proxy distance ${finiteCoreExperimentDistanceMeters().toFixed(1)} m`,
     `Configured observer ${observerLatitudeInput.value}°, ${observerLongitudeInput.value}° east-positive, ${observerElevationInput.value} m MSL (${observerLocationEntry === 'development-default' ? 'development defaults' : 'user-edited this session'}; no persistence)`,
@@ -593,6 +642,8 @@ function renderCelestialAxis(): void {
     celestialAxis.clear();
     celestialEquator.clear();
     celestialCoordinateGrid.clear();
+    realSkyOverlayGrid.clear();
+    currentRealSkyOrientation = undefined;
     observerOffsetStudy.clear();
     finiteCoreParallaxExperiment.clear('scientific state not ready');
     currentFiniteCoreModel = undefined;
@@ -619,7 +670,102 @@ function renderCelestialAxis(): void {
     gridSettings,
     geocentricPresentation,
   );
-  celestialCoordinateGrid.update(gridModel, gridSettings);
+  const realSkyOrientation = createRealSkyEquatorialOrientation(
+    result.snapshot.clock.instant,
+    result.snapshot.observer.observer,
+  );
+  const gridRotation = createRealSkyGridDirectionRotation({
+    zeroLongitude: gridModel.coordinateBasis.zeroLongitude,
+    positiveNinetyLongitude: gridModel.coordinateBasis.positiveNinetyLongitude,
+    northPole: gridModel.coordinateBasis.northPole,
+  }, realSkyOrientation);
+  const skyMode = currentSkyFrameStudyMode();
+  const orientationReady = realSkyOrientation.kind === 'ready' && gridRotation.kind === 'ready';
+  const orientationSignature = orientationReady
+    ? `${result.snapshot.clock.instant.utcIso}|${result.snapshot.observer.observer.latitudeDeg}|${result.snapshot.observer.observer.longitudeDegEast}`
+    : '';
+  if (orientationSignature && orientationSignature !== realSkyOrientationSignature) {
+    realSkyOrientationLastReason = realSkyOrientationSignature
+      ? 'central clock or observer revision changed'
+      : 'initial ready orientation';
+    realSkyOrientationSignature = orientationSignature;
+    realSkyOrientationUpdateCount += 1;
+  }
+  currentRealSkyOrientation = realSkyOrientation.kind === 'ready'
+    ? realSkyOrientation
+    : undefined;
+  if (skyMode === 'real-sky') {
+    if (orientationReady) {
+      celestialCoordinateGrid.update(gridModel, gridSettings, {
+        id: 'real-sky',
+        rows: gridRotation.rows,
+      });
+    } else {
+      celestialCoordinateGrid.clear();
+    }
+    realSkyOverlayGrid.clear();
+  } else {
+    celestialCoordinateGrid.update(gridModel, gridSettings);
+    if (skyMode === 'overlay' && orientationReady) {
+      realSkyOverlayGrid.update(gridModel, gridSettings, {
+        id: 'real-sky',
+        rows: gridRotation.rows,
+      });
+    } else {
+      realSkyOverlayGrid.clear();
+    }
+  }
+  if (realSkyOrientation.kind === 'ready' && gridRotation.kind === 'ready') {
+    const formatMatrix = (rows: typeof realSkyOrientation.eqjToHorRows) =>
+      rows.map((row) => `[${row.map((value) => value.toFixed(7)).join(', ')}]`).join(' ');
+    const basisDirections = [0, 6, 12, 18].map((hours) =>
+      catalogEquatorialJ2000ToHorizontalEnu(hours, 0, realSkyOrientation));
+    const pole = realSkyOrientation.gridBasisApplication.northPole;
+    const horizonIntersectionLength = Math.hypot(-pole.z, pole.x);
+    const equatorEast = horizonIntersectionLength > 0
+      ? [(-pole.z) / horizonIntersectionLength, 0, pole.x / horizonIntersectionLength] as const
+      : [1, 0, 0] as const;
+    const equatorWest = equatorEast.map((value) => -value) as unknown as readonly [number, number, number];
+    const localDisplayTime = civilTimeZoneState.current.kind === 'ready'
+      ? new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'long',
+        timeZone: civilTimeZoneState.current.timeZone.ianaName,
+      }).format(new Date(realSkyOrientation.instant.unixMilliseconds))
+      : 'IANA zone not ready';
+    const directionText = (direction: ReturnType<typeof catalogEquatorialJ2000ToHorizontalEnu>) =>
+      direction.kind === 'ready'
+        ? `(${direction.direction.east.toFixed(5)}, ${direction.direction.north.toFixed(5)}, ${direction.direction.up.toFixed(5)})`
+        : `suppressed:${direction.reason}`;
+    skyFrameStudyDiagnostics.replaceChildren(...[
+      `Mode ${skyMode}; source catalog EQJ J2000; grid phase EQD true-of-date; output HORIZONTAL_ENU; geometric airless`,
+      `UTC ${realSkyOrientation.instant.utcIso}; observer ${realSkyOrientation.observer.latitudeDeg.toFixed(4)}, ${realSkyOrientation.observer.longitudeDegEast.toFixed(4)}, ${realSkyOrientation.observer.elevationMeters.toFixed(0)} m MSL`,
+      `Local display time ${localDisplayTime}`,
+      `Astronomy Engine ${realSkyOrientation.providerVersion}; APIs Rotation_EQJ_EQD + Rotation_EQD_HOR + Rotation_EQJ_HOR; GAST ${realSkyOrientation.greenwichApparentSiderealTimeHours.toFixed(7)} h`,
+      `EQJ→EQD ${formatMatrix(realSkyOrientation.eqjToEqdRows)}`,
+      `EQD→HOR ${formatMatrix(realSkyOrientation.eqdToHorRows)}`,
+      `EQJ→HOR ${formatMatrix(realSkyOrientation.eqjToHorRows)}`,
+      `HOR→application ${formatMatrix(realSkyOrientation.horToApplicationRows)}`,
+      `det ${realSkyOrientation.determinant.toFixed(12)}; orthonormal error ${realSkyOrientation.orthonormalityError.toExponential(3)}; inverse error ${realSkyOrientation.inverseRoundTripError.toExponential(3)}`,
+      `NCP (${pole.x.toFixed(6)}, ${pole.y.toFixed(6)}, ${pole.z.toFixed(6)}); SCP (${(-pole.x).toFixed(6)}, ${(-pole.y).toFixed(6)}, ${(-pole.z).toFixed(6)})`,
+      `EQJ RA 0h ${directionText(basisDirections[0]!)}; 6h ${directionText(basisDirections[1]!)}; 12h ${directionText(basisDirections[2]!)}; 18h ${directionText(basisDirections[3]!)}`,
+      `Celestial-equator horizon intersections east ${fixed(equatorEast, 6)}; west ${fixed(equatorWest, 6)}`,
+      `Grid pole alignment ${gridRotation.poleAlignmentErrorDeg.toExponential(3)} deg; grid rotation det ${gridRotation.determinant.toFixed(12)}; orthonormal error ${gridRotation.orthonormalityError.toExponential(3)}`,
+      `Responsibility: Astronomy Engine applies UTC, sidereal rotation, longitude, and latitude once; geographic-reference-frame applies accepted physical-north yaw once`,
+      `Orientation updates ${realSkyOrientationUpdateCount}; last reason ${realSkyOrientationLastReason}; geometry rebuilt for orientation false; per-eye orientation mutation false`,
+      `Build ${buildIdentifier}`,
+    ].map((line) => Object.assign(document.createElement('li'), { textContent: line })));
+  } else {
+    currentRealSkyOrientation = undefined;
+    const reason = realSkyOrientation.kind === 'not-ready'
+      ? realSkyOrientation.reason
+      : gridRotation.kind === 'not-ready'
+        ? gridRotation.reason
+        : 'unknown orientation failure';
+    skyFrameStudyDiagnostics.replaceChildren(Object.assign(document.createElement('li'), {
+      textContent: `Real-sky orientation locally suppressed: ${reason}`,
+    }));
+  }
   const observerOffsetContract = createObserverOffsetGeocentricPresentation(geocentricPresentation);
   if (observerOffsetContract.kind === 'not-ready') {
     observerOffsetStudy.clear();
@@ -664,6 +810,24 @@ function renderCelestialAxis(): void {
   solarSystemBodies.update(bodyModel);
   const bodyDiagnostics = solarSystemBodies.getDiagnostics();
   const planetLabelScale = getPlanetLabelScaleDefinition(bodyModel.labels[0]?.scale ?? parsePlanetLabelScale(planetLabelScaleSelect.value));
+  const bridgeBodyNames = new Set(['Sun', 'Moon', 'Mercury', 'Jupiter', 'Uranus']);
+  const bodyBridgeToleranceDeg = 1e-6;
+  const bodyBridgeComparisons = currentRealSkyOrientation
+    ? bodyState.bodies.filter((body) => bridgeBodyNames.has(body.body)).map((body) => {
+      const transformed = equatorialOfDateToHorizontalEnu(
+        body.equatorial.rightAscensionHours,
+        body.equatorial.declinationDeg,
+        currentRealSkyOrientation!,
+      );
+      const errorDeg = transformed.kind === 'ready'
+        ? angularSeparationDeg(
+          [transformed.direction.east, transformed.direction.north, transformed.direction.up],
+          [body.horizontal.direction.east, body.horizontal.direction.north, body.horizontal.direction.up],
+        )
+        : Number.NaN;
+      return `${body.body}: topocentric apparent EQD to geometric HOR/ENU; ${body.correctionProfile.refraction === 'disabled' ? 'airless matched' : 'refracted comparison flagged'}; error ${Number.isFinite(errorDeg) ? errorDeg.toExponential(3) : 'suppressed'} deg; tolerance ${bodyBridgeToleranceDeg.toExponential(0)} deg; ${Number.isFinite(errorDeg) && errorDeg <= bodyBridgeToleranceDeg ? 'PASS' : 'REVIEW'}`;
+    })
+    : [];
   celestialDiagnostics.append(...[
     `Apparent-body provider ${bodyModel.provenance.provider} ${bodyModel.provenance.providerVersion}; ${bodyModel.provenance.sourceFrame} → ${bodyModel.provenance.outputFrame}; profile ${bodyModel.provenance.correctionProfile}`,
     `Planet Labels ${showPlanetLabelsInput.checked ? 'ON' : 'OFF'}; study ${bodyModel.planetLabelStudyMode}; preset ${planetLabelScale.id} (${planetLabelScale.displayName}); dimensions ${planetLabelScale.dimensionsMeters[0].toFixed(2)} × ${planetLabelScale.dimensionsMeters[1].toFixed(2)} m; multiplier ${planetLabelScale.relativeToPreviousLarge}× previous Large; configured ${bodyDiagnostics.configuredLabelObjectNames.length}; submitted ${bodyDiagnostics.submittedLabelObjectNames.length}; visible ${bodyDiagnostics.activeLabelObjectNames.length}; render-callback observed ${bodyDiagnostics.renderedLabelObjectNames.length}`,
@@ -674,7 +838,10 @@ function renderCelestialAxis(): void {
       return `${body} label: created=${detail.objectCreated}; texture=${detail.textureWidth}x${detail.textureHeight}; alphaPixels=${detail.visibleAlphaPixelCount}; spriteScale=${detail.worldScale.map((value) => value.toFixed(2)).join('×')} m; material=${detail.materialType}; opacity=${detail.opacity}; transparent=${detail.transparent}; depthTest=${detail.depthTest}; depthWrite=${detail.depthWrite}; renderOrder=${detail.renderOrder}; frustumCulled=${detail.frustumCulled}; anchor=${placement ? placement.anchor.toArray().map((value) => value.toFixed(4)).join(',') : 'suppressed'}; offset=${placement ? placement.tangentOffset.toArray().map((value) => value.toFixed(4)).join(',') : 'suppressed'}; projected=${Object.entries(detail.projectedCentersNdc).map(([eye, value]) => `${eye}:${value.map((component) => component.toFixed(4)).join(',')}`).join(';') || 'not-rendered'}; disparity=${detail.stereoDisparityNdc?.toExponential(3) ?? 'pending'}; cameraDistance=${detail.cameraDistanceMeters?.toFixed(3) ?? 'pending'}; callbackErrors=${detail.callbackErrorCount}; reason=${detail.suppressionReason ?? 'none'}`;
     }),
     ...bodyModel.markers.map((marker) => `${marker.body}: ENU (${marker.directionEnu.east.toFixed(4)}, ${marker.directionEnu.north.toFixed(4)}, ${marker.directionEnu.up.toFixed(4)}) → application (${marker.directionApplication.x.toFixed(4)}, ${marker.directionApplication.y.toFixed(4)}, ${marker.directionApplication.z.toFixed(4)}); marker ${marker.visible ? 'enabled' : 'disabled'}; finite ${Number.isFinite(marker.directionApplication.x) && Number.isFinite(marker.directionApplication.y) && Number.isFinite(marker.directionApplication.z)}`),
+    ...bodyBridgeComparisons.map((comparison) => `Real-sky body cross-check ${comparison}`),
   ].map((detail) => Object.assign(document.createElement('li'), { textContent: detail })));
+  skyFrameStudyDiagnostics.append(...bodyBridgeComparisons.map((comparison) =>
+    Object.assign(document.createElement('li'), { textContent: `Body cross-check ${comparison}` })));
   if (civilTimeZoneState.current.kind !== 'ready') {
     solarDailyPath.clear();
     celestialDiagnostics.append(
@@ -739,6 +906,7 @@ function setImmersivePresentation(active: boolean): void {
     celestialAxis.applyEyePresentationViews();
     celestialEquator.applyEyePresentationViews();
     celestialCoordinateGrid.applyEyePresentationViews();
+    realSkyOverlayGrid.applyEyePresentationViews();
     localHorizon.applyEyePresentationViews();
   }
 }
@@ -1079,6 +1247,16 @@ useCurrentTimeButton.addEventListener('click', () => {
   control.addEventListener('change', renderCelestialAxis);
 });
 
+skyFrameStudyModeSelect.addEventListener('change', () => {
+  const mode = currentSkyFrameStudyMode();
+  skyFrameStudyModeSelect.value = mode;
+  showCelestialGridInput.checked = true;
+  const url = new URL(window.location.href);
+  url.searchParams.set('skyFrameStudy', mode);
+  window.history.replaceState({}, '', url);
+  renderCelestialAxis();
+});
+
 geoStudyModeSelect.addEventListener('change', () => {
   const mode = geoStudyModeSelect.value as ObserverOffsetGeoStudyMode;
   const defaults = defaultObserverOffsetGeoStudySettings(mode);
@@ -1136,6 +1314,7 @@ function applyEyePresentationForFrame(frame?: XRFrame): void {
   celestialAxis.applyEyePresentationViews(views, renderer.xr.isPresenting);
   celestialEquator.applyEyePresentationViews(views, renderer.xr.isPresenting);
   celestialCoordinateGrid.applyEyePresentationViews(views, renderer.xr.isPresenting);
+  realSkyOverlayGrid.applyEyePresentationViews(views, renderer.xr.isPresenting);
   localHorizon.applyEyePresentationViews(views, renderer.xr.isPresenting);
   updateEyePresentationStatus();
 }
@@ -1201,6 +1380,7 @@ window.addEventListener('pagehide', () => {
   celestialAxis.dispose();
   celestialEquator.dispose();
   celestialCoordinateGrid.dispose();
+  realSkyOverlayGrid.dispose();
   finiteCoreParallaxExperiment.dispose();
   localHorizon.dispose();
   solarSystemBodies.dispose();

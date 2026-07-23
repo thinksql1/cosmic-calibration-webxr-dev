@@ -110,6 +110,12 @@ relationship is not evidence that a scientific frame transform occurred.
 - **Invalidation:** session end, reference-space reset/discontinuity, boundary/floor reset, room
   change, or lost/re-established tracking origin.
 
+The later query-gated real-sky bridge does not modify this rule. Sidereal/time/longitude rotation
+is applied to celestial directions by Astronomy Engine before presentation; accepted north yaw is
+then inherited once from `geographic-reference-frame`. The XR tracking frame itself is never
+astronomically rotated. Current authority is
+[Real-Sky Equatorial Orientation](REAL_SKY_EQUATORIAL_ORIENTATION.md).
+
 ### 2. Room-relative diagnostic frame
 
 - **Origin/axes/units:** inherits the XR frame; origin marker and diagnostics are authored in

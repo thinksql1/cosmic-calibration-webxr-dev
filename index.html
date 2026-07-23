@@ -168,7 +168,18 @@
           <p class="simulation-note">World-scale WGS84 model: one Earth-centered structure contains the core, rotational spindle, projective NCP/SCP directions, and a finite reference ring in the celestial-equatorial plane. The optional 24 m local horizon is intentionally observer-centered and tangent-plane based; its radius is a visual reference, not distance to the natural horizon. The room floor is not an opaque Earth surface.</p>
           <p class="simulation-note">Sun and Moon remain separate categories. Mercury through Neptune are major planets; Pluto is a dwarf planet. Their markers are actual apparent topocentric directions at the selected observer and UTC instant. Planet Labels affects only planet/Pluto labels and defaults off; marker sizes are symbolic visibility aids, not planetary disks.</p>
           <p class="simulation-note">The optional Sun path is an observer-relative apparent trace across the selected local civil day. Its notches are independently calculated at valid civil-hour boundaries on the path itself, including below-horizon positions; it is neither the celestial equator nor an annual ecliptic.</p>
-          <p class="simulation-note">The coordinate grid is a restrained geocentric reference: four closed declination circles and twelve intentionally open pole-to-pole longitude arcs. Its current 0h reference is deterministic and non-sidereal; future constellations must reuse this coordinate utility rather than introduce another convention.</p>
+          <p class="simulation-note">The coordinate grid is a restrained geocentric reference: four closed declination circles and twelve intentionally open pole-to-pole longitude arcs. The ordinary view retains its validated deterministic non-sidereal 0h reference. The query-gated real-sky study applies provider-native sidereal phase without rebuilding the grid; future constellations must use the accepted catalog bridge rather than introduce another convention.</p>
+          <details id="sky-frame-study-controls" hidden>
+            <summary>Real-sky equatorial orientation study</summary>
+            <label for="sky-frame-study-mode">Grid sky frame</label>
+            <select id="sky-frame-study-mode">
+              <option value="canonical" selected>Canonical non-sidereal</option>
+              <option value="real-sky">Real sky (EQD grid phase)</option>
+              <option value="overlay">Canonical + real-sky overlay</option>
+            </select>
+            <p class="simulation-note">Catalog coordinates use the provider-native J2000 EQJ bridge. The existing mean-of-date grid uses the provider-native EQD phase so its validated pole convergence remains exact. Both are geometric and non-refracted.</p>
+            <ul id="sky-frame-study-diagnostics" class="diagnostics-list"></ul>
+          </details>
           <details id="geo-study-controls" hidden>
             <summary>Observer-offset geocentric study</summary>
             <p class="simulation-note">Development-only explanatory aids. They do not change the validated celestial grid, equator, or calibration.</p>

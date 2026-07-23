@@ -16,9 +16,13 @@ references. North calibration rotates only the geographic display group around l
 rotates the XR camera, renderer, room/floor frame, controller target-ray objects, or scientific
 source data.
 
-The coordinate grid reuses the assembly's P03 axis and deterministic equatorial basis. Its current
-longitude zero is explicitly non-sidereal rather than a claimed vernal-equinox reference; see
-`docs/CELESTIAL_COORDINATE_GRID.md` for the reusable conversion and topology contract.
+The ordinary coordinate grid reuses the assembly's P03 axis and deterministic equatorial basis;
+its longitude zero remains explicitly non-sidereal. A query-gated study now provides the missing
+provider-native orientation bridge: catalog J2000 RA/declination uses `EQJ -> HOR`, while the
+existing mean-date grid uses `EQD -> HOR` phase so validated pole convergence remains exact. Both
+map HOR `(north, west, up)` to application `(east, up, -north)`, remain geometric/non-refracted,
+and inherit north calibration only from the geographic parent. See
+`docs/REAL_SKY_EQUATORIAL_ORIENTATION.md` and `docs/CELESTIAL_COORDINATE_GRID.md`.
 
 ## Coordinate convention
 

@@ -41,8 +41,9 @@ Quest but exposed a zero-area projective-plane label defect. The repaired labels
 marker direction at a disclosed finite `24 m` presentation anchor plus a deterministic tangent
 offset and render as native XR sprites. They are not a new coordinate convention or astronomical
 distance claim. Quest testing confirmed rendering and attachment but found the original size table
-too small for comfortable reading. Old Large is new Small; Medium is the default and larger
-canonical XL/XXL experiments are available for physical readability comparison. A full
+too small for comfortable reading. Old Large is new Small; Medium (`2.24 × 0.56 m`) at `24 m`
+is now the physically selected default, while larger canonical XL/XXL experiments remain
+available. A full
 collision/decluttering engine is deliberately deferred; inter-body overlap is an accepted
 readability-test limitation. See [XR Planet Label Rendering](XR_PLANET_LABEL_RENDERING.md).
 
@@ -60,6 +61,5 @@ validated apparent/equatorial direction pathway rather than inventing another ba
 Earth-axis spindle is unrelated and unchanged.
 
 Quest validation passed Uranus, Neptune, and Pluto markers and the repaired finite Sprite labels'
-basic rendering/attachment behavior. Physical comparison is now pending for Small, Medium, Large,
-XL, and XXL readability, label-to-marker anchoring, and stereo stability. Record only observed
-results; do not infer exact angular accuracy or body identification from a short session.
+rendering, marker attachment, world locking, stereo behavior, toggle behavior, and Medium
+readability. This does not approve the same size or overlap policy for constellation labels.

@@ -10,9 +10,14 @@ implemented or remain deferred. Current temporal implementation status is govern
 The published baseline implements one central simulation clock; deterministic frozen and paused
 modes; bounded live refresh; apparent Sun, Moon, and ten-body state; explicit IANA-zone
 civil-day resolution with DST fold/gap metadata; a daily observer-relative apparent Sun path; and
-exact civil-hour notches. Labels, event-jump controls, broad time manipulation, richer lunar
+exact civil-hour notches. Constellation labels, event-jump controls, broad time manipulation, richer lunar
 temporal visualization, and planetary trajectories remain deferred. All celestial layers consume
 the same simulation snapshot; no scientific provider may call `new Date()` independently.
+
+The query-gated real-sky grid study also consumes this same clock. It recomputes one immutable
+provider-native EQD grid-phase matrix only when the central clock or observer changes; it does not
+own a timer, tick per eye, or rebuild celestial geometry. Deterministic `skyTime` URLs freeze the
+existing clock rather than introduce another time system.
 
 UTC, UT1, TT, civil-time, and provider claims trace to the [official astronomy source
 register](OFFICIAL_ASTRONOMY_SOURCES.md).

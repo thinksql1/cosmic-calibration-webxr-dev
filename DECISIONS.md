@@ -465,7 +465,7 @@
 
 ### DEC-036: Render planet labels as finite world-anchored XR sprites
 - **Date:** 2026-07-22
-- **Status:** Accepted for development-only Quest revalidation
+- **Status:** Accepted for development planet labels by physical Quest evidence
 - **Owner:** Darrell Wright / project control
 - **Decision:** Retain each apparent planet marker as its validated projective direction, but render
   its label as one finite native Three.js sprite at `24 m` along that exact direction plus a bounded
@@ -477,11 +477,12 @@
   previous shader ignored plane vertices, making both textured triangles degenerate. A finite
   sprite is the smallest established WebXR scene primitive that preserves world locking, stereo,
   calibrated direction, and scientific honesty without camera parenting or per-eye geometry
-  mutation. It is not approved for constellation labels until this repair passes Quest.
+  mutation. Physical Quest evidence accepts it for planet labels only; constellation-label scale
+  and decluttering remain separately gated.
 
 ### DEC-037: Use five canonical planet-label readability presets for development Quest comparison
 - **Date:** 2026-07-22
-- **Status:** Accepted for development-only physical size selection
+- **Status:** Accepted; physical Quest comparison selected Medium for planet labels
 - **Owner:** Darrell Wright / project control
 - **Decision:** Physical Quest testing confirmed the finite Sprite contract renders and remains
   marker-attached, but its former Small/Medium/Large dimensions were too small for comfortable
@@ -492,6 +493,22 @@
 - **Rationale:** The world anchor, texture, material, marker direction, and XR eye contract have
   physical evidence. Adjusting only immutable Sprite dimensions isolates the remaining readability
   question without compromising the validated rendering contract or introducing a collision system.
+
+### DEC-038: Use provider-native EQJ catalog conversion and EQD phase for the real-sky grid study
+- **Date:** 2026-07-22
+- **Status:** Accepted for query-gated development study; physical Quest validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Convert catalog J2000 RA/declination through Astronomy Engine `Rotation_EQJ_HOR`
+  into geometric `HORIZONTAL_ENU`. Orient the already validated mean-date grid with
+  `Rotation_EQD_HOR`, changing only its longitude phase so its Earth-axis pole convergence remains
+  exact. Remap provider HOR `(north, west, up)` to application `(east, up, -north)` with one proper
+  determinant-`+1` matrix. Apply physical-north calibration only on the existing geographic
+  parent. Keep canonical mode as the normal default until Quest acceptance.
+- **Rationale:** Raw J2000 `+Z` differs from the current mean-date pole (about `0.149 degrees` at the
+  audit epoch), so one mislabeled matrix cannot satisfy both catalog truth and exact validated pole
+  convergence. The two explicit provider frames preserve each contract without double-applying
+  UTC, longitude, sidereal phase, or calibration yaw. A shader-side rotation about the encoded core
+  retains immutable homogeneous grid geometry and native stereo projection.
 
 ## Proposed decisions awaiting review
 

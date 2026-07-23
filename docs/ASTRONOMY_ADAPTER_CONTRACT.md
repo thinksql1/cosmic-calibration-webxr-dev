@@ -86,6 +86,7 @@ It is never passed through silently. Legitimate below-sea-level values are accep
 
 | Tag | Meaning in this spike | Units |
 |---|---|---|
+| `EQJ_J2000` | Astronomy Engine J2000 mean equator/equinox catalog frame | RA sidereal hours, declination degrees, or normalized unit vector |
 | `EQD_TRUE` | Astronomy Engine topocentric true equator/equinox of date; precession and nutation included by the documented `ofdate=true` operation | RA sidereal hours, declination degrees, distance AU, or unit vector |
 | `HORIZONTAL_ENU` | application-owned observer-local east/north/up basis | azimuth/altitude degrees and normalized unit direction |
 | `GCRS` | geocentric celestial reference axes used by the P03 provider | normalized Cartesian unit direction |
@@ -158,6 +159,16 @@ provider documentation defines azimuth as degrees clockwise from north:
 
 Altitude is degrees above the geometric local horizon, negative below it. Below-horizon values
 are retained and never clamped.
+
+### Real-sky equatorial rotations
+
+The development study adds immutable matrix results at the existing adapter boundary using
+Astronomy Engine `Rotation_EQJ_EQD`, `Rotation_EQD_HOR`, and `Rotation_EQJ_HOR`. Provider HOR is
+`(north, west, up)`; the application explicitly remaps it to ENU and then `(east, up, -north)`
+with determinant `+1`. Catalog J2000 directions use `EQJ -> HOR`. The already validated
+mean-date grid uses the `EQD -> HOR` phase to retain exact pole-marker convergence. These are
+geometric rigid rotations: elevation is provenance, not a matrix input, and refraction is absent.
+See [Real-Sky Equatorial Orientation](REAL_SKY_EQUATORIAL_ORIENTATION.md).
 
 Canonical ENU is calculated explicitly:
 
