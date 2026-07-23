@@ -49,7 +49,7 @@ describe('first-set constellation catalog', () => {
       license: 'UNITED_STATES_GOVERNMENT_WORK_PUBLIC_DOMAIN',
       catalogFrame: 'EQJ_J2000',
       catalogEpoch: 'J2000.0',
-      properMotionPolicy: 'OMITTED_FIXED_J2000_FIRST_VISUAL_LAYER',
+      properMotionPolicy: 'OMITTED_FIXED_J2000_VISUAL_CATALOG',
       connectivitySource: 'PROJECT_AUTHORED_CONVENTIONAL_WESTERN_FIRST_SET_V1',
     });
     expect(FIRST_CONSTELLATION_DATASET_METADATA.starCoordinateSourceUrl).toMatch(/^https:\/\/heasarc\.gsfc\.nasa\.gov/);

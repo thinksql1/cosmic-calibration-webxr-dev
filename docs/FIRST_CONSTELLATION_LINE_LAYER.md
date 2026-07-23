@@ -4,6 +4,11 @@
 
 **Status: deployed development-only query-gated study; physical Quest rendering accepted.**
 
+The accepted first set is now retained as the historical seven-figure subset of the versioned
+expanded V2 catalog. `constellationStudy=first-set` still exposes only these seven and preserves
+their coordinates, connectivity, styling, and rendering contract. See
+[Expanded Constellation Catalog](EXPANDED_CONSTELLATION_CATALOG.md) for the 29-figure study.
+
 Quest review found all seven figures recognizable, smooth, world-locked, and stereo-stable. The
 Lunar Phase Transit work does not alter constellation data, geometry, sampling, or rendering.
 

@@ -561,6 +561,22 @@
   remove inherited rotation/nonuniform-transform coupling, and dynamic texture aspect removes the
   prior label compression without changing accepted procedural images.
 
+### DEC-041: Preserve Quest-approved lunar transit and expand constellations through a versioned 29-figure catalog
+- **Date:** 2026-07-23
+- **Status:** Implemented development study; physical Quest validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Create immutable annotated tag `quest-approved-lunar-transit-v1` at development
+  commit `0d3f7219774bac51c0b3f5061205a307e67546d3`. Keep all accepted solar/lunar systems
+  unchanged. Evolve the first constellation data into `COSMIC_CONSTELLATION_CATALOG_V2_EXPANDED_29`:
+  canonical NASA HEASARC BSC5P J2000 star records, project-authored conventional connectivity,
+  29 figures including Libra, and declarative learning-group selection. Reuse the accepted EQJ
+  great-circle, shared-orientation, calibrated-parent, native-stereo line contract unchanged.
+- **Rationale:** The checkpoint gives a non-destructive recovery point before catalog expansion.
+  A shared-star V2 catalog prevents coordinate duplication while adding enough seasonal/zodiacal
+  anchors for a future course. Libra makes the Zodiac group coherent without implying a move to all
+  88 constellations. Labels, guided lessons, eclipse visualization, and stable promotion remain
+  separately gated.
+
 ## Proposed decisions awaiting review
 
 None yet.

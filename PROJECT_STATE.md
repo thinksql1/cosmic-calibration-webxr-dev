@@ -1,5 +1,20 @@
 # Project State
 
+## Quest-approved checkpoint and expanded constellation catalog V2 (development study)
+
+`quest-approved-lunar-transit-v1` is an immutable annotated development tag at
+`0d3f7219774bac51c0b3f5061205a307e67546d3` / visible build `0d3f721`. It records physical Quest
+acceptance of the real-sky bridge, first seven constellation figures, outer-body labels, finite
+core, safe Sun path, and the complete solar/lunar presentation. It is not a stable release.
+
+The current development branch adds query-gated `constellationStudy=expanded` using
+`COSMIC_CONSTELLATION_CATALOG_V2_EXPANDED_29`: 29 conventional Western figures, 22 additions
+including Libra, canonical NASA HEASARC BSC5P EQJ/J2000 star records, project-authored
+connectivity, deterministic learning-group visibility sets, and the already accepted immutable
+great-circle/shared-orientation renderer. The first set remains a seven-only compatibility mode;
+the normal URL remains unchanged. This expanded study awaits physical Quest validation. No
+constellation labels, all-88 catalog, lessons, eclipse work, or stable promotion is authorized.
+
 ## Lunar Phase Transit Path and clean Moon billboards (development feature)
 
 Physical Quest review accepted the compact `24 m` / `3.2 m` Moon phase dial, its procedural phase

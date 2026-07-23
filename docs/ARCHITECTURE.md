@@ -1,5 +1,12 @@
 # Cosmic Calibration WebXR Architecture
 
+## Expanded constellation catalog ownership
+
+`constellationCatalogV2` owns unique BSC5P J2000 star records and figure metadata; first-set and
+expanded connectivity live separately, and learning groups are declarative visibility presets.
+The scene still consumes immutable canonical great-circle buffers through the accepted shared
+EQJ orientation and calibrated geographic parent. Constellation labels are intentionally absent.
+
 ## Lunar phase transit
 
 The monthly transit layer is specified in `LUNAR_PHASE_TRANSIT_PATH.md`. Provider event searches

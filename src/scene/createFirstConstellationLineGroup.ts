@@ -69,6 +69,8 @@ export interface FirstConstellationLineDiagnostics {
   readonly geometryBuildCount: number;
   readonly perEyeMutation: false;
   readonly submittedObjectNames: readonly string[];
+  readonly materialCount: number;
+  readonly bufferCount: number;
 }
 export interface FirstConstellationLineGroupHandle {
   readonly group: THREE.Group;
@@ -83,7 +85,7 @@ export interface FirstConstellationLineGroupHandle {
 
 export function createFirstConstellationLineGroup(reportDiagnostic: (event: string, detail: string) => void = () => undefined): FirstConstellationLineGroupHandle {
   const group = new THREE.Group();
-  group.name = 'first-constellation-line-layer';
+  group.name = 'constellation-line-layer';
   group.visible = false;
   const entries: RenderEntry[] = [];
   const groups = new Map<string, THREE.Group>();
@@ -228,6 +230,8 @@ export function createFirstConstellationLineGroup(reportDiagnostic: (event: stri
         geometryBuildCount,
         perEyeMutation: false,
         submittedObjectNames: Object.freeze([...submitted]),
+        materialCount: entries.length,
+        bufferCount: entries.length,
       });
     },
     dispose(): void {

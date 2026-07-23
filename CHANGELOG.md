@@ -4,6 +4,14 @@
 
 ### Added
 
+- Created immutable development tag `quest-approved-lunar-transit-v1` at accepted build
+  `0d3f7219774bac51c0b3f5061205a307e67546d3`, pushed only to the development remote, and recorded
+  recovery/verification instructions. No stable release or stable tag was created.
+- Added `COSMIC_CONSTELLATION_CATALOG_V2_EXPANDED_29`: 29 query-gated conventional figures using
+  de-duplicated public-domain NASA HEASARC BSC5P J2000 records, project-authored connectivity,
+  declarative seasonal/learning groups, and the accepted immutable great-circle renderer. Libra is
+  included for the Zodiac group; constellation labels remain deferred.
+
 - Added the query-gated Lunar Phase Transit Path: one apparent-topocentric EQJ track from previous
   New Moon through next New Moon, authoritative arbitrary-angle phase events, 60-minute sampling,
   bounded one-degree minor-arc subdivision, visible and Earth-hidden portions, eight event notches,

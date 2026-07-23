@@ -18,4 +18,14 @@ describe('first constellation query gate', () => {
   it('does not enable an invalid mode', () => {
     expect(parseConstellationStudyLaunch('?constellationStudy=unknown&showConstellations=1')).toMatchObject({ enabled: false, explicitlyRequested: true, masterVisible: false });
   });
+  it('uses the bounded expanded study with an introduction-anchor selection by default', () => {
+    const launch = parseConstellationStudyLaunch('?constellationStudy=expanded');
+    expect(launch).toMatchObject({ enabled: true, mode: 'expanded', masterVisible: false, selectedGroup: 'introduction-anchors' });
+    expect([...launch.enabledConstellations]).toEqual(['ORI', 'UMA', 'CAS']);
+  });
+  it('accepts the course-set alias and deterministic selected group', () => {
+    const launch = parseConstellationStudyLaunch('?constellationStudy=course-set&constellationGroup=zodiac&showConstellations=1');
+    expect(launch).toMatchObject({ enabled: true, mode: 'expanded', selectedGroup: 'zodiac', masterVisible: true });
+    expect([...launch.enabledConstellations]).toContain('LIB');
+  });
 });

@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { CONSTELLATION_CATALOG_V2_FIGURES } from '../science/constellations/constellationCatalogV2';
+import { CONSTELLATION_LEARNING_GROUPS } from '../science/constellations/constellationLearningGroups';
 
 export interface XrObjectIsolationState {
   readonly id: string;
@@ -32,9 +34,8 @@ const CELESTIAL_GRID_LINE_NAMES = Object.freeze([
 const REAL_SKY_OVERLAY_LINE_NAMES = Object.freeze(
   CELESTIAL_GRID_LINE_NAMES.map((name) => `real-sky-overlay-${name}`),
 );
-const CONSTELLATION_SEGMENT_COUNTS = Object.freeze({ ori: 8, uma: 7, cas: 4, cyg: 4, tau: 4, leo: 7, sco: 6 } as const);
-const constellationLineNames = (identifier: keyof typeof CONSTELLATION_SEGMENT_COUNTS) => Object.freeze(
-  Array.from({ length: CONSTELLATION_SEGMENT_COUNTS[identifier] }, (_, index) =>
+const constellationLineNames = (identifier: string) => Object.freeze(
+  Array.from({ length: CONSTELLATION_CATALOG_V2_FIGURES.find((figure) => figure.identifier.toLowerCase() === identifier)?.segments.length ?? 0 }, (_, index) =>
     `constellation-${identifier}-segment-${String(index + 1).padStart(2, '0')}`),
 );
 const ORION_CONSTELLATION_NAMES = constellationLineNames('ori');
@@ -44,14 +45,13 @@ const CYGNUS_CONSTELLATION_NAMES = constellationLineNames('cyg');
 const TAURUS_CONSTELLATION_NAMES = constellationLineNames('tau');
 const LEO_CONSTELLATION_NAMES = constellationLineNames('leo');
 const SCORPIUS_CONSTELLATION_NAMES = constellationLineNames('sco');
-const FIRST_CONSTELLATION_LINE_NAMES = Object.freeze([
-  ...ORION_CONSTELLATION_NAMES, ...URSA_MAJOR_CONSTELLATION_NAMES,
-  ...CASSIOPEIA_CONSTELLATION_NAMES, ...CYGNUS_CONSTELLATION_NAMES,
-  ...TAURUS_CONSTELLATION_NAMES, ...LEO_CONSTELLATION_NAMES, ...SCORPIUS_CONSTELLATION_NAMES,
-]);
-const FIRST_CONSTELLATION_ENDPOINT_NAMES = Object.freeze(
-  Object.keys(CONSTELLATION_SEGMENT_COUNTS).map((identifier) => `constellation-${identifier}-endpoint-markers`),
-);
+const FIRST_CONSTELLATION_LINE_NAMES = Object.freeze(['ori', 'uma', 'cas', 'cyg', 'tau', 'leo', 'sco'].flatMap(constellationLineNames));
+const EXPANDED_CONSTELLATION_LINE_NAMES = Object.freeze(CONSTELLATION_CATALOG_V2_FIGURES.flatMap((figure) => constellationLineNames(figure.identifier.toLowerCase())));
+const FIRST_CONSTELLATION_ENDPOINT_NAMES = Object.freeze(['ori', 'uma', 'cas', 'cyg', 'tau', 'leo', 'sco'].map((identifier) => `constellation-${identifier}-endpoint-markers`));
+const constellationGroupNames = (groupId: string) => {
+  const group = CONSTELLATION_LEARNING_GROUPS.find((value) => value.id === groupId);
+  return Object.freeze((group?.constellationIdentifiers ?? []).flatMap((identifier) => constellationLineNames(identifier.toLowerCase())));
+};
 const MOON_PHASE_IDS = Object.freeze([
   'new-moon', 'waxing-crescent', 'first-quarter', 'waxing-gibbous',
   'full-moon', 'waning-gibbous', 'last-quarter', 'waning-crescent',
@@ -133,6 +133,26 @@ export const XR_OBJECT_ISOLATION_STATES: readonly XrObjectIsolationState[] = Obj
   state('constellations-canonical-eqj', 'Canonical EQJ constellation geometry (use constellationFrame=canonical)', FIRST_CONSTELLATION_LINE_NAMES),
   state('constellations-real-sky', 'Real-sky transformed constellation geometry', FIRST_CONSTELLATION_LINE_NAMES),
   state('constellation-sun-path-comparison', 'Sun path plus Orion for wobble comparison', ['apparent-sun-civil-day-projective-path', ...ORION_CONSTELLATION_NAMES]),
+  state('constellations-expanded-all', 'All expanded constellations', EXPANDED_CONSTELLATION_LINE_NAMES),
+  state('constellations-expanded-added-only', 'Added constellations only', constellationGroupNames('added-only')),
+  state('constellations-expanded-introduction', 'Introduction anchors', constellationGroupNames('introduction-anchors')),
+  state('constellations-expanded-circumpolar', 'Circumpolar group', constellationGroupNames('circumpolar')),
+  state('constellations-expanded-winter', 'Winter group', constellationGroupNames('winter')),
+  state('constellations-expanded-spring', 'Spring group', constellationGroupNames('spring')),
+  state('constellations-expanded-summer', 'Summer group', constellationGroupNames('summer')),
+  state('constellations-expanded-autumn', 'Autumn group', constellationGroupNames('autumn')),
+  state('constellations-expanded-zodiac', 'Zodiac group', constellationGroupNames('zodiac')),
+  ...CONSTELLATION_CATALOG_V2_FIGURES.filter((figure) => !['ORI', 'UMA', 'CAS', 'CYG', 'TAU', 'LEO', 'SCO'].includes(figure.identifier)).map((figure) =>
+    state(`constellation-${figure.identifier.toLowerCase()}`, `${figure.displayName} only`, constellationLineNames(figure.identifier.toLowerCase()))),
+  state('constellations-expanded-grid', 'Expanded constellations plus real-sky grid', [...EXPANDED_CONSTELLATION_LINE_NAMES, ...CELESTIAL_GRID_LINE_NAMES]),
+  state('constellations-expanded-planets', 'Expanded constellations plus planets', [...EXPANDED_CONSTELLATION_LINE_NAMES, 'apparent-mercury-marker', 'apparent-venus-marker', 'apparent-mars-marker', 'apparent-jupiter-marker', 'apparent-saturn-marker', 'apparent-uranus-marker', 'apparent-neptune-marker', 'apparent-pluto-marker']),
+  state('constellations-expanded-lunar-transit', 'Expanded constellations plus Lunar Phase Transit', [...EXPANDED_CONSTELLATION_LINE_NAMES, ...LUNAR_TRANSIT_PATH_NAMES]),
+  state('constellations-expanded-sun-moon-paths', 'Expanded constellations plus Sun and Moon paths', [...EXPANDED_CONSTELLATION_LINE_NAMES, 'apparent-sun-civil-day-projective-path', 'apparent-moon-civil-day-projective-path']),
+  state('constellations-expanded-performance', 'Expanded constellation performance diagnostic', EXPANDED_CONSTELLATION_LINE_NAMES),
+  state('constellations-expanded-long-segment', 'Long constellation-segment sampling proof', constellationLineNames('dra').slice(0, 1)),
+  state('constellations-expanded-shared-star', 'Shared-star proof: Andromeda and Pegasus', [...constellationLineNames('and'), ...constellationLineNames('peg')]),
+  state('constellations-expanded-canonical', 'Canonical EQJ expanded catalog', EXPANDED_CONSTELLATION_LINE_NAMES),
+  state('constellations-expanded-real-sky', 'Real-sky transformed expanded catalog', EXPANDED_CONSTELLATION_LINE_NAMES),
   state('declination-grid', 'Declination circles only', ['declination-circle-plus-60', 'declination-circle-plus-30', 'declination-circle-minus-30', 'declination-circle-minus-60']),
   state('right-ascension-grid', 'Right-ascension meridians only', ['right-ascension-meridian-00h', 'right-ascension-meridian-02h', 'right-ascension-meridian-04h', 'right-ascension-meridian-06h', 'right-ascension-meridian-08h', 'right-ascension-meridian-10h', 'right-ascension-meridian-12h', 'right-ascension-meridian-14h', 'right-ascension-meridian-16h', 'right-ascension-meridian-18h', 'right-ascension-meridian-20h', 'right-ascension-meridian-22h']),
   state('right-ascension-00h', '0h meridian only', ['right-ascension-meridian-00h']),

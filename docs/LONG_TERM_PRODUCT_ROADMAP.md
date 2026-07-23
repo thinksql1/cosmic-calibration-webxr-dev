@@ -2,10 +2,20 @@
 
 ## Current bounded gate
 
-Before catalog expansion or constellation labels, physically validate the complete Lunar Phase
-Transit Path and repaired Moon billboards. The transit feature is a development study, not a
-literal-distance lunar orbit. Expansion remains blocked if event notches, current progress,
-stereo stability, image aspect, or label readability fail on Quest.
+Physically validate the query-gated expanded 29-constellation catalog and learning-group controls.
+The approved lunar transit systems are protected development baseline, not a stable promotion.
+Constellation labels remain blocked until the expanded line layer passes Quest review.
+
+## Educational objective and staged direction
+
+Guide a learner from simple egocentric orientation toward an integrated perception that holds
+egocentric and allocentric celestial frames simultaneously.
+
+1. Expanded constellation catalog
+2. Constellation labels
+3. Guided observation presets and introductory course
+4. Eclipse event prediction and visualization
+5. Full constellation catalog and advanced celestial layers
 
 ## Purpose and status
 
