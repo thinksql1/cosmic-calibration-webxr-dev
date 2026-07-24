@@ -591,6 +591,19 @@
   itself from constellation structure, while optional group emphasis can aid instruction without
   making the normal sky noisy. Material-only styling preserves the accepted XR/science contracts.
 
+### DEC-045: Use declarative, temporary Guided Observation presets on the accepted V3A Course-40 branch
+- **Date:** 2026-07-23
+- **Status:** Implemented development feature; physical Quest validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Keep guided observation as a declarative three-preset registry with one controller,
+  one existing-control adapter, bounded original-state Restore, and a temporary appearance scope.
+  Use native query-gated controls only as a thin UI over public controller entry points. Preserve the
+  user’s persisted appearance and never change scientific geometry, calibration, observer/time, or
+  accepted solar/lunar/planetary systems.
+- **Rationale:** A small reusable state layer permits focused observation without duplicating scene
+  manipulation in UI handlers or creating a premature lesson engine. Temporary state and explicit
+  Restore protect user personalization while preserving V3A contracts.
+
 ## Proposed decisions awaiting review
 
 ### DEC-043: Clean defaults and curated, persisted celestial appearance preferences

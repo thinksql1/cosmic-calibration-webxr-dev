@@ -4,6 +4,13 @@
 
 ### Added
 
+- Added Guided Observation Presets V1 on the V3A Course-40 basis: a declarative three-preset
+  registry, bounded snapshot/Restore controller, control adapter, temporary appearance-persistence
+  guard, query-gated native UI, and focused tests. The normal URL remains unchanged; no geometry,
+  astronomy, calibration, solar/lunar, or stable changes are included. Physical Quest validation
+  remains pending. Clean lockfile install, audit, type-check, focused tests, full `606`-test suite,
+  and production build pass locally.
+
 - Added development-only `COSMIC_CONSTELLATION_CATALOG_V3A_COURSE_40`: 11 NASA HEASARC BSC5P
   audited figures, 48 canonical records, original reviewed connectivity, Course-40 query mode,
   extended learning groups, diagnostics, and source-review documentation. V1/V2 and solar/lunar

@@ -1,5 +1,19 @@
 # Project State
 
+## Guided Observation Presets V1 — 2026-07-23
+
+The V3A-only branch `feature/guided-observation-presets-v1`, rooted at accepted Course-40 commit
+`36346b2b5a80567ac4344db6595bbd0cd7dea427`, adds a bounded declarative Guided Observation
+framework. The normal URL remains free of constellation-study and Guided Observation controls;
+the Course-40 query exposes Local Orientation, Introduction Anchors, North Star and Circumpolar,
+and Restore Previous State. The feature uses a pure preset/session layer, one live adapter, one
+central `renderCelestialAxis()` refresh, and a temporary persistence guard that preserves
+`cosmic-calibration:appearance:v1`. It changes no catalog or geometry, astronomy, calibration,
+observer/time, planets, Sun, Moon, V3B, or stable state. Automated and local production-browser
+validation evidence is recorded with the feature commit. Clean lockfile install, zero-vulnerability
+audit, type-check, focused `15` tests, full `606`-test suite, production build, and production
+browser validation pass locally. Physical Quest validation remains the next acceptance gate.
+
 ## V3A local implementation record — 2026-07-23
 
 V3A Course 40 is implemented locally on `feature/constellation-catalog-v3a-40` from clean
