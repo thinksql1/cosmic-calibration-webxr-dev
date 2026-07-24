@@ -12,7 +12,11 @@ central `renderCelestialAxis()` refresh, and a temporary persistence guard that 
 observer/time, planets, Sun, Moon, V3B, or stable state. Automated and local production-browser
 validation evidence is recorded with the feature commit. Clean lockfile install, zero-vulnerability
 audit, type-check, focused `15` tests, full `606`-test suite, production build, and production
-browser validation pass locally. Physical Quest validation remains the next acceptance gate.
+browser validation pass locally. The existing Pages workflow supports manual dispatch from this
+exact branch, but it auto-runs only on development `master`; this environment has no GitHub CLI,
+API credential, or signed-in browser session to dispatch it. No merge, workflow change, or hosted
+deployment occurred. The next bounded action is authenticated feature-branch dispatch followed by
+physical Quest validation.
 
 ## V3A local implementation record — 2026-07-23
 

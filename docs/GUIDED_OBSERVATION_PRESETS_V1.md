@@ -145,3 +145,12 @@ behavior.
 
 Physical Quest validation is pending. This feature is not Quest-approved merely from desktop,
 automated, or hosted checks.
+
+## Deployment status
+
+The existing development Pages workflow has a `workflow_dispatch` trigger and can build this exact
+feature ref without merging development `master`. It was not dispatched from this environment:
+the local GitHub CLI is unavailable, no API credential is configured, and the browser session is
+signed out. The automatic push trigger remains master-only, whose current contents include excluded
+V3B work; merging or deploying that branch would violate this feature’s boundary. An authenticated
+manual dispatch on the feature ref is the safe next deployment action.
