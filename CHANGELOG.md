@@ -18,6 +18,19 @@
   `quest-approved-constellations-v3a-v1` at the exact physically tested deployment-record commit
   `36346b2b5a80567ac4344db6595bbd0cd7dea427`. Stable remains untouched and V3B work is authorized
   only in development.
+- Added Guided Observation Presets V1 on the V3A Course-40 basis: a declarative three-preset
+  registry, bounded snapshot/Restore controller, control adapter, temporary appearance-persistence
+  guard, query-gated native UI, and focused tests. The normal URL remains unchanged; no geometry,
+  astronomy, calibration, solar/lunar, or stable changes are included. Physical Quest validation
+  remains pending. Clean lockfile install, audit, type-check, focused tests, full `606`-test suite,
+  and production build pass locally.
+
+- Manually dispatched development workflow run `30062308604` for exact V3A-only feature commit
+  `288981211d545da36e368161c6b68a51e8c02fd9`. Its build passed (79 test files / 606 tests), but
+  the protected `github-pages` environment rejected deployment because the feature branch is not
+  allowed to deploy. No master merge, V3B inclusion, workflow change, hosted deployment, stable
+  change, or Quest acceptance occurred.
+
 - Added development-only `COSMIC_CONSTELLATION_CATALOG_V3A_COURSE_40`: 11 NASA HEASARC BSC5P
   audited figures, 48 canonical records, original reviewed connectivity, Course-40 query mode,
   extended learning groups, diagnostics, and source-review documentation. V1/V2 and solar/lunar

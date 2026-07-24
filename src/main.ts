@@ -78,6 +78,9 @@ import {
 import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
 import { parseSkyFrameStudyLaunch, type SkyFrameStudyMode } from './presentation/realSkyGridStudy';
 import { parseConstellationStudyLaunch } from './presentation/constellationStudy';
+import { GuidedObservationController, type GuidedObservationControlAdapter, type GuidedObservationPresetId, type GuidedObservationState } from './presentation/guidedObservationPresets';
+import { GuidedObservationTemporaryScope } from './presentation/guidedObservationTemporaryScope';
+import { bindGuidedObservationUi, updateGuidedObservationUiStatus, type GuidedObservationUiElements } from './presentation/guidedObservationUi';
 import { parseCelestialColorSettings, DEFAULT_CELESTIAL_COLOR_SETTINGS, validateCelestialAppearancePreferences, type CelestialAppearancePreferences } from './presentation/color/celestialColorModes';
 import { CONSTELLATION_BASE_SWATCHES, CONSTELLATION_HIGHLIGHT_SWATCHES, LUNAR_PALETTE_CATALOG, constellationBaseSwatch, constellationHighlightSwatch, lunarPaletteDefinition } from './presentation/color/celestialColorCatalog';
 import { CELESTIAL_APPEARANCE_STORAGE_KEY, readAppearancePreferences, writeAppearancePreferences, clearAppearancePreferences } from './presentation/color/celestialAppearancePersistence';
@@ -234,6 +237,16 @@ const constellationHighlightSwatchElement = requireElement<HTMLSpanElement>('#co
 const constellationColorStrengthSelect = requireElement<HTMLSelectElement>('#constellation-color-strength');
 const resetConstellationColorsButton = requireElement<HTMLButtonElement>('#reset-constellation-colors');
 const constellationStudyDiagnostics = requireElement<HTMLUListElement>('#constellation-study-diagnostics');
+const guidedObservationControls = requireElement<HTMLDetailsElement>('#guided-observation-controls');
+const guidedObservationUiElements: GuidedObservationUiElements = Object.freeze({
+  presetButtons: Object.freeze({
+    'local-orientation': requireElement<HTMLButtonElement>('#guided-observation-local-orientation'),
+    'introduction-anchors': requireElement<HTMLButtonElement>('#guided-observation-introduction-anchors'),
+    'north-star-and-circumpolar': requireElement<HTMLButtonElement>('#guided-observation-north-star-and-circumpolar'),
+  }),
+  restoreButton: requireElement<HTMLButtonElement>('#restore-guided-observation'),
+  statusElement: requireElement<HTMLParagraphElement>('#guided-observation-status'),
+});
 const moonStudyControls = requireElement<HTMLDetailsElement>('#moon-study-controls');
 const showMoonPathInput = requireElement<HTMLInputElement>('#show-moon-path');
 const showLunarPhaseTransitPathInput = requireElement<HTMLInputElement>('#show-lunar-phase-transit-path');
@@ -345,6 +358,7 @@ planetLabelScaleSelect.value = parsePlanetLabelScale(new URLSearchParams(window.
 skyFrameStudyControls.hidden = !(xrDiagnostics.enabled || skyFrameLaunch.explicitlyRequested);
 skyFrameStudyModeSelect.value = skyFrameLaunch.mode;
 constellationStudyControls.hidden = !constellationStudyLaunch.enabled;
+guidedObservationControls.hidden = !constellationStudyLaunch.enabled;
 showConstellationsInput.checked = constellationStudyLaunch.masterVisible;
 showConstellationEndpointsInput.checked = constellationStudyLaunch.showEndpointMarkers;
 constellationLearningGroupSelect.value = constellationStudyLaunch.selectedGroup ?? 'clear';
@@ -364,6 +378,52 @@ for (const control of document.querySelectorAll<HTMLElement>('[data-course50-con
 for (const option of document.querySelectorAll<HTMLOptionElement>('[data-course50-group]')) {
   option.hidden = constellationStudyLaunch.mode !== 'course-50';
 }
+const guidedObservationTemporaryScope = new GuidedObservationTemporaryScope();
+const guidedObservationAdapter: GuidedObservationControlAdapter = {
+  read: (): GuidedObservationState => Object.freeze({
+    horizon: showLocalHorizonInput.checked, constellations: showConstellationsInput.checked,
+    group: constellationLearningGroup(constellationLearningGroupSelect.value)?.id,
+    selected: Object.freeze(COURSE_40_CONSTELLATION_IDENTIFIERS.filter((id) => constellationVisibilityInputs[id].checked)),
+    colorMode: activeAppearancePreferences.constellationMode,
+    base: activeAppearancePreferences.constellationBaseColor,
+    highlight: activeAppearancePreferences.constellationHighlightColor,
+    strength: activeAppearancePreferences.constellationStrength,
+    axis: showAxisInput.checked, poleMarkers: showMarkersInput.checked, poleLabels: showLabelsInput.checked, earthCore: showEarthCoreInput.checked,
+  }),
+  write: (next) => {
+    showLocalHorizonInput.checked = next.horizon; showConstellationsInput.checked = next.constellations;
+    constellationLearningGroupSelect.value = next.group ?? 'clear';
+    for (const id of COURSE_40_CONSTELLATION_IDENTIFIERS) constellationVisibilityInputs[id].checked = next.selected.includes(id);
+    showAxisInput.checked = next.axis ?? showAxisInput.checked; showMarkersInput.checked = next.poleMarkers ?? showMarkersInput.checked;
+    showLabelsInput.checked = next.poleLabels ?? showLabelsInput.checked; showEarthCoreInput.checked = next.earthCore ?? showEarthCoreInput.checked;
+    activeAppearancePreferences = Object.freeze({ ...activeAppearancePreferences, constellationMode: next.colorMode, constellationBaseColor: next.base, constellationHighlightColor: next.highlight, constellationStrength: next.strength });
+    constellationColorModeSelect.value = next.colorMode; constellationBaseColorSelect.value = next.base; constellationHighlightColorSelect.value = next.highlight; constellationColorStrengthSelect.value = next.strength;
+  },
+  refresh: () => renderCelestialAxis(),
+};
+const guidedObservationController = new GuidedObservationController(guidedObservationAdapter);
+export function applyGuidedObservationPresetState(id: GuidedObservationPresetId): boolean {
+  return guidedObservationTemporaryScope.run(() => guidedObservationController.apply(id));
+}
+export function restoreGuidedObservationPresetState(): boolean {
+  return guidedObservationTemporaryScope.run(() => guidedObservationController.restore());
+}
+export function guidedObservationStatus(): Readonly<{ activePreset: GuidedObservationPresetId | undefined; canRestore: boolean }> { return Object.freeze({ activePreset: guidedObservationController.activePreset, canRestore: guidedObservationController.canRestore }); }
+function updateGuidedObservationUi(): void {
+  updateGuidedObservationUiStatus(guidedObservationUiElements, guidedObservationStatus());
+}
+bindGuidedObservationUi(guidedObservationUiElements, {
+  apply: applyGuidedObservationPresetState,
+  restore: restoreGuidedObservationPresetState,
+  status: guidedObservationStatus,
+});
+const guidedObservationControlledInputs: readonly (HTMLInputElement | HTMLSelectElement)[] = Object.freeze([showLocalHorizonInput, showConstellationsInput, constellationLearningGroupSelect, showAxisInput, showMarkersInput, showLabelsInput, showEarthCoreInput, constellationColorModeSelect, constellationHighlightColorSelect, constellationColorStrengthSelect, ...Object.values(constellationVisibilityInputs)]);
+for (const input of guidedObservationControlledInputs) input.addEventListener('change', () => {
+  if (!guidedObservationTemporaryScope.isActive) {
+    guidedObservationController.clearActivePresetPreservingSnapshot();
+    updateGuidedObservationUi();
+  }
+});
 moonStudyControls.hidden = !(xrDiagnostics.enabled || moonStudyLaunch.explicitlyRequested);
 showMoonPathInput.checked = moonStudyLaunch.showMoonPath;
 showLunarPhaseTransitPathInput.checked = moonStudyLaunch.showLunarPhaseTransitPath;
@@ -725,6 +785,7 @@ function resolvedAppearanceFromControls(): CelestialAppearancePreferences {
 }
 
 function persistAppearanceFromControls(source: 'user-change' | 'reset'): void {
+  if (guidedObservationTemporaryScope.isActive) return;
   activeAppearancePreferences = resolvedAppearanceFromControls();
   appearanceLastSource = source;
   writeAppearancePreferences(appearanceStorage, activeAppearancePreferences);

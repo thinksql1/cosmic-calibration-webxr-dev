@@ -12,6 +12,27 @@ and Quest-approved V3A figures remain unchanged. `course-50` and `course-v3b` ar
 the V3B Difficult Figures group contains exactly ten. Type-check, production build, and the full
 76-file / 595-test suite pass locally. This is development-only implementation evidence, not
 physical Quest acceptance; stable remains untouched.
+## Guided Observation Presets V1 — 2026-07-23
+
+The V3A-only branch `feature/guided-observation-presets-v1`, rooted at accepted Course-40 commit
+`36346b2b5a80567ac4344db6595bbd0cd7dea427`, adds a bounded declarative Guided Observation
+framework. The normal URL remains free of constellation-study and Guided Observation controls;
+the Course-40 query exposes Local Orientation, Introduction Anchors, North Star and Circumpolar,
+and Restore Previous State. The feature uses a pure preset/session layer, one live adapter, one
+central `renderCelestialAxis()` refresh, and a temporary persistence guard that preserves
+`cosmic-calibration:appearance:v1`. It changes no catalog or geometry, astronomy, calibration,
+observer/time, planets, Sun, Moon, V3B, or stable state. Automated and local production-browser
+validation evidence is recorded with the feature commit. Clean lockfile install, zero-vulnerability
+audit, type-check, focused `15` tests, full `606`-test suite, production build, and production
+browser validation pass locally. GitHub Actions workflow run `30062308604` manually built exact
+feature commit `288981211d545da36e368161c6b68a51e8c02fd9` successfully (79 test files / 606
+tests), but GitHub Pages rejected its deploy job because the protected `github-pages` environment
+does not permit `feature/guided-observation-presets-v1`. No merge, workflow change, hosted
+deployment, V3B incorporation, or stable change occurred. Subsequent physical Quest testing of
+the V3A-only Guided Observation deployment found no visible constellation lines, no selected
+Observation Orange change, and no lunar testing controls in that interface. It is not accepted;
+the all-features integration now intentionally combines current development V3B and lunar systems
+with Guided Observation. Stable remains untouched.
 
 ## V3A local implementation record — 2026-07-23
 
