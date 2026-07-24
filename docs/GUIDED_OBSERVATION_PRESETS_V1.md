@@ -1,160 +1,128 @@
 # Guided Observation Presets V1
 
-## Purpose and scope
+## Purpose and status
 
-Guided Observation Presets V1 adds a small, declarative starting point for focused observation
-without creating a lesson engine. It is implemented on the V3A Course-40 branch rooted at
-`36346b2b5a80567ac4344db6595bbd0cd7dea427`. It deliberately excludes V3B difficult figures and
-does not alter stable.
+Guided Observation Presets V1 is a small declarative observation layer, not a lesson engine. The
+first V3A-only hosted build failed physical Quest testing: manual constellation group selection
+left the master layer off and the color mode Unified, so no constellation lines appeared and
+selected figures remained Celestial Lavender. That same Course-40 surface hid the existing lunar
+controls. This is a failure record, not a Quest acceptance.
 
-The feature provides three temporary, restorable configurations:
-
-1. Local Orientation
-2. Introduction Anchors
-3. North Star and Circumpolar
-
-It does not add narration, audio, timers, completion tracking, next/previous navigation,
-constellation labels, new astronomy, or any geometry.
+The corrective branch, `feature/all-features-guided-presets-v1`, is based on current development
+`master`. It intentionally contains V3A Course 40, V3B Course 50, grid/orientation, planets
+through Pluto, Sun, and the existing Moon systems together with Guided Observation. Stable is not
+changed. Physical Quest validation remains pending after hosted verification.
 
 ## Architecture
 
-Preset definitions, transitions, and snapshot semantics live in
-`src/presentation/guidedObservationPresets.ts`. They contain identifiers, display text,
-objectives, ordering, and explicitly controlled partial state only. They contain no DOM, Three.js,
-scene-object, or render-callback references.
+Definitions, transition rules, and snapshot semantics are in
+`src/presentation/guidedObservationPresets.ts`. The definitions are typed presentation state only;
+they have no DOM, Three.js, astronomy, geometry, or render-callback references.
 
-The live integration in `src/main.ts` follows one route:
+The sole live path is:
 
 ```text
-Guided Observation UI
-  -> public entry point
-  -> GuidedObservationController
-  -> live control adapter write
-  -> renderCelestialAxis()
+UI -> public entry point -> GuidedObservationController -> live control adapter write -> renderCelestialAxis()
 ```
 
-The public UI-facing entry points are:
+The public UI-facing entry points in `src/main.ts` are:
 
 - `applyGuidedObservationPresetState(id)`
 - `restoreGuidedObservationPresetState()`
 - `guidedObservationStatus()`
 
-The adapter reads and writes only existing controls. One controller transition performs one
-adapter write followed by the existing centralized refresh. No preset button directly changes a
-scene object, runs astronomy, changes geometry, or calls the renderer refresh itself.
+The adapter uses existing checkbox/select ownership and performs one centralized refresh after a
+successful transition. Buttons do not alter scene objects, invoke astronomy, write persistence, or
+rebuild geometry.
 
-## Authorized and excluded state
+## Authorized state and restoration
 
-The adapter may capture and restore local-horizon visibility, constellation master visibility,
-learning-group and individual figure selection, constellation appearance controls, axis,
-pole-marker, pole-label, and Earth Core visibility.
+The preset service may read, snapshot, and write only local-horizon visibility, constellation
+master visibility, learning group/figure selections, constellation appearance controls, axis,
+pole-marker, pole-label, and Earth Core visibility. It never captures or writes calibration/yaw,
+observer location, clock/time controls, catalog data, connectivity, geometry, planets, Sun, Moon,
+XR camera/eye state, or unrelated persistence.
 
-It does not read, capture, restore, or modify calibration/yaw, observer location, simulation date
-or time, time speed, canonical records, connectivity, geometry, planets, Sun, Moon, XR camera or
-eye state, or unrelated persistence. The V3A `COSMIC_CONSTELLATION_CATALOG_V3A_COURSE_40` data
-and original seven figures remain unchanged.
+The first successful preset captures authorized pre-preset state. Switching presets retains that
+original snapshot. Restore writes the snapshot, clears active state and the snapshot, and is safe
+when repeated. A manual change to a guided control clears the active label to `Modified` but keeps
+the original snapshot available; unrelated controls do not affect preset state.
 
-## Snapshot and Restore lifecycle
+`GuidedObservationTemporaryScope` surrounds controller apply and Restore with `try/finally`.
+While active, `persistAppearanceFromControls()` does not write
+`cosmic-calibration:appearance:v1`. Temporary instructional colors are therefore restorable and a
+reload returns to ordinary persisted appearance. Manual appearance changes continue to persist.
 
-The first successful preset captures the original authorized live state. Changing to another
-preset keeps that original snapshot. Restore writes it back, clears the snapshot and active preset,
-and is safe to select again. A later preset application captures a fresh original state.
-
-If a user changes a control that Guided Observation owns, the active label becomes `Modified` while
-the original snapshot remains available. Changes to calibration, observer/time, planetary, solar,
-lunar, and unrelated controls do not invalidate the label. Programmatic preset writes do not fire
-that invalidation path.
-
-## Temporary appearance boundary
-
-`GuidedObservationTemporaryScope` wraps the complete controller transition with `try/finally`.
-While it is active, `persistAppearanceFromControls()` returns before writing
-`cosmic-calibration:appearance:v1`. This lets the live controls and material selection change for
-instruction without replacing the user’s saved appearance. Restore uses the same scope.
-
-Normal manual appearance changes still use the existing persistence path. A reload therefore uses
-the normal persisted preference and does not resume a guided preset.
-
-## Preset definitions
+## Initial presets
 
 ### Local Orientation
 
 - Enables the existing local horizon.
-- Hides constellation lines and clears the selected constellation set.
-- Sets axis, north/south pole marker control, pole labels, and Earth Core off.
-- Leaves planets, Sun, Moon, calibration, observer state, and simulation time untouched.
+- Hides constellation lines and clears selected constellations.
+- Turns axis, pole markers, pole labels, and Earth Core off.
+- Leaves planets, Sun, Moon, calibration, observer, and time unchanged.
 
 ### Introduction Anchors
 
-- Shows constellation lines and selects exactly `ORI`, `UMA`, and `CAS` through the existing
-  Introduction Anchors group.
-- Uses the existing Highlight Selected Group presentation mode so selected figures can use
-  Observation Orange; the base is temporarily Celestial Lavender and strength is Subtle.
-- This is the project’s existing mechanism for “unified lavender context plus selected orange,”
-  rather than a new color mode.
+- Enables constellation lines and selects exactly `ORI`, `UMA`, and `CAS`.
+- Uses Highlight Selected Group, Celestial Lavender base, Observation Orange highlight, and
+  Subtle strength.
 
 ### North Star and Circumpolar
 
-- Shows constellation lines and selects exactly `UMI`, `UMA`, `CAS`, `CEP`, and `DRA` through the
-  existing North Star and Circumpolar group.
-- Uses Celestial Lavender base, Observation Orange selected-group highlight, and Subtle strength.
-- Sets axis, pole markers, pole labels, and Earth Core off. It adds no Polaris marker.
+- Enables constellation lines and selects exactly `UMI`, `UMA`, `CAS`, `CEP`, and `DRA`.
+- Uses Highlight Selected Group, Celestial Lavender base, Observation Orange highlight, and
+  Subtle strength.
+- Turns axis, pole markers, pole labels, and Earth Core off. It adds no Polaris marker.
 
-## Query-gated UI and accessibility
+## Course-study behavior and controls
 
-The compact `Guided Observation` details section appears only when a constellation study is
-enabled, including `?constellationStudy=course-40`; it remains hidden on the normal URL. It uses
-native buttons for the three presets and Restore Previous State, a native disabled Restore state,
-`aria-pressed` for the active preset, and a `role=status` active-state message. The controls follow
-the existing panel and native pointer/keyboard interaction model, which is also the project’s
-Quest-compatible HTML-control route.
+Guided Observation is query-gated with constellation study controls, including
+`?constellationStudy=course-40`, and hidden on the normal URL. The compact native-button section
+contains the three presets, Restore Previous State, and `Active: None`, active-preset, or
+`Active: Modified` status. `aria-pressed`, native disabled Restore, and a status role provide
+keyboard, pointer, and Quest-control-panel accessibility.
 
-The status is `Active: None`, the active preset name, or `Active: Modified`. The UI is a view of
-controller status, not another state store.
+A manual non-clear learning-group selection is explicit instructional intent: it turns the
+constellation master on, selects that group, and applies the existing Highlight Selected Group
+mode without writing appearance persistence. With the accepted defaults, selected figures resolve
+to Observation Orange and remaining context to a Celestial Lavender-derived material. The former
+manual path only changed checkboxes, which was the direct cause of the observed Quest failure.
 
-## Validation
+Constellation-course queries now also expose and activate the current lunar study control surface.
+Moon Daily Path, Lunar Phase Transit, notches, transit marker, phase dial, current Moon appearance,
+lunar palette, and their existing controls retain current default visibility and scientific
+geometry. No lunar redesign or Moon/path-alignment work is included.
 
-Focused tests cover the pure registry/session behavior, controller mapping and snapshot lifecycle,
-temporary persistence scope, live invalidation, and thin UI binding/listener behavior. Production
-and browser validation results are recorded in the project-control documents for the feature
-commit. Before commit, `npm ci`, type-check, four focused files (`15` tests), the complete suite
-(`79` files / `606` tests), production build, dependency audit, dependency-tree comparison, and
-`git diff --check` passed. The audit reported zero vulnerabilities. The build retains the existing
-single large-chunk advisory; no dependency, lockfile, or bundle-architecture change was made.
+## Testing and browser validation
 
-Browser validation uses both the normal URL and Course-40. It verifies normal study controls are
-hidden, all three selections map to their exact identifiers, Modify/Restore status behavior works,
-and no immediate console errors occur. The production preview passed these checks with normal
-defaults off and Course-40 state restored after a reload. It does not establish Quest stereo
-behavior.
+Focused tests cover the registry/session, controller, temporary persistence, UI binding, manual
+course-group rendering eligibility, orange-versus-lavender material resolution, and the Course-40
+lunar control surface. Full command totals and hosted evidence are recorded in project-control
+documents after the final integration validation and deployment.
+
+Desktop browser validation uses normal and Course-40 URLs. It verifies normal query gating;
+manual group selection enables/submits constellation lines and resolves selected orange material;
+each preset selects its exact set; lunar controls coexist with constellation controls; and no
+immediate console errors occur. Browser evidence does not establish Quest stereo behavior.
 
 ## Physical Quest checklist
 
-1. Open the exact Course-40 development URL in a fresh private Quest Browser session.
-2. Confirm normal URL defaults and Guided Observation query gating.
-3. Apply Local Orientation; verify horizon on, constellations off, selection cleared, and axis,
-   pole markers, labels, and Earth Core off.
-4. Apply Introduction Anchors; verify `ORI`, `UMA`, `CAS` and subtle Observation Orange.
-5. Apply North Star and Circumpolar; verify `UMI`, `UMA`, `CAS`, `CEP`, `DRA`.
-6. Switch presets repeatedly; verify no duplicate lines, flicker, incomplete eyes, or stereo
-   instability.
-7. Manually change a guided control; verify `Active: Modified` and an enabled Restore action.
-8. Restore; verify the original state returns and Restore disables.
-9. Confirm grid, planets, Sun, Moon, calibration, observer state, and simulation time remain
-   unchanged. Do not investigate Moon/path alignment in this test.
+1. Open the exact Course-40 all-features URL in a fresh private Quest Browser session.
+2. Confirm Guided Observation and the complete lunar control surface appear only in the study URL.
+3. Apply Local Orientation: horizon on, constellations off, selection cleared, and axis/poles/
+   labels/Earth Core off.
+4. Apply Introduction Anchors: `ORI`, `UMA`, `CAS`, visible lines, and subtle Observation Orange.
+5. Apply North Star and Circumpolar: `UMI`, `UMA`, `CAS`, `CEP`, `DRA`, visible lines, and orange.
+6. Manually change a learning group; confirm master visibility, immediate orange update, and no
+   duplicate lines.
+7. Toggle Moon Daily Path, Lunar Phase Transit, notches, marker, dial, and current Moon controls.
+8. Switch/Restore presets repeatedly; confirm both-eye completeness and no flicker or instability.
+9. Confirm grid, planets, Sun, calibration, observer/time, V3A, and V3B remain available.
+10. Do not investigate Moon/path alignment in this validation.
 
-Physical Quest validation is pending. This feature is not Quest-approved merely from desktop,
-automated, or hosted checks.
+## Explicit non-goals
 
-## Deployment status
-
-The existing development Pages workflow has a `workflow_dispatch` trigger and did build this exact
-feature ref without merging development `master`: run
-[`30062308604`](https://github.com/thinksql1/cosmic-calibration-webxr-dev/actions/runs/30062308604)
-built source commit `288981211d545da36e368161c6b68a51e8c02fd9` successfully, including 79 test
-files / 606 tests. Its deploy job was rejected because the protected `github-pages` environment
-does not permit `feature/guided-observation-presets-v1` to deploy. The automatic push trigger
-remains master-only, whose current contents include excluded V3B work; merging or deploying that
-branch would violate this feature’s boundary. A bounded Pages preview/deployment explicitly
-permitted for this exact feature branch is required before physical Quest validation. This feature
-is not Quest-approved.
+No narration, audio, timers, completion tracking, labels, V3B catalog changes, astronomy changes,
+Moon/path redesign, Galactic Center/Milky Way work, eclipse visualization, stable promotion, or
+Quest-approval tag is included.

@@ -4,6 +4,15 @@
 
 ### Added
 
+- Added the development-only all-features Guided Observation corrective integration. It combines
+  the current Course-50/V3B catalog and complete lunar control surface with the V3A Guided
+  Observation implementation. Manual constellation-group selection now enables the constellation
+  master layer and uses the existing selected-group material route, resolving selected figures to
+  Observation Orange rather than leaving them Unified lavender. Course-study queries retain all
+  lunar controls without changing lunar geometry or default visibility. The earlier V3A-only
+  Guided Observation Quest result is a failure record, not an acceptance; physical validation of
+  this integration remains pending. Stable is untouched.
+
 - Added development-only `COSMIC_CONSTELLATION_CATALOG_V3B_COURSE_50`: ten NASA HEASARC BSC5P
   audited difficult figures, 101 new canonical records, original reviewed connectivity,
   `course-50`/`course-v3b` selection, a ten-member V3B Difficult Figures group, Course-50

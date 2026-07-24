@@ -604,6 +604,21 @@
   manipulation in UI handlers or creating a premature lesson engine. Temporary state and explicit
   Restore protect user personalization while preserving V3A contracts.
 
+### DEC-046: Keep all current lunar controls available in constellation-course testing
+- **Date:** 2026-07-24
+- **Status:** Implemented development integration; physical Quest validation pending
+- **Owner:** Darrell Wright / project control
+- **Decision:** Build the Guided Observation corrective branch from current development `master`,
+  preserving V3B and the existing lunar systems. A manual constellation learning-group selection
+  explicitly enables the master layer and uses Highlight Selected Group presentation. A
+  constellation-course query also exposes and enables the existing lunar study surface, while its
+  individual lunar toggles retain their current defaults. No catalog, astronomy, lunar geometry,
+  calibration, observer/time, or stable state changes.
+- **Rationale:** The V3A-only Quest build made group selection look ineffective because it retained
+  the master-off and Unified defaults, and it hid lunar controls by an unrelated moon-query gate.
+  Repairing the control-state integration is narrower and safer than changing scientific layers or
+  creating a separate test interface.
+
 ## Proposed decisions awaiting review
 
 ### DEC-043: Clean defaults and curated, persisted celestial appearance preferences

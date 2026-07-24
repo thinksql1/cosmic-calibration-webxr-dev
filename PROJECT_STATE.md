@@ -34,6 +34,19 @@ Observation Orange change, and no lunar testing controls in that interface. It i
 the all-features integration now intentionally combines current development V3B and lunar systems
 with Guided Observation. Stable remains untouched.
 
+## All-features Guided Observation corrective integration - 2026-07-24
+
+`feature/all-features-guided-presets-v1` is based on development `master` and keeps V3A, V3B,
+grid/orientation, planets through Pluto, Sun, and every current lunar study control together with
+Guided Observation. The physical V3A-only failure was reproduced in the study-control path: a
+manual learning-group change selected checkboxes but left the constellation master off and
+constellation mode Unified. The correction makes a manual group change enable the master and use
+the existing Highlight Selected Group material route; selected figures resolve to the configured
+Observation Orange while context remains Celestial Lavender-derived. Course-study sessions now
+expose the existing lunar panel and run its current render path without changing defaults or lunar
+geometry. Automated and desktop validation are required before a bounded development-only Pages
+deployment. Physical Quest validation remains pending; stable is untouched.
+
 ## V3A local implementation record — 2026-07-23
 
 V3A Course 40 is implemented locally on `feature/constellation-catalog-v3a-40` from clean
