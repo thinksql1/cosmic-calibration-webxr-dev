@@ -220,6 +220,16 @@
             <p class="simulation-note">Query-gated J2000 stick figures use the accepted real-sky bridge. A group replaces the current selection; individual choices may then refine it. Connectivity is project-authored conventional Western visualization, not IAU boundaries. Constellation labels are deliberately deferred.</p>
             <ul id="constellation-study-diagnostics" class="diagnostics-list"></ul>
           </details>
+          <details id="guided-observation-controls" hidden>
+            <summary>Guided Observation</summary>
+            <div class="preset-grid" aria-label="Guided observation presets">
+              <button id="guided-observation-local-orientation" type="button" data-guided-observation-preset="local-orientation" aria-pressed="false">Local Orientation</button>
+              <button id="guided-observation-introduction-anchors" type="button" data-guided-observation-preset="introduction-anchors" aria-pressed="false">Introduction Anchors</button>
+              <button id="guided-observation-north-star-and-circumpolar" type="button" data-guided-observation-preset="north-star-and-circumpolar" aria-pressed="false">North Star and Circumpolar</button>
+              <button id="restore-guided-observation" type="button" disabled>Restore Previous State</button>
+            </div>
+            <p id="guided-observation-status" class="simulation-note" role="status">Active: None</p>
+          </details>
           <details id="moon-study-controls" hidden>
             <summary>Solar/lunar presentation study</summary>
             <p class="simulation-note"><strong>Daily motion</strong></p>
