@@ -78,6 +78,7 @@ import {
 import { createCelestialCoordinateGridPresentationModel, DEFAULT_CELESTIAL_COORDINATE_GRID_DISPLAY_SETTINGS, type CelestialCoordinateGridDisplaySettings } from './presentation/celestialCoordinateGridPresentationModel';
 import { parseSkyFrameStudyLaunch, type SkyFrameStudyMode } from './presentation/realSkyGridStudy';
 import { parseConstellationStudyLaunch } from './presentation/constellationStudy';
+import { manualConstellationGroupSelection } from './presentation/constellationStudyInteraction';
 import { GuidedObservationController, type GuidedObservationControlAdapter, type GuidedObservationPresetId, type GuidedObservationState } from './presentation/guidedObservationPresets';
 import { GuidedObservationTemporaryScope } from './presentation/guidedObservationTemporaryScope';
 import { bindGuidedObservationUi, updateGuidedObservationUiStatus, type GuidedObservationUiElements } from './presentation/guidedObservationUi';
@@ -89,6 +90,7 @@ import { resolveConstellationColor } from './presentation/color/constellationCol
 import { lunarSemanticPalette } from './presentation/color/lunarColorPolicy';
 import { colorDistance, relativeLuminance } from './presentation/color/colorValidation';
 import { parseMoonStudyLaunch } from './presentation/moonStudy';
+import { resolveMoonStudySurface } from './presentation/moonStudySurface';
 import { createMoonDailyPathPresentationModel } from './presentation/moonDailyPathPresentationModel';
 import { createMoonPhasePresentationModel } from './presentation/moonPhasePresentation';
 import {
@@ -324,6 +326,11 @@ const activeConstellationIdentifiers = constellationStudyLaunch.mode === 'course
 const activeConstellationGeometry = constellationStudyLaunch.mode === 'course-50' ? COURSE_50_CONSTELLATION_CANONICAL_GEOMETRY : constellationStudyLaunch.mode === 'course-40' ? COURSE_40_CONSTELLATION_CANONICAL_GEOMETRY : EXPANDED_CONSTELLATION_CANONICAL_GEOMETRY;
 const activeConstellationMetadata = constellationStudyLaunch.mode === 'course-50' ? CONSTELLATION_CATALOG_V3B_DATASET_METADATA : constellationStudyLaunch.mode === 'course-40' ? CONSTELLATION_CATALOG_V3A_DATASET_METADATA : CONSTELLATION_CATALOG_V2_DATASET_METADATA;
 const moonStudyLaunch = parseMoonStudyLaunch(window.location.search);
+const moonStudySurface = resolveMoonStudySurface(
+  moonStudyLaunch,
+  constellationStudyLaunch.enabled,
+  xrDiagnostics.enabled,
+);
 const defaultVisibilityLaunch = resolveCelestialVisibility(window.location.search);
 let appearanceStorage: Storage | undefined;
 try { appearanceStorage = window.localStorage; } catch { appearanceStorage = undefined; }
@@ -424,7 +431,7 @@ for (const input of guidedObservationControlledInputs) input.addEventListener('c
     updateGuidedObservationUi();
   }
 });
-moonStudyControls.hidden = !(xrDiagnostics.enabled || moonStudyLaunch.explicitlyRequested);
+moonStudyControls.hidden = !moonStudySurface.controlsVisible;
 showMoonPathInput.checked = moonStudyLaunch.showMoonPath;
 showLunarPhaseTransitPathInput.checked = moonStudyLaunch.showLunarPhaseTransitPath;
 showEarthHiddenLunarPathInput.checked = moonStudyLaunch.showEarthHiddenLunarPath;
@@ -1199,7 +1206,7 @@ function renderCelestialAxis(): void {
   const lunarPalette = activeAppearancePreferences.lunarPalette;
   moonDailyPath.setLunarPalette(lunarPalette);
   lunarPhaseTransit.setLunarPalette(lunarPalette);
-  if (!moonStudyLaunch.enabled) {
+  if (!moonStudySurface.enabled) {
     moonDailyPath.clear('Moon study query absent');
     moonPhaseStudy.clear('Moon study query absent');
     lunarPhaseTransit.clear('Moon study query absent');
@@ -1718,7 +1725,6 @@ useCurrentTimeButton.addEventListener('click', () => {
   showRightAscensionGridInput,
   showConstellationsInput,
   showConstellationEndpointsInput,
-  constellationLearningGroupSelect,
   ...Object.values(constellationVisibilityInputs),
   showLocalHorizonInput,
   showSolarSystemBodiesInput,
@@ -1790,15 +1796,24 @@ for (const input of Object.values(constellationVisibilityInputs)) {
 
 constellationLearningGroupSelect.addEventListener('change', () => {
   if (constellationStudyLaunch.mode !== 'expanded' && constellationStudyLaunch.mode !== 'course-40' && constellationStudyLaunch.mode !== 'course-50') return;
-  const group = constellationLearningGroup(constellationLearningGroupSelect.value);
-  if (!group) return;
-  const selected = new Set(group.constellationIdentifiers);
+  const interaction = manualConstellationGroupSelection(
+    constellationLearningGroupSelect.value,
+    activeConstellationIdentifiers,
+    activeAppearancePreferences,
+  );
+  if (!interaction) return;
+  const selected = new Set(interaction.selected);
+  showConstellationsInput.checked = interaction.masterVisible;
   for (const identifier of activeConstellationIdentifiers) {
     constellationVisibilityInputs[identifier].checked = selected.has(identifier);
   }
+  activeAppearancePreferences = interaction.appearance;
+  applyAppearanceToControls(activeAppearancePreferences);
   const url = new URL(window.location.href);
-  url.searchParams.set('constellationGroup', group.id);
-  url.searchParams.set('constellations', group.constellationIdentifiers.join(','));
+  url.searchParams.set('showConstellations', '1');
+  url.searchParams.set('constellationGroup', interaction.group);
+  url.searchParams.set('constellations', interaction.selected.join(','));
+  url.searchParams.set('constellationColor', 'highlight');
   window.history.replaceState({}, '', url);
   renderCelestialAxis();
 });
