@@ -148,9 +148,13 @@ automated, or hosted checks.
 
 ## Deployment status
 
-The existing development Pages workflow has a `workflow_dispatch` trigger and can build this exact
-feature ref without merging development `master`. It was not dispatched from this environment:
-the local GitHub CLI is unavailable, no API credential is configured, and the browser session is
-signed out. The automatic push trigger remains master-only, whose current contents include excluded
-V3B work; merging or deploying that branch would violate this feature’s boundary. An authenticated
-manual dispatch on the feature ref is the safe next deployment action.
+The existing development Pages workflow has a `workflow_dispatch` trigger and did build this exact
+feature ref without merging development `master`: run
+[`30062308604`](https://github.com/thinksql1/cosmic-calibration-webxr-dev/actions/runs/30062308604)
+built source commit `288981211d545da36e368161c6b68a51e8c02fd9` successfully, including 79 test
+files / 606 tests. Its deploy job was rejected because the protected `github-pages` environment
+does not permit `feature/guided-observation-presets-v1` to deploy. The automatic push trigger
+remains master-only, whose current contents include excluded V3B work; merging or deploying that
+branch would violate this feature’s boundary. A bounded Pages preview/deployment explicitly
+permitted for this exact feature branch is required before physical Quest validation. This feature
+is not Quest-approved.

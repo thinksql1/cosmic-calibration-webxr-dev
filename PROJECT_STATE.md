@@ -12,11 +12,12 @@ central `renderCelestialAxis()` refresh, and a temporary persistence guard that 
 observer/time, planets, Sun, Moon, V3B, or stable state. Automated and local production-browser
 validation evidence is recorded with the feature commit. Clean lockfile install, zero-vulnerability
 audit, type-check, focused `15` tests, full `606`-test suite, production build, and production
-browser validation pass locally. The existing Pages workflow supports manual dispatch from this
-exact branch, but it auto-runs only on development `master`; this environment has no GitHub CLI,
-API credential, or signed-in browser session to dispatch it. No merge, workflow change, or hosted
-deployment occurred. The next bounded action is authenticated feature-branch dispatch followed by
-physical Quest validation.
+browser validation pass locally. GitHub Actions workflow run `30062308604` manually built exact
+feature commit `288981211d545da36e368161c6b68a51e8c02fd9` successfully (79 test files / 606
+tests), but GitHub Pages rejected its deploy job because the protected `github-pages` environment
+does not permit `feature/guided-observation-presets-v1`. No merge, workflow change, hosted
+deployment, V3B incorporation, or stable change occurred. The next bounded action is an approved
+exact-feature-branch Pages preview/deployment, followed by physical Quest validation.
 
 ## V3A local implementation record — 2026-07-23
 
